@@ -23,20 +23,20 @@ public class Edge {
 
     private long sink;
     
-    private String iteration;
+    private String interation;
 
     private String type;
     
     private String effect;
 
-    public Edge(String name, long iD, String shared_Name, long source, long sink, String iteration, String effect) {
+    public Edge(String name, long iD, String shared_Name, long source, long sink, String interation, String effect) {
 		super();
 		this.name = name;
 		ID = iD;
 		this.shared_Name = shared_Name;
 		this.source = source;
 		this.sink = sink;
-		this.iteration = iteration;
+		this.interation = interation;
 		this.effect = effect;
 	}
 
@@ -67,21 +67,21 @@ public class Edge {
     }
 
     /**
-     * Get the value of iteration
+     * Get the value of interation
      *
-     * @return the value of iteration
+     * @return the value of interation
      */
-    public String getIteration() {
-        return iteration;
+    public String getinteration() {
+        return interation;
     }
 
     /**
-     * Set the value of iteration
+     * Set the value of interation
      *
-     * @param iteration new value of iteration
+     * @param interation new value of interation
      */
-    public void setIteration(String iteration) {
-        this.iteration = iteration;
+    public void setinteration(String interation) {
+        this.interation = interation;
     }
 
 
