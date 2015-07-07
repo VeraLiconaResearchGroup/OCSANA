@@ -1,6 +1,9 @@
 package org.cytoscape.myapp.internal;
 
 
+import java.util.ArrayList;
+import java.util.Hashtable;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -11,7 +14,11 @@ import java.util.Vector;
 
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNetwork;
+
 import org.cytoscape.myapp.internal.a;
+
+//import GUI.ocsanaInput;
+
 import org.cytoscape.*;
 
 /**
@@ -26,23 +33,24 @@ public class Graph {
 	public Graph() {
 	}
 
-	private Vector<Node> node_List;
+	private ArrayList<Node> node_List;
 
-	private Vector<Edge> edges_List;
+	private ArrayList<Edge> edges_List;
 
 	private int[][] graph_Table;
 
-	private Vector<Node> source;
+	private int[] source;
 
-	private Vector<Node> target;
+	private int[] target;
 
-	private Vector<Node> offtarget;
+	private int[] offtarget;
 
 	private Node[][] graph_data;
 
 	private int node_Count;
 
 	private int edgeCount;
+	Hashtable<Long, Integer> numbers; 
 
 	private CyNetwork cyNetwork;
 	private Edge edge;
@@ -51,8 +59,8 @@ public class Graph {
 	public Graph(CyNetwork cyNetwork) {
 		super();
 		this.cyNetwork = cyNetwork;
-		a aa= new a();
-		aa.setVisible(true);
+		//a aa= new a();
+		//aa.setVisible(true);
 		initial();
 	}
 
@@ -140,7 +148,7 @@ public class Graph {
 	 *
 	 * @return the value of offtarget
 	 */
-	public Vector<Node> getOfftarget() {
+	public int[] getOfftarget() {
 		return offtarget;
 	}
 
@@ -150,7 +158,7 @@ public class Graph {
 	 * @param offtarget
 	 *            new value of offtarget
 	 */
-	public void setOfftarget(Vector<Node> offtarget) {
+	public void setOfftarget(int[] offtarget) {
 		this.offtarget = offtarget;
 	}
 
@@ -159,7 +167,7 @@ public class Graph {
 	 *
 	 * @return the value of target
 	 */
-	public Vector<Node> getTarget() {
+	public int[] getTarget() {
 		return target;
 	}
 
@@ -169,7 +177,7 @@ public class Graph {
 	 * @param target
 	 *            new value of target
 	 */
-	public void setTarget(Vector<Node> target) {
+	public void setTarget(int[] target) {
 		this.target = target;
 	}
 
@@ -178,7 +186,7 @@ public class Graph {
 	 *
 	 * @return the value of source
 	 */
-	public Vector<Node> getSource() {
+	public int[] getSource() {
 		return source;
 	}
 
@@ -188,7 +196,7 @@ public class Graph {
 	 * @param source
 	 *            new value of source
 	 */
-	public void setSource(Vector<Node> source) {
+	public void setSource(int[] source) {
 		this.source = source;
 	}
 
@@ -210,20 +218,16 @@ public class Graph {
 	public void setGraph_Table() {
 		a aa= new a();
 		graph_Table = new  int[cyNetwork.getNodeList().size()][cyNetwork.getNodeList().size()];
-		aa.setTitle(String.valueOf(node_Count));
-		//cyNetwork.getEdgeList().get(1).getSource().getSUID()
-		for (int i = 0; i < cyNetwork.getNodeList().size()-1; i++) {
-			for (int j = i; j < cyNetwork.getNodeList().size(); j++) {
-				if(cyNetwork.containsEdge(cyNetwork.getNodeList().get(i),cyNetwork.getNodeList().get(j)) )
-					
-					graph_Table[i][j] = 1;
-				else {
-					aa.setTitle(String.valueOf(node_Count+"  fv"));
-					graph_Table[i][j] = 0;
-				}
-				
-			}
-			
+		for (int i = 0; i < node_List.size(); i++) {
+			for (int j = 0; j < node_List.size(); j++) {
+				graph_Table[i][j] = 0 ;
+			}	
+		}
+		 
+		for (int i = 0; i < node_List.size(); i++) {
+			for (int j = 0; j < node_List.get(i).getNeighborHashing().size(); j++) {
+				graph_Table[node_List.get(i).getHashing_map()][node_List.get(i).getNeighborHashing().get(j)] = 1 ;
+			}	
 		}
 		
 		aa.setVisible(true);
@@ -236,7 +240,7 @@ public class Graph {
 	 *
 	 * @return the value of edges_List
 	 */
-	public Vector<Edge> getEdges_List() {
+	public ArrayList<Edge> getEdges_List() {
 		return edges_List;
 	}
 
@@ -250,7 +254,8 @@ public class Graph {
 		String iteration, name, shared_Name,effect;
 		Long iD,sink=(long) 0;
 		Long source=(long) 0;
-		edges_List = new Vector<>();
+		edges_List = new ArrayList<Edge>();
+		a aa= new a();
 		
 		for (int i = 0; i < edgeCount; i++) {
 			iD = cyNetwork.getEdgeList().get(i).getSUID();
@@ -258,25 +263,29 @@ public class Graph {
 			name = cyNetwork.getRow(cyNetwork.getEdgeList().get(i)).get("name", String.class);
 			shared_Name = cyNetwork.getRow(cyNetwork.getEdgeList().get(i)).get("shared name", String.class);
 			effect = cyNetwork.getRow(cyNetwork.getEdgeList().get(i)).get("EFFECT", String.class);
-			
-			//String[] parts = shared_Name.split(" (");
-			//String[] parts1 = parts[1] .split(") ");
-			
-			/*for (int j = 0; j <node_Count; j++) {
-				
-				if(node_List.get(j).getName() == parts[0])
-					source = node_List.get(j).getID(); // 004
-				else {
-					if (node_List.get(j).getName() == parts[1]) {
-						source = node_List.get(j).getID(); // 004
-					}
-				}
-			} */
+			source = cyNetwork.getEdgeList().get(i).getSource().getSUID();
+			sink = cyNetwork.getEdgeList().get(i).getTarget().getSUID();
+			node_List.get(numbers.get(source)).setNeighborHashing(numbers.get(sink));
+			node_List.get(numbers.get(source)).setNeighbor(sink);
+			aa.jTextArea2.append(name  +"b  ** b"+String.valueOf(source) +"b ** b"+String.valueOf(sink)+"\n");
 			edge= new Edge(shared_Name, iD, shared_Name, source, sink, iteration, effect);
 			edges_List.add(edge);
-			
 		}
 		
+		
+		for (int i = 0; i < node_List.size(); i++) {
+			node_List.get(i).setDegree_Out(node_List.get(i).getNeighbor().size());
+		}
+		for (int i = 0; i < node_List.size(); i++) {
+			aa.jTextArea1.append(i+"   name: "+node_List.get(i).getName() +"  ID   "+ node_List.get(i).getID()+
+					"  hash: "+node_List.get(i).getHashing_map()+"\n");
+			for (int j = 0; j < node_List.get(i).getNeighbor().size(); j++) {
+				aa.jTextArea1.append(j+"  "+String.valueOf(node_List.get(i).getNeighbor().get(j)) +"   "+String.valueOf(node_List.get(i).getNeighborHashing().get(j))+"\n");
+				
+			}
+			
+		}
+		aa.setVisible(true);	
 	}
 
 	/**
@@ -284,7 +293,7 @@ public class Graph {
 	 *
 	 * @return the value of node_List
 	 */
-	public Vector<Node> getNode_List() {
+	public ArrayList<Node> getNode_List() {
 		return node_List;
 	}
 
@@ -295,31 +304,44 @@ public class Graph {
 	 *            new value of nodes
 	 */
 	public void setNode_List() {
-		String interaction, name, shared_Name;
+		
+		String canonicalName, name, shared_Name;
 		Long iD;
+		int hashing_map;
+		
+		node_List = new ArrayList<Node>();
 		
 		for (int i = 0; i < node_Count; i++) {
 			iD = cyNetwork.getNodeList().get(i).getSUID();
-			interaction = cyNetwork.getRow(cyNetwork.getNodeList().get(i)).get("interaction", String.class);
+			canonicalName = cyNetwork.getRow(cyNetwork.getNodeList().get(i)).get("canonicalName", String.class);
 			name = cyNetwork.getRow(cyNetwork.getNodeList().get(i)).get("name", String.class);
 			shared_Name = cyNetwork.getRow(cyNetwork.getNodeList().get(i)).get("shared name", String.class);
-			node = new Node(name, iD, shared_Name, interaction);
-			node_List = new Vector<>();
+			numbers.put(iD, i);
+			hashing_map = i;
+			node = new Node(name, iD, shared_Name, canonicalName,hashing_map);
 			node_List.add(node);
-			
-			
-			
 		}
-		
+		//test
+		//****************
+		//****************
+		a aa= new a();
+		aa.jTextArea1.append(node_List.size() +"\n");
+		for (int i = 0; i < node_List.size(); i++) {
+			aa.jTextArea1.append(i+"   name: "+node_List.get(i).getName() +"  ID   "+ node_List.get(i).getID()+"  hash: "+node_List.get(i).getHashing_map()+"\n");
+		}
+		aa.setVisible(true);
+
 	}
 
 	public void initial() {
 
+		 numbers = new Hashtable<Long,Integer>();
 		setNode_Count(cyNetwork.getNodeList().size());
 		setEdgeCount(cyNetwork.getEdgeList().size());
 		setNode_List();
 		setEdges_List();
-		setGraph_Table();
+		
+		//setGraph_Table();
 	//	setGraph_data();
 	//	test();
 	
@@ -330,11 +352,11 @@ public class Graph {
 	public void test() {
 		a aa= new a();
 		for (int i = 0; i <node_Count; i++) {
-			aa.jTextArea1.append("name: " + node_List.get(i).getName() + "ID: \n" + String.valueOf(node_List.get(i).getID()) + " \n" +"ID" + node_List.get(i).getInteraction() );
+			aa.jTextArea1.append("name: " + node_List.get(i).getName() + "ID: \n" + String.valueOf(node_List.get(i).getID()) + " \n" +"ID" + node_List.get(i).getCanonicalName() );
 			
 		}
 		for (int i = 0; i <edgeCount; i++) {
-			aa.jTextArea2.append("name: " + edges_List.get(i).getName() + "ID: \n" + String.valueOf(edges_List.get(i).getID()) + " \n" +"ID" + edges_List.get(i).getIteration() + "source"  +  String.valueOf(edges_List.get(i).getSource()) 
+			aa.jTextArea2.append("name: " + edges_List.get(i).getName() + "ID: \n" + String.valueOf(edges_List.get(i).getID()) + " \n" +"ID" + edges_List.get(i).getinteration() + "source"  +  String.valueOf(edges_List.get(i).getSource()) 
 			+ "sink"  +  String.valueOf(edges_List.get(i).getSink()));
 			
 		}
