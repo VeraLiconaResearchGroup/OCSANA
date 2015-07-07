@@ -1,5 +1,8 @@
 package org.cytoscape.myapp.internal;
 
+import java.util.ArrayList;
+import java.util.Hashtable;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -14,27 +17,85 @@ import java.util.Vector;
  */
 public class Node {
 
+	public Node(String name, long iD, String shared_Name, String canonicalName, Integer hashmaping ) {
+		super();
+		initial();
+		this.name = name;
+		ID = iD;
+		this.shared_Name = shared_Name;
+		this.canonicalName = canonicalName;
+		this.hashing_map = hashmaping;
+	}
+	
+	
 	private String name;
 	private long ID;
 	private String shared_Name;
+	private String canonicalName;
 	private long weight;
 	private long capacity;
 	private int degree_In;
 	private int degree_Out;
 	private String type;
     private String interaction;
-    private Vector<Long> income_Edges = new Vector<>();
+    private ArrayList<Long> income_Edges;
+    private Integer hashing_map;
+    private ArrayList<Long> Neighbor;
+    private ArrayList<Integer> NeighborHashing;
+    private Vector<Long> outcome_Edges = new Vector<>();
     
-    public Node(String name, long iD, String shared_Name, String interaction) {
-		super();
-		this.name = name;
-		ID = iD;
-		this.shared_Name = shared_Name;
-		this.interaction = interaction;
+    public String getCanonicalName() {
+		return canonicalName;
 	}
 
-	private Vector<Long> outcome_Edges = new Vector<>();
-    
+	public void setCanonicalName(String canonicalName) {
+		this.canonicalName = canonicalName;
+	}
+
+	public void setNeighbor(ArrayList<Long> neighbor) {
+		Neighbor = neighbor;
+	}
+
+	public void setNeighborHashing(ArrayList<Integer> neighborHashing) {
+		NeighborHashing = neighborHashing;
+	}
+	
+    public ArrayList<Long> getNeighbor() {
+		return Neighbor;
+	}
+
+	public void setNeighbor(Long neighbor) {
+		this.Neighbor.add(neighbor) ;
+	}
+
+	public ArrayList<Integer> getNeighborHashing() {
+		return NeighborHashing;
+	}
+
+	public void setNeighborHashing(Integer neighborHashing) {
+		this.NeighborHashing.add(neighborHashing) ;
+	}
+
+	public void setHashing_map(Integer hashing_map) {
+		this.hashing_map = hashing_map;
+	}
+
+	public ArrayList<Long> getIncome_Edges() {
+		return income_Edges;
+	}
+
+	public void setIncome_Edges(ArrayList<Long> income_Edges) {
+		this.income_Edges = income_Edges;
+	}
+
+	public int getHashing_map() {
+		return hashing_map;
+	}
+
+	public void setHashing_map(int hashing_map) {
+		this.hashing_map = hashing_map;
+	}
+
     public Vector<Long> getOutcome_Edges() {
 		return outcome_Edges;
 	}
@@ -106,24 +167,12 @@ public class Node {
     public void setType(String type) {
         this.type = type;
     }
-    
-
-    /**
-     * Get the value of interaction
-     *
-     * @return the value of interaction
-     */
-    public String getInteraction() {
-        return interaction;
-    }
-
-    /**
-     * Set the value of interaction
-     *
-     * @param interaction new value of interaction
-     */
-    public void setInteraction(String interaction) {
-        this.interaction = interaction;
+       
+    public void initial(){
+    	
+    	income_Edges = new ArrayList<Long>();
+		Neighbor = new ArrayList<Long>();
+		NeighborHashing = new ArrayList<Integer>();
     }
 
     
