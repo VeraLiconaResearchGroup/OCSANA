@@ -1,0 +1,468 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package org.cytoscape.myapp.internal;
+
+import java.beans.VetoableChangeListener;
+import java.beans.VetoableChangeSupport;
+import static java.lang.Math.abs;
+import java.util.ArrayList;
+import java.util.Arrays;
+import static java.util.Collections.list;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.Vector;
+
+/**
+ *
+ * @author raha
+ */
+public class scorring {
+    
+    private Vector<Vector<Integer>> pathes;
+    
+    private ArrayList<Node> nodeList;
+
+    private Graph graph;
+
+    private ArrayList<Integer> typeOfEdge;
+    
+    private int[] source;
+
+    private int[] target;
+
+    private int[] offtarget;
+    
+    private Vector<Integer> elementaryNOdes;
+    
+    private int x;
+    
+    private int y;
+    
+     private int[] x_i;
+    
+    private int[] y_i;
+
+    public int[] getScoreSet() {
+        return scoreSet;
+    }
+
+    public void setScoreSet() {
+        
+        int temp = -10;
+        
+        scoreSet = new int[elementaryNOdes.size()];
+        
+        for (int i = 0; i < elementaryNOdes.size(); i++) {
+            
+            source[i] = 0;
+        }
+       
+            for (int i = 0; i < elementaryNOdes.size(); i++) {
+                
+            for (int j = 0; j < getPathes().size(); j++) {
+                
+                if (Arrays.asList(getOfftarget()).contains(getPathes().get(j).get(getPathes().get(j).size()-1)) ) {
+                    
+                    if (Arrays.asList(getPathes().get(j)).contains(getElementaryNOdes().get(i))) {
+                        
+                       scoreSet[i]++;     
+                }   
+            }
+        }
+       
+    }
+    
+    }
+    
+    private int[]  scoreSet;
+
+    public int getX() {
+        return x;
+    }
+
+    public void setX() {
+             
+        List<Integer> al = new ArrayList<>();
+        
+        for (int i = 0; i < getPathes().size(); i++) {
+            
+            if (Arrays.asList(getTarget()).contains(getPathes().get(i).get(getPathes().get(i).size()-1)) ) {
+                    
+                 al.add(getPathes().get(i).get(getPathes().get(i).size()-1)); 
+            }
+        }
+        
+        Set<Integer>  hs = new HashSet<>();
+        
+        hs.addAll(al);
+        
+        this.x = hs.size();
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public void setY() {
+             
+        List<Integer> al = new ArrayList<>();
+        
+        for (int i = 0; i < getPathes().size(); i++) {
+            
+            if (Arrays.asList(getOfftarget()).contains(getPathes().get(i).get(getPathes().get(i).size()-1)) ) {
+                    
+                 al.add(getPathes().get(i).get(getPathes().get(i).size()-1)); 
+            }
+        }
+        
+        Set<Integer>  hs = new HashSet<>();
+        
+        hs.addAll(al);
+        
+        this.y = hs.size();
+    }
+
+    public int[] getX_i() {
+        return x_i;
+    }
+
+    public void setX_i() {
+        
+        int temp = -10;
+            
+        x_i = new int[elementaryNOdes.size()];
+        
+        for (int i = 0; i < elementaryNOdes.size(); i++) {
+            
+            x_i[i] = 0;
+        }
+       
+            for (int i = 0; i < elementaryNOdes.size(); i++) {
+                
+            for (int j = 0; j < getPathes().size(); j++) {
+                
+                if (Arrays.asList(getTarget()).contains(getPathes().get(j).get(getPathes().get(j).size()-1)) & temp != getPathes().get(j).get(getPathes().get(j).size()-1)) {
+                    
+                    if (Arrays.asList(getPathes().get(j)).contains(getElementaryNOdes().get(i))) {
+                        
+                        x_i[i]++;
+                        
+                        temp = getPathes().get(j).get(getPathes().get(j).size()-1);
+                        
+                    }  
+                }   
+            }
+        }
+    }
+
+    public int[] getY_i() {
+        return y_i;
+    }
+
+    public void setY_i(int[] y_i)  {
+        
+        int temp = -10;
+        
+        y_i = new int[elementaryNOdes.size()];
+        
+        for (int i = 0; i < elementaryNOdes.size(); i++) {
+            
+            y_i[i] = 0;
+        }
+       
+            for (int i = 0; i < elementaryNOdes.size(); i++) {
+                
+            for (int j = 0; j < getPathes().size(); j++) {
+                
+                if (Arrays.asList(getOfftarget()).contains(getPathes().get(j).get(getPathes().get(j).size()-1)) & temp != getPathes().get(j).get(getPathes().get(j).size()-1)) {
+                    
+                    if (Arrays.asList(getPathes().get(j)).contains(getElementaryNOdes().get(i))) {
+                        
+                        y_i[i]++;
+                        
+                        temp = getPathes().get(j).get(getPathes().get(j).size()-1);  
+                    }  
+                }   
+            }
+        }
+    }
+    
+    public int[] getSource() {
+        return source;
+    }
+
+    public void setSource() {
+        this.source = graph.getSource();
+    }
+
+    public int[] getTarget() {
+        return target;
+    }
+
+    public void setTarget() {
+        this.target = graph.getTarget();
+    }
+
+    public int[] getOfftarget() {
+        return offtarget;
+    }
+
+    public void setOfftarget() {
+        this.offtarget = graph.getOfftarget();
+    }
+
+    /**
+     * Get the value of typeOfEdge
+     *
+     * @return the value of typeOfEdge
+     */
+    public ArrayList<Integer> getTypeOfEdge() {
+        return typeOfEdge;
+    }
+    
+    /**
+     * Set the value of typeOfEdge
+     *
+     * @param typeOfEdge new value of typeOfEdge
+     */
+    public void setTypeOfEdge(ArrayList<Integer> typeOfEdge) {
+        this.typeOfEdge = typeOfEdge;
+    }
+
+    public scorring(Vector<Vector<Integer>> pathes, Graph graph) {
+        this.pathes = pathes;
+        this.graph = graph;
+        initial();
+        
+    }
+    
+    private void initial(){
+    
+        setNodeList();
+        setSource();
+        setTarget();
+        setOfftarget();
+        
+        CI();
+ 
+    }
+
+    /**
+     * Get the value of graph
+     *
+     * @return the value of graph
+     */
+    public Graph getGraph() {
+        return graph;
+    }
+
+    /**
+     * Set the value of graph
+     *
+     * @param graph new value of graph
+     */
+    public void setGraph(Graph graph) {
+        this.graph = graph;
+    }
+
+    public Vector<Integer> getElementaryNOdes() {
+        return elementaryNOdes;
+    }
+
+    public void setElementaryNOdes(Vector<Integer> elementaryNOdes) {
+        
+        this.elementaryNOdes =  new Vector();
+        
+        for (int j = 0; j < nodeList.size(); j++) {
+              
+            for (int i = 0; i < pathes.size(); i++) {
+                
+                if (pathes.get(i).size()>1) {
+                    
+                    if (pathes.get(i).contains(nodeList.get(j))) {
+                        
+                        elementaryNOdes.add(nodeList.get(j).getHashing_map());
+                        
+                        break; 
+                    }   
+                }  
+            }  
+        }
+       
+    }
+
+    /**
+    private ArrayList<Node> nodeList;
+     *
+     * /**
+     * Get the value of nodeList
+     *
+     * @return the value of nodeList
+     */
+    public ArrayList<Node> getNodeList() {
+        ArrayList<Node> nodeList = null;
+        return nodeList;
+    }
+
+    /**
+     * Set the value of nodeList
+     *
+     * @param nodeList new value of nodeList
+     */
+    public void setNodeList() {
+        this.nodeList = graph.getNode_List();
+    }
+
+    public Vector<Vector<Integer>> getPathes() {
+        return pathes;
+    }
+
+    /**
+     * Set the value of pathes
+     *
+     * @param pathes new value of pathes
+     */
+    public void setPathes(Vector<Vector<Integer>> pathes) {
+        this.pathes = pathes;
+    }
+    
+     private int lengthOfPath(Vector< Integer> path){
+         
+         int lengthOfPath;
+         lengthOfPath = path.size();
+         return lengthOfPath;
+     }
+     
+     private int signOfPath(Vector< Integer> path){
+     
+         int signOfPath =1;
+   
+         int signOfEdge = 1;
+         
+         int nodeHashingNumber;
+         
+         for (int i = 0; i < path.size()-1; i++) {
+            
+             nodeHashingNumber = path.get(i);
+             
+             for (int j = 0; j < nodeList.get(nodeHashingNumber).getNeighborHashing().size(); j++) {
+                 
+                 if(nodeList.get(nodeHashingNumber).getNeighborHashing().get(j) == path.get(i+1)){
+                 
+                     signOfEdge = nodeList.get(nodeHashingNumber).getTypeOfEdge().get(j);
+                     signOfPath = signOfPath*signOfEdge;
+                     break;
+                 }
+             }     
+         }
+         return signOfPath;
+     }
+     
+     private Vector<Vector<Integer>> allPath(int sourceId , int sinkId ){
+            
+         Vector<Vector<Integer>> allPath =  new Vector<>();
+         
+         for (int i = 0; i < pathes.size(); i++) {
+            
+             if(pathes.get(i).get(0) == sourceId & pathes.get(i).get(pathes.get(i).size()-1) == sinkId)
+                 
+                 allPath.add(pathes.get(i));
+         }
+         
+         return allPath;
+     }
+     
+     private double effectOnTarget(int sourceId, int sinkId){
+         
+         int numberOfPath = 0;
+         
+         double effectOnTarget = 0;
+         
+         Vector<Vector<Integer>> allPathes = new Vector<>();
+         
+         allPathes = allPath(sourceId, sinkId);
+         
+         numberOfPath = allPathes.size();
+         
+         for (int i = 0; i < numberOfPath; i++) {
+             
+             effectOnTarget = effectOnTarget + (double)(1/lengthOfPath(allPathes.get(i)))*signOfPath(allPathes.get(i));
+         }
+     return effectOnTarget;
+     }
+     
+     private double effectOfTargets(int sourceId){
+         
+         double effectOfTargets = 0;
+         
+         int[] target  = getTarget();
+         
+         for (int i = 0; i < target.length; i++) {
+             
+             effectOfTargets = effectOfTargets + effectOnTarget(sourceId, target[i]);   
+         }
+     
+         return effectOfTargets;
+     }
+     
+     private double sideEffects(int sourceId){
+         
+         double effectOfTargets = 0;
+         
+         int[] oftarget  = getOfftarget();
+         
+         for (int i = 0; i < oftarget.length; i++) {
+             
+             effectOfTargets = abs(effectOnTarget(sourceId, oftarget[i])) + effectOfTargets;   
+         }
+     
+         return effectOfTargets;
+     }
+     
+     private double overAllScore(int v_i){
+     
+         double overAllScor = 0;
+     
+         double firstTerm = 0;
+    
+         double secondTerm = 0;
+         
+         firstTerm = (double)(x_i[v_i]/x)*(double)abs(effectOfTargets(v_i));
+     
+        secondTerm = (double)(y_i[v_i]/y)*(double)abs(sideEffects(v_i));
+     
+         if (firstTerm > secondTerm) {
+             
+             overAllScor = firstTerm - secondTerm;
+         }
+         
+         return overAllScor;
+     }
+     
+     private double ocsanaScore(int v_i){
+     
+         double ocsanaScore = 0;
+         
+         ocsanaScore = overAllScore(v_i)*scoreSet[v_i];
+         
+         return ocsanaScore;
+     }
+     
+     private double CI(){
+     
+         double CI = 0;
+         
+         for (int i = 0; i < elementaryNOdes.size(); i++) {
+             
+             CI =  CI + ocsanaScore(elementaryNOdes.get(i));  
+         }
+         
+         return CI;
+     }
+    
+}
