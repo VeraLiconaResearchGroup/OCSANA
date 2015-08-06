@@ -38,6 +38,8 @@ public class hittingSetGreedyAlgorithm {
 
     private Vector<Vector<Integer>> pathes;
 
+    private Vector<Vector<Integer>> result;
+
     private Vector<Vector<Integer>> elementarypathes;
 
     private int radius;
@@ -88,6 +90,7 @@ public class hittingSetGreedyAlgorithm {
         printfinalresult2(ocsanaScore);
         printfinalresult3(setscoreset);
         printfinalresult4(elementaryNOdes);
+        result = new Vector<>();
         //printfinalresult1(elementaryNOdes);
         initial();
     }
@@ -106,6 +109,7 @@ public class hittingSetGreedyAlgorithm {
         exceptionone();
         kEqualOne();
         allpossiblesubset();
+        printfinalresultresult(result);
 
     }
 
@@ -203,8 +207,7 @@ public class hittingSetGreedyAlgorithm {
         this.largNumberOfCandidate = largNumberOfCandidate;
     }
 
-    public void sort() {
-
+    public void sort() {//sort in decreasing order not increasing 
         int count = 0;
         inputArr = new Float[ocsanaScore.size()];
         for (int i = 0; i < ocsanaScore.size(); i++) {
@@ -463,7 +466,7 @@ public class hittingSetGreedyAlgorithm {
         int tempvalue1 = -1;
         int tempvalue2 = -1;
         Vector<Vector<Integer>> Useed = new Vector<>();
-
+        Vector<Integer> result1;
         hittingsetGreedyGUI.txt.append("\n******************For page 8 line 2**********************\n");
 
         for (int i = 1; i < c2nprime + 1; i++) {
@@ -483,16 +486,21 @@ public class hittingSetGreedyAlgorithm {
                 }
             }
             hittingsetGreedyGUI.txt.append(tempvalue1 + "   " + tempvalue2 + "\n");
-
+            hittingsetGreedyGUI.txt.append(nodeList.get(NprimeOrder.get(tempvalue1)).getName() + "   " + nodeList.get(NprimeOrder.get(tempvalue2)).getName() + "\n");
             for (int j = 0; j < elementarypathes.size(); j++) {
                 //  hittingsetGreedyGUI.txt.append(NprimeOrder.get(tempvalue1)+"   "+NprimeOrder.get(tempvalue2)+"\n");   
                 if (elementarypathes.get(j).contains(NprimeOrder.get(tempvalue1)) | elementarypathes.get(j).contains(NprimeOrder.get(tempvalue2))) {
                     elementarypathhit++;
                 }
             }
+            result1 = new Vector<>();
             hittingsetGreedyGUI.txt.append(elementarypathhit + "\n");
             if (elementarypathhit == elementarypathes.size()) {
-                hittingsetGreedyGUI.txt.append(nodeList.get(NprimeOrder.get(tempvalue1)).getName() + "   " + nodeList.get(NprimeOrder.get(tempvalue2)).getName());
+                result1.addElement(NprimeOrder.get(tempvalue1));
+                result1.addElement(NprimeOrder.get(tempvalue2));
+                result.addElement(result1);
+                hittingsetGreedyGUI.txt.append(nodeList.get(NprimeOrder.get(tempvalue1)).getName() + "   " + nodeList.get(NprimeOrder.get(tempvalue2)).getName() + "\n");
+
             } else {
                 tempvector = new Vector<>();
                 tempvector.add(NprimeOrder.get(tempvalue1));
@@ -502,21 +510,13 @@ public class hittingSetGreedyAlgorithm {
             }
         }
 
-        for (int i = 0; i < Useed.size(); i++) {
-
-            for (int j = 0; j < Useed.get(i).size(); j++) {
-                //hittingsetGreedyGUI.txt.append(Useed.get(i).get(j)+" +-  "); 
-                hittingsetGreedyGUI.txt.append(Useed.get(i).get(j) + "  " + nodeList.get(Useed.get(i).get(j)).getName() + "   ");
-            }
-            hittingsetGreedyGUI.txt.append("\n");
-        }
-
+        printfinalresultresult(result);
         hittingsetGreedyGUI.txt.append("\n******************k>2*********************\n");
         int z = 0;
         boolean exit = false;
-        for (int k = 3; k < largeCardinality & Useed.get(Useed.size()-1).size()< NprimeOrder.size()+1 && exit == false; k++) {
+        for (int k = 3; k < largeCardinality && Useed.size() > 0 && Useed.get(Useed.size() - 1).size() < NprimeOrder.size() + 1 && exit == false; k++) {
 
-            if (k == largeCardinality  && exceptionone()) {
+            if (k == largeCardinality && exceptionone()) {
                 break;
             }
 
@@ -525,27 +525,48 @@ public class hittingSetGreedyAlgorithm {
                 hittingsetGreedyGUI.txt.append(NprimeVectore.get(i) + "\n");
             }
 
-            
             U = new Vector<>();
 
             for (int i = 0; i < NprimeVectore.size(); i++) {
                 hittingsetGreedyGUI.txt.append(NprimeVectore.get(i) + "  \n");
                 for (int j = 0; j < Useed.size(); j++) {
+                    int x = 0;
+                    for (int l = 0; l < result.size(); l++) {
+                        if (comapringtwopath(result.get(l), Useed.get(j))) {
 
-                    if (Useed.get(j).contains(NprimeVectore.get(i)) != true) {
+                            x = 1;
+                            break;
+                        }
+
+                    }
+
+                    if (Useed.get(j).contains(NprimeVectore.get(i)) != true & x == 0) {
                         tempvector = new Vector<>();
                         for (int l = 0; l < Useed.get(j).size(); l++) {
                             tempvector.add(Useed.get(j).get(l));
+                            hittingsetGreedyGUI.txt.append(nodeList.get(Useed.get(j).get(l)).getName() + "   ");
                         }
 
                         tempvector.add(NprimeVectore.get(i));
-                       // for (int l = 0; l < tempvector.size(); l++) 
-                          //  hittingsetGreedyGUI.txt.append(tempvector.get(l) + "   ");
-                       // hittingsetGreedyGUI.txt.append("  \n");
-                        U.add(tempvector);
-                        if (U.size() == largNumberOfCandidate) {
-                            exit = true;
-                            break;
+                        hittingsetGreedyGUI.txt.append(nodeList.get(NprimeVectore.get(i)).getName() + "\n");
+
+                        x = 0;
+                        for (int l = 0; l < result.size(); l++) {
+                            if (comapringtwopath(result.get(l), tempvector)) {
+                                x = 1;
+                                break;
+                            }
+                        }
+                        hittingsetGreedyGUI.txt.append(x + "   x\n");
+                        if (x == 0) {
+
+                            U.add(tempvector);
+                            if (U.size() == largNumberOfCandidate) {
+                                exit = true;
+                                break;
+                            }
+                        } else {
+                            tempvector.remove(tempvector.size() - 1);
                         }
                     }
                     if (exit) {
@@ -558,22 +579,20 @@ public class hittingSetGreedyAlgorithm {
                 z = 1;
             }
 
-           
             Useed.clear();
-             Useed = U;
-              hittingsetGreedyGUI.txt.append(" \n "+" \n "+Useed.size() + " \n "+" \n ");
+            Useed = U;
+            hittingsetGreedyGUI.txt.append(" \n " + " \n " + Useed.size() + " \n " + " \n ");
             for (int i = 0; i < Useed.size(); i++) {
-               // hittingsetGreedyGUI.txt.append(Useed.get(i).size() + "  ");
+                // hittingsetGreedyGUI.txt.append(Useed.get(i).size() + "  ");
                 for (int j = 0; j < Useed.get(i).size(); j++) {
-                   // hittingsetGreedyGUI.txt.append(Useed.get(i).get(j) + "  ");
+                    // hittingsetGreedyGUI.txt.append(Useed.get(i).get(j) + "  ");
                     hittingsetGreedyGUI.txt.append(nodeList.get(Useed.get(i).get(j)).getName() + "   ");
                 }
                 hittingsetGreedyGUI.txt.append(" \n");
             }
-          //  hittingsetGreedyGUI.txt.append(Useed.size() + " *00000000000000000* \n");
 
             Vector<Vector<Integer>> Utemp = new Vector<>();
-            Vector<Integer> tempvector1 ;
+            Vector<Integer> tempvector1;
             tempvalue1 = 0;
 
             if (k == largeCardinality - 1 && exceptionone()) {
@@ -586,16 +605,24 @@ public class hittingSetGreedyAlgorithm {
                             tempvector1 = new Vector<>();
                             tempvector1 = Useed.get(j);
                             tempvector1.add(elementaryNOdes.get(i));
-                            Utemp.add(tempvector1);                    
+                            int x = 0;
+                            for (int l = 0; l < result.size(); l++) {
+                                if (comapringtwopath(result.get(l), tempvector1)) {
+
+                                    x = 1;
+                                    break;
+                                }
+                            }
+                            if (x == 0) {
+                                Utemp.add(tempvector1);
+                            }
                         }
                     }
 
-                }               
-             Useed.clear();
-             Useed = Utemp;
+                }
+                Useed.clear();
+                Useed = Utemp;
             }
-             // hittingsetGreedyGUI.txt.append("0\n");
-
             for (int i = 0; i < Useed.size(); i++) {
 
                 for (int j = 0; j < elementarypathestemp.length; j++) {
@@ -603,10 +630,8 @@ public class hittingSetGreedyAlgorithm {
 
                 }
 
-              // hittingsetGreedyGUI.txt.append("1\n");
-
-                    for (int l = 0; l < elementarypathes.size(); l++) {
-                         for (int j = 0; j < Useed.get(i).size(); j++) {
+                for (int l = 0; l < elementarypathes.size(); l++) {
+                    for (int j = 0; j < Useed.get(i).size(); j++) {
 
                         if (elementarypathes.get(l).contains(Useed.get(i).get(j))) {
                             elementarypathestemp[l] = 1;
@@ -615,32 +640,65 @@ public class hittingSetGreedyAlgorithm {
 
                     }
                 }
-                  //  hittingsetGreedyGUI.txt.append("2\n");
                 tempvalue1 = 0;
                 for (int j = 0; j < elementarypathestemp.length; j++) {
-                    // hittingsetGreedyGUI.txt.append(elementarypathestemp[j] + "  ");
                     if (elementarypathestemp[j] == 1) {
                         tempvalue1++;
                     }
-
                 }
-               // hittingsetGreedyGUI.txt.append("3\n");
-                 //  hittingsetGreedyGUI.txt.append(" "+tempvalue1 +" ");
+
                 if (tempvalue1 == elementarypathestemp.length) {
-                    hittingsetGreedyGUI.txt.append( "\n");
-                    for (int j = 0; j < Useed.get(i).size(); j++) {
-                   // hittingsetGreedyGUI.txt.append(Useed.get(i).get(j) + "  ");
-                    hittingsetGreedyGUI.txt.append(nodeList.get(Useed.get(i).get(j)).getName() + "   ");
-                }
-                }
-              // hittingsetGreedyGUI.txt.append("4\n");
-                 
-            
 
+                    int x = 0;
+                    for (int l = 0; l < result.size(); l++) {
+                        if (comapringtwopath(result.get(l), Useed.get(i))) {
+
+                            x = 1;
+                            break;
+                        }
+                    }
+                    if (x == 0) {
+                        result.addElement(Useed.get(i));
+                    }
+
+                }
             }
-          //  if (z == 1) 
-             //   break;
+
         }
+    }
+
+    private boolean comapringtwopath(Vector<Integer> oldpath, Vector<Integer> newpath) {
+        boolean equal = true;
+
+        int temp = 0;
+
+        for (int i = 0; i < oldpath.size(); i++) {
+
+            if (newpath.contains(oldpath.get(i))) {
+
+                temp++;
+            }
+        }
+
+        if (temp != oldpath.size()) {
+            equal = false;
+        }
+        return equal;
+    }
+
+    public boolean cover(Vector<Integer> current, Vector<Integer> Path1) {
+
+        boolean cover = false;
+
+        for (int i = 0; i < current.size(); i++) {
+
+            if (Path1.contains(current.get(i))) {
+
+                cover = true;
+                break;
+            }
+        }
+        return cover;
     }
 
     public void printfinalresult(Vector<Vector<Integer>> finalresult) {
@@ -753,33 +811,20 @@ public class hittingSetGreedyAlgorithm {
         }
 
     }
-}
-/*
- for (int i = 0; i < elementryPathArray.length; i++) {
- for (int j = 0; j < elementryPathArray[i].length; j++) {
- hittingsetGreedyGUI.txt.append(elementryPathArray[i][j]+"\t");  
- }
- hittingsetGreedyGUI.txt.append("\n");   
- }
- */
-/*
-for (int i = 100000; i < NprimeVectore.size(); i++) {
-                for (int j = 0; j < Useed.size(); j++) {
-                    tempvector = Useed.get(j);
-                    tempvector.add(NprimeVectore.get(i));
-                    U.add(tempvector);
-                    tempvector.clear();
-                    if (U.size() == largNumberOfCandidate) {
 
-                        exit = true;
-                        break;
-                    }
-                }
-                if (exit) {
-                    break;
-                }
+    public void printfinalresultresult(Vector<Vector<Integer>> resurlt) {
+        hittingsetGreedyGUI.txt.append("\n**************************printfinalresultresult*************************************\n");
+        hittingsetGreedyGUI.txt.append("path\t\tCI\n");
+        for (int i = 0; i < resurlt.size(); i++) {
+            Vector<Integer> get = resurlt.get(i);
+            for (int j = 0; j < get.size(); j++) {
+                Integer get1 = get.get(j);
+                hittingsetGreedyGUI.txt.append(nodeList.get(get1).getName() + "   ");
             }
+            hittingsetGreedyGUI.txt.append("\t\t" + inputArr[i] + "\n");
 
-            NPrime = NprimeVectore.size();
-            // } 
-*/
+        }
+        hittingsetGreedyGUI.txt.append("**********************end printfinalresultresult********************************************\n");
+
+    }
+}
