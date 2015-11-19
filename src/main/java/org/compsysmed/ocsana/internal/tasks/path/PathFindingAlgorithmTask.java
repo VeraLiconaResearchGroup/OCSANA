@@ -63,7 +63,7 @@ public class PathFindingAlgorithmTask extends AbstractOCSANATask {
             throw new IllegalArgumentException("Invalid algorithm step for path-finding");
         }
 
-        taskMonitor.setTitle("Paths to " + targetType + "s.");
+        taskMonitor.setTitle("Paths to " + targetType + "s");
 
         taskMonitor.showMessage(TaskMonitor.Level.INFO, "Finding paths from " +
                                 sourceNodes.size() + " source nodes to to " +
