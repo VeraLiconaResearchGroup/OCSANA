@@ -34,17 +34,96 @@ public class RSAlgorithm extends AbstractMHSAlgorithm {
     public static final String NAME = "RS algorithm";
     public static final String SHORTNAME = "RS";
 
+    // Tunables for threading
+    // TODO: Add note that not specifying will use *all* hardware units
+    @Tunable(description = "Specify number of threads",
+             gravity = 401,
+             tooltip="By default, all CPUs will be utilized",
+             groups = {AbstractMHSAlgorithm.CONFIG_GROUP + ": " + SHORTNAME})
+    public Boolean configureThreads = false;
+
+    protected Integer numThreads = 1;
     @Tunable(description = "Number of threads",
-             groups = {RSAlgorithm.NAME})
-             public int numThreads = 1;
+             gravity = 401.1,
+             dependsOn = "configureThreads=true",
+             groups = {AbstractMHSAlgorithm.CONFIG_GROUP + ": " + SHORTNAME})
+    public Integer getNumThreads () {
+        return numThreads;
+    }
 
-    @Tunable(description = "Maximum size of hitting set to find",
-             groups = {RSAlgorithm.NAME})
-             public int maxCardinality = 5;
+    public void setNumThreads (Integer numThreads) {
+        if (numThreads == null) {
+            throw new NullPointerException("Number of threads is null.");
+        }
 
+        synchronized(this) {
+            if (numThreads <= 0) {
+                throw new IllegalArgumentException("Number of threads must be positive!");
+            } else {
+                this.numThreads = numThreads;
+            }
+        }
+    }
+
+    // Tunables for bounded-cardinality search
+    // TODO: Add note that not using this may take a long time
+    @Tunable(description = "Restrict search to small CIs",
+             gravity = 402,
+             tooltip="Unbounded search may take a very long time!",
+             groups = {AbstractMHSAlgorithm.CONFIG_GROUP + ": " + SHORTNAME})
+    public Boolean useMaxCardinality = true;
+
+    protected Integer maxCardinality = 5;
+    @Tunable(description = "Maximum size of CI to find",
+             gravity = 402.1,
+             dependsOn = "useMaxCardinality=true",
+             groups = {AbstractMHSAlgorithm.CONFIG_GROUP + ": " + SHORTNAME})
+    public Integer getMaxCardinality () {
+        return maxCardinality;
+    }
+
+    public void setMaxCardinality (Integer maxCardinality) {
+        if (maxCardinality == null) {
+            throw new NullPointerException("Maximum cardinality is null.");
+        }
+
+        synchronized(this) {
+            if (maxCardinality <= 0) {
+                throw new IllegalArgumentException("Maximum size must be positive!");
+            } else {
+                this.maxCardinality = maxCardinality;
+            }
+        }
+    }
+
+    // Tunables for bounded-length search
+    @Tunable(description = "Consider a restricted number of candidates",
+             gravity = 403,
+             groups = {AbstractMHSAlgorithm.CONFIG_GROUP + ": " + SHORTNAME})
+    public Boolean useMaxCandidates = false;
+
+    protected Integer maxCandidates = 1000000;
     @Tunable(description = "Maximum number of candidates to consider",
-             groups = {RSAlgorithm.NAME})
-             public int maxCandidates = 0;
+             gravity = 403.1,
+             dependsOn = "useMaxCandidates=true",
+             groups = {AbstractMHSAlgorithm.CONFIG_GROUP + ": " + SHORTNAME})
+    public Integer getMaxCandidates () {
+        return maxCandidates;
+    }
+
+    public void setMaxCandidates (Integer maxCandidates) {
+        if (maxCandidates == null) {
+            throw new NullPointerException("Maximum candidates is null.");
+        }
+
+        synchronized(this) {
+            if (maxCandidates <= 0) {
+                throw new IllegalArgumentException("Maximum candidate count must be positive!");
+            } else {
+                this.maxCandidates = maxCandidates;
+            }
+        }
+    }
 
     // No docstring because the interface has one
     public List<Set<CyNode>> MHSes (Iterable<? extends Iterable<CyNode>> sets) {

@@ -28,6 +28,8 @@ import org.cytoscape.model.CyNetwork;
  **/
 
 public abstract class AbstractPathFindingAlgorithm {
+    protected static final String CONFIG_GROUP = "Path-finding algorithm";
+
     protected CyNetwork network;
 
     public AbstractPathFindingAlgorithm (CyNetwork network) {

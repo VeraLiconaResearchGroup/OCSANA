@@ -27,6 +27,8 @@ import org.cytoscape.model.CyNetwork;
  **/
 
 public abstract class AbstractMHSAlgorithm {
+    protected static final String CONFIG_GROUP = "CI search algorithm";
+
     protected CyNetwork network;
 
     public AbstractMHSAlgorithm () {};

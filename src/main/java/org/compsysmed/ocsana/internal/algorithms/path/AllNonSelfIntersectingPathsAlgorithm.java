@@ -35,10 +35,11 @@ import org.compsysmed.ocsana.internal.algorithms.path.AbstractPathFindingAlgorit
  **/
 public class AllNonSelfIntersectingPathsAlgorithm extends AbstractPathFindingAlgorithm {
     public static final String NAME = "All non-self-intersecting paths";
-    public static final String SHORTNAME = "all";
+    public static final String SHORTNAME = "ALL";
 
     @Tunable(description = "Find paths with up to this many nodes:",
-             groups = {AllNonSelfIntersectingPathsAlgorithm.NAME})
+             groups = {AbstractPathFindingAlgorithm.CONFIG_GROUP + ": " + SHORTNAME},
+             gravity = 210)
     public Integer maxPathLength = 20;
 
     public AllNonSelfIntersectingPathsAlgorithm(CyNetwork network) {

@@ -20,6 +20,7 @@ import java.util.concurrent.ForkJoinPool;
 
 // Cytoscape imports
 import org.cytoscape.work.Tunable;
+import org.cytoscape.work.util.BoundedInteger;
 
 import org.cytoscape.model.CyNode;
 import org.cytoscape.model.CyNetwork;
@@ -34,17 +35,96 @@ public class MMCSAlgorithm extends AbstractMHSAlgorithm {
     public static final String NAME = "MMCS algorithm";
     public static final String SHORTNAME = "MMCS";
 
+    // Tunables for threading
+    // TODO: Add note that not specifying will use *all* hardware units
+    @Tunable(description = "Specify number of threads",
+             gravity = 410,
+             tooltip="By default, all CPUs will be utilized",
+             groups = {AbstractMHSAlgorithm.CONFIG_GROUP + ": " + SHORTNAME})
+    public Boolean configureThreads = false;
+
+    protected Integer numThreads = 1;
     @Tunable(description = "Number of threads",
-             groups = {MMCSAlgorithm.NAME})
-    public int numThreads = 1;
+             gravity = 411,
+             dependsOn = "configureThreads=true",
+             groups = {AbstractMHSAlgorithm.CONFIG_GROUP + ": " + SHORTNAME})
+    public Integer getNumThreads () {
+        return numThreads;
+    }
 
-    @Tunable(description = "Maximum size of hitting set to find",
-             groups = {MMCSAlgorithm.NAME})
-    public int maxCardinality = 5;
+    public void setNumThreads (Integer numThreads) {
+        if (numThreads == null) {
+            throw new NullPointerException("Number of threads is null.");
+        }
 
+        synchronized(this) {
+            if (numThreads <= 0) {
+                throw new IllegalArgumentException("Number of threads must be positive!");
+            } else {
+                this.numThreads = numThreads;
+            }
+        }
+    }
+
+    // Tunables for bounded-cardinality search
+    // TODO: Add note that not using this may take a long time
+    @Tunable(description = "Restrict search to small CIs",
+             gravity = 420,
+             tooltip="Unbounded search may take a very long time!",
+             groups = {AbstractMHSAlgorithm.CONFIG_GROUP + ": " + SHORTNAME})
+    public Boolean useMaxCardinality = true;
+
+    protected Integer maxCardinality = 5;
+    @Tunable(description = "Maximum size of CI to find",
+             gravity = 421,
+             dependsOn = "useMaxCardinality=true",
+             groups = {AbstractMHSAlgorithm.CONFIG_GROUP + ": " + SHORTNAME})
+    public Integer getMaxCardinality () {
+        return maxCardinality;
+    }
+
+    public void setMaxCardinality (Integer maxCardinality) {
+        if (maxCardinality == null) {
+            throw new NullPointerException("Maximum cardinality is null.");
+        }
+
+        synchronized(this) {
+            if (maxCardinality <= 0) {
+                throw new IllegalArgumentException("Maximum size must be positive!");
+            } else {
+                this.maxCardinality = maxCardinality;
+            }
+        }
+    }
+
+    // Tunables for bounded-length search
+    @Tunable(description = "Consider a restricted number of candidates",
+             gravity = 430,
+             groups = {AbstractMHSAlgorithm.CONFIG_GROUP + ": " + SHORTNAME})
+    public Boolean useMaxCandidates = false;
+
+    protected Integer maxCandidates = 1000000;
     @Tunable(description = "Maximum number of candidates to consider",
-             groups = {MMCSAlgorithm.NAME})
-    public int maxCandidates = 0;
+             gravity = 431,
+             dependsOn = "useMaxCandidates=true",
+             groups = {AbstractMHSAlgorithm.CONFIG_GROUP + ": " + SHORTNAME})
+    public Integer getMaxCandidates () {
+        return maxCandidates;
+    }
+
+    public void setMaxCandidates (Integer maxCandidates) {
+        if (maxCandidates == null) {
+            throw new NullPointerException("Maximum candidates is null.");
+        }
+
+        synchronized(this) {
+            if (maxCandidates <= 0) {
+                throw new IllegalArgumentException("Maximum candidate count must be positive!");
+            } else {
+                this.maxCandidates = maxCandidates;
+            }
+        }
+    }
 
     // No docstring because the interface has one
     public List<Set<CyNode>> MHSes (Iterable<? extends Iterable<CyNode>> sets) {
@@ -70,6 +150,15 @@ public class MMCSAlgorithm extends AbstractMHSAlgorithm {
         SHDCounters counters = new SHDCounters();
         ConcurrentLinkedQueue<BitSet> results = new ConcurrentLinkedQueue<>();
 
+        // Handle argument processing
+        if (!useMaxCardinality) {
+            maxCardinality = 0;
+        }
+
+        if (!useMaxCandidates) {
+            maxCandidates = 0;
+        }
+
         // Candidate hitting set, initially empty
         BitSet S = new BitSet(H.numVerts());
 
@@ -88,10 +177,10 @@ public class MMCSAlgorithm extends AbstractMHSAlgorithm {
         MMCSRecursiveTask calculation = new MMCSRecursiveTask(H, T, S, CAND, crit, uncov, maxCardinality, maxCandidates, counters, results);
 
         ForkJoinPool pool;
-        if (numThreads > 0) {
-            pool = new ForkJoinPool (numThreads);
+        if (configureThreads) {
+            pool = new ForkJoinPool(numThreads);
         } else {
-            pool = new ForkJoinPool ();
+            pool = new ForkJoinPool();
         }
 
         pool.invoke(calculation);
