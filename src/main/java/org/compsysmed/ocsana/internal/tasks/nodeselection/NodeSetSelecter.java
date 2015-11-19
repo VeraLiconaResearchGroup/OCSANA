@@ -35,36 +35,67 @@ public class NodeSetSelecter {
 
     @Tunable(description = "Source nodes",
              groups = {configGroup})
-    public ListMultipleSelection<CyNode> sourceNodes;
+    public ListMultipleSelection<NodeWithName> sourceNodeStrings;
 
     @Tunable(description = "Target nodes",
              groups = {configGroup})
-    public ListMultipleSelection<CyNode> targetNodes;
+    public ListMultipleSelection<NodeWithName> targetNodeStrings;
 
     @Tunable(description = "Off-target nodes",
              groups = {configGroup})
-    public ListMultipleSelection<CyNode> offTargetNodes;
+    public ListMultipleSelection<NodeWithName> offTargetNodeStrings;
 
     private CyNetwork network;
+    private List<CyNode> nodes;
+    private List<NodeWithName> nodesWithNames;
 
     public NodeSetSelecter (CyNetwork network) {
         this.network = network;
 
-        List<CyNode> nodes = network.getNodeList();
-        sourceNodes = new ListMultipleSelection<>(nodes);
-        targetNodes = new ListMultipleSelection<>(nodes);
-        offTargetNodes = new ListMultipleSelection<>(nodes);
+        nodes = network.getNodeList();
+        nodesWithNames = new ArrayList<>(nodes.size());
+
+        for (CyNode node: nodes) {
+            String nodeName = network.getRow(node).get(CyNetwork.NAME, String.class);
+            nodesWithNames.add(new NodeWithName(node, nodeName));
+        }
+
+        sourceNodeStrings = new ListMultipleSelection<>(nodesWithNames);
+        targetNodeStrings = new ListMultipleSelection<>(nodesWithNames);
+        offTargetNodeStrings = new ListMultipleSelection<>(nodesWithNames);
     }
 
     public List<CyNode> getSourceNodes () {
-        return sourceNodes.getSelectedValues();
+        return getNodesFromList(sourceNodeStrings.getSelectedValues());
     }
 
     public List<CyNode> getTargetNodes () {
-        return targetNodes.getSelectedValues();
+        return getNodesFromList(targetNodeStrings.getSelectedValues());
     }
 
     public List<CyNode> getOffTargetNodes () {
-        return offTargetNodes.getSelectedValues();
+        return getNodesFromList(offTargetNodeStrings.getSelectedValues());
+    }
+
+    private List<CyNode> getNodesFromList (List<NodeWithName> nodesWithNames) {
+        List<CyNode> nodes = new ArrayList<>(nodesWithNames.size());
+        for (NodeWithName nodeWithName: nodesWithNames) {
+            nodes.add(nodeWithName.node);
+        }
+        return nodes;
+    }
+}
+
+class NodeWithName {
+    public CyNode node;
+    public String name;
+
+    public NodeWithName (CyNode node, String name) {
+        this.node = node;
+        this.name = name;
+    }
+
+    public String toString () {
+        return name;
     }
 }
