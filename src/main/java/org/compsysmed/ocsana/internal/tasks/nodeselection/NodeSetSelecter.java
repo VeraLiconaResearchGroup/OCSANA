@@ -60,6 +60,9 @@ public class NodeSetSelecter {
             nodesWithNames.add(new NodeWithName(node, nodeName));
         }
 
+        // Sort the nodes alphabetically for display
+        Collections.sort(nodesWithNames);
+
         sourceNodeStrings = new ListMultipleSelection<>(nodesWithNames);
         targetNodeStrings = new ListMultipleSelection<>(nodesWithNames);
         offTargetNodeStrings = new ListMultipleSelection<>(nodesWithNames);
@@ -86,7 +89,7 @@ public class NodeSetSelecter {
     }
 }
 
-class NodeWithName {
+class NodeWithName implements Comparable<NodeWithName> {
     public CyNode node;
     public String name;
 
@@ -97,5 +100,9 @@ class NodeWithName {
 
     public String toString () {
         return name;
+    }
+
+    public int compareTo (NodeWithName otherNode) {
+        return name.compareTo(otherNode.name);
     }
 }
