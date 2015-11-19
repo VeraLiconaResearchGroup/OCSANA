@@ -26,6 +26,7 @@ import org.cytoscape.model.CyNetwork;
 // OCSANA imports
 import org.compsysmed.ocsana.internal.algorithms.mhs.AbstractMHSAlgorithm;
 import org.compsysmed.ocsana.internal.algorithms.mhs.MMCSAlgorithm;
+import org.compsysmed.ocsana.internal.algorithms.mhs.RSAlgorithm;
 
 /**
  * Interface handler for path-finding algorithms
@@ -52,6 +53,7 @@ public class MHSAlgorithmSelecter {
         // order from fastest to most complete..
         List<AbstractMHSAlgorithm> algorithms = new ArrayList<>();
         algorithms.add(new MMCSAlgorithm());
+        algorithms.add(new RSAlgorithm());
 
         // Then we populate the ListSingleSelection.
         algorithmSelecter = new ListSingleSelection<>(algorithms);

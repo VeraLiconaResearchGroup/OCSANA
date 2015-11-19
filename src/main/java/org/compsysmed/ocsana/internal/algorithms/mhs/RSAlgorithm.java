@@ -1,5 +1,5 @@
 /**
- * Implementation of the MMCS algorithm for finding minimal hitting sets
+ * Implementation of the RS algorithm for finding minimal hitting sets
  *
  * Copyright Vera-Licona Research Group (C) 2015
  * @author Andrew Gainer-Dewar, Ph.D. <andrew.gainer.dewar@gmail.com>
@@ -27,24 +27,24 @@ import org.cytoscape.model.CyNetwork;
 // OCSANA imports
 
 /**
- * The 'MMCS' algorithm for finding minimal hitting sets
+ * The 'RS' algorithm for finding minimal hitting sets.
  **/
 
-public class MMCSAlgorithm extends AbstractMHSAlgorithm {
-    public static final String NAME = "MMCS algorithm";
-    public static final String SHORTNAME = "MMCS";
+public class RSAlgorithm extends AbstractMHSAlgorithm {
+    public static final String NAME = "RS algorithm";
+    public static final String SHORTNAME = "RS";
 
     @Tunable(description = "Number of threads",
-             groups = {MMCSAlgorithm.NAME})
-    public int numThreads = 1;
+             groups = {RSAlgorithm.NAME})
+             public int numThreads = 1;
 
     @Tunable(description = "Maximum size of hitting set to find",
-             groups = {MMCSAlgorithm.NAME})
-    public int maxCardinality = 5;
+             groups = {RSAlgorithm.NAME})
+             public int maxCardinality = 5;
 
     @Tunable(description = "Maximum number of candidates to consider",
-             groups = {MMCSAlgorithm.NAME})
-    public int maxCandidates = 0;
+             groups = {RSAlgorithm.NAME})
+             public int maxCandidates = 0;
 
     // No docstring because the interface has one
     public List<Set<CyNode>> MHSes (Iterable<? extends Iterable<CyNode>> sets) {
@@ -64,7 +64,7 @@ public class MMCSAlgorithm extends AbstractMHSAlgorithm {
      *
      * @param H  the hypergraph whose MHSes we should find
      **/
-    public Hypergraph transversalHypergraph (Hypergraph H) {
+    public Hypergraph transversalHypergraph(Hypergraph H) {
         // Generate inputs to algorithm
         Hypergraph T = H.transpose();
         SHDCounters counters = new SHDCounters();
@@ -73,10 +73,6 @@ public class MMCSAlgorithm extends AbstractMHSAlgorithm {
         // Candidate hitting set, initially empty
         BitSet S = new BitSet(H.numVerts());
 
-        // Eligible vertices, initially full
-        BitSet CAND = new BitSet(H.numVerts());
-        CAND.set(0, H.numVerts());
-
         // Which edges each vertex is critical for (initially all empty)
         Hypergraph crit = new Hypergraph (H.numEdges(), H.numVerts());
 
@@ -84,8 +80,11 @@ public class MMCSAlgorithm extends AbstractMHSAlgorithm {
         BitSet uncov = new BitSet(H.numEdges());
         uncov.set(0, H.numEdges());
 
+        // Which vertices are known to be violating (initially empty)
+        BitSet violatingVertices = new BitSet (H.numVerts());
+
         // Set up and run the calculation
-        MMCSRecursiveTask calculation = new MMCSRecursiveTask(H, T, S, CAND, crit, uncov, maxCardinality, maxCandidates, counters, results);
+        RSRecursiveTask calculation = new RSRecursiveTask(H, T, S, crit, uncov, violatingVertices, maxCardinality, maxCandidates, counters, results);
 
         ForkJoinPool pool;
         if (numThreads > 0) {
@@ -93,7 +92,6 @@ public class MMCSAlgorithm extends AbstractMHSAlgorithm {
         } else {
             pool = new ForkJoinPool ();
         }
-
         pool.invoke(calculation);
 
         // Wait for all algorithms to complete
@@ -105,46 +103,48 @@ public class MMCSAlgorithm extends AbstractMHSAlgorithm {
         while (itr.hasNext()) {
             MHSes.add(itr.next());
         }
-        MHSes.updateNumVerts();
 
         return MHSes;
     }
 
-    private class MMCSRecursiveTask extends SHDRecursiveTask {
-        BitSet CAND;
+    private class RSRecursiveTask extends SHDRecursiveTask {
+        BitSet violatingVertices;
 
         /**
-         * Recursive task for the MMCS algorithm
+         * Recursive task for the RS algorithm
          *
          * @param H  {@code Hypergraph} to process
          * @param T  transversal hypergraph of H
          * @param S  candidate hitting set to process
-         * @param CAND  vertices which are eligible to add to S (must be nonempty)
          * @param crit for each vertex v of H, crit[v] records the edges
          * for which v is critical
          * @param uncov  which edges are uncovered (must be nonempty)
-         * @param maxCardinality  the maximum size of MHS to consider
-         * @param maxCandidates  the maximum number of candidates to
-         * consider before returning
+         * @param violatingVertices  which vertices are known to be
+         * violating for S
+         * @param maxCardinality largest size hitting set to consider
+         * (0 to find all, must be larger than {@code S.cardinality()}
+         * otherwise)
+         * @param maxCandidates  largest number of candidates to consider before
+         * termination (0 to run to termination)
          * @param counters  to store counts of various subalgorithms
          * @param confirmedMHSes  to store any confirmed MHSes
          **/
-        MMCSRecursiveTask (Hypergraph H,
-                           Hypergraph T,
-                           BitSet S,
-                           BitSet CAND,
-                           Hypergraph crit,
-                           BitSet uncov,
-                           Integer maxCardinality,
-                           Integer maxCandidates,
-                           SHDCounters counters,
-                           ConcurrentLinkedQueue<BitSet> confirmedMHSes) {
+        RSRecursiveTask (Hypergraph H,
+                         Hypergraph T,
+                         BitSet S,
+                         Hypergraph crit,
+                         BitSet uncov,
+                         BitSet violatingVertices,
+                         Integer maxCardinality,
+                         Integer maxCandidates,
+                         SHDCounters counters,
+                         ConcurrentLinkedQueue<BitSet> confirmedMHSes) {
             this.H = H;
             this.T = T;
             this.S = S;
-            this.CAND = CAND;
             this.crit = crit;
             this.uncov = uncov;
+            this.violatingVertices = violatingVertices;
             this.maxCardinality = maxCardinality;
             this.maxCandidates = maxCandidates;
             this.counters = counters;
@@ -153,10 +153,6 @@ public class MMCSAlgorithm extends AbstractMHSAlgorithm {
             // Argument checking
             if (H.numEdges() == 0) {
                 throw new IllegalArgumentException("Cannot process an edgeless hypergraph.");
-            }
-
-            if (CAND.isEmpty()) {
-                throw new IllegalArgumentException("CAND cannot be empty.");
             }
 
             if (uncov.isEmpty()) {
@@ -170,50 +166,55 @@ public class MMCSAlgorithm extends AbstractMHSAlgorithm {
             if (maxCandidates < 0) {
                 throw new IllegalArgumentException("maxCandidates must be non-negative.");
             }
+
+            if (violatingVertices.intersects(S)) {
+                throw new IllegalArgumentException("Vertices in S cannot be violating.");
+            }
         }
 
         /**
          * Run the algorithm.
          **/
         @Override
-        protected void compute () {
+        protected void compute() {
             // Handle maxCandidates
             if ((counters.iterations.getAndIncrement() >= maxCandidates) && (maxCandidates > 0)) {
                 return;
             }
 
-            // Prune the vertices to search
-            // Per M+U, find the uncovered edge e with the smallest intersection
-            // with CAND
-            // We name this intersection C for easy reference
-            BitSet C = new BitSet(H.numVerts());
-            C.set(0, H.numVerts() - 1);
-            for (int e = uncov.nextSetBit(0); e >= 0; e = uncov.nextSetBit(e+1)) {
-                BitSet searchIntersection = (BitSet) H.get(e).clone();
-                searchIntersection.and(CAND);
-                if (searchIntersection.cardinality() < C.cardinality()) {
-                    C = searchIntersection;
+            // Get an uncovered edge
+            Integer searchEdgeIndex = uncov.nextSetBit(0);
+            BitSet searchEdge = (BitSet) H.get(searchEdgeIndex).clone();
+
+            // Remove known violating vertices
+            searchEdge.andNot(violatingVertices);
+
+            // Check remaining vertices for violation and store the
+            // results in a new BitSet
+            BitSet newViolatingVertices = (BitSet) violatingVertices.clone();
+            for (int v = searchEdge.nextSetBit(0); v >= 0; v = searchEdge.nextSetBit(v+1)) {
+                if (vertexWouldViolate(v)) {
+                    // Remove newfound violators from the search edge
+                    counters.violators.getAndIncrement();
+                    newViolatingVertices.set(v);
+                    searchEdge.clear(v);
                 }
             }
 
-            // Temporarily remove these vertices from CAND
-            CAND.andNot(C);
-
-            // Record which vertices of C were violating for S
-            BitSet violators = new BitSet(H.numVerts());
-
-            // Iterate through the vertices in the intersection (in reverse order)
-            for (int v = C.length(); (v = C.previousSetBit(v-1)) >= 0; ) {
+            // Iterate through the vertices in the search edge in reverse order
+            for (int v = searchEdge.length(); (v = searchEdge.previousSetBit(v-1)) >= 0; ) {
                 counters.updateLoopRuns.getAndIncrement();
-                // First, check for violators
-                if (vertexWouldViolate(v)) {
-                    counters.violators.getAndIncrement();
-                    violators.set(v);
+
+                // Update crit and uncov
+                Map<Integer, BitSet> critMark = updateCritAndUncov(v);
+
+                // Check the critical edge condition
+                if (anyEdgeCriticalAfter(searchEdgeIndex)) {
+                    restoreCritAndUncov(critMark, v);
                     continue;
                 }
 
-                // Add v to S and update crit and uncov
-                Map<Integer, BitSet> critMark = updateCritAndUncov(v);
+                // If we made it this far, S+v is valid
                 S.set(v);
 
                 // Process the new candidate S
@@ -221,7 +222,7 @@ public class MMCSAlgorithm extends AbstractMHSAlgorithm {
                     // S is a genuine MHS, so we store it and move on
                     BitSet cloneS = (BitSet) S.clone();
                     confirmedMHSes.add(cloneS);
-                } else if ((!CAND.isEmpty()) && ((maxCardinality == 0) || (S.cardinality() < maxCardinality))) {
+                } else if ((maxCardinality == 0) || (S.cardinality() < maxCardinality)) {
                     // S is a viable candidate, so we fork a new job to process it
                     if ((getQueuedTaskCount() < 4) && (uncov.cardinality() > 2)) {
                         // Spawn a new task if the queue is getting
@@ -231,29 +232,45 @@ public class MMCSAlgorithm extends AbstractMHSAlgorithm {
                         // use.
 
                         // Make defensive copies of mutable variables
-                        BitSet newS = (BitSet) S.clone();
-                        BitSet newCAND = (BitSet) CAND.clone();
-                        Hypergraph newcrit = new Hypergraph(crit);
-                        BitSet newuncov = (BitSet) uncov.clone();
+                        BitSet cloneS = (BitSet) S.clone();
+                        Hypergraph cloneCrit = new Hypergraph(crit);
+                        BitSet cloneUncov = (BitSet) uncov.clone();
+                        BitSet cloneViolatingVertices = (BitSet) newViolatingVertices.clone();
 
-                        MMCSRecursiveTask child = new MMCSRecursiveTask(H, T, newS, newCAND, newcrit, newuncov, maxCardinality, maxCandidates, counters, confirmedMHSes);
+                        RSRecursiveTask child = new RSRecursiveTask(H, T, cloneS, cloneCrit, cloneUncov, cloneViolatingVertices, maxCardinality, maxCandidates, counters, confirmedMHSes);
                         child.fork();
                     } else {
                         // Do the work in this thread without forking or copying
-                        MMCSRecursiveTask child = new MMCSRecursiveTask(H, T, S, CAND, crit, uncov, maxCardinality, maxCandidates, counters, confirmedMHSes);
+                        RSRecursiveTask child = new RSRecursiveTask(H, T, S, crit, uncov, newViolatingVertices, maxCardinality, maxCandidates, counters, confirmedMHSes);
                         child.invoke();
                     }
                 }
 
-                // Finally, we update CAND, crit, uncov and S
-                CAND.set(v);
+                // Restore helper variables and proceed to the next vertex
                 S.clear(v);
                 restoreCritAndUncov(critMark, v);
+            }
+        }
 
+        /**
+         * Determine whether any vertex in S has its first critical
+         * edge after v.
+         *
+         * @param v  the vertex to search from
+         **/
+        protected Boolean anyEdgeCriticalAfter(Integer v) {
+            // Iterate through vertices in S
+            for (int i = S.nextSetBit(0); i >= 0; i = S.nextSetBit(i+1)) {
+                // Check first critical edge for vertex i
+                int iFirstCritEdge = crit.get(i).nextSetBit(0);
+                if (iFirstCritEdge < 0) {
+                    throw new IllegalArgumentException("Vertex in S has no critical edges.");
+                } else if (iFirstCritEdge >= v) {
+                    return true;
+                }
             }
 
-            // Restore the violators to CAND before any other run uses it
-            CAND.or(violators);
+            return false;
         }
     }
 
