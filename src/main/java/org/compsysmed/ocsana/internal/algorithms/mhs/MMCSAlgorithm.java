@@ -43,28 +43,11 @@ public class MMCSAlgorithm extends AbstractMHSAlgorithm {
              groups = {AbstractMHSAlgorithm.CONFIG_GROUP + ": " + SHORTNAME})
     public Boolean configureThreads = false;
 
-    protected Integer numThreads = 1;
     @Tunable(description = "Number of threads",
              gravity = 411,
              dependsOn = "configureThreads=true",
-             groups = {AbstractMHSAlgorithm.CONFIG_GROUP + ": " + SHORTNAME})
-    public Integer getNumThreads () {
-        return numThreads;
-    }
-
-    public void setNumThreads (Integer numThreads) {
-        if (numThreads == null) {
-            throw new NullPointerException("Number of threads is null.");
-        }
-
-        synchronized(this) {
-            if (numThreads <= 0) {
-                throw new IllegalArgumentException("Number of threads must be positive!");
-            } else {
-                this.numThreads = numThreads;
-            }
-        }
-    }
+             groups={AbstractMHSAlgorithm.CONFIG_GROUP + ": " + SHORTNAME})
+    public BoundedInteger numThreads;
 
     // Tunables for bounded-cardinality search
     // TODO: Add note that not using this may take a long time
@@ -74,28 +57,11 @@ public class MMCSAlgorithm extends AbstractMHSAlgorithm {
              groups = {AbstractMHSAlgorithm.CONFIG_GROUP + ": " + SHORTNAME})
     public Boolean useMaxCardinality = true;
 
-    protected Integer maxCardinality = 5;
     @Tunable(description = "Maximum size of CI to find",
              gravity = 421,
              dependsOn = "useMaxCardinality=true",
              groups = {AbstractMHSAlgorithm.CONFIG_GROUP + ": " + SHORTNAME})
-    public Integer getMaxCardinality () {
-        return maxCardinality;
-    }
-
-    public void setMaxCardinality (Integer maxCardinality) {
-        if (maxCardinality == null) {
-            throw new NullPointerException("Maximum cardinality is null.");
-        }
-
-        synchronized(this) {
-            if (maxCardinality <= 0) {
-                throw new IllegalArgumentException("Maximum size must be positive!");
-            } else {
-                this.maxCardinality = maxCardinality;
-            }
-        }
-    }
+    public BoundedInteger maxCardinalityBInt;
 
     // Tunables for bounded-length search
     @Tunable(description = "Consider a restricted number of candidates",
@@ -103,27 +69,17 @@ public class MMCSAlgorithm extends AbstractMHSAlgorithm {
              groups = {AbstractMHSAlgorithm.CONFIG_GROUP + ": " + SHORTNAME})
     public Boolean useMaxCandidates = false;
 
-    protected Integer maxCandidates = 1000000;
     @Tunable(description = "Maximum number of candidates to consider",
              gravity = 431,
              dependsOn = "useMaxCandidates=true",
              groups = {AbstractMHSAlgorithm.CONFIG_GROUP + ": " + SHORTNAME})
-    public Integer getMaxCandidates () {
-        return maxCandidates;
-    }
+    public BoundedInteger maxCandidatesBInt;
 
-    public void setMaxCandidates (Integer maxCandidates) {
-        if (maxCandidates == null) {
-            throw new NullPointerException("Maximum candidates is null.");
-        }
-
-        synchronized(this) {
-            if (maxCandidates <= 0) {
-                throw new IllegalArgumentException("Maximum candidate count must be positive!");
-            } else {
-                this.maxCandidates = maxCandidates;
-            }
-        }
+    public MMCSAlgorithm () {
+        super();
+        numThreads = new BoundedInteger(1, 1, Runtime.getRuntime().availableProcessors(), false, false);
+        maxCardinalityBInt = new BoundedInteger(1, 6, 20, false, false);
+        maxCandidatesBInt = new BoundedInteger(1, 1, 99999999, false, false);
     }
 
     // No docstring because the interface has one
@@ -151,11 +107,17 @@ public class MMCSAlgorithm extends AbstractMHSAlgorithm {
         ConcurrentLinkedQueue<BitSet> results = new ConcurrentLinkedQueue<>();
 
         // Handle argument processing
-        if (!useMaxCardinality) {
+        int maxCardinality;
+        if (useMaxCardinality) {
+            maxCardinality = maxCardinalityBInt.getValue();
+        } else {
             maxCardinality = 0;
         }
 
-        if (!useMaxCandidates) {
+        int maxCandidates;
+        if (useMaxCandidates) {
+            maxCandidates = maxCardinalityBInt.getValue();
+        } else {
             maxCandidates = 0;
         }
 
@@ -178,7 +140,7 @@ public class MMCSAlgorithm extends AbstractMHSAlgorithm {
 
         ForkJoinPool pool;
         if (configureThreads) {
-            pool = new ForkJoinPool(numThreads);
+            pool = new ForkJoinPool(numThreads.getValue());
         } else {
             pool = new ForkJoinPool();
         }
