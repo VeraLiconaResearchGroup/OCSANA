@@ -7,7 +7,7 @@
  * @author Andrew Gainer-Dewar, Ph.D. <andrew.gainer.dewar@gmail.com>
  **/
 
-package org.compsysmed.ocsana.internal.tasks.mhs;
+package org.compsysmed.ocsana.internal.algorithms.mhs;
 
 import java.util.*;
 

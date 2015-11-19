@@ -5,7 +5,7 @@
  * @author Andrew Gainer-Dewar, Ph.D. <andrew.gainer.dewar@gmail.com>
  **/
 
-package org.compsysmed.ocsana.internal.tasks.mhs;
+package org.compsysmed.ocsana.internal.algorithms.mhs;
 
 import java.util.*;
 
@@ -19,7 +19,14 @@ public class Hypergraph extends ArrayList<BitSet> {
     // TODO: Do we need a no-arg constructor?
     // TODO: Document throws
 
-    private int numVerts;
+    protected int numVerts;
+
+    /**
+     * Construct an empty Hypergraph
+     **/
+    public Hypergraph () {
+        this(1);
+    }
 
     /**
      * Construct an empty {@code Hypergraph}.

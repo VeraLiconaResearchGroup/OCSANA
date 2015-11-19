@@ -3,58 +3,59 @@
  *
  * Copyright Vera-Licona Research Group (C) 2015
  * @author Andrew Gainer-Dewar, Ph.D. <andrew.gainer.dewar@gmail.com>
+ *
+ * This software is licensed under the Artistic License 2.0, see the
+ * LICENSE file or
+ * http://www.opensource.org/licenses/artistic-license-2.0.php for
+ * details
  **/
 
-package org.compsysmed.ocsana.internal.tasks.mhs;
+package org.compsysmed.ocsana.internal.algorithms.mhs;
 
+// Java imports
 import java.util.*;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ForkJoinPool;
 
+// Cytoscape imports
+import org.cytoscape.work.Tunable;
+
+import org.cytoscape.model.CyNode;
+import org.cytoscape.model.CyNetwork;
+
+// OCSANA imports
+
 /**
- * The 'MMCS' algorithm for finding minimal hitting sets.
+ * The 'MMCS' algorithm for finding minimal hitting sets
  **/
 
-public class MMCSAlgorithm implements MHSAlgorithm {
-    // No docstring because the interface has one
-    public Boolean supportsMaxCardinality() {
-        return true;
-    };
+public class MMCSAlgorithm extends AbstractMHSAlgorithm {
+    public static final String NAME = "MMCS algorithm";
+    public static final String SHORTNAME = "mmcs";
+
+    @Tunable(description = "Number of threads",
+             groups = {MMCSAlgorithm.NAME})
+    public int numThreads = 1;
+
+    @Tunable(description = "Maximum size of hitting set to find",
+             groups = {MMCSAlgorithm.NAME})
+    public int maxCardinality = 5;
+
+    @Tunable(description = "Maximum number of candidates to consider",
+             groups = {MMCSAlgorithm.NAME})
+    public int maxCandidates = 0;
 
     // No docstring because the interface has one
-    public Boolean supportMaxCandidates() {
-        return true;
-    };
+    public List<Set<CyNode>> MHSes (Iterable<? extends Iterable<CyNode>> sets) {
+        HypergraphOfSetsOfCyNodes inputHypergraph
+            = new HypergraphOfSetsOfCyNodes(sets);
 
-    // No docstring because the interface has one
-    public Boolean supportsMultipleThreads() {
-        return true;
-    };
+        Hypergraph resultHypergraph = transversalHypergraph(inputHypergraph);
 
-    // No docstring because the interface has one
-    public Boolean supportsRandomSeed() {
-        return false;
-    };
+        List<Set<CyNode>> result =
+            inputHypergraph.getCyNodeSetsFromHypergraph(resultHypergraph);
 
-    // No docstring because the interface has one
-    public String name() {
-        return "MMCS";
-    };
-
-    // No docstring because the interface has one
-    public List<List<Integer>> transversal(List<List<Integer>> sets,
-                                           List<Float> setScores,
-                                           Integer maxCardinality,
-                                           Integer maxCandidates,
-                                           Integer numThreads,
-                                           Integer randomSeed) {
-        Hypergraph inputHypergraph = new Hypergraph(sets);
-        Hypergraph resultHypergraph = transversalHypergraph(inputHypergraph,
-                                                            maxCardinality,
-                                                            maxCandidates,
-                                                            numThreads);
-        List<List<Integer>> result = resultHypergraph.edgesAsList();
         return result;
     };
 
@@ -62,16 +63,8 @@ public class MMCSAlgorithm implements MHSAlgorithm {
      * Compute MHSes of a given hypergraph.
      *
      * @param H  the hypergraph whose MHSes we should find
-     * @param maxCardinality  the maximum size of MHS to consider
-     * @param maxCandidates  the maximum number of candidates to
-     * consider before returning
-     * @param numThreads  the number of threads to use for the
-     * calculation
      **/
-    public Hypergraph transversalHypergraph(Hypergraph H,
-                                            Integer maxCardinality,
-                                            Integer maxCandidates,
-                                            Integer numThreads) {
+    public Hypergraph transversalHypergraph (Hypergraph H) {
         // Generate inputs to algorithm
         Hypergraph T = H.transpose();
         SHDCounters counters = new SHDCounters();
@@ -100,9 +93,10 @@ public class MMCSAlgorithm implements MHSAlgorithm {
         } else {
             pool = new ForkJoinPool ();
         }
+
         pool.invoke(calculation);
 
-        // Wait for all tasks to complete
+        // Wait for all algorithms to complete
         pool.invoke(new TaskWaiter());
 
         // Construct a Hypergraph with the resulting MHSes
@@ -129,12 +123,10 @@ public class MMCSAlgorithm implements MHSAlgorithm {
          * @param crit for each vertex v of H, crit[v] records the edges
          * for which v is critical
          * @param uncov  which edges are uncovered (must be nonempty)
-         * @param maxCardinality largest size hitting set to consider
-         * (0 to find all, must be larger than {@code S.cardinality()}
-         * otherwise)
-         * @param maxCandidates  largest number of candidates to consider before
-         * termination (0 to run to termination)
-         * @param counters  to store counts of various subtasks
+         * @param maxCardinality  the maximum size of MHS to consider
+         * @param maxCandidates  the maximum number of candidates to
+         * consider before returning
+         * @param counters  to store counts of various subalgorithms
          * @param confirmedMHSes  to store any confirmed MHSes
          **/
         MMCSRecursiveTask (Hypergraph H,
@@ -184,7 +176,7 @@ public class MMCSAlgorithm implements MHSAlgorithm {
          * Run the algorithm.
          **/
         @Override
-        protected void compute() {
+        protected void compute () {
             // Handle maxCandidates
             if ((counters.iterations.getAndIncrement() >= maxCandidates) && (maxCandidates > 0)) {
                 return;
@@ -234,7 +226,7 @@ public class MMCSAlgorithm implements MHSAlgorithm {
                     if ((getQueuedTaskCount() < 4) && (uncov.cardinality() > 2)) {
                         // Spawn a new task if the queue is getting
                         // low.  We define "low" as "has fewer than
-                        // four tasks waiting", which is entirely
+                        // four algorithms waiting", which is entirely
                         // ad-hoc and should be tuned before serious
                         // use.
 
@@ -265,5 +257,16 @@ public class MMCSAlgorithm implements MHSAlgorithm {
         }
     }
 
+    public String fullName () {
+        return this.NAME;
+    }
+
+    public String shortName () {
+        return this.SHORTNAME;
+    }
+
+    public String toString () {
+        return this.shortName();
+    }
 
 }

@@ -1,5 +1,5 @@
 /**
- * Interface handler for path finding algorithms
+ * Interface handler for MHS algorithms
  *
  * Copyright Vera-Licona Research Group (C) 2015
  * @author Andrew Gainer-Dewar, Ph.D. <andrew.gainer.dewar@gmail.com>
@@ -10,7 +10,7 @@
  * details
  **/
 
-package org.compsysmed.ocsana.internal.tasks.path;
+package org.compsysmed.ocsana.internal.tasks.mhs;
 
 // Java imports
 import java.util.*;
@@ -18,47 +18,46 @@ import java.util.*;
 // Cytoscape imports
 import org.cytoscape.work.TaskMonitor;
 import org.cytoscape.work.Tunable;
-import org.cytoscape.work.ContainsTunables;
 import org.cytoscape.work.util.ListSingleSelection;
 
 import org.cytoscape.model.CyNode;
 import org.cytoscape.model.CyNetwork;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.algorithms.path.AbstractPathFindingAlgorithm;
-import org.compsysmed.ocsana.internal.algorithms.path.AllNonSelfIntersectingPathsAlgorithm;
+import org.compsysmed.ocsana.internal.algorithms.mhs.AbstractMHSAlgorithm;
+import org.compsysmed.ocsana.internal.algorithms.mhs.MMCSAlgorithm;
 
 /**
  * Interface handler for path-finding algorithms
  *
  * @param network  the network to compute on
  **/
-public class PathFindingAlgorithmSelecter {
-    public static final String configGroup = "2: Find pathways";
-    public static final float configGravity = 2;
+public class MHSAlgorithmSelecter {
+    public static final String configGroup = "4: Find minimal CIs";
+    public static final float configGravity = 4;
 
-    @Tunable(description = "Path-finding algorithm (in order from fastest to most complete)",
+    @Tunable(description = "MHS algorithm",
              groups = {configGroup},
              gravity = configGravity)
-    public ListSingleSelection<AbstractPathFindingAlgorithm> algorithmSelecter;
+    public ListSingleSelection<AbstractMHSAlgorithm> algorithmSelecter;
 
     private CyNetwork network;
 
-    public PathFindingAlgorithmSelecter (CyNetwork network) {
+    public MHSAlgorithmSelecter (CyNetwork network) {
         this.network = network;
 
         // Set up the algorithm selecter
         //
         // First, we build a list of all the available algorithms, in
         // order from fastest to most complete..
-        List<AbstractPathFindingAlgorithm> algorithms = new ArrayList<>();
-        algorithms.add(new AllNonSelfIntersectingPathsAlgorithm(network));
+        List<AbstractMHSAlgorithm> algorithms = new ArrayList<>();
+        algorithms.add(new MMCSAlgorithm());
 
         // Then we populate the ListSingleSelection.
         algorithmSelecter = new ListSingleSelection<>(algorithms);
     }
 
-    public AbstractPathFindingAlgorithm getAlgorithm () {
+    public AbstractMHSAlgorithm getAlgorithm () {
         return algorithmSelecter.getSelectedValue();
     }
 }

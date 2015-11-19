@@ -16,16 +16,21 @@ package org.compsysmed.ocsana.internal;
 import java.util.Properties;
 
 // Cytoscape imports
+import org.cytoscape.work.TaskManager;
+
 import static org.cytoscape.work.ServiceProperties.*;
 import org.cytoscape.service.util.AbstractCyActivator;
 import org.osgi.framework.BundleContext;
 import org.cytoscape.task.NetworkTaskFactory;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.tasks.OCSANATaskFactory;
+import org.compsysmed.ocsana.internal.tasks.OCSANACoordinatorTaskFactory;
 
 public class CyActivator extends AbstractCyActivator {
     public void start (BundleContext bc) throws Exception {
+        // Get a TaskManager
+        TaskManager taskManager = getService(bc, TaskManager.class);
+
         // Main OCSANA task registration
         Properties properties = new Properties();
 
@@ -33,7 +38,7 @@ public class CyActivator extends AbstractCyActivator {
         properties.setProperty(TITLE, "OCSANA");
 
         registerService(bc,
-                        new OCSANATaskFactory(),
+                        new OCSANACoordinatorTaskFactory(taskManager),
                         NetworkTaskFactory.class,
                         properties);
     }

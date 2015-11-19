@@ -12,15 +12,28 @@
 
 package org.compsysmed.ocsana.internal.tasks;
 
+//Java imports
+
+// Cytoscape imports
 import org.cytoscape.task.AbstractNetworkTaskFactory;
 import org.cytoscape.work.TaskIterator;
+import org.cytoscape.work.TaskManager;
 
 import org.cytoscape.model.CyNetwork;
 
-public class OCSANATaskFactory extends AbstractNetworkTaskFactory {
+// OCSANA imports
+
+public class OCSANACoordinatorTaskFactory extends AbstractNetworkTaskFactory {
+    protected TaskManager taskManager;
+
+    public OCSANACoordinatorTaskFactory (TaskManager taskManager) {
+        super();
+        this.taskManager = taskManager;
+    }
+
     public TaskIterator createTaskIterator (CyNetwork network) {
         TaskIterator tasks = new TaskIterator();
-        tasks.append(new OCSANATask(network));
+        tasks.append(new OCSANACoordinatorTask(network, taskManager));
         return tasks;
     }
 }

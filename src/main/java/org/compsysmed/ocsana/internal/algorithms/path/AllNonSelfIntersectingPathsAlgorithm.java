@@ -10,7 +10,7 @@
  * details
  **/
 
-package org.compsysmed.ocsana.internal.tasks.path;
+package org.compsysmed.ocsana.internal.algorithms.path;
 
 // Java imports
 import java.util.*;
@@ -23,7 +23,7 @@ import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyEdge;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.tasks.path.AbstractPathFindingAlgorithm;
+import org.compsysmed.ocsana.internal.algorithms.path.AbstractPathFindingAlgorithm;
 
 /**
  * Use depth-first search to generate all non-self-intersecting
@@ -39,7 +39,7 @@ public class AllNonSelfIntersectingPathsAlgorithm extends AbstractPathFindingAlg
 
     @Tunable(description = "Find paths with up to this many nodes:",
              groups = {AllNonSelfIntersectingPathsAlgorithm.NAME})
-             public int maxPathLength = 20;
+    public Integer maxPathLength = 20;
 
     public AllNonSelfIntersectingPathsAlgorithm(CyNetwork network) {
         super(network);

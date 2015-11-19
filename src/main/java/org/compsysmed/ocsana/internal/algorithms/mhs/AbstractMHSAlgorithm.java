@@ -1,5 +1,5 @@
 /**
- * Abstract base class for all path-finding algorithms
+ * Abstract base class for all MHS algorithms
  *
  * Copyright Vera-Licona Research Group (C) 2015
  * @author Andrew Gainer-Dewar, Ph.D. <andrew.gainer.dewar@gmail.com>
@@ -9,8 +9,7 @@
  * http://www.opensource.org/licenses/artistic-license-2.0.php for
  * details
  **/
-
-package org.compsysmed.ocsana.internal.tasks.path;
+package org.compsysmed.ocsana.internal.algorithms.mhs;
 
 // Java imports
 import java.util.*;
@@ -22,28 +21,23 @@ import org.cytoscape.model.CyNetwork;
 // OCSANA imports
 
 /**
- * Public abstract base class for all path-finding algorithms.
+ * Public abstract base class for all MHS algorithms.
  *
  * @param network  the CyNetwork to compute on
  **/
 
-public abstract class AbstractPathFindingAlgorithm {
+public abstract class AbstractMHSAlgorithm {
     protected CyNetwork network;
 
-    public AbstractPathFindingAlgorithm (CyNetwork network) {
-        this.network = network;
-    }
+    public AbstractMHSAlgorithm () {};
 
     /**
-     * Compute paths from a set of source nodes to a set of target nodes.
+     * Compute MHSes of a given collection of sets
      *
-     * @param sources  the source nodes
-     * @param targets  the target nodes
-     * @return a List of paths, each of which is given as a List of
-     * CyNodes, in order from source to target
+     * @param sets  the sets to hit
+     * @return the collection of MHSes of the input sets
      **/
-    abstract public List<List<CyNode>> paths (Set<CyNode> sources,
-                                              Set<CyNode> targets);
+    abstract public List<Set<CyNode>> MHSes (Iterable<? extends Iterable<CyNode>> sets);
 
     /**
      * Return a name suitable for printing in a menu or status message
