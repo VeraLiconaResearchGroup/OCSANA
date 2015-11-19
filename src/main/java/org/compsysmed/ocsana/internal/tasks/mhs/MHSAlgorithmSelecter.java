@@ -34,12 +34,8 @@ import org.compsysmed.ocsana.internal.algorithms.mhs.RSAlgorithm;
  * @param network  the network to compute on
  **/
 public class MHSAlgorithmSelecter {
-    public static final String configGroup = "4: Find minimal CIs";
-    public static final float configGravity = 4;
-
     @Tunable(description = "MHS algorithm",
-             groups = {configGroup},
-             gravity = configGravity)
+             groups = {"Find minimal CIs"})
     public ListSingleSelection<AbstractMHSAlgorithm> algorithmSelecter;
 
     private CyNetwork network;

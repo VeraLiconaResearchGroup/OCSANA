@@ -31,22 +31,18 @@ import org.cytoscape.model.CyNetwork;
  **/
 
 public class NodeSetSelecter {
-    public static final String configGroup = "1: Select nodes";
-    public static final float configGravity = 1;
+    public static final String configGroup = "Select nodes";
 
     @Tunable(description = "Source nodes",
-             groups = {configGroup},
-             gravity = configGravity)
+             groups = {configGroup})
     public ListMultipleSelection<CyNode> sourceNodes;
 
     @Tunable(description = "Target nodes",
-             groups = {configGroup},
-             gravity = configGravity)
+             groups = {configGroup})
     public ListMultipleSelection<CyNode> targetNodes;
 
     @Tunable(description = "Off-target nodes",
-             groups = {configGroup},
-             gravity = configGravity)
+             groups = {configGroup})
     public ListMultipleSelection<CyNode> offTargetNodes;
 
     private CyNetwork network;

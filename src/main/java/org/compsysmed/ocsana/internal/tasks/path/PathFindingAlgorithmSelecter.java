@@ -34,12 +34,8 @@ import org.compsysmed.ocsana.internal.algorithms.path.AllNonSelfIntersectingPath
  * @param network  the network to compute on
  **/
 public class PathFindingAlgorithmSelecter {
-    public static final String configGroup = "2: Find pathways";
-    public static final float configGravity = 2;
-
-    @Tunable(description = "Path-finding algorithm (in order from fastest to most complete)",
-             groups = {configGroup},
-             gravity = configGravity)
+    @Tunable(description = "Path-finding algorithm",
+             groups = {"Find pathways"})
     public ListSingleSelection<AbstractPathFindingAlgorithm> algorithmSelecter;
 
     private CyNetwork network;
