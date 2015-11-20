@@ -41,6 +41,9 @@ import org.compsysmed.ocsana.internal.tasks.path.PathFindingAlgorithmTaskFactory
 import org.compsysmed.ocsana.internal.tasks.mhs.MHSAlgorithmTask;
 import org.compsysmed.ocsana.internal.tasks.mhs.MHSAlgorithmTaskFactory;
 
+import org.compsysmed.ocsana.internal.tasks.results.PresentResultsTask;
+import org.compsysmed.ocsana.internal.tasks.results.PresentResultsTaskFactory;
+
 /**
  * Runner task for OCSANA
  *
@@ -128,6 +131,21 @@ public class OCSANARunnerTask extends AbstractNetworkTask
         taskManager.execute(mhsTaskFactory.createTaskIterator(), this);
     }
 
+    protected void spawnPresentResultsTask () {
+        PresentResultsTaskFactory presentResultsTaskFactory =
+            new PresentResultsTaskFactory(network,
+                                          sourceNodes,
+                                          targetNodes,
+                                          offTargetNodes,
+                                          pathFindingAlg,
+                                          pathsToTargets,
+                                          pathsToOffTargets,
+                                          mhsAlg,
+                                          MHSes);
+
+        taskManager.execute(presentResultsTaskFactory.createTaskIterator(), this);
+    }
+
     public void taskFinished(ObservableTask task) {
         // Make sure the task returned non-null
         if (task.getResults(Object.class) == null) {
@@ -157,6 +175,7 @@ public class OCSANARunnerTask extends AbstractNetworkTask
 
         case FIND_MHSES:
             MHSes = task.getResults(List.class);
+            spawnPresentResultsTask();
             break;
 
         case PRESENT_RESULTS:
