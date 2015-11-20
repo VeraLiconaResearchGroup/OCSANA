@@ -27,7 +27,12 @@ import org.cytoscape.model.CyEdge;
 // OCSANA imports
 import org.compsysmed.ocsana.internal.algorithms.mhs.AbstractMHSAlgorithm;
 
-public class MHSAlgorithmTask extends AbstractNetworkTask {
+import org.compsysmed.ocsana.internal.tasks.AbstractOCSANATask;
+import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
+
+public class MHSAlgorithmTask extends AbstractOCSANATask {
+    private static final OCSANAStep algStep = OCSANAStep.FIND_MHSES;
+
     public AbstractMHSAlgorithm algorithm;
 
     private Iterable<List<CyEdge>> paths;
@@ -72,9 +77,12 @@ public class MHSAlgorithmTask extends AbstractNetworkTask {
         return MHSes;
     }
 
-
     public <T> T getResults (Class<? extends T> type) {
-        return (T) getMHSes();
+        if (type.isAssignableFrom(OCSANAStep.class)) {
+            return (T) algStep;
+        } else {
+            return (T) getMHSes();
+        }
     }
 
     public void cancel () {

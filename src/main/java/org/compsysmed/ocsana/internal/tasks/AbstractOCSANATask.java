@@ -25,10 +25,15 @@ import org.cytoscape.work.ObservableTask;
 // OCSANA imports
 import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
 
+/**
+ * Abstract base class for OCSANA tasks.
+ *
+ * The getResults() method must respond reasonably to a request for an
+ * OCSANAStep.
+ **/
 public abstract class AbstractOCSANATask extends AbstractNetworkTask
     implements ObservableTask {
     public AbstractOCSANATask (CyNetwork network) {
         super(network);
     }
-    public abstract OCSANAStep getOCSANAStep ();
 }
