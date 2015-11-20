@@ -30,13 +30,13 @@ import org.compsysmed.ocsana.internal.algorithms.mhs.AbstractMHSAlgorithm;
 public class MHSAlgorithmTask extends AbstractNetworkTask {
     public AbstractMHSAlgorithm algorithm;
 
-    private Iterable<? extends Iterable<CyEdge>> paths;
+    private Iterable<List<CyEdge>> paths;
 
     private List<Set<CyNode>> MHSes;
 
     public MHSAlgorithmTask (CyNetwork network,
                              AbstractMHSAlgorithm algorithm,
-                             Iterable<? extends Iterable<CyEdge>> paths) {
+                             Iterable<List<CyEdge>> paths) {
         super(network);
         this.algorithm = algorithm;
         this.paths = paths;
@@ -47,13 +47,18 @@ public class MHSAlgorithmTask extends AbstractNetworkTask {
 
         taskMonitor.showMessage(TaskMonitor.Level.INFO, "Converting paths to node sets,");
         List<Set<CyNode>> nodeSets = new ArrayList<>();
-        for (Iterable<CyEdge> path: paths) {
+        for (List<CyEdge> path: paths) {
             Set<CyNode> nodes = new HashSet<>();
-            for (CyEdge edge: path) {
+            // The first node is a source and the last is a target, so we skip them
+            for (int i = 1; i < path.size() - 1; i++) {
+                CyEdge edge = path.get(i);
                 nodes.add(edge.getSource());
                 nodes.add(edge.getTarget());
             }
-            nodeSets.add(nodes);
+
+            if (!nodes.isEmpty()) {
+                nodeSets.add(nodes);
+            }
         }
 
         taskMonitor.showMessage(TaskMonitor.Level.INFO, "Finding minimal combinations of interventions.");
