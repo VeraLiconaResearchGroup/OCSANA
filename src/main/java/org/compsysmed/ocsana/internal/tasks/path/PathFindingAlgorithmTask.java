@@ -19,6 +19,7 @@ import java.util.*;
 import org.cytoscape.work.TaskMonitor;
 
 import org.cytoscape.model.CyNode;
+import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNetwork;
 
 // OCSANA imports
@@ -34,7 +35,7 @@ public class PathFindingAlgorithmTask extends AbstractOCSANATask {
     private Set<CyNode> sourceNodes;
     private Set<CyNode> targetNodes;
 
-    private List<List<CyNode>> paths;
+    private List<List<CyEdge>> paths;
 
     public PathFindingAlgorithmTask (CyNetwork network,
                                      OCSANAStep algStep,
@@ -74,7 +75,7 @@ public class PathFindingAlgorithmTask extends AbstractOCSANATask {
         taskMonitor.showMessage(TaskMonitor.Level.INFO, "Found " + paths.size() + " paths.");
     }
 
-    public List<List<CyNode>> getPaths () {
+    public List<List<CyEdge>> getPaths () {
         return paths;
     }
 

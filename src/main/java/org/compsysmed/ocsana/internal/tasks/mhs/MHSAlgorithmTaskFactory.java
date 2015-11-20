@@ -20,8 +20,9 @@ import org.cytoscape.work.AbstractTaskFactory;
 import org.cytoscape.work.TaskMonitor;
 import org.cytoscape.work.TaskIterator;
 
-import org.cytoscape.model.CyNode;
 import org.cytoscape.model.CyNetwork;
+import org.cytoscape.model.CyEdge;
+import org.cytoscape.model.CyNode;
 
 // OCSANA imports
 import org.compsysmed.ocsana.internal.algorithms.mhs.AbstractMHSAlgorithm;
@@ -31,11 +32,11 @@ import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
 public class MHSAlgorithmTaskFactory extends AbstractTaskFactory {
     private CyNetwork network;
     private AbstractMHSAlgorithm algorithm;
-    private Iterable<? extends Iterable<CyNode>> sets;
+    private Iterable<? extends Iterable<CyEdge>> sets;
 
     public MHSAlgorithmTaskFactory (CyNetwork network,
                                     AbstractMHSAlgorithm algorithm,
-                                    Iterable<? extends Iterable<CyNode>> sets) {
+                                    Iterable<? extends Iterable<CyEdge>> sets) {
         super();
         this.network = network;
         this.algorithm = algorithm;

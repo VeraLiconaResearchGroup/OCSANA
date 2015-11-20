@@ -28,6 +28,7 @@ import org.cytoscape.work.FinishStatus;
 import org.cytoscape.work.ContainsTunables;
 
 import org.cytoscape.model.CyNetwork;
+import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNode;
 
 // OCSANA imports
@@ -60,8 +61,8 @@ public class OCSANARunnerTask extends AbstractNetworkTask
     protected Set<CyNode> targetNodes;
     protected Set<CyNode> offTargetNodes;
 
-    protected List<List<CyNode>> pathsToTargets;
-    protected List<List<CyNode>> pathsToOffTargets;
+    protected List<List<CyEdge>> pathsToTargets;
+    protected List<List<CyEdge>> pathsToOffTargets;
     protected List<Set<CyNode>> MHSes;
 
     private TaskManager taskManager;

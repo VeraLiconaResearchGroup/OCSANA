@@ -18,9 +18,9 @@ import java.util.*;
 // Cytoscape imports
 import org.cytoscape.work.Tunable;
 
-import org.cytoscape.model.CyNode;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyEdge;
+import org.cytoscape.model.CyNode;
 
 // OCSANA imports
 import org.compsysmed.ocsana.internal.algorithms.path.AbstractPathFindingAlgorithm;
@@ -46,10 +46,10 @@ public class AllNonSelfIntersectingPathsAlgorithm extends AbstractPathFindingAlg
         super(network);
     }
 
-    public List<List<CyNode>> paths (Set<CyNode> sources,
+    public List<List<CyEdge>> paths (Set<CyNode> sources,
                                      Set<CyNode> targets) {
         assert maxPathLength >= 0;
-        List<List<CyNode>> results = null;
+        List<List<CyEdge>> results = null;
 
         Map<CyEdge, Integer> edgeMinDistances = computeEdgeMinDistances(sources, targets);
 
@@ -132,8 +132,10 @@ public class AllNonSelfIntersectingPathsAlgorithm extends AbstractPathFindingAlg
      * @param targets  the target nodes
      * @param edgeMinDistances  the minimum number of edges in a path
      * to a target beginning with the given edge
+     * @return a List of paths, each given as a List of CyEdges in
+     * order from a source to a target
      **/
-    protected List<List<CyNode>> computePaths (Set<CyNode> sources,
+    protected List<List<CyEdge>> computePaths (Set<CyNode> sources,
                                                Set<CyNode> targets,
                                                Map<CyEdge, Integer> edgeMinDistances) {
         // This time, we'll iterate down through the network, starting
@@ -141,24 +143,16 @@ public class AllNonSelfIntersectingPathsAlgorithm extends AbstractPathFindingAlg
         // walk, we'll extend the incomplete paths we find along any
         // edges whose minimum distance to a target is small enough to
         // keep the total path length no larger than maxPathLength.
-        List<List<CyNode>> completePaths = new ArrayList<>();
-        Queue<List<CyNode>> incompletePaths = new LinkedList<>();
+        List<List<CyEdge>> completePaths = new ArrayList<>();
+        Queue<List<CyEdge>> incompletePaths = new LinkedList<>();
 
-        // TODO: Handle error case when maxPathLength < 0?
+        // Invalid state: abort!
+        if (maxPathLength <= 0) {
+            return null;
+        }
 
         // Bootstrap the queue with the edges coming out of the sources
         for (CyNode sourceNode: sources) {
-            if (targets.contains(sourceNode)) {
-                List<CyNode> newPath = new ArrayList<>();
-                newPath.add(sourceNode);
-                completePaths.add(newPath);
-                continue;
-            }
-
-            if (maxPathLength <= 0) {
-                continue;
-            }
-
             for (CyEdge outEdge: network.getAdjacentEdgeIterable(sourceNode, CyEdge.Type.OUTGOING)) {
                 // Handle cancellation
                 if (isCanceled()) {
@@ -166,10 +160,10 @@ public class AllNonSelfIntersectingPathsAlgorithm extends AbstractPathFindingAlg
                 }
 
                 assert outEdge.getSource() == sourceNode;
+
                 if (edgeMinDistances.containsKey(outEdge)) {
-                    List<CyNode> newPath = new ArrayList<>();
-                    newPath.add(outEdge.getSource());
-                    newPath.add(outEdge.getTarget());
+                    List<CyEdge> newPath = new ArrayList<>();
+                    newPath.add(outEdge);
 
                     incompletePaths.add(newPath);
                 }
@@ -177,37 +171,42 @@ public class AllNonSelfIntersectingPathsAlgorithm extends AbstractPathFindingAlg
         }
 
         // Work through the queue of incomplete paths
-        for (List<CyNode> incompletePath; (incompletePath = incompletePaths.poll()) != null;) {
-            // Number of *edges* in path
-            Integer pathLength = incompletePath.size() - 1;
+        for (List<CyEdge> incompletePath; (incompletePath = incompletePaths.poll()) != null;) {
+            // Number of edges in path
+            Integer pathLength = incompletePath.size();
 
-            // Consider all edges coming out of the tail of the path
-            CyNode tailNode = incompletePath.get(incompletePath.size() - 1);
-            for (CyEdge outEdge: network.getAdjacentEdgeIterable(tailNode, CyEdge.Type.OUTGOING)) {
+            // Consider all edges coming out of the leaf of the path
+            CyEdge leafEdge = incompletePath.get(incompletePath.size() - 1);
+            assert leafEdge.isDirected();
+
+            CyNode leafNode = leafEdge.getTarget();
+            for (CyEdge outEdge: network.getAdjacentEdgeIterable(leafNode, CyEdge.Type.OUTGOING)) {
                 // Handle cancellation
                 if (isCanceled()) {
                     return null;
                 }
 
                 if ((edgeMinDistances.containsKey(outEdge)) && (edgeMinDistances.get(outEdge) + pathLength <= maxPathLength)) {
-                    // Cytoscape handles undirected edges strangely,
-                    // so we have to be careful with source and target order
-                    CyNode nextNode;
-                    if (outEdge.getSource().equals(tailNode)) {
-                        nextNode = outEdge.getTarget();
-                    } else {
-                        nextNode = outEdge.getSource();
+                    assert outEdge.isDirected();
+
+                    // Make sure this doesn't create a self-intersecting path
+                    boolean pathIsSelfIntersecting = false;
+                    for (CyEdge pathEdge: incompletePath) {
+                        if (pathEdge.getSource().equals(outEdge.getTarget()) || (pathEdge.getTarget().equals(outEdge.getTarget()))) {
+                            pathIsSelfIntersecting = true;
+                            break;
+                        }
                     }
 
-                    // Make sure this doesn't form a self-intersecting path
-                    if (incompletePath.contains(nextNode)) {
+                    if (pathIsSelfIntersecting) {
                         continue;
                     }
 
-                    List<CyNode> newPath = new ArrayList<>(incompletePath);
-                    newPath.add(nextNode);
+                    // Otherwise, create the new path
+                    List<CyEdge> newPath = new ArrayList<>(incompletePath);
+                    newPath.add(outEdge);
 
-                    if (targets.contains(nextNode)) {
+                    if (targets.contains(outEdge.getTarget())) {
                         completePaths.add(newPath);
                     } else {
                         incompletePaths.add(newPath);
