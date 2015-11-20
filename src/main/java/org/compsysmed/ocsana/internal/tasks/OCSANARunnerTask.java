@@ -65,7 +65,6 @@ public class OCSANARunnerTask extends AbstractNetworkTask
     protected List<Set<CyNode>> MHSes;
 
     private TaskManager taskManager;
-    private Task currentSubTask;
 
     public OCSANARunnerTask (CyNetwork network,
                              TaskManager taskManager,
@@ -129,15 +128,16 @@ public class OCSANARunnerTask extends AbstractNetworkTask
     }
 
     public void taskFinished(ObservableTask task) {
-        // if (!(task instanceOf AbstractOCSANATask)) {
-        //     // do something
-        //     return;
-        // }
+        // Make sure the task returned non-null
+        if (task.getResults(Object.class) == null) {
+            cancel();
+            return;
+        }
 
+        // Process the results based on the step of the algorithm
         OCSANAStep currentStep = task.getResults(OCSANAStep.class);
 
         switch (currentStep) {
-            // TODO: default handling
         case GET_SETS:
             break;
 
@@ -160,6 +160,9 @@ public class OCSANARunnerTask extends AbstractNetworkTask
 
         case PRESENT_RESULTS:
             break;
+
+        default:
+            // TODO: sane default handling
         }
     }
 

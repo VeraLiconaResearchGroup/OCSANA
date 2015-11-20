@@ -20,6 +20,7 @@ import org.cytoscape.model.CyNode;
 import org.cytoscape.model.CyNetwork;
 
 // OCSANA imports
+import org.compsysmed.ocsana.internal.algorithms.AbstractOCSANAAlgorithm;
 
 /**
  * Public abstract base class for all path-finding algorithms.
@@ -27,7 +28,8 @@ import org.cytoscape.model.CyNetwork;
  * @param network  the CyNetwork to compute on
  **/
 
-public abstract class AbstractPathFindingAlgorithm {
+public abstract class AbstractPathFindingAlgorithm
+    extends AbstractOCSANAAlgorithm {
     protected static final String CONFIG_GROUP = "Path-finding algorithm";
 
     protected CyNetwork network;

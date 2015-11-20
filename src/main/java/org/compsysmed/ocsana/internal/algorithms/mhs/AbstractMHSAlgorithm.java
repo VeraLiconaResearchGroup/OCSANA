@@ -19,6 +19,7 @@ import org.cytoscape.model.CyNode;
 import org.cytoscape.model.CyNetwork;
 
 // OCSANA imports
+import org.compsysmed.ocsana.internal.algorithms.AbstractOCSANAAlgorithm;
 
 /**
  * Public abstract base class for all MHS algorithms.
@@ -26,7 +27,8 @@ import org.cytoscape.model.CyNetwork;
  * @param network  the CyNetwork to compute on
  **/
 
-public abstract class AbstractMHSAlgorithm {
+public abstract class AbstractMHSAlgorithm
+    extends AbstractOCSANAAlgorithm {
     protected static final String CONFIG_GROUP = "CI search algorithm";
 
     protected CyNetwork network;

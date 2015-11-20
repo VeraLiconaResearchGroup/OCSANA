@@ -49,8 +49,15 @@ public class AllNonSelfIntersectingPathsAlgorithm extends AbstractPathFindingAlg
     public List<List<CyNode>> paths (Set<CyNode> sources,
                                      Set<CyNode> targets) {
         assert maxPathLength >= 0;
+        List<List<CyNode>> results = null;
+
         Map<CyEdge, Integer> edgeMinDistances = computeEdgeMinDistances(sources, targets);
-        List<List<CyNode>> results = computePaths(sources, targets, edgeMinDistances);
+
+        // Only run the next step if the previous succeeded
+        if (edgeMinDistances != null) {
+            results = computePaths(sources, targets, edgeMinDistances);
+        }
+
         return results;
     }
 
@@ -86,6 +93,11 @@ public class AllNonSelfIntersectingPathsAlgorithm extends AbstractPathFindingAlg
 
         // Work through the node queue
         for (CyNode nodeToProcess; (nodeToProcess = nodesToProcess.poll()) != null;) {
+            // Handle cancellation
+            if (isCanceled()) {
+                return null;
+            }
+
             assert nodeMinDistances.containsKey(nodeToProcess);
             // Look at all the edges connected to this node
             for (CyEdge outEdge: network.getAdjacentEdgeIterable(nodeToProcess, CyEdge.Type.INCOMING)) {
@@ -148,6 +160,11 @@ public class AllNonSelfIntersectingPathsAlgorithm extends AbstractPathFindingAlg
             }
 
             for (CyEdge outEdge: network.getAdjacentEdgeIterable(sourceNode, CyEdge.Type.OUTGOING)) {
+                // Handle cancellation
+                if (isCanceled()) {
+                    return null;
+                }
+
                 assert outEdge.getSource() == sourceNode;
                 if (edgeMinDistances.containsKey(outEdge)) {
                     List<CyNode> newPath = new ArrayList<>();
@@ -167,6 +184,11 @@ public class AllNonSelfIntersectingPathsAlgorithm extends AbstractPathFindingAlg
             // Consider all edges coming out of the tail of the path
             CyNode tailNode = incompletePath.get(incompletePath.size() - 1);
             for (CyEdge outEdge: network.getAdjacentEdgeIterable(tailNode, CyEdge.Type.OUTGOING)) {
+                // Handle cancellation
+                if (isCanceled()) {
+                    return null;
+                }
+
                 if ((edgeMinDistances.containsKey(outEdge)) && (edgeMinDistances.get(outEdge) + pathLength <= maxPathLength)) {
                     // Cytoscape handles undirected edges strangely,
                     // so we have to be careful with source and target order

@@ -89,4 +89,9 @@ public class PathFindingAlgorithmTask extends AbstractOCSANATask {
     public OCSANAStep getOCSANAStep () {
         return algStep;
     }
+
+    public void cancel () {
+        super.cancel();
+        algorithm.cancel();
+    }
 }

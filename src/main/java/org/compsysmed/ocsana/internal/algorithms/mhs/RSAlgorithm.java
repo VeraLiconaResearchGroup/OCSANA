@@ -233,6 +233,11 @@ public class RSAlgorithm extends AbstractMHSAlgorithm {
                 return;
             }
 
+            // Handle cancellation
+            if (isCanceled()) {
+                return;
+            }
+
             // Get an uncovered edge
             Integer searchEdgeIndex = uncov.nextSetBit(0);
             BitSet searchEdge = (BitSet) H.get(searchEdgeIndex).clone();

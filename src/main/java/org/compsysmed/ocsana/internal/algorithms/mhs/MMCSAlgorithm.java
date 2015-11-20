@@ -233,6 +233,11 @@ public class MMCSAlgorithm extends AbstractMHSAlgorithm {
                 return;
             }
 
+            // Handle cancellation
+            if (isCanceled()) {
+                return;
+            }
+
             // Prune the vertices to search
             // Per M+U, find the uncovered edge e with the smallest intersection
             // with CAND

@@ -59,4 +59,9 @@ public class MHSAlgorithmTask extends AbstractNetworkTask {
     public <T> T getResults (Class<? extends T> type) {
         return (T) getMHSes();
     }
+
+    public void cancel () {
+        super.cancel();
+        algorithm.cancel();
+    }
 }
