@@ -101,6 +101,10 @@ public class AllNonSelfIntersectingPathsAlgorithm extends AbstractPathFindingAlg
             assert nodeMinDistances.containsKey(nodeToProcess);
             // Look at all the edges connected to this node
             for (CyEdge outEdge: network.getAdjacentEdgeIterable(nodeToProcess, CyEdge.Type.INCOMING)) {
+                if (!outEdge.isDirected()) {
+                    throw new IllegalArgumentException("Undirected edges are not supported.");
+                }
+
                 assert nodeToProcess == outEdge.getTarget();
                 CyNode nextNode = outEdge.getSource();
 
@@ -159,6 +163,10 @@ public class AllNonSelfIntersectingPathsAlgorithm extends AbstractPathFindingAlg
                     return null;
                 }
 
+                if (!outEdge.isDirected()) {
+                    throw new IllegalArgumentException("Undirected edges are not supported.");
+                }
+
                 assert outEdge.getSource() == sourceNode;
 
                 if (edgeMinDistances.containsKey(outEdge)) {
@@ -177,7 +185,10 @@ public class AllNonSelfIntersectingPathsAlgorithm extends AbstractPathFindingAlg
 
             // Consider all edges coming out of the leaf of the path
             CyEdge leafEdge = incompletePath.get(incompletePath.size() - 1);
-            assert leafEdge.isDirected();
+
+            if (!leafEdge.isDirected()) {
+                throw new IllegalArgumentException("Undirected edges are not supported.");
+            }
 
             CyNode leafNode = leafEdge.getTarget();
             for (CyEdge outEdge: network.getAdjacentEdgeIterable(leafNode, CyEdge.Type.OUTGOING)) {
@@ -186,9 +197,11 @@ public class AllNonSelfIntersectingPathsAlgorithm extends AbstractPathFindingAlg
                     return null;
                 }
 
-                if ((edgeMinDistances.containsKey(outEdge)) && (edgeMinDistances.get(outEdge) + pathLength <= maxPathLength)) {
-                    assert outEdge.isDirected();
+                if (!outEdge.isDirected()) {
+                    throw new IllegalArgumentException("Undirected edges are not supported.");
+                }
 
+                if ((edgeMinDistances.containsKey(outEdge)) && (edgeMinDistances.get(outEdge) + pathLength <= maxPathLength)) {
                     // Make sure this doesn't create a self-intersecting path
                     boolean pathIsSelfIntersecting = false;
                     for (CyEdge pathEdge: incompletePath) {
