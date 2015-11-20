@@ -203,7 +203,8 @@ public class MMCSAlgorithm extends AbstractMHSAlgorithm {
 
             // Argument checking
             if (H.numEdges() == 0) {
-                throw new IllegalArgumentException("Cannot process an edgeless hypergraph.");
+                // Edgeless case is handled in compute()
+                return;
             }
 
             if (CAND.isEmpty()) {
@@ -228,13 +229,18 @@ public class MMCSAlgorithm extends AbstractMHSAlgorithm {
          **/
         @Override
         protected void compute () {
-            // Handle maxCandidates
-            if ((counters.iterations.getAndIncrement() >= maxCandidates) && (maxCandidates > 0)) {
+            // Handle empty hypergraph case
+            if (H.numEdges() == 0) {
                 return;
             }
 
             // Handle cancellation
             if (isCanceled()) {
+                return;
+            }
+
+            // Handle maxCandidates
+            if ((counters.iterations.getAndIncrement() >= maxCandidates) && (maxCandidates > 0)) {
                 return;
             }
 

@@ -34,7 +34,7 @@ public class Hypergraph extends ArrayList<BitSet> {
      * @param numVerts  (positive) number of vertices
      **/
     public Hypergraph (int numVerts) {
-        if (numVerts <= 0) {
+        if (numVerts < 0) {
             throw new IllegalArgumentException("A hypergraph can only have positively many vertices.");
         }
 
@@ -50,7 +50,7 @@ public class Hypergraph extends ArrayList<BitSet> {
     public Hypergraph (int numVerts, int numEdges) {
         this(numVerts);
         for (int i = 0; i < numEdges; i++) {
-            add(new BitSet());
+            add(new BitSet(numVerts));
         }
     }
 
