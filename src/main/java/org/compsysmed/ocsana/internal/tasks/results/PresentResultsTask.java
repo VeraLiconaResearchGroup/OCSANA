@@ -68,19 +68,11 @@ public class PresentResultsTask extends AbstractOCSANATask {
     }
 
     public void run (TaskMonitor taskMonitor) {
-        taskMonitor.setTitle("OCSANA results");
+        taskMonitor.setTitle("Generating OCSANA results");
 
-        // User inputs
-        taskMonitor.showMessage(TaskMonitor.Level.INFO, "Source nodes: " + printNodes(sourceNodes));
-        taskMonitor.showMessage(TaskMonitor.Level.INFO, "Target nodes: " + printNodes(targetNodes));
-        taskMonitor.showMessage(TaskMonitor.Level.INFO, "Off-Target nodes: " + printNodes(offTargetNodes));
-
-        // Paths
-        taskMonitor.showMessage(TaskMonitor.Level.INFO, "Paths to off-targets: " + printEdgeSets(pathsToOffTargets));
-        taskMonitor.showMessage(TaskMonitor.Level.INFO, "Paths to targets: " + printEdgeSets(pathsToTargets));
-
-        // CIs
-        taskMonitor.showMessage(TaskMonitor.Level.INFO, "Minimal CIs: " + printNodeSets(MHSes));
+        for (String line: reportLines()) {
+            taskMonitor.showMessage(TaskMonitor.Level.INFO, line);
+        }
     }
 
     public <T> T getResults (Class<? extends T> type) {
@@ -91,12 +83,85 @@ public class PresentResultsTask extends AbstractOCSANATask {
         }
     }
 
-    // Helper functions for common printing tasks
+    // Helper functions for generating report sections
+    private String report () {
+        List<String> reportLines = reportLines();
+        String report = String.join("\n", reportLines);
+        return report;
+    }
+
+    private List<String> reportLines () {
+        List<String> lines = new ArrayList<> ();
+
+        lines.addAll(inputReportLines());
+        lines.add(SECTION_SEPARATOR);
+
+        lines.addAll(pathReportLines());
+        lines.add(SECTION_SEPARATOR);
+
+        lines.addAll(CIReportLines());
+
+        return lines;
+    }
+
+    private List<String> inputReportLines () {
+        List<String> lines = new ArrayList<> ();
+
+        String headerLine = "User arguments";
+        lines.add(headerLine);
+
+        String sourceLine = "Source nodes: " + nodeSetString(sourceNodes);
+        lines.add(sourceLine);
+
+        String targetLine = "Target nodes: " + nodeSetString(targetNodes);
+        lines.add(targetLine);
+
+        String offTargetLine = "Off-target nodes: " + nodeSetString(offTargetNodes);
+        lines.add(offTargetLine);
+
+        return lines;
+    }
+
+    private List<String> pathReportLines() {
+        List<String> lines = new ArrayList<> ();
+
+        String algLine = "Path-finding algorithm: " + pathAlg.fullName();
+        lines.add(algLine);
+
+        lines.add("Paths to targets:");
+        for (Iterable<CyEdge> path: pathsToTargets) {
+            lines.add(edgeSetString(path));
+        }
+        lines.add(MINOR_SEPARATOR);
+
+        lines.add("Paths to off-targets:");
+        for (Iterable<CyEdge> path: pathsToOffTargets) {
+            lines.add(edgeSetString(path));
+        }
+
+        return lines;
+    }
+
+    private List<String> CIReportLines() {
+        List<String> lines = new ArrayList<> ();
+
+        String algLine = "MHS algorithm: " + mhsAlg.fullName();
+        lines.add(algLine);
+
+        lines.add("Optimal CIs:");
+        for (Iterable<CyNode> MHS: MHSes) {
+            lines.add(nodeSetString(MHS));
+        }
+
+        return lines;
+    }
+
+    // Helper functions for generating strings from structures
     private String nodeName(CyNode node) {
         return network.getRow(node).get(CyNetwork.NAME, String.class);
     }
 
-    private String printNodes(Iterable<CyNode> nodes) {
+    private String nodeSetString(Iterable<CyNode> nodes) {
         if (nodes == null) {
             return new String();
         }
@@ -109,15 +174,7 @@ public class PresentResultsTask extends AbstractOCSANATask {
         return "[" + String.join(", ", strings) + "]";
     }
 
-    private String printNodeSets(Iterable<? extends Iterable<CyNode>> nodeSets) {
-        String result = new String();
-        for (Iterable<CyNode> nodeSet: nodeSets) {
-            result += printNodes(nodeSet) + "\n";
-        }
-        return result;
-    }
-
-    private String printEdges(Iterable<CyEdge> edges) {
+    private String edgeSetString(Iterable<CyEdge> edges) {
         if (edges == null) {
             return new String();
         }
@@ -143,11 +200,6 @@ public class PresentResultsTask extends AbstractOCSANATask {
         return result;
     }
 
-    private String printEdgeSets(Iterable<? extends Iterable<CyEdge>> edgeSets) {
-        String result = new String();
-        for (Iterable<CyEdge> edgeSet: edgeSets) {
-            result += printEdges(edgeSet) + "\n";
-        }
-        return result;
-    }
+    private static final String MINOR_SEPARATOR = "\n";
+    private static final String SECTION_SEPARATOR = "\n******\n";
 }
