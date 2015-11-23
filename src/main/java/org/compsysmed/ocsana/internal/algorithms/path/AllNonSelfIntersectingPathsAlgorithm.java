@@ -37,9 +37,15 @@ public class AllNonSelfIntersectingPathsAlgorithm extends AbstractPathFindingAlg
     public static final String NAME = "All non-self-intersecting paths";
     public static final String SHORTNAME = "ALL";
 
+    @Tunable(description = "Use finite search radius",
+             groups = {AbstractPathFindingAlgorithm.CONFIG_GROUP + ": " + SHORTNAME},
+             gravity=210)
+    public Boolean restrictPathLength = true;
+
     @Tunable(description = "Find paths with up to this many nodes:",
              groups = {AbstractPathFindingAlgorithm.CONFIG_GROUP + ": " + SHORTNAME},
-             gravity = 210)
+             gravity = 211,
+             dependsOn = "restrictPathLength=true")
     public Integer maxPathLength = 20;
 
     public AllNonSelfIntersectingPathsAlgorithm(CyNetwork network) {
@@ -201,7 +207,9 @@ public class AllNonSelfIntersectingPathsAlgorithm extends AbstractPathFindingAlg
                     throw new IllegalArgumentException("Undirected edges are not supported.");
                 }
 
-                if ((edgeMinDistances.containsKey(outEdge)) && (edgeMinDistances.get(outEdge) + pathLength <= maxPathLength)) {
+                if ((edgeMinDistances.containsKey(outEdge)) &&
+                    ((edgeMinDistances.get(outEdge) + pathLength <= maxPathLength) || (!restrictPathLength))
+                        ) {
                     // Make sure this doesn't create a self-intersecting path
                     boolean pathIsSelfIntersecting = false;
                     for (CyEdge pathEdge: incompletePath) {
