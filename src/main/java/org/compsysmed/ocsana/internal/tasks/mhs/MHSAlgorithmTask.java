@@ -50,7 +50,7 @@ public class MHSAlgorithmTask extends AbstractOCSANATask {
     public void run (TaskMonitor taskMonitor) {
         taskMonitor.setTitle("Minimal CIs");
 
-        taskMonitor.showMessage(TaskMonitor.Level.INFO, "Converting paths to node sets,");
+        taskMonitor.setStatusMessage("Converting paths to node sets,");
         List<Set<CyNode>> nodeSets = new ArrayList<>();
         for (List<CyEdge> path: paths) {
             Set<CyNode> nodes = new HashSet<>();
@@ -66,7 +66,7 @@ public class MHSAlgorithmTask extends AbstractOCSANATask {
             }
         }
 
-        taskMonitor.showMessage(TaskMonitor.Level.INFO, "Finding minimal combinations of interventions.");
+        taskMonitor.setStatusMessage("Finding minimal combinations of interventions.");
 
         MHSes = algorithm.MHSes(nodeSets);
 

@@ -66,9 +66,9 @@ public class PathFindingAlgorithmTask extends AbstractOCSANATask {
 
         taskMonitor.setTitle("Paths to " + targetType + "s");
 
-        taskMonitor.showMessage(TaskMonitor.Level.INFO, "Finding paths from " +
-                                sourceNodes.size() + " source nodes to to " +
-                                targetNodes.size() + " " + targetType + " nodes.");
+        taskMonitor.setStatusMessage("Finding paths from " +
+                                     sourceNodes.size() + " source nodes to to " +
+                                     targetNodes.size() + " " + targetType + " nodes.");
 
         paths = algorithm.paths(sourceNodes, targetNodes);
 
