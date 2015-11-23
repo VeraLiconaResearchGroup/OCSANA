@@ -71,16 +71,16 @@ public class PresentResultsTask extends AbstractOCSANATask {
         taskMonitor.setTitle("OCSANA results");
 
         // User inputs
-        taskMonitor.showMessage(TaskMonitor.Level.INFO, "Source nodes: " + printIterableInline(sourceNodes));
-        taskMonitor.showMessage(TaskMonitor.Level.INFO, "Target nodes: " + printIterableInline(targetNodes));
-        taskMonitor.showMessage(TaskMonitor.Level.INFO, "Off-Target nodes: " + printIterableInline(offTargetNodes));
+        taskMonitor.showMessage(TaskMonitor.Level.INFO, "Source nodes: " + printNodes(sourceNodes));
+        taskMonitor.showMessage(TaskMonitor.Level.INFO, "Target nodes: " + printNodes(targetNodes));
+        taskMonitor.showMessage(TaskMonitor.Level.INFO, "Off-Target nodes: " + printNodes(offTargetNodes));
 
         // Paths
-        taskMonitor.showMessage(TaskMonitor.Level.INFO, "Paths to off-targets: " + printNestedIterable(pathsToOffTargets));
-        taskMonitor.showMessage(TaskMonitor.Level.INFO, "Paths to targets: " + printNestedIterable(pathsToTargets));
+        taskMonitor.showMessage(TaskMonitor.Level.INFO, "Paths to off-targets: " + printEdgeSets(pathsToOffTargets));
+        taskMonitor.showMessage(TaskMonitor.Level.INFO, "Paths to targets: " + printEdgeSets(pathsToTargets));
 
         // CIs
-        taskMonitor.showMessage(TaskMonitor.Level.INFO, "Minimal CIs: " + printNestedIterable(MHSes));
+        taskMonitor.showMessage(TaskMonitor.Level.INFO, "Minimal CIs: " + printNodeSets(MHSes));
     }
 
     public <T> T getResults (Class<? extends T> type) {
@@ -92,23 +92,61 @@ public class PresentResultsTask extends AbstractOCSANATask {
     }
 
     // Helper functions for common printing tasks
-    private String printCyIdentifiable(CyIdentifiable cyThing) {
-        return network.getRow(cyThing).get(CyNetwork.NAME, String.class);
+    private String nodeName(CyNode node) {
+        return network.getRow(node).get(CyNetwork.NAME, String.class);
     }
 
-    private <T extends CyIdentifiable, I extends Iterable<T>> String printIterableInline(I toPrint) {
+    private String printNodes(Iterable<CyNode> nodes) {
+        if (nodes == null) {
+            return new String();
+        }
+
         List<String> strings = new ArrayList<>();
-        for (T elt: toPrint) {
-            strings.add(printCyIdentifiable(elt));
+        for (CyNode node: nodes) {
+            strings.add(nodeName(node));
         }
 
         return "[" + String.join(", ", strings) + "]";
     }
 
-    private <T extends CyIdentifiable, I extends Iterable<T>> String printNestedIterable (Iterable<I> toPrint) {
+    private String printNodeSets(Iterable<? extends Iterable<CyNode>> nodeSets) {
         String result = new String();
-        for (I innerIterable: toPrint) {
-            result += printIterableInline(innerIterable) + "\n";
+        for (Iterable<CyNode> nodeSet: nodeSets) {
+            result += printNodes(nodeSet) + "\n";
+        }
+        return result;
+    }
+
+    private String printEdges(Iterable<CyEdge> edges) {
+        if (edges == null) {
+            return new String();
+        }
+
+        String result = new String("[");
+
+        // Handle first node
+        try {
+            CyNode firstNode = edges.iterator().next().getSource();
+            result += nodeName(firstNode);
+        } catch (NoSuchElementException e) {
+            return "[]";
+        }
+
+        // Each other node is a target
+        for (CyEdge edge: edges) {
+            // TODO: Handle activation and inhibition symbols
+            result += " -> ";
+            result += nodeName(edge.getTarget());
+        }
+
+        result += "]";
+        return result;
+    }
+
+    private String printEdgeSets(Iterable<? extends Iterable<CyEdge>> edgeSets) {
+        String result = new String();
+        for (Iterable<CyEdge> edgeSet: edgeSets) {
+            result += printEdges(edgeSet) + "\n";
         }
         return result;
     }
