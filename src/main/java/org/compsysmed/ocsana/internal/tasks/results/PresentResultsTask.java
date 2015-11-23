@@ -104,6 +104,7 @@ public class PresentResultsTask extends AbstractOCSANATask {
         return lines;
     }
 
+    // Generate report lines describing the user's inputs
     private List<String> inputReportLines () {
         List<String> lines = new ArrayList<> ();
 
@@ -122,6 +123,7 @@ public class PresentResultsTask extends AbstractOCSANATask {
         return lines;
     }
 
+    // Generate report lines describing the paths
     private List<String> pathReportLines() {
         List<String> lines = new ArrayList<> ();
 
@@ -142,6 +144,7 @@ public class PresentResultsTask extends AbstractOCSANATask {
         return lines;
     }
 
+    // Generate report lines describing the CIs
     private List<String> CIReportLines() {
         List<String> lines = new ArrayList<> ();
 
