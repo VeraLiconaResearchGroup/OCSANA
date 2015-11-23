@@ -41,4 +41,14 @@ public abstract class AbstractOCSANAAlgorithm {
     public boolean isCanceled() {
         return canceled.get();
     }
+
+    /**
+     * Return a long, explanatory name
+     **/
+    abstract public String fullName ();
+
+    /**
+     * Return a short name
+     **/
+    abstract public String shortName ();
 }

@@ -54,14 +54,4 @@ public abstract class AbstractPathFindingAlgorithm
      * Return a name suitable for printing in a menu or status message
      **/
     abstract public String toString ();
-
-    /**
-     * Return a long, explanatory name
-     **/
-    abstract public String fullName ();
-
-    /**
-     * Return a short name
-     **/
-    abstract public String shortName ();
 }
