@@ -31,56 +31,24 @@ import org.compsysmed.ocsana.internal.algorithms.scoring.OCSANAScoringAlgorithm;
 
 import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
 
+import org.compsysmed.ocsana.internal.ui.OCSANAResultsPanel;
+
 public class PresentResultsTaskFactory extends AbstractTaskFactory {
     private CyNetwork network;
-
-    // User inputs
-    protected Set<CyNode> sourceNodes;
-    protected Set<CyNode> targetNodes;
-    protected Set<CyNode> offTargetNodes;
-
-    // Paths data
-    protected AbstractPathFindingAlgorithm pathAlg;
-    protected Collection<? extends List<CyEdge>> pathsToTargets;
-    protected Collection<? extends List<CyEdge>> pathsToOffTargets;
-
-    // Scoring data
-    protected OCSANAScoringAlgorithm ocsanaAlg;
-
-    // MHS data
-    protected AbstractMHSAlgorithm mhsAlg;
-    protected Collection<? extends Collection<CyNode>> MHSes;
+    private OCSANAResults results;
+    private OCSANAResultsPanel resultsPanel;
 
     public PresentResultsTaskFactory (CyNetwork network,
-                                      Set<CyNode> sourceNodes,
-                                      Set<CyNode> targetNodes,
-                                      Set<CyNode> offTargetNodes,
-                                      AbstractPathFindingAlgorithm pathAlg,
-                                      Collection<? extends List<CyEdge>> pathsToTargets,
-                                      Collection<? extends List<CyEdge>> pathsToOffTargets,
-                                      OCSANAScoringAlgorithm ocsanaAlg,
-                                      AbstractMHSAlgorithm mhsAlg,
-                                      Collection<? extends Collection<CyNode>> MHSes) {
+                                      OCSANAResults results,
+                                      OCSANAResultsPanel resultsPanel) {
         this.network = network;
-        this.sourceNodes = sourceNodes;
-        this.targetNodes = targetNodes;
-        this.offTargetNodes = offTargetNodes;
-        this.pathAlg = pathAlg;
-        this.pathsToTargets = pathsToTargets;
-        this.pathsToOffTargets = pathsToOffTargets;
-        this.ocsanaAlg = ocsanaAlg;
-        this.mhsAlg = mhsAlg;
-        this.MHSes = MHSes;
+        this.results = results;
+        this.resultsPanel = resultsPanel;
     }
 
     public TaskIterator createTaskIterator () {
         TaskIterator tasks = new TaskIterator();
-        tasks.append(new PresentResultsTask(network, sourceNodes,
-                                            targetNodes, offTargetNodes,
-                                            pathAlg,
-                                            pathsToTargets, pathsToOffTargets,
-                                            ocsanaAlg,
-                                            mhsAlg, MHSes));
+        tasks.append(new PresentResultsTask(network, results, resultsPanel));
         return tasks;
     }
 }

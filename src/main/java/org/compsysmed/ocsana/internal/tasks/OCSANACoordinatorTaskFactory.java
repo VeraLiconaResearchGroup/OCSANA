@@ -22,18 +22,22 @@ import org.cytoscape.work.TaskManager;
 import org.cytoscape.model.CyNetwork;
 
 // OCSANA imports
+import org.compsysmed.ocsana.internal.ui.OCSANAResultsPanel;
 
 public class OCSANACoordinatorTaskFactory extends AbstractNetworkTaskFactory {
     protected TaskManager taskManager;
+    protected OCSANAResultsPanel resultsPanel;
 
-    public OCSANACoordinatorTaskFactory (TaskManager taskManager) {
+    public OCSANACoordinatorTaskFactory (TaskManager taskManager,
+                                         OCSANAResultsPanel resultsPanel) {
         super();
         this.taskManager = taskManager;
+        this.resultsPanel = resultsPanel;
     }
 
     public TaskIterator createTaskIterator (CyNetwork network) {
         TaskIterator tasks = new TaskIterator();
-        tasks.append(new OCSANACoordinatorTask(network, taskManager));
+        tasks.append(new OCSANACoordinatorTask(network, taskManager, resultsPanel));
         return tasks;
     }
 }

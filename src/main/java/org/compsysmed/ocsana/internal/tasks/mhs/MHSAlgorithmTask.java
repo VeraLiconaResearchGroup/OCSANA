@@ -35,13 +35,13 @@ public class MHSAlgorithmTask extends AbstractOCSANATask {
 
     public AbstractMHSAlgorithm algorithm;
 
-    private Collection<List<CyEdge>> paths;
+    private Collection<? extends List<CyEdge>> paths;
 
-    private List<Set<CyNode>> MHSes;
+    private List<? extends Set<CyNode>> MHSes;
 
     public MHSAlgorithmTask (CyNetwork network,
                              AbstractMHSAlgorithm algorithm,
-                             Collection<List<CyEdge>> paths) {
+                             Collection<? extends List<CyEdge>> paths) {
         super(network);
         this.algorithm = algorithm;
         this.paths = paths;
@@ -73,7 +73,7 @@ public class MHSAlgorithmTask extends AbstractOCSANATask {
         taskMonitor.showMessage(TaskMonitor.Level.INFO, "Found " + MHSes.size() + " minimal CIs.");
     }
 
-    public List<Set<CyNode>> getMHSes () {
+    public List<? extends Set<CyNode>> getMHSes () {
         return MHSes;
     }
 

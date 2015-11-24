@@ -26,6 +26,7 @@ import org.cytoscape.model.CyRow;
 import org.cytoscape.model.CyColumn;
 
 // OCSANA imports
+import org.compsysmed.ocsana.internal.algorithms.AbstractOCSANAAlgorithm;
 
 /**
  * Implementation of the OCSANA scoring algorithm
@@ -33,7 +34,8 @@ import org.cytoscape.model.CyColumn;
  * @param network  the network to compute on
  **/
 
-public class OCSANAScoringAlgorithm {
+public class OCSANAScoringAlgorithm
+    extends AbstractOCSANAAlgorithm {
     public static final String CONFIG_GROUP = "Scoring algorithm";
     public static final String NAME = "OCSANA scoring";
     public static final String SHORTNAME = "OCSANA";
@@ -132,8 +134,8 @@ public class OCSANAScoringAlgorithm {
      * @param pathsToTargets  the paths to the target nodes
      * @param pathsToOffTargets  the paths to the off-target nodes
      **/
-    public void applyScores(Collection<List<CyEdge>> pathsToTargets,
-                            Collection<List<CyEdge>> pathsToOffTargets) {
+    public void applyScores(Collection<? extends List<CyEdge>> pathsToTargets,
+                            Collection<? extends List<CyEdge>> pathsToOffTargets) {
         resetScoreColumn(effectsOnTargetsColumn);
         resetScoreColumn(effectsOnOffTargetsColumn);
 
@@ -215,7 +217,7 @@ public class OCSANAScoringAlgorithm {
      * @param targetColumn  table column to store targets hit
      * @param targetsHitSet  set to store targets hit
      **/
-    protected void precomputeScoresForPaths(Collection<List<CyEdge>> paths,
+    protected void precomputeScoresForPaths(Collection<? extends List<CyEdge>> paths,
                                             String effectColumn,
                                             String pathCountColumn,
                                             String targetColumn,

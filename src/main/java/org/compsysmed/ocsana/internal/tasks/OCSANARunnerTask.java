@@ -47,6 +47,9 @@ import org.compsysmed.ocsana.internal.tasks.mhs.MHSAlgorithmTaskFactory;
 
 import org.compsysmed.ocsana.internal.tasks.results.PresentResultsTask;
 import org.compsysmed.ocsana.internal.tasks.results.PresentResultsTaskFactory;
+import org.compsysmed.ocsana.internal.tasks.results.OCSANAResults;
+
+import org.compsysmed.ocsana.internal.ui.OCSANAResultsPanel;
 
 /**
  * Runner task for OCSANA
@@ -70,14 +73,15 @@ public class OCSANARunnerTask extends AbstractNetworkTask
     protected Set<CyNode> targetNodes;
     protected Set<CyNode> offTargetNodes;
 
-    protected List<List<CyEdge>> pathsToTargets;
-    protected List<List<CyEdge>> pathsToOffTargets;
-    protected List<Set<CyNode>> MHSes;
+    protected OCSANAResults results;
+
+    protected OCSANAResultsPanel resultsPanel;
 
     private TaskManager taskManager;
 
     public OCSANARunnerTask (CyNetwork network,
                              TaskManager taskManager,
+                             OCSANAResultsPanel resultsPanel,
                              AbstractPathFindingAlgorithm pathFindingAlg,
                              OCSANAScoringAlgorithm ocsanaAlg,
                              AbstractMHSAlgorithm mhsAlg,
@@ -86,6 +90,7 @@ public class OCSANARunnerTask extends AbstractNetworkTask
                              Set<CyNode> offTargetNodes) {
         super(network);
         this.taskManager = taskManager;
+        this.resultsPanel = resultsPanel;
 
         this.pathFindingAlg = pathFindingAlg;
         this.ocsanaAlg = ocsanaAlg;
@@ -94,6 +99,16 @@ public class OCSANARunnerTask extends AbstractNetworkTask
         this.sourceNodes = sourceNodes;
         this.targetNodes = targetNodes;
         this.offTargetNodes = offTargetNodes;
+
+        results = new OCSANAResults();
+        results.network = network;
+        results.pathFindingAlg = pathFindingAlg;
+        results.ocsanaAlg = ocsanaAlg;
+        results.mhsAlg = mhsAlg;
+
+        results.sourceNodes = sourceNodes;
+        results.targetNodes = targetNodes;
+        results.offTargetNodes = offTargetNodes;
     }
 
     public void run (TaskMonitor taskMonitor) {
@@ -133,8 +148,8 @@ public class OCSANARunnerTask extends AbstractNetworkTask
     protected void spawnScoringTask () {
         OCSANAScoringAlgorithmTaskFactory scoringTaskFactory =
             new OCSANAScoringAlgorithmTaskFactory(network, ocsanaAlg,
-                                                  pathsToTargets,
-                                                  pathsToOffTargets);
+                                                  results.pathsToTargets,
+                                                  results.pathsToOffTargets);
 
         taskManager.execute(scoringTaskFactory.createTaskIterator(), this);
     }
@@ -143,23 +158,14 @@ public class OCSANARunnerTask extends AbstractNetworkTask
         MHSAlgorithmTaskFactory mhsTaskFactory =
             new MHSAlgorithmTaskFactory(network,
                                         mhsAlg,
-                                        pathsToTargets);
+                                        results.pathsToTargets);
 
         taskManager.execute(mhsTaskFactory.createTaskIterator(), this);
     }
 
     protected void spawnPresentResultsTask () {
         PresentResultsTaskFactory presentResultsTaskFactory =
-            new PresentResultsTaskFactory(network,
-                                          sourceNodes,
-                                          targetNodes,
-                                          offTargetNodes,
-                                          pathFindingAlg,
-                                          pathsToTargets,
-                                          pathsToOffTargets,
-                                          ocsanaAlg,
-                                          mhsAlg,
-                                          MHSes);
+            new PresentResultsTaskFactory(network, results, resultsPanel);
 
         taskManager.execute(presentResultsTaskFactory.createTaskIterator(), this);
     }
@@ -184,12 +190,12 @@ public class OCSANARunnerTask extends AbstractNetworkTask
             break;
 
         case FIND_PATHS_TO_TARGETS:
-            pathsToTargets = task.getResults(List.class);
+            results.pathsToTargets = task.getResults(List.class);
             spawnPathsToOffTargetsTask();
             break;
 
         case FIND_PATHS_TO_OFF_TARGETS:
-            pathsToOffTargets = task.getResults(List.class);
+            results.pathsToOffTargets = task.getResults(List.class);
             spawnScoringTask();
             break;
 
@@ -198,7 +204,7 @@ public class OCSANARunnerTask extends AbstractNetworkTask
             break;
 
         case FIND_MHSES:
-            MHSes = task.getResults(List.class);
+            results.MHSes = task.getResults(List.class);
             spawnPresentResultsTask();
             break;
 
