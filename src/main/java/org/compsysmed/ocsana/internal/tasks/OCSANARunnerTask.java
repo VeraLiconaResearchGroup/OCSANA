@@ -34,9 +34,13 @@ import org.cytoscape.model.CyNode;
 // OCSANA imports
 import org.compsysmed.ocsana.internal.algorithms.path.AbstractPathFindingAlgorithm;
 import org.compsysmed.ocsana.internal.algorithms.mhs.AbstractMHSAlgorithm;
+import org.compsysmed.ocsana.internal.algorithms.scoring.OCSANAScoringAlgorithm;
 
 import org.compsysmed.ocsana.internal.tasks.path.PathFindingAlgorithmTask;
 import org.compsysmed.ocsana.internal.tasks.path.PathFindingAlgorithmTaskFactory;
+
+import org.compsysmed.ocsana.internal.tasks.scoring.OCSANAScoringAlgorithmTask;
+import org.compsysmed.ocsana.internal.tasks.scoring.OCSANAScoringAlgorithmTaskFactory;
 
 import org.compsysmed.ocsana.internal.tasks.mhs.MHSAlgorithmTask;
 import org.compsysmed.ocsana.internal.tasks.mhs.MHSAlgorithmTaskFactory;
@@ -60,6 +64,8 @@ public class OCSANARunnerTask extends AbstractNetworkTask
     @ContainsTunables
     public AbstractMHSAlgorithm mhsAlg;
 
+    public OCSANAScoringAlgorithm ocsanaAlg;
+
     protected Set<CyNode> sourceNodes;
     protected Set<CyNode> targetNodes;
     protected Set<CyNode> offTargetNodes;
@@ -73,6 +79,7 @@ public class OCSANARunnerTask extends AbstractNetworkTask
     public OCSANARunnerTask (CyNetwork network,
                              TaskManager taskManager,
                              AbstractPathFindingAlgorithm pathFindingAlg,
+                             OCSANAScoringAlgorithm ocsanaAlg,
                              AbstractMHSAlgorithm mhsAlg,
                              Set<CyNode> sourceNodes,
                              Set<CyNode> targetNodes,
@@ -81,6 +88,7 @@ public class OCSANARunnerTask extends AbstractNetworkTask
         this.taskManager = taskManager;
 
         this.pathFindingAlg = pathFindingAlg;
+        this.ocsanaAlg = ocsanaAlg;
         this.mhsAlg = mhsAlg;
 
         this.sourceNodes = sourceNodes;
@@ -122,6 +130,15 @@ public class OCSANARunnerTask extends AbstractNetworkTask
                             this);
     }
 
+    protected void spawnScoringTask () {
+        OCSANAScoringAlgorithmTaskFactory scoringTaskFactory =
+            new OCSANAScoringAlgorithmTaskFactory(network, ocsanaAlg,
+                                                  pathsToTargets,
+                                                  pathsToOffTargets);
+
+        taskManager.execute(scoringTaskFactory.createTaskIterator(), this);
+    }
+
     protected void spawnMHSTask () {
         MHSAlgorithmTaskFactory mhsTaskFactory =
             new MHSAlgorithmTaskFactory(network,
@@ -140,6 +157,7 @@ public class OCSANARunnerTask extends AbstractNetworkTask
                                           pathFindingAlg,
                                           pathsToTargets,
                                           pathsToOffTargets,
+                                          ocsanaAlg,
                                           mhsAlg,
                                           MHSes);
 
@@ -167,10 +185,11 @@ public class OCSANARunnerTask extends AbstractNetworkTask
 
         case FIND_PATHS_TO_OFF_TARGETS:
             pathsToOffTargets = task.getResults(List.class);
-            spawnMHSTask();
+            spawnScoringTask();
             break;
 
         case SCORE_PATHS:
+            spawnMHSTask();
             break;
 
         case FIND_MHSES:
@@ -182,7 +201,7 @@ public class OCSANARunnerTask extends AbstractNetworkTask
             break;
 
         default:
-            // TODO: sane default handling
+            throw new AssertionError("Invalid OCSANA step " + currentStep);
         }
     }
 

@@ -26,6 +26,7 @@ import org.cytoscape.model.CyNetwork;
 // OCSANA imports
 import org.compsysmed.ocsana.internal.algorithms.path.AbstractPathFindingAlgorithm;
 import org.compsysmed.ocsana.internal.algorithms.mhs.AbstractMHSAlgorithm;
+import org.compsysmed.ocsana.internal.algorithms.scoring.OCSANAScoringAlgorithm;
 
 import org.compsysmed.ocsana.internal.tasks.AbstractOCSANATask;
 import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
@@ -33,17 +34,20 @@ import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
 public class PresentResultsTask extends AbstractOCSANATask {
     private static final OCSANAStep algStep = OCSANAStep.PRESENT_RESULTS;
 
-// User inputs
+    // User inputs
     protected Set<CyNode> sourceNodes;
     protected Set<CyNode> targetNodes;
     protected Set<CyNode> offTargetNodes;
 
-// Paths data
+    // Paths data
     protected AbstractPathFindingAlgorithm pathAlg;
     protected Iterable<? extends Iterable<CyEdge>> pathsToTargets;
     protected Iterable<? extends Iterable<CyEdge>> pathsToOffTargets;
 
-// MHS data
+    // Scoring data
+    protected OCSANAScoringAlgorithm ocsanaAlg;
+
+    // MHS data
     protected AbstractMHSAlgorithm mhsAlg;
     protected Iterable<? extends Iterable<CyNode>> MHSes;
 
@@ -54,6 +58,7 @@ public class PresentResultsTask extends AbstractOCSANATask {
                                AbstractPathFindingAlgorithm pathAlg,
                                Iterable<? extends Iterable<CyEdge>> pathsToTargets,
                                Iterable<? extends Iterable<CyEdge>> pathsToOffTargets,
+                               OCSANAScoringAlgorithm ocsanaAlg,
                                AbstractMHSAlgorithm mhsAlg,
                                Iterable<? extends Iterable<CyNode>> MHSes) {
         super(network);
@@ -63,6 +68,7 @@ public class PresentResultsTask extends AbstractOCSANATask {
         this.pathAlg = pathAlg;
         this.pathsToTargets = pathsToTargets;
         this.pathsToOffTargets = pathsToOffTargets;
+        this.ocsanaAlg = ocsanaAlg;
         this.mhsAlg = mhsAlg;
         this.MHSes = MHSes;
     }
@@ -170,11 +176,13 @@ public class PresentResultsTask extends AbstractOCSANATask {
         }
 
         List<String> strings = new ArrayList<>();
+        Double score = 0.0;
         for (CyNode node: nodes) {
             strings.add(nodeName(node));
+            score += ocsanaAlg.getScore(node);
         }
 
-        return "[" + String.join(", ", strings) + "]";
+        return "(" + score + "): [" + String.join(", ", strings) + "]";
     }
 
     private String edgeSetString(Iterable<CyEdge> edges) {

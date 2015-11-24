@@ -29,6 +29,7 @@ import org.cytoscape.model.CyNode;
 
 // OCSANA imports
 import org.compsysmed.ocsana.internal.algorithms.path.AbstractPathFindingAlgorithm;
+import org.compsysmed.ocsana.internal.algorithms.scoring.OCSANAScoringAlgorithm;
 import org.compsysmed.ocsana.internal.algorithms.mhs.AbstractMHSAlgorithm;
 
 import org.compsysmed.ocsana.internal.tasks.OCSANARunnerTask;
@@ -59,6 +60,8 @@ public class OCSANACoordinatorTask extends AbstractNetworkTask {
     @ContainsTunables
     public MHSAlgorithmSelecter mhsAlgSelecter;
 
+    public OCSANAScoringAlgorithm ocsanaAlgorithm;
+
     public OCSANACoordinatorTask (CyNetwork network, TaskManager taskManager) {
         super(network);
 
@@ -66,6 +69,8 @@ public class OCSANACoordinatorTask extends AbstractNetworkTask {
         nodeSelecter = new NodeSetSelecter(network);
         pathAlgSelecter = new PathFindingAlgorithmSelecter(network);
         mhsAlgSelecter = new MHSAlgorithmSelecter(network);
+
+        ocsanaAlgorithm = new OCSANAScoringAlgorithm(network);
     }
 
     public void run (TaskMonitor taskMonitor) {
@@ -84,6 +89,7 @@ public class OCSANACoordinatorTask extends AbstractNetworkTask {
         OCSANARunnerTask runnerTask = new OCSANARunnerTask(network,
                                                            taskManager,
                                                            pathAlgorithm,
+                                                           ocsanaAlgorithm,
                                                            mhsAlgorithm,
                                                            sourceNodes,
                                                            targetNodes,

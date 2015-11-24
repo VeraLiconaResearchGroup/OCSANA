@@ -27,6 +27,7 @@ import org.cytoscape.model.CyEdge;
 // OCSANA imports
 import org.compsysmed.ocsana.internal.algorithms.path.AbstractPathFindingAlgorithm;
 import org.compsysmed.ocsana.internal.algorithms.mhs.AbstractMHSAlgorithm;
+import org.compsysmed.ocsana.internal.algorithms.scoring.OCSANAScoringAlgorithm;
 
 import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
 
@@ -43,6 +44,9 @@ public class PresentResultsTaskFactory extends AbstractTaskFactory {
     protected Iterable<? extends Iterable<CyEdge>> pathsToTargets;
     protected Iterable<? extends Iterable<CyEdge>> pathsToOffTargets;
 
+    // Scoring data
+    protected OCSANAScoringAlgorithm ocsanaAlg;
+
     // MHS data
     protected AbstractMHSAlgorithm mhsAlg;
     protected Iterable<? extends Iterable<CyNode>> MHSes;
@@ -54,6 +58,7 @@ public class PresentResultsTaskFactory extends AbstractTaskFactory {
                                       AbstractPathFindingAlgorithm pathAlg,
                                       Iterable<? extends Iterable<CyEdge>> pathsToTargets,
                                       Iterable<? extends Iterable<CyEdge>> pathsToOffTargets,
+                                      OCSANAScoringAlgorithm ocsanaAlg,
                                       AbstractMHSAlgorithm mhsAlg,
                                       Iterable<? extends Iterable<CyNode>> MHSes) {
         this.network = network;
@@ -63,6 +68,7 @@ public class PresentResultsTaskFactory extends AbstractTaskFactory {
         this.pathAlg = pathAlg;
         this.pathsToTargets = pathsToTargets;
         this.pathsToOffTargets = pathsToOffTargets;
+        this.ocsanaAlg = ocsanaAlg;
         this.mhsAlg = mhsAlg;
         this.MHSes = MHSes;
     }
@@ -73,6 +79,7 @@ public class PresentResultsTaskFactory extends AbstractTaskFactory {
                                             targetNodes, offTargetNodes,
                                             pathAlg,
                                             pathsToTargets, pathsToOffTargets,
+                                            ocsanaAlg,
                                             mhsAlg, MHSes));
         return tasks;
     }
