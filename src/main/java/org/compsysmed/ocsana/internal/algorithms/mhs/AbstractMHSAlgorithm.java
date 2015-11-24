@@ -31,8 +31,6 @@ public abstract class AbstractMHSAlgorithm
     extends AbstractOCSANAAlgorithm {
     protected static final String CONFIG_GROUP = "CI search algorithm";
 
-    protected CyNetwork network;
-
     public AbstractMHSAlgorithm () {};
 
     /**
