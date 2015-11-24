@@ -28,7 +28,7 @@ import org.cytoscape.model.CyColumn;
 /**
  * Implementation of the OCSANA scoring algorithm
  *
- * @param tablePrefix  prefix to use for
+ * @param network  the network to compute on
  **/
 
 public class OCSANAScoringAlgorithm {
@@ -60,12 +60,14 @@ public class OCSANAScoringAlgorithm {
     }
 
     /**
-     * Compute the OCSANA score for a given node
+     * Retrieve the OCSANA score for a given node
      *
      * @param node  the node to score
      **/
     public Double getScore (CyNode node) {
-        assert algorithmHasRun;
+        if (!algorithmHasRun) {
+            throw new IllegalArgumentException("Cannot retrieve scores before running algorithm");
+        }
 
         CyRow nodeRow = nodeTable.getRow(node.getSUID());
 
@@ -222,15 +224,31 @@ public class OCSANAScoringAlgorithm {
 
     }
 
-        // Ensure that the specified column exists and is empty
+    /**
+     * Initialize (create and clear) a column of scores
+     *
+     * @param columnName  the name of the column
+     **/
     protected void resetScoreColumn(String columnName) {
         resetColumn(columnName, Double.class, 0.0);
     }
 
+    /**
+     * Initialize (create and clear) a column of counts
+     *
+     * @param columnName  the name of the column
+     **/
     protected void resetCountColumn(String columnName) {
         resetColumn(columnName, Integer.class, 0);
     }
 
+    /**
+     * Initialize (create and clear) a column
+     *
+     * @param columnName  the name of the column
+     * @param type  the data type for the column
+     * @param defaultValue  the default value for the column
+     **/
     private <T extends Number> void resetColumn(String columnName,
                                                 Class <? extends T> type,
                                                 T defaultValue) {
@@ -252,6 +270,12 @@ public class OCSANAScoringAlgorithm {
         resetListColumn(columnName, Long.class);
     }
 
+    /**
+     * Initialize (create and clear) a list column
+     *
+     * @param columnName  the name of the column
+     * @param type  the data type for list entries in the column
+     **/
     private <T> void resetListColumn(String columnName,
                                      Class<? extends T> type) {
         // Delete the column if it exists
@@ -320,8 +344,12 @@ public class OCSANAScoringAlgorithm {
     }
 
     /**
-     * Add an element to a list column entry if it is not already
+     * Add an SUID to a list column entry if it is not already
      * there
+     *
+     * @param node  the node to modify
+     * @param columnName  the column/attribute to modify
+     * @param newSUID  the SUID to add to the list
      **/
     protected void addToTableSUIDListIfAbsent(CyNode node,
                                               String columnName,
@@ -329,6 +357,15 @@ public class OCSANAScoringAlgorithm {
         addToTableListIfAbsent(node, columnName, newSUID, Long.class);
     }
 
+    /**
+     * Add an element to a list column entry if it is not already
+     * there
+     *
+     * @param node  the node to modify
+     * @param columnName  the column/attribute to modify
+     * @param newElement  the new element to add to the list
+     * @param type  the data type of the elements of the column
+     **/
     private <T> void addToTableListIfAbsent(CyNode node,
                                             String columnName,
                                             T newElement,
