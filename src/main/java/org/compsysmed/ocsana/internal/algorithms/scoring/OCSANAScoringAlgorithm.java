@@ -45,17 +45,22 @@ public class OCSANAScoringAlgorithm {
     protected static final String targetsHitColumn = "_ocsana_targetsHit";
     protected static final String offTargetsHitColumn = "_ocsana_offTargetsHit";
 
+    protected static final String ocsanaScoreColumn = "OCSANA score";
+
     protected CyTable nodeTable;
 
     protected Set<CyNode> targetsHit;
     protected Set<CyNode> offTargetsHit;
+
+    protected Set<CyNode> elementaryNodes;
 
     @Tunable(description = "Delete intermediate table columns",
              gravity = 350,
              groups = {CONFIG_GROUP})
     public Boolean clearColumnsAfterRun = true;
 
-    protected Boolean algorithmHasRun = false;
+    protected Boolean nodeScoringComplete = false;
+    protected Boolean pathScoringComplete = false;
 
     protected CyNetwork network;
 
@@ -65,6 +70,7 @@ public class OCSANAScoringAlgorithm {
 
         targetsHit = new HashSet<>();
         offTargetsHit = new HashSet<>();
+        elementaryNodes = new HashSet<>();
     }
 
     /**
@@ -91,45 +97,13 @@ public class OCSANAScoringAlgorithm {
      * @param node  the node to score
      **/
     public Double getScore (CyNode node) {
-        if (!algorithmHasRun) {
+        if (!nodeScoringComplete) {
             throw new IllegalArgumentException("Cannot retrieve scores before running algorithm");
         }
 
         CyRow nodeRow = nodeTable.getRow(node.getSUID());
-
-        Double targetEffectScore = 0.0;
-        List<Long> targetsHitByNode = nodeRow.getList(targetsHitColumn, Long.class);
-        Double effectsOnTargetsScore = nodeRow.get(effectsOnTargetsColumn, Double.class);
-
-        if ((targetsHit != null) && (!targetsHit.isEmpty()) &&
-            (targetsHitByNode != null) && (!targetsHitByNode.isEmpty()) &&
-            (effectsOnTargetsScore != null)) {
-            Double targetFraction = new Double(targetsHitByNode.size());
-            targetFraction /= targetsHit.size();
-
-            targetEffectScore = targetFraction * effectsOnTargetsScore;
-        }
-
-        Double offTargetEffectScore = 0.0;
-        List<Long> offTargetsHitByNode = nodeRow.getList(offTargetsHitColumn, Long.class);
-        Double effectsOnOffTargetsScore = nodeRow.get(effectsOnOffTargetsColumn, Double.class);
-
-        if ((offTargetsHit != null) && (!offTargetsHit.isEmpty()) &&
-            (offTargetsHitByNode != null) && (!offTargetsHitByNode.isEmpty()) &&
-            (effectsOnOffTargetsScore != null)) {
-            Double offTargetFraction = new Double(offTargetsHitByNode.size());
-            offTargetFraction /= offTargetsHit.size();
-
-            offTargetEffectScore = offTargetFraction * effectsOnOffTargetsScore;
-        }
-
-        Double totalScore = targetEffectScore - offTargetEffectScore;
-
-        if (totalScore < 0) {
-            return 0.0;
-        } else {
-            return totalScore;
-        }
+        Double score = nodeRow.get(ocsanaScoreColumn, Double.class);
+        return score;
     }
 
     /**
@@ -177,11 +151,63 @@ public class OCSANAScoringAlgorithm {
                                  pathsToOffTargetsColumn,
                                  offTargetsHitColumn, offTargetsHit);
 
-        algorithmHasRun = true;
+        pathScoringComplete = true;
+
+        computeScoresForNodes();
+
+        nodeScoringComplete = true;
     };
 
+    protected void computeScoresForNodes () {
+        if (!pathScoringComplete) {
+            throw new IllegalArgumentException("Cannot score nodes before scoring paths.");
+        }
+
+        resetScoreColumn(ocsanaScoreColumn);
+
+        for (CyNode node: elementaryNodes) {
+            CyRow nodeRow = nodeTable.getRow(node.getSUID());
+
+            Double targetEffectScore = 0.0;
+            List<Long> targetsHitByNode = nodeRow.getList(targetsHitColumn, Long.class);
+            Double effectsOnTargetsScore = nodeRow.get(effectsOnTargetsColumn, Double.class);
+
+            if ((targetsHit != null) && (!targetsHit.isEmpty()) &&
+                (targetsHitByNode != null) && (!targetsHitByNode.isEmpty()) &&
+                (effectsOnTargetsScore != null)) {
+                Double targetFraction = new Double(targetsHitByNode.size());
+                targetFraction /= targetsHit.size();
+
+                targetEffectScore = targetFraction * effectsOnTargetsScore;
+            }
+
+            Double offTargetEffectScore = 0.0;
+            List<Long> offTargetsHitByNode = nodeRow.getList(offTargetsHitColumn, Long.class);
+            Double effectsOnOffTargetsScore = nodeRow.get(effectsOnOffTargetsColumn, Double.class);
+
+            if ((offTargetsHit != null) && (!offTargetsHit.isEmpty()) &&
+                (offTargetsHitByNode != null) && (!offTargetsHitByNode.isEmpty()) &&
+                (effectsOnOffTargetsScore != null)) {
+                Double offTargetFraction = new Double(offTargetsHitByNode.size());
+                offTargetFraction /= offTargetsHit.size();
+
+                offTargetEffectScore = offTargetFraction * effectsOnOffTargetsScore;
+            }
+
+            Double totalScore = targetEffectScore - offTargetEffectScore;
+
+            if (totalScore < 0) {
+                totalScore = 0.0;
+            }
+
+            nodeRow.set(ocsanaScoreColumn, totalScore);
+        }
+
+        nodeScoringComplete = true;
+    }
+
     /**
-     * Score the specified collection of paths
+     * Precompute subscores on the specified collection of paths
      *
      * @param paths  the paths to score
      * @param effectColumn  table column to store EFFECT score
@@ -201,7 +227,7 @@ public class OCSANAScoringAlgorithm {
     }
 
     /**
-     * Score the specified single path
+     * Precompute subscores on the specified single path
      *
      * @param path  the path to score
      * @param effectColumn  table column to store EFFECT score
@@ -225,6 +251,8 @@ public class OCSANAScoringAlgorithm {
         addToTableSUIDListIfAbsent(target, targetColumn, target.getSUID());
         targetsHitSet.add(target);
 
+        elementaryNodes.add(target);
+
         // We score the source of each edge, updating the table
         // columns appropriately.
 
@@ -235,6 +263,7 @@ public class OCSANAScoringAlgorithm {
 
             CyNode currentNode = edge.getSource();
             prevNode = currentNode;
+            elementaryNodes.add(currentNode);
 
             // EFFECT_ON_TARGETS
             // TODO: Handle signed paths
@@ -247,8 +276,9 @@ public class OCSANAScoringAlgorithm {
             // Record target hit
             addToTableSUIDListIfAbsent(currentNode, targetColumn, target.getSUID());
         }
-
     }
+
+
 
     /**
      * Initialize (create and clear) a column of scores
