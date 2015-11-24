@@ -58,9 +58,10 @@ public class OCSANACoordinatorTask extends AbstractNetworkTask {
     public PathFindingAlgorithmSelecter pathAlgSelecter;
 
     @ContainsTunables
-    public MHSAlgorithmSelecter mhsAlgSelecter;
-
     public OCSANAScoringAlgorithm ocsanaAlgorithm;
+
+    @ContainsTunables
+    public MHSAlgorithmSelecter mhsAlgSelecter;
 
     public OCSANACoordinatorTask (CyNetwork network, TaskManager taskManager) {
         super(network);

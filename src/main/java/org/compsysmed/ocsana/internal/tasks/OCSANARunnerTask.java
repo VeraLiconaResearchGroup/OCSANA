@@ -164,6 +164,11 @@ public class OCSANARunnerTask extends AbstractNetworkTask
         taskManager.execute(presentResultsTaskFactory.createTaskIterator(), this);
     }
 
+    protected void spawnCleanupTask () {
+        // Any post-process cleanup should happen here
+        ocsanaAlg.cleanupAfterRun();
+    }
+
     public void taskFinished(ObservableTask task) {
         // Make sure the task returned non-null
         if (task.getResults(Object.class) == null) {
@@ -171,7 +176,7 @@ public class OCSANARunnerTask extends AbstractNetworkTask
             return;
         }
 
-        // Process the results based on the step of the algorithm
+        // Process the results based on the step just completed
         OCSANAStep currentStep = task.getResults(OCSANAStep.class);
 
         switch (currentStep) {
@@ -198,6 +203,7 @@ public class OCSANARunnerTask extends AbstractNetworkTask
             break;
 
         case PRESENT_RESULTS:
+            spawnCleanupTask();
             break;
 
         default:
@@ -206,6 +212,7 @@ public class OCSANARunnerTask extends AbstractNetworkTask
     }
 
     public void allFinished(FinishStatus finishStatus) {
-        // wut do?
+        // Called after the TaskManager finished up a TaskIterator.
+        // Currently, we don't do anything with this information.
     }
 }

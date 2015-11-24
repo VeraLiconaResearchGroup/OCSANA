@@ -15,6 +15,8 @@ package org.compsysmed.ocsana.internal.algorithms.scoring;
 import java.util.*;
 
 // Cytoscape imports
+import org.cytoscape.work.Tunable;
+
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNode;
@@ -32,6 +34,7 @@ import org.cytoscape.model.CyColumn;
  **/
 
 public class OCSANAScoringAlgorithm {
+    public static final String CONFIG_GROUP = "Scoring algorithm";
     public static final String NAME = "OCSANA scoring";
     public static final String SHORTNAME = "OCSANA";
 
@@ -47,6 +50,11 @@ public class OCSANAScoringAlgorithm {
     protected Set<CyNode> targetsHit;
     protected Set<CyNode> offTargetsHit;
 
+    @Tunable(description = "Delete intermediate table columns",
+             gravity = 350,
+             groups = {CONFIG_GROUP})
+    public Boolean clearColumnsAfterRun = true;
+
     protected Boolean algorithmHasRun = false;
 
     protected CyNetwork network;
@@ -57,6 +65,24 @@ public class OCSANAScoringAlgorithm {
 
         targetsHit = new HashSet<>();
         offTargetsHit = new HashSet<>();
+    }
+
+    /**
+     * Run any appropriate cleanup routines
+     *
+     * This method should be called at the end of an OCSANA run
+     **/
+    public void cleanupAfterRun () {
+        if (clearColumnsAfterRun) {
+            nodeTable.deleteColumn(effectsOnTargetsColumn);
+            nodeTable.deleteColumn(effectsOnOffTargetsColumn);
+
+            nodeTable.deleteColumn(pathsToTargetsColumn);
+            nodeTable.deleteColumn(pathsToOffTargetsColumn);
+
+            nodeTable.deleteColumn(targetsHitColumn);
+            nodeTable.deleteColumn(offTargetsHitColumn);
+        }
     }
 
     /**
