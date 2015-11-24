@@ -24,7 +24,6 @@ import org.cytoscape.model.CyRow;
 import org.cytoscape.model.CyColumn;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.algorithms.AbstractOCSANAAlgorithm;
 
 /**
  * Implementation of the OCSANA scoring algorithm
@@ -32,8 +31,7 @@ import org.compsysmed.ocsana.internal.algorithms.AbstractOCSANAAlgorithm;
  * @param tablePrefix  prefix to use for
  **/
 
-public class OCSANAScoringAlgorithm
-    extends AbstractScoringAlgorithm {
+public class OCSANAScoringAlgorithm {
     public static final String NAME = "OCSANA scoring";
     public static final String SHORTNAME = "OCSANA";
 
@@ -51,8 +49,10 @@ public class OCSANAScoringAlgorithm
 
     protected Boolean algorithmHasRun = false;
 
+    protected CyNetwork network;
+
     public OCSANAScoringAlgorithm (CyNetwork network) {
-        super(network);
+        this.network = network;
         this.nodeTable = network.getDefaultNodeTable();
 
         targetsHit = new HashSet<>();
