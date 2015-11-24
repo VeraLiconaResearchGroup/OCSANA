@@ -35,6 +35,7 @@ import org.compsysmed.ocsana.internal.algorithms.path.AllNonSelfIntersectingPath
  **/
 public class PathFindingAlgorithmSelecter {
     @Tunable(description = "Path-finding algorithm",
+             gravity = 250,
              groups = {"Find pathways"})
     public ListSingleSelection<AbstractPathFindingAlgorithm> algorithmSelecter;
 

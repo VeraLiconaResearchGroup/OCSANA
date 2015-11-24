@@ -34,14 +34,17 @@ public class NodeSetSelecter {
     public static final String configGroup = "Select nodes";
 
     @Tunable(description = "Source nodes",
+             gravity = 140,
              groups = {configGroup})
     public ListMultipleSelection<NodeWithName> sourceNodeStrings;
 
     @Tunable(description = "Target nodes",
+             gravity = 150,
              groups = {configGroup})
     public ListMultipleSelection<NodeWithName> targetNodeStrings;
 
     @Tunable(description = "Off-target nodes",
+             gravity = 160,
              groups = {configGroup})
     public ListMultipleSelection<NodeWithName> offTargetNodeStrings;
 

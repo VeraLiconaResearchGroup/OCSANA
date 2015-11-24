@@ -35,6 +35,7 @@ import org.compsysmed.ocsana.internal.algorithms.mhs.RSAlgorithm;
  **/
 public class MHSAlgorithmSelecter {
     @Tunable(description = "MHS algorithm",
+             gravity = 350,
              groups = {"Find minimal CIs"})
     public ListSingleSelection<AbstractMHSAlgorithm> algorithmSelecter;
 
