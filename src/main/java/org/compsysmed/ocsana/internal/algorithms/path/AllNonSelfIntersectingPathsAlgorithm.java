@@ -111,7 +111,7 @@ public class AllNonSelfIntersectingPathsAlgorithm extends AbstractPathFindingAlg
                     throw new IllegalArgumentException("Undirected edges are not supported.");
                 }
 
-                assert nodeToProcess == outEdge.getTarget();
+                assert nodeToProcess.equals(outEdge.getTarget());
                 CyNode nextNode = outEdge.getSource();
 
                 // Mark this edge if needed
@@ -130,7 +130,7 @@ public class AllNonSelfIntersectingPathsAlgorithm extends AbstractPathFindingAlg
             }
         }
 
-        assert nodesToProcess.size() == 0;
+        assert nodesToProcess.isEmpty();
         return edgeMinDistances;
     }
 
@@ -229,9 +229,12 @@ public class AllNonSelfIntersectingPathsAlgorithm extends AbstractPathFindingAlg
 
                     if (targets.contains(outEdge.getTarget())) {
                         completePaths.add(newPath);
-                    } else {
-                        incompletePaths.add(newPath);
                     }
+
+                    // Note: we allow paths to pass through targets.
+                    // To exclude this case, use "else if" on the
+                    // previous conditional.
+                    incompletePaths.add(newPath);
                 }
             }
         }
