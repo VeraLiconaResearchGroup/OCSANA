@@ -41,26 +41,26 @@ public class PresentResultsTaskFactory extends AbstractTaskFactory {
 
     // Paths data
     protected AbstractPathFindingAlgorithm pathAlg;
-    protected Iterable<? extends Iterable<CyEdge>> pathsToTargets;
-    protected Iterable<? extends Iterable<CyEdge>> pathsToOffTargets;
+    protected Collection<? extends List<CyEdge>> pathsToTargets;
+    protected Collection<? extends List<CyEdge>> pathsToOffTargets;
 
     // Scoring data
     protected OCSANAScoringAlgorithm ocsanaAlg;
 
     // MHS data
     protected AbstractMHSAlgorithm mhsAlg;
-    protected Iterable<? extends Iterable<CyNode>> MHSes;
+    protected Collection<? extends Collection<CyNode>> MHSes;
 
     public PresentResultsTaskFactory (CyNetwork network,
                                       Set<CyNode> sourceNodes,
                                       Set<CyNode> targetNodes,
                                       Set<CyNode> offTargetNodes,
                                       AbstractPathFindingAlgorithm pathAlg,
-                                      Iterable<? extends Iterable<CyEdge>> pathsToTargets,
-                                      Iterable<? extends Iterable<CyEdge>> pathsToOffTargets,
+                                      Collection<? extends List<CyEdge>> pathsToTargets,
+                                      Collection<? extends List<CyEdge>> pathsToOffTargets,
                                       OCSANAScoringAlgorithm ocsanaAlg,
                                       AbstractMHSAlgorithm mhsAlg,
-                                      Iterable<? extends Iterable<CyNode>> MHSes) {
+                                      Collection<? extends Collection<CyNode>> MHSes) {
         this.network = network;
         this.sourceNodes = sourceNodes;
         this.targetNodes = targetNodes;

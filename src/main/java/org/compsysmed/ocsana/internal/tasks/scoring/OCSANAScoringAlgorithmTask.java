@@ -34,13 +34,13 @@ public class OCSANAScoringAlgorithmTask extends AbstractOCSANATask {
 
     public OCSANAScoringAlgorithm algorithm;
 
-    private Iterable<List<CyEdge>> pathsToTargets;
-    private Iterable<List<CyEdge>> pathsToOffTargets;
+    private Collection<List<CyEdge>> pathsToTargets;
+    private Collection<List<CyEdge>> pathsToOffTargets;
 
     public OCSANAScoringAlgorithmTask (CyNetwork network,
                                        OCSANAScoringAlgorithm algorithm,
-                                       Iterable<List<CyEdge>> pathsToTargets,
-                                       Iterable<List<CyEdge>> pathsToOffTargets) {
+                                       Collection<List<CyEdge>> pathsToTargets,
+                                       Collection<List<CyEdge>> pathsToOffTargets) {
         super(network);
         this.algorithm = algorithm;
         this.pathsToTargets = pathsToTargets;

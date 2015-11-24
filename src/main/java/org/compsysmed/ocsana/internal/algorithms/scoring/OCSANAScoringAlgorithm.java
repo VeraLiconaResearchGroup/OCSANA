@@ -130,8 +130,8 @@ public class OCSANAScoringAlgorithm
      * @param pathsToTargets  the paths to the target nodes
      * @param pathsToOffTargets  the paths to the off-target nodes
      **/
-    public void applyScores(Iterable<List<CyEdge>> pathsToTargets,
-                            Iterable<List<CyEdge>> pathsToOffTargets) {
+    public void applyScores(Collection<List<CyEdge>> pathsToTargets,
+                            Collection<List<CyEdge>> pathsToOffTargets) {
         resetScoreColumn(effectsOnTargetsColumn);
         resetScoreColumn(effectsOnOffTargetsColumn);
 
@@ -161,7 +161,7 @@ public class OCSANAScoringAlgorithm
      * @param targetColumn  table column to store targets hit
      * @param targetsHitSet  set to store targets hit
      **/
-    protected void precomputeScoresForPaths(Iterable<List<CyEdge>> paths,
+    protected void precomputeScoresForPaths(Collection<List<CyEdge>> paths,
                                             String effectColumn,
                                             String pathCountColumn,
                                             String targetColumn,

@@ -34,13 +34,13 @@ public class OCSANAScoringAlgorithmTaskFactory extends AbstractTaskFactory {
 
     // User inputs
     private OCSANAScoringAlgorithm algorithm;
-    private Iterable<List<CyEdge>> pathsToTargets;
-    private Iterable<List<CyEdge>> pathsToOffTargets;
+    private Collection<List<CyEdge>> pathsToTargets;
+    private Collection<List<CyEdge>> pathsToOffTargets;
 
     public OCSANAScoringAlgorithmTaskFactory (CyNetwork network,
                                               OCSANAScoringAlgorithm algorithm,
-                                              Iterable<List<CyEdge>> pathsToTargets,
-                                              Iterable<List<CyEdge>> pathsToOffTargets) {
+                                              Collection<List<CyEdge>> pathsToTargets,
+                                              Collection<List<CyEdge>> pathsToOffTargets) {
         this.network = network;
         this.algorithm = algorithm;
         this.pathsToTargets = pathsToTargets;

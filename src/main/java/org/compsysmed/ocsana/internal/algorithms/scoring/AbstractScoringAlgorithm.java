@@ -42,8 +42,8 @@ public abstract class AbstractScoringAlgorithm
      * @param pathsToTargets  the paths to the targets
      * @param pathsToOffTargets  the paths to the off-targets
      **/
-    abstract public void applyScores(Iterable<List<CyEdge>> pathsToTargets,
-                                     Iterable<List<CyEdge>> pathsToOffTargets);
+    abstract public void applyScores(Collection<List<CyEdge>> pathsToTargets,
+                                     Collection<List<CyEdge>> pathsToOffTargets);
 
     /**
      * Return a name suitable for printing in a menu or status message

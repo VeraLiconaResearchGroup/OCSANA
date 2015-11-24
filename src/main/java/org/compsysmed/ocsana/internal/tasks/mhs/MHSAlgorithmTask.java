@@ -35,13 +35,13 @@ public class MHSAlgorithmTask extends AbstractOCSANATask {
 
     public AbstractMHSAlgorithm algorithm;
 
-    private Iterable<List<CyEdge>> paths;
+    private Collection<List<CyEdge>> paths;
 
     private List<Set<CyNode>> MHSes;
 
     public MHSAlgorithmTask (CyNetwork network,
                              AbstractMHSAlgorithm algorithm,
-                             Iterable<List<CyEdge>> paths) {
+                             Collection<List<CyEdge>> paths) {
         super(network);
         this.algorithm = algorithm;
         this.paths = paths;

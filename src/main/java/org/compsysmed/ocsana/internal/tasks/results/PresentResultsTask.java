@@ -41,26 +41,26 @@ public class PresentResultsTask extends AbstractOCSANATask {
 
     // Paths data
     protected AbstractPathFindingAlgorithm pathAlg;
-    protected Iterable<? extends Iterable<CyEdge>> pathsToTargets;
-    protected Iterable<? extends Iterable<CyEdge>> pathsToOffTargets;
+    protected Collection<? extends List<CyEdge>> pathsToTargets;
+    protected Collection<? extends List<CyEdge>> pathsToOffTargets;
 
     // Scoring data
     protected OCSANAScoringAlgorithm ocsanaAlg;
 
     // MHS data
     protected AbstractMHSAlgorithm mhsAlg;
-    protected Iterable<? extends Iterable<CyNode>> MHSes;
+    protected Collection<? extends Collection<CyNode>> MHSes;
 
     public PresentResultsTask (CyNetwork network,
                                Set<CyNode> sourceNodes,
                                Set<CyNode> targetNodes,
                                Set<CyNode> offTargetNodes,
                                AbstractPathFindingAlgorithm pathAlg,
-                               Iterable<? extends Iterable<CyEdge>> pathsToTargets,
-                               Iterable<? extends Iterable<CyEdge>> pathsToOffTargets,
+                               Collection<? extends List<CyEdge>> pathsToTargets,
+                               Collection<? extends List<CyEdge>> pathsToOffTargets,
                                OCSANAScoringAlgorithm ocsanaAlg,
                                AbstractMHSAlgorithm mhsAlg,
-                               Iterable<? extends Iterable<CyNode>> MHSes) {
+                               Collection<? extends Collection<CyNode>> MHSes) {
         super(network);
         this.sourceNodes = sourceNodes;
         this.targetNodes = targetNodes;
@@ -137,13 +137,13 @@ public class PresentResultsTask extends AbstractOCSANATask {
         lines.add(algLine);
 
         lines.add("Paths to targets:");
-        for (Iterable<CyEdge> path: pathsToTargets) {
+        for (List<CyEdge> path: pathsToTargets) {
             lines.add(edgeSetString(path));
         }
         lines.add(MINOR_SEPARATOR);
 
         lines.add("Paths to off-targets:");
-        for (Iterable<CyEdge> path: pathsToOffTargets) {
+        for (List<CyEdge> path: pathsToOffTargets) {
             lines.add(edgeSetString(path));
         }
 
@@ -158,7 +158,7 @@ public class PresentResultsTask extends AbstractOCSANATask {
         lines.add(algLine);
 
         lines.add("Optimal CIs:");
-        for (Iterable<CyNode> MHS: MHSes) {
+        for (Collection<CyNode> MHS: MHSes) {
             lines.add(nodeSetString(MHS));
         }
 
@@ -170,7 +170,7 @@ public class PresentResultsTask extends AbstractOCSANATask {
         return network.getRow(node).get(CyNetwork.NAME, String.class);
     }
 
-    private String nodeSetString(Iterable<CyNode> nodes) {
+    private String nodeSetString(Collection<CyNode> nodes) {
         if (nodes == null) {
             return new String();
         }
@@ -185,7 +185,7 @@ public class PresentResultsTask extends AbstractOCSANATask {
         return "(" + score + "): [" + String.join(", ", strings) + "]";
     }
 
-    private String edgeSetString(Iterable<CyEdge> edges) {
+    private String edgeSetString(List<CyEdge> edges) {
         if (edges == null) {
             return new String();
         }

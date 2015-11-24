@@ -1,5 +1,5 @@
 /**
- * Helper class to handle converting Iterable<Set<CyNode>> to
+ * Helper class to handle converting Collection<Set<CyNode>> to
  * Hypergraph and back
  *
  * Copyright Vera-Licona Research Group (C) 2015
@@ -40,11 +40,11 @@ public class HypergraphOfSetsOfCyNodes extends Hypergraph {
      * @param sets  the sets to transform into edges of the Hypergraph
      **/
 
-    public HypergraphOfSetsOfCyNodes (Iterable<? extends Iterable<CyNode>> sets) {
+    public HypergraphOfSetsOfCyNodes (Collection<? extends Collection<CyNode>> sets) {
         mapNodeToHash = new HashMap<>();
         mapHashToNode = new HashMap<>();
 
-        for (Iterable<CyNode> set: sets) {
+        for (Collection<CyNode> set: sets) {
             BitSet newEdge = new BitSet();
             for (CyNode node: set) {
                 newEdge.set(hashOfNode(node));

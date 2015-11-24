@@ -32,11 +32,11 @@ import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
 public class MHSAlgorithmTaskFactory extends AbstractTaskFactory {
     private CyNetwork network;
     private AbstractMHSAlgorithm algorithm;
-    private Iterable<List<CyEdge>> sets;
+    private Collection<List<CyEdge>> sets;
 
     public MHSAlgorithmTaskFactory (CyNetwork network,
                                     AbstractMHSAlgorithm algorithm,
-                                    Iterable<List<CyEdge>> sets) {
+                                    Collection<List<CyEdge>> sets) {
         super();
         this.network = network;
         this.algorithm = algorithm;
