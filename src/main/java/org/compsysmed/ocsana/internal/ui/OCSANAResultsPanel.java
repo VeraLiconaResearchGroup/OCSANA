@@ -14,19 +14,28 @@ package org.compsysmed.ocsana.internal.ui;
 
 // Java imports
 import java.util.*;
+import java.io.*;
 
 import java.awt.Component;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.BoxLayout;
 import javax.swing.Icon;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
+import javax.swing.JOptionPane;
 import javax.swing.border.TitledBorder;
 import javax.swing.AbstractListModel;
 import javax.swing.DefaultListModel;
@@ -54,51 +63,121 @@ public class OCSANAResultsPanel
     protected CySwingApplication cySwingApplication;
     protected CytoPanel cyResultsPanel;
 
+    OCSANAResults results;
+    List<String> reportLines;
+
     public OCSANAResultsPanel (CySwingApplication cySwingApplication) {
         super();
         this.cySwingApplication = cySwingApplication;
         this.cyResultsPanel = cySwingApplication.getCytoPanel(getCytoPanelName());
     }
 
-    protected void buildPanel (OCSANAResults results) {
+    public void updateResults (OCSANAResults results) {
+        this.results = results;
+        reportLines = results.getReportLines();
+
+        removeAll();
+        buildPanel();
+        revalidate();
+        repaint();
+    }
+
+    protected void buildPanel () {
         setLayout(new BorderLayout());
 
-        JPanel resultsPanel = getResultsPanel(results);
-        if (resultsPanel != null) {
-            this.add(resultsPanel, BorderLayout.CENTER);
-        }
+        JPanel resultsPanel = getResultsPanel();
+        this.add(resultsPanel, BorderLayout.CENTER);
+
+        JPanel operationsPanel = getOperationsPanel();
+        this.add(operationsPanel, BorderLayout.SOUTH);
 
         setSize(getMinimumSize());
     }
 
-    protected JPanel getResultsPanel (OCSANAResults results) {
+    protected JPanel getOperationsPanel () {
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+
+        JButton showReportButton = new JButton("Show report");
+        buttonPanel.add(showReportButton);
+        showReportButton.addActionListener(new ActionListener() {
+                public void actionPerformed (ActionEvent e) {
+                    showResultsReport();
+                }
+            });
+
+        JButton saveReportButton = new JButton("Save report");
+        buttonPanel.add(saveReportButton);
+
+        saveReportButton.addActionListener(new ActionListener() {
+                public void actionPerformed (ActionEvent event) {
+                    JFileChooser fileChooser = new JFileChooser();
+                    if (fileChooser.showSaveDialog(buttonPanel) == JFileChooser.APPROVE_OPTION) {
+                        File outFile = fileChooser.getSelectedFile();
+                        try (BufferedWriter fileWriter =
+                             new BufferedWriter(new FileWriter(outFile))) {
+                            for (String reportLine: reportLines) {
+                                fileWriter.write(reportLine);
+                                fileWriter.newLine();
+                            }
+                        } catch (IOException exception) {
+                            String message = "Could not save to " + outFile.toString() + "\n" + exception;
+                            JOptionPane.showMessageDialog(buttonPanel,
+                                                          message,
+                                                          "Error",
+                                                          JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+                }
+            });
+
+
+        getRootPane().setDefaultButton(showReportButton);
+
+        return buttonPanel;
+    }
+
+    protected void showResultsReport () {
+        JTextArea reportTextArea = new JTextArea();
+        reportTextArea.setText(String.join("\n", reportLines));
+        reportTextArea.setEditable(false);
+
+        JScrollPane reportPane = new JScrollPane(reportTextArea);
+        JOptionPane.showMessageDialog(this, reportPane, "OCSANA report", JOptionPane.PLAIN_MESSAGE);
+    }
+
+    protected JPanel getResultsPanel () {
         JPanel resultsPanel = new JPanel(new BorderLayout());
+
+        if (results == null) {
+            return resultsPanel;
+        }
 
         JTabbedPane resultsTabbedPane = new JTabbedPane();
         resultsPanel.add(resultsTabbedPane, BorderLayout.CENTER);
         resultsPanel.setBorder(new TitledBorder("Results"));
 
         if (results.MHSes != null) {
-            JPanel ciPanel = buildCIPanel(results);
+            JPanel ciPanel = buildCIPanel();
             resultsTabbedPane.addTab("Optimal CIs", ciPanel);
         }
 
         if (results.pathsToTargets != null) {
-            JPanel targetPathsPanel = buildPathsToTargetsPanel(results);
+            JPanel targetPathsPanel = buildPathsPanel(results.pathsToTargets, "targets");
             resultsTabbedPane.addTab("Paths to targets", targetPathsPanel);
         }
 
         if (results.pathsToOffTargets != null) {
-            JPanel targetPathsPanel = buildPathsToOffTargetsPanel(results);
+            JPanel targetPathsPanel = buildPathsPanel(results.pathsToOffTargets, "off-targets");
             resultsTabbedPane.addTab("Paths to Off-targets", targetPathsPanel);
         }
 
         return resultsPanel;
     }
 
-    protected JPanel buildCIPanel (OCSANAResults results) {
+    protected JPanel buildCIPanel () {
         if (results.MHSes != null) {
-            Vector<Vector<Object>> mhsRows = getMHSRows(results);
+            Vector<Vector<Object>> mhsRows = getMHSRows();
 
             JTable mhsTable = new JTable(mhsRows, mhsCols);
             mhsTable.setAutoCreateRowSorter(true);
@@ -120,11 +199,11 @@ public class OCSANAResultsPanel
     protected static final Vector<String> mhsCols =
         new Vector<>(Arrays.asList(new String[] {"CI", "Size", "Score"}));
 
-    protected Vector<Vector<Object>> getMHSRows (OCSANAResults results) {
+    protected Vector<Vector<Object>> getMHSRows () {
         Vector<Vector<Object>> rows = new Vector<>();
         for (Collection<CyNode> MHS: results.MHSes) {
             Vector<Object> row = new Vector<>();
-            row.add(nodeSetString(MHS, results));
+            row.add(results.nodeSetString(MHS));
             row.add(MHS.size());
             row.add(results.ocsanaAlg.getScore(MHS));
 
@@ -133,21 +212,12 @@ public class OCSANAResultsPanel
         return rows;
     }
 
-    protected JPanel buildPathsToTargetsPanel (OCSANAResults results) {
-        return buildPathsPanel(results.pathsToTargets, "targets", results);
-    }
-
-    protected JPanel buildPathsToOffTargetsPanel (OCSANAResults results) {
-        return buildPathsPanel(results.pathsToOffTargets, "off-targets", results);
-    }
-
     protected JPanel buildPathsPanel (Collection<? extends List<CyEdge>> paths,
-                                      String pathType,
-                                      OCSANAResults results) {
+                                      String pathType) {
         if (paths != null) {
             DefaultListModel<String> pathStrings = new DefaultListModel<>();
             for (List<CyEdge> path: paths) {
-                pathStrings.addElement(edgeSetString(path, results));
+                pathStrings.addElement(results.pathString(path));
             }
 
             JList pathList = new JList(pathStrings);
@@ -164,53 +234,8 @@ public class OCSANAResultsPanel
         }
     }
 
-
     // Helper functions to get names and strings for various substructures
-    private String nodeName(CyNetwork network,
-                            CyNode node) {
-        return network.getRow(node).get(CyNetwork.NAME, String.class);
-    }
 
-    private String nodeSetString(Collection<CyNode> nodes,
-                                 OCSANAResults results) {
-        if (nodes == null) {
-            return new String();
-        }
-
-        List<String> strings = new ArrayList<>();
-         for (CyNode node: nodes) {
-            strings.add(nodeName(results.network, node));
-         }
-
-        return "[" + String.join(", ", strings) + "]";
-    }
-
-    private String edgeSetString(List<CyEdge> edges,
-                                 OCSANAResults results) {
-        if (edges == null) {
-            return new String();
-        }
-
-        String result = new String("[");
-
-        // Handle first node
-        try {
-            CyNode firstNode = edges.iterator().next().getSource();
-            result += nodeName(results.network, firstNode);
-        } catch (NoSuchElementException e) {
-            return "[]";
-        }
-
-        // Each other node is a target
-        for (CyEdge edge: edges) {
-            // TODO: Handle activation and inhibition symbols
-            result += " -> ";
-            result += nodeName(results.network, edge.getTarget());
-        }
-
-        result += "]";
-        return result;
-    }
 
     /**
      * Get the results panel component
@@ -238,12 +263,5 @@ public class OCSANAResultsPanel
      */
     public Icon getIcon() {
         return null;
-    }
-
-    public void updateResults (OCSANAResults results) {
-        removeAll();
-        buildPanel(results);
-        revalidate();
-        repaint();
     }
 }

@@ -45,7 +45,6 @@ public class PresentResultsTask extends AbstractOCSANATask {
         taskMonitor.setTitle("Generating OCSANA results");
 
         resultsPanel.updateResults(results);
-
     }
 
     public <T> T getResults (Class<? extends T> type) {
