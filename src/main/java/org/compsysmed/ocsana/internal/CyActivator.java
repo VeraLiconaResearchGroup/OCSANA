@@ -37,7 +37,8 @@ public class CyActivator extends AbstractCyActivator {
 
         // Results panel registration
         CySwingApplication cySwingApplicationService = getService(bc,CySwingApplication.class);
-        OCSANAResultsPanel resultsPanel = new OCSANAResultsPanel(cySwingApplicationService);
+        OCSANAResultsPanel resultsPanel =
+            new OCSANAResultsPanel(cySwingApplicationService);
         registerService(bc, resultsPanel, CytoPanelComponent.class, new Properties());
 
         // Main OCSANA task registration
