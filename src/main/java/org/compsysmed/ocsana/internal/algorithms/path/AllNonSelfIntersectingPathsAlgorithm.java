@@ -52,10 +52,10 @@ public class AllNonSelfIntersectingPathsAlgorithm extends AbstractPathFindingAlg
         super(network);
     }
 
-    public List<List<CyEdge>> paths (Set<CyNode> sources,
-                                     Set<CyNode> targets) {
+    public Collection<List<CyEdge>> paths (Set<CyNode> sources,
+                                           Set<CyNode> targets) {
         assert maxPathLength >= 0;
-        List<List<CyEdge>> results = null;
+        Collection<List<CyEdge>> results = null;
 
         Map<CyEdge, Integer> edgeMinDistances = computeEdgeMinDistances(sources, targets);
 

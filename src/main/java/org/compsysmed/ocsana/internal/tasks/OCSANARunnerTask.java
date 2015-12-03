@@ -125,10 +125,8 @@ public class OCSANARunnerTask extends AbstractNetworkTask
 
     protected void spawnPathsToTargetsTask () {
         PathFindingAlgorithmTaskFactory pathsToTargetsTaskFactory =
-            new PathFindingAlgorithmTaskFactory(network,
-                                                OCSANAStep.FIND_PATHS_TO_TARGETS,
-                                                pathFindingAlg,
-                                                sourceNodes, targetNodes);
+            new PathFindingAlgorithmTaskFactory(results,
+                                                OCSANAStep.FIND_PATHS_TO_TARGETS);
 
         taskManager.execute(pathsToTargetsTaskFactory.createTaskIterator(),
                             this);
@@ -136,10 +134,8 @@ public class OCSANARunnerTask extends AbstractNetworkTask
 
     protected void spawnPathsToOffTargetsTask () {
         PathFindingAlgorithmTaskFactory pathsToOffTargetsTaskFactory =
-            new PathFindingAlgorithmTaskFactory(network,
-                                                OCSANAStep.FIND_PATHS_TO_OFF_TARGETS,
-                                                pathFindingAlg,
-                                                sourceNodes, offTargetNodes);
+            new PathFindingAlgorithmTaskFactory(results,
+                                                OCSANAStep.FIND_PATHS_TO_OFF_TARGETS);
 
         taskManager.execute(pathsToOffTargetsTaskFactory.createTaskIterator(),
                             this);
@@ -147,25 +143,21 @@ public class OCSANARunnerTask extends AbstractNetworkTask
 
     protected void spawnScoringTask () {
         OCSANAScoringAlgorithmTaskFactory scoringTaskFactory =
-            new OCSANAScoringAlgorithmTaskFactory(network, ocsanaAlg,
-                                                  results.pathsToTargets,
-                                                  results.pathsToOffTargets);
+            new OCSANAScoringAlgorithmTaskFactory(results);
 
         taskManager.execute(scoringTaskFactory.createTaskIterator(), this);
     }
 
     protected void spawnMHSTask () {
         MHSAlgorithmTaskFactory mhsTaskFactory =
-            new MHSAlgorithmTaskFactory(network,
-                                        mhsAlg,
-                                        results.pathsToTargets);
+            new MHSAlgorithmTaskFactory(results);
 
         taskManager.execute(mhsTaskFactory.createTaskIterator(), this);
     }
 
     protected void spawnPresentResultsTask () {
         PresentResultsTaskFactory presentResultsTaskFactory =
-            new PresentResultsTaskFactory(network, results, resultsPanel);
+            new PresentResultsTaskFactory(results, resultsPanel);
 
         taskManager.execute(presentResultsTaskFactory.createTaskIterator(), this);
     }
@@ -177,7 +169,7 @@ public class OCSANARunnerTask extends AbstractNetworkTask
 
     public void taskFinished(ObservableTask task) {
         // Make sure the task returned non-null
-        if (task.getResults(Object.class) == null) {
+         if (task.getResults(Object.class) == null) {
             cancel();
             return;
         }
@@ -190,12 +182,10 @@ public class OCSANARunnerTask extends AbstractNetworkTask
             break;
 
         case FIND_PATHS_TO_TARGETS:
-            results.pathsToTargets = task.getResults(List.class);
             spawnPathsToOffTargetsTask();
             break;
 
         case FIND_PATHS_TO_OFF_TARGETS:
-            results.pathsToOffTargets = task.getResults(List.class);
             spawnScoringTask();
             break;
 
@@ -204,7 +194,6 @@ public class OCSANARunnerTask extends AbstractNetworkTask
             break;
 
         case FIND_MHSES:
-            results.MHSes = task.getResults(List.class);
             spawnPresentResultsTask();
             break;
 

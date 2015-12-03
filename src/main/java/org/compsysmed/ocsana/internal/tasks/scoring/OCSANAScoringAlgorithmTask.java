@@ -24,27 +24,19 @@ import org.cytoscape.model.CyNode;
 import org.cytoscape.model.CyEdge;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.algorithms.scoring.OCSANAScoringAlgorithm;
-
 import org.compsysmed.ocsana.internal.tasks.AbstractOCSANATask;
 import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
+
+import org.compsysmed.ocsana.internal.tasks.results.OCSANAResults;
 
 public class OCSANAScoringAlgorithmTask extends AbstractOCSANATask {
     private static final OCSANAStep algStep = OCSANAStep.SCORE_PATHS;
 
-    public OCSANAScoringAlgorithm algorithm;
+    private OCSANAResults results;
 
-    private Collection<? extends List<CyEdge>> pathsToTargets;
-    private Collection<? extends List<CyEdge>> pathsToOffTargets;
-
-    public OCSANAScoringAlgorithmTask (CyNetwork network,
-                                       OCSANAScoringAlgorithm algorithm,
-                                       Collection<? extends List<CyEdge>> pathsToTargets,
-                                       Collection<? extends List<CyEdge>> pathsToOffTargets) {
-        super(network);
-        this.algorithm = algorithm;
-        this.pathsToTargets = pathsToTargets;
-        this.pathsToOffTargets = pathsToOffTargets;
+    public OCSANAScoringAlgorithmTask (OCSANAResults results) {
+        super(results.network);
+        this.results = results;
     }
 
     public void run (TaskMonitor taskMonitor) {
@@ -52,7 +44,7 @@ public class OCSANAScoringAlgorithmTask extends AbstractOCSANATask {
 
         taskMonitor.setStatusMessage("Computing scores.");
 
-        algorithm.applyScores(pathsToTargets, pathsToOffTargets);
+        results.ocsanaAlg.applyScores(results.pathsToTargets, results.pathsToOffTargets);
     }
 
     public <T> T getResults (Class<? extends T> type) {
@@ -65,6 +57,6 @@ public class OCSANAScoringAlgorithmTask extends AbstractOCSANATask {
 
     public void cancel () {
         super.cancel();
-        algorithm.cancel();
+        results.ocsanaAlg.cancel();
     }
 }

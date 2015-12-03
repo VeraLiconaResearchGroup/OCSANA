@@ -25,31 +25,23 @@ import org.cytoscape.model.CyNode;
 import org.cytoscape.model.CyEdge;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.algorithms.scoring.OCSANAScoringAlgorithm;
-
 import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
+
+import org.compsysmed.ocsana.internal.tasks.results.OCSANAResults;
 
 public class OCSANAScoringAlgorithmTaskFactory extends AbstractTaskFactory {
     private CyNetwork network;
 
     // User inputs
-    private OCSANAScoringAlgorithm algorithm;
-    private Collection<? extends List<CyEdge>> pathsToTargets;
-    private Collection<? extends List<CyEdge>> pathsToOffTargets;
+    private OCSANAResults results;
 
-    public OCSANAScoringAlgorithmTaskFactory (CyNetwork network,
-                                              OCSANAScoringAlgorithm algorithm,
-                                              Collection<? extends List<CyEdge>> pathsToTargets,
-                                              Collection<? extends List<CyEdge>> pathsToOffTargets) {
-        this.network = network;
-        this.algorithm = algorithm;
-        this.pathsToTargets = pathsToTargets;
-        this.pathsToOffTargets = pathsToOffTargets;
+    public OCSANAScoringAlgorithmTaskFactory (OCSANAResults results) {
+        this.results = results;
     }
 
     public TaskIterator createTaskIterator () {
         TaskIterator tasks = new TaskIterator();
-        tasks.append(new OCSANAScoringAlgorithmTask(network, algorithm, pathsToTargets, pathsToOffTargets));
+        tasks.append(new OCSANAScoringAlgorithmTask(results));
         return tasks;
     }
 }

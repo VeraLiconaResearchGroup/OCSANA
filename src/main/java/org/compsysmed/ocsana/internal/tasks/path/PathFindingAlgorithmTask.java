@@ -23,41 +23,35 @@ import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNetwork;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.algorithms.path.AbstractPathFindingAlgorithm;
-
 import org.compsysmed.ocsana.internal.tasks.AbstractOCSANATask;
 import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
 
+import org.compsysmed.ocsana.internal.tasks.results.OCSANAResults;
+
 public class PathFindingAlgorithmTask extends AbstractOCSANATask {
+    private OCSANAResults results;
     private OCSANAStep algStep;
-    public AbstractPathFindingAlgorithm algorithm;
+    private Collection<List<CyEdge>> paths;
 
-    private Set<CyNode> sourceNodes;
-    private Set<CyNode> targetNodes;
-
-    private List<List<CyEdge>> paths;
-
-    public PathFindingAlgorithmTask (CyNetwork network,
-                                     OCSANAStep algStep,
-                                     AbstractPathFindingAlgorithm algorithm,
-                                     Set<CyNode> sourceNodes,
-                                     Set<CyNode> targetNodes) {
-        super(network);
+    public PathFindingAlgorithmTask (OCSANAResults results,
+                                     OCSANAStep algStep) {
+        super(results.network);
+        this.results = results;
         this.algStep = algStep;
-        this.algorithm = algorithm;
-        this.sourceNodes = sourceNodes;
-        this.targetNodes = targetNodes;
     }
 
     public void run (TaskMonitor taskMonitor) {
         String targetType;
+        Set<CyNode> targetsForThisRun;
         switch (algStep) {
         case FIND_PATHS_TO_TARGETS:
             targetType = "target";
+            targetsForThisRun = results.targetNodes;
             break;
 
         case FIND_PATHS_TO_OFF_TARGETS:
             targetType = "off-target";
+            targetsForThisRun = results.offTargetNodes;
             break;
 
         default:
@@ -67,15 +61,28 @@ public class PathFindingAlgorithmTask extends AbstractOCSANATask {
         taskMonitor.setTitle("Paths to " + targetType + "s");
 
         taskMonitor.setStatusMessage("Finding paths from " +
-                                     sourceNodes.size() + " source nodes to to " +
-                                     targetNodes.size() + " " + targetType + " nodes.");
+                                     results.sourceNodes.size() + " source nodes to to " +
+                                     targetsForThisRun.size() + " " + targetType + " nodes.");
 
-        paths = algorithm.paths(sourceNodes, targetNodes);
+        paths = results.pathFindingAlg.paths(results.sourceNodes, targetsForThisRun);
+
+        switch (algStep) {
+        case FIND_PATHS_TO_TARGETS:
+            results.pathsToTargets = paths;
+            break;
+
+        case FIND_PATHS_TO_OFF_TARGETS:
+            results.pathsToOffTargets = paths;
+            break;
+
+        default:
+            throw new IllegalArgumentException("Invalid algorithm step for path-finding");
+        }
 
         taskMonitor.showMessage(TaskMonitor.Level.INFO, "Found " + paths.size() + " paths.");
     }
 
-    public List<List<CyEdge>> getPaths () {
+    public Collection<List<CyEdge>> getPaths () {
         return paths;
     }
 
@@ -89,6 +96,6 @@ public class PathFindingAlgorithmTask extends AbstractOCSANATask {
 
     public void cancel () {
         super.cancel();
-        algorithm.cancel();
+        results.pathFindingAlg.cancel();
     }
 }

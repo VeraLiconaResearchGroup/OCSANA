@@ -44,11 +44,11 @@ public abstract class AbstractPathFindingAlgorithm
      *
      * @param sources  the source nodes
      * @param targets  the target nodes
-     * @return a List of paths, each of which is given as a List of
+     * @return the paths, each of which is given as a List of
      * CyEdges, in order from source to target
      **/
-    abstract public List<List<CyEdge>> paths (Set<CyNode> sources,
-                                              Set<CyNode> targets);
+    abstract public Collection<List<CyEdge>> paths (Set<CyNode> sources,
+                                                    Set<CyNode> targets);
 
     /**
      * Return a name suitable for printing in a menu or status message

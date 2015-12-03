@@ -34,21 +34,18 @@ import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
 import org.compsysmed.ocsana.internal.ui.OCSANAResultsPanel;
 
 public class PresentResultsTaskFactory extends AbstractTaskFactory {
-    private CyNetwork network;
     private OCSANAResults results;
     private OCSANAResultsPanel resultsPanel;
 
-    public PresentResultsTaskFactory (CyNetwork network,
-                                      OCSANAResults results,
+    public PresentResultsTaskFactory (OCSANAResults results,
                                       OCSANAResultsPanel resultsPanel) {
-        this.network = network;
         this.results = results;
         this.resultsPanel = resultsPanel;
     }
 
     public TaskIterator createTaskIterator () {
         TaskIterator tasks = new TaskIterator();
-        tasks.append(new PresentResultsTask(network, results, resultsPanel));
+        tasks.append(new PresentResultsTask(results, resultsPanel));
         return tasks;
     }
 }

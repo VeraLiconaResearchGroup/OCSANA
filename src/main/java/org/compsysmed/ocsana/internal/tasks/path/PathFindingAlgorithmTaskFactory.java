@@ -24,34 +24,24 @@ import org.cytoscape.model.CyNode;
 import org.cytoscape.model.CyNetwork;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.algorithms.path.AbstractPathFindingAlgorithm;
-
 import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
 
-public class PathFindingAlgorithmTaskFactory extends AbstractTaskFactory {
-    private CyNetwork network;
-    private OCSANAStep algStep;
-    private AbstractPathFindingAlgorithm algorithm;
-    private Set<CyNode> sourceNodes;
-    private Set<CyNode> targetNodes;
+import org.compsysmed.ocsana.internal.tasks.results.OCSANAResults;
 
-    public PathFindingAlgorithmTaskFactory (CyNetwork network,
-                                            OCSANAStep algStep,
-                                            AbstractPathFindingAlgorithm algorithm,
-                                            Set<CyNode> sourceNodes,
-                                            Set<CyNode> targetNodes) {
+public class PathFindingAlgorithmTaskFactory extends AbstractTaskFactory {
+    private OCSANAResults results;
+    private OCSANAStep algStep;
+
+    public PathFindingAlgorithmTaskFactory (OCSANAResults results,
+                                            OCSANAStep algStep) {
         super();
-        this.network = network;
+        this.results = results;
         this.algStep = algStep;
-        this.algorithm = algorithm;
-        this.sourceNodes = sourceNodes;
-        this.targetNodes = targetNodes;
     }
 
     public TaskIterator createTaskIterator () {
         TaskIterator tasks = new TaskIterator();
-        tasks.append(new PathFindingAlgorithmTask(network, algStep, algorithm,
-                                                  sourceNodes, targetNodes));
+        tasks.append(new PathFindingAlgorithmTask(results, algStep));
         return tasks;
     }
 }

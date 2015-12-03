@@ -25,27 +25,21 @@ import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNode;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.algorithms.mhs.AbstractMHSAlgorithm;
-
 import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
 
-public class MHSAlgorithmTaskFactory extends AbstractTaskFactory {
-    private CyNetwork network;
-    private AbstractMHSAlgorithm algorithm;
-    private Collection<? extends List<CyEdge>> sets;
+import org.compsysmed.ocsana.internal.tasks.results.OCSANAResults;
 
-    public MHSAlgorithmTaskFactory (CyNetwork network,
-                                    AbstractMHSAlgorithm algorithm,
-                                    Collection<? extends List<CyEdge>> sets) {
+public class MHSAlgorithmTaskFactory extends AbstractTaskFactory {
+    private OCSANAResults results;
+
+    public MHSAlgorithmTaskFactory (OCSANAResults results) {
         super();
-        this.network = network;
-        this.algorithm = algorithm;
-        this.sets = sets;
+        this.results = results;
     }
 
     public TaskIterator createTaskIterator () {
         TaskIterator tasks = new TaskIterator();
-        tasks.append(new MHSAlgorithmTask(network, algorithm, sets));
+        tasks.append(new MHSAlgorithmTask(results));
         return tasks;
     }
 }

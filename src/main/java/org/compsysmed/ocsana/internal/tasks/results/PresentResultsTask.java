@@ -33,10 +33,9 @@ public class PresentResultsTask extends AbstractOCSANATask {
     protected OCSANAResults results;
     protected OCSANAResultsPanel resultsPanel;
 
-    public PresentResultsTask (CyNetwork network,
-                               OCSANAResults results,
+    public PresentResultsTask (OCSANAResults results,
                                OCSANAResultsPanel resultsPanel) {
-        super(network);
+        super(results.network);
         this.results = results;
         this.resultsPanel = resultsPanel;
     }
