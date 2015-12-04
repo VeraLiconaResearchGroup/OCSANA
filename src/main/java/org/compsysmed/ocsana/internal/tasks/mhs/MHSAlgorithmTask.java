@@ -41,7 +41,15 @@ public class MHSAlgorithmTask extends AbstractOCSANATask {
     }
 
     public void run (TaskMonitor taskMonitor) {
+        if (results.pathFindingCanceled) {
+            return;
+        }
+
         taskMonitor.setTitle("Minimal CIs");
+
+        if (results.pathsToTargets == null) {
+            throw new IllegalStateException("Paths to targets not set.");
+        }
 
         taskMonitor.setStatusMessage("Converting paths to node sets,");
         List<Set<CyNode>> nodeSets = new ArrayList<>();
@@ -81,5 +89,6 @@ public class MHSAlgorithmTask extends AbstractOCSANATask {
     public void cancel () {
         super.cancel();
         results.mhsAlg.cancel();
+        results.mhsFindingCanceled = true;
     }
 }

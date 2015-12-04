@@ -35,17 +35,17 @@ public class OCSANAResults {
 
     // Paths data
     public AbstractPathFindingAlgorithm pathFindingAlg;
-    public Boolean pathFindingCanceled;
+    public Boolean pathFindingCanceled = false;
     public Collection<? extends List<CyEdge>> pathsToTargets;
     public Collection<? extends List<CyEdge>> pathsToOffTargets;
 
     // Scoring data
     public OCSANAScoringAlgorithm ocsanaAlg;
-    public Boolean scoringCanceled;
+    public Boolean scoringCanceled = false;
 
     // MHS data
     public AbstractMHSAlgorithm mhsAlg;
-    public Boolean mhsFindingCanceled;
+    public Boolean mhsFindingCanceled = false;
     public Collection<? extends Collection<CyNode>> MHSes;
 
     public OCSANAResults () {};

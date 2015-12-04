@@ -40,6 +40,14 @@ public class OCSANAScoringAlgorithmTask extends AbstractOCSANATask {
     }
 
     public void run (TaskMonitor taskMonitor) {
+        if (results.pathFindingCanceled) {
+            return;
+        }
+
+        if (results.pathsToTargets == null || results.pathsToOffTargets == null) {
+            throw new IllegalStateException("Paths have not been computed.");
+        }
+
         taskMonitor.setTitle("Scoring");
 
         taskMonitor.setStatusMessage("Computing scores.");
@@ -58,5 +66,6 @@ public class OCSANAScoringAlgorithmTask extends AbstractOCSANATask {
     public void cancel () {
         super.cancel();
         results.ocsanaAlg.cancel();
+        results.scoringCanceled = true;
     }
 }

@@ -55,7 +55,11 @@ public class PathFindingAlgorithmTask extends AbstractOCSANATask {
             break;
 
         default:
-            throw new IllegalArgumentException("Invalid algorithm step for path-finding");
+            throw new IllegalStateException("Invalid algorithm step for path-finding");
+        }
+
+        if (targetsForThisRun == null || results.sourceNodes == null) {
+            throw new IllegalStateException("Nodes not set by user.");
         }
 
         taskMonitor.setTitle("Paths to " + targetType + "s");
@@ -76,7 +80,7 @@ public class PathFindingAlgorithmTask extends AbstractOCSANATask {
             break;
 
         default:
-            throw new IllegalArgumentException("Invalid algorithm step for path-finding");
+            throw new IllegalStateException("Invalid algorithm step for path-finding");
         }
 
         taskMonitor.showMessage(TaskMonitor.Level.INFO, "Found " + paths.size() + " paths.");
@@ -97,5 +101,6 @@ public class PathFindingAlgorithmTask extends AbstractOCSANATask {
     public void cancel () {
         super.cancel();
         results.pathFindingAlg.cancel();
+        results.pathFindingCanceled = true;
     }
 }
