@@ -68,22 +68,28 @@ public class PathFindingAlgorithmTask extends AbstractOCSANATask {
                                      results.sourceNodes.size() + " source nodes to to " +
                                      targetsForThisRun.size() + " " + targetType + " nodes.");
 
+        Long preTime = System.nanoTime();
         paths = results.pathFindingAlg.paths(results.sourceNodes, targetsForThisRun);
+        Long postTime = System.nanoTime();
+
+        Double runTime = (postTime - preTime) / 1E9;
 
         switch (algStep) {
         case FIND_PATHS_TO_TARGETS:
             results.pathsToTargets = paths;
+            results.pathsToTargetsExecutionSeconds = runTime;
             break;
 
         case FIND_PATHS_TO_OFF_TARGETS:
             results.pathsToOffTargets = paths;
+            results.pathsToOffTargetsExecutionSeconds = runTime;
             break;
 
         default:
             throw new IllegalStateException("Invalid algorithm step for path-finding");
         }
 
-        taskMonitor.showMessage(TaskMonitor.Level.INFO, "Found " + paths.size() + " paths.");
+        taskMonitor.showMessage(TaskMonitor.Level.INFO, "Found " + paths.size() + " paths in " + runTime + "s.");
     }
 
     public Collection<List<CyEdge>> getPaths () {

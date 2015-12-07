@@ -39,15 +39,22 @@ public class OCSANAResults {
     public Collection<? extends List<CyEdge>> pathsToTargets;
     public Collection<? extends List<CyEdge>> pathsToOffTargets;
 
+    public Double pathsToTargetsExecutionSeconds;
+    public Double pathsToOffTargetsExecutionSeconds;
+
     // Scoring data
     public OCSANAScoringAlgorithm ocsanaAlg;
     public Map<CyNode, Double> ocsanaScores;
     public Boolean scoringCanceled = false;
 
+    public Double scoringExecutionSeconds;
+
     // MHS data
     public AbstractMHSAlgorithm mhsAlg;
     public Boolean mhsFindingCanceled = false;
     public Collection<? extends Collection<CyNode>> MHSes;
+
+    public Double mhsExecutionSeconds;
 
     public OCSANAResults () {};
 
@@ -164,7 +171,8 @@ public class OCSANAResults {
             }
         }
 
-        String pathSummaryString = "Found " + pathsToTargets.size() + " elementary paths with search strategy " + pathFindingAlg.shortName() +  " and " + elementaryNodes.size() + " elementary nodes.";
+        String pathSummaryString = "Found " + pathsToTargets.size() + " elementary paths with search strategy " + pathFindingAlg.shortName() +  " and " + elementaryNodes.size() + " elementary nodes.\n" +
+            "Search times: " + pathsToTargetsExecutionSeconds + " s. for targets, " + pathsToOffTargetsExecutionSeconds + " s. for off-targets.";
         reportLines.add(pathSummaryString);
         reportLines.add("");
 
@@ -173,7 +181,12 @@ public class OCSANAResults {
         }
         reportLines.add("");
 
-        String mhsSummaryString = "Found " + MHSes.size() + " CIs using MHS algorithm " + mhsAlg.shortName();
+        // TODO: Proper reporting for scoring
+        String scoringSummaryString = "Scored elementary nodes in " + scoringExecutionSeconds + " s.";
+        reportLines.add(scoringSummaryString);
+        reportLines.add("");
+
+        String mhsSummaryString = "Found " + MHSes.size() + " CIs using MHS algorithm " + mhsAlg.shortName() + " in " + mhsExecutionSeconds + " s.";
         reportLines.add(mhsSummaryString);
         reportLines.add("");
 

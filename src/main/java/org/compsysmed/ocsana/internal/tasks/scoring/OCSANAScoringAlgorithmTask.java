@@ -52,7 +52,14 @@ public class OCSANAScoringAlgorithmTask extends AbstractOCSANATask {
 
         taskMonitor.setStatusMessage("Computing scores.");
 
+        Long preTime = System.nanoTime();
         results.ocsanaScores = results.ocsanaAlg.computeScores(results.pathsToTargets, results.pathsToOffTargets);
+        Long postTime = System.nanoTime();
+
+        Double runTime = (postTime - preTime) / 1E9;
+        taskMonitor.setStatusMessage("Scored nodes in " + runTime + "s.");
+
+        results.scoringExecutionSeconds = runTime;
     }
 
     public <T> T getResults (Class<? extends T> type) {

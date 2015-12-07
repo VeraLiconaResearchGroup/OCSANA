@@ -163,12 +163,12 @@ public class OCSANAResultsPanel
         }
 
         if (results.pathsToTargets != null) {
-            JPanel targetPathsPanel = buildPathsPanel(results.pathsToTargets, "targets");
+            JPanel targetPathsPanel = buildPathsPanel(results.pathsToTargets, "targets", results.pathsToTargetsExecutionSeconds);
             resultsTabbedPane.addTab("Paths to targets", targetPathsPanel);
         }
 
         if (results.pathsToOffTargets != null) {
-            JPanel targetPathsPanel = buildPathsPanel(results.pathsToOffTargets, "off-targets");
+            JPanel targetPathsPanel = buildPathsPanel(results.pathsToOffTargets, "off-targets", results.pathsToOffTargetsExecutionSeconds);
             resultsTabbedPane.addTab("Paths to Off-targets", targetPathsPanel);
         }
 
@@ -190,7 +190,7 @@ public class OCSANAResultsPanel
             JScrollPane mhsScrollPane = new JScrollPane(mhsTable);
 
             JPanel mhsPanel = new JPanel(new BorderLayout());
-            String mhsText = "Found " + results.MHSes.size() + " optimal CIs.";
+            String mhsText = "<html>" + "Found " + results.MHSes.size() + " optimal CIs in " + results.mhsExecutionSeconds + " s." + "<br />" + "Scored them in " + results.scoringExecutionSeconds + " s." + "</html>";
             mhsPanel.add(new JLabel(mhsText), BorderLayout.PAGE_START);
             mhsPanel.add(mhsScrollPane, BorderLayout.CENTER);
 
@@ -222,7 +222,8 @@ public class OCSANAResultsPanel
     }
 
     protected JPanel buildPathsPanel (Collection<? extends List<CyEdge>> paths,
-                                      String pathType) {
+                                      String pathType,
+                                      Double runTime) {
         if (paths != null) {
             DefaultListModel<String> pathStrings = new DefaultListModel<>();
             for (List<CyEdge> path: paths) {
@@ -233,7 +234,7 @@ public class OCSANAResultsPanel
             JScrollPane pathScrollPane = new JScrollPane(pathList);
 
             JPanel pathPanel = new JPanel(new BorderLayout());
-            String panelText = "Found " + paths.size() + " paths to " + pathType;
+            String panelText = "Found " + paths.size() + " paths to " + pathType + " in " + runTime + " s.";
             pathPanel.add(new JLabel(panelText), BorderLayout.PAGE_START);
             pathPanel.add(pathScrollPane, BorderLayout.CENTER);
 
