@@ -183,6 +183,10 @@ public class OCSANAResultsPanel
             mhsTable.setAutoCreateRowSorter(true);
             mhsTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 
+            // Sort by score in descending order
+            mhsTable.getRowSorter().toggleSortOrder(2);
+            mhsTable.getRowSorter().toggleSortOrder(2);
+
             JScrollPane mhsScrollPane = new JScrollPane(mhsTable);
 
             JPanel mhsPanel = new JPanel(new BorderLayout());
