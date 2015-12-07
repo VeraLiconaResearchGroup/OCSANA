@@ -40,26 +40,13 @@ public class OCSANAScoringAlgorithm
     public static final String NAME = "OCSANA scoring";
     public static final String SHORTNAME = "OCSANA";
 
-    protected static final String effectsOnTargetsColumn = "_ocsana_effectsOnTargets";
-    protected static final String effectsOnOffTargetsColumn = "_ocsana_effectsOnOffTargets";
-    protected static final String pathsToTargetsColumn = "_ocsana_pathsToTargets";
-    protected static final String pathsToOffTargetsColumn = "_ocsana_pathsToOffTargets";
-    protected static final String targetsHitColumn = "_ocsana_targetsHit";
-    protected static final String offTargetsHitColumn = "_ocsana_offTargetsHit";
+    protected static final Double DEFAULT_SCORE = 0.0;
+    protected static final Integer DEFAULT_COUNT = 0;
 
-    protected static final String ocsanaScoreColumn = "OCSANA score";
-
-    protected CyTable nodeTable;
-
-    protected Set<CyNode> targetsHit;
-    protected Set<CyNode> offTargetsHit;
-
-    protected Set<CyNode> elementaryNodes;
-
-    @Tunable(description = "Delete intermediate table columns",
-             gravity = 350,
+    @Tunable(description = "Compute OCSANA scores",
+             gravity = 330,
              groups = {CONFIG_GROUP})
-    public Boolean clearColumnsAfterRun = true;
+    public Boolean computeScores = true;
 
     protected Boolean nodeScoringComplete = false;
     protected Boolean pathScoringComplete = false;
@@ -68,383 +55,190 @@ public class OCSANAScoringAlgorithm
 
     public OCSANAScoringAlgorithm (CyNetwork network) {
         this.network = network;
-        this.nodeTable = network.getDefaultNodeTable();
-
-        targetsHit = new HashSet<>();
-        offTargetsHit = new HashSet<>();
-        elementaryNodes = new HashSet<>();
     }
 
     /**
-     * Run any appropriate cleanup routines
+     * Compute the OCSANA scores for the specified paths
      *
-     * This method should be called at the end of an OCSANA run
-     **/
-    public void cleanupAfterRun () {
-        if (clearColumnsAfterRun) {
-            nodeTable.deleteColumn(effectsOnTargetsColumn);
-            nodeTable.deleteColumn(effectsOnOffTargetsColumn);
-
-            nodeTable.deleteColumn(pathsToTargetsColumn);
-            nodeTable.deleteColumn(pathsToOffTargetsColumn);
-
-            nodeTable.deleteColumn(targetsHitColumn);
-            nodeTable.deleteColumn(offTargetsHitColumn);
-        }
-    }
-
-    /**
-     * Retrieve the OCSANA score for a given node
-     *
-     * @param node  the node to score
-     **/
-    public Double getScore (CyNode node) {
-        if (!nodeScoringComplete) {
-            throw new IllegalArgumentException("Cannot retrieve scores before running algorithm");
-        }
-
-        CyRow nodeRow = nodeTable.getRow(node.getSUID());
-        Double score = nodeRow.get(ocsanaScoreColumn, Double.class);
-        return score;
-    }
-
-    /**
-     * Compute the OCSANA score for a set of nodes
-     *
-     * This is simply the sum of the scores of the nodes in the set
-     *
-     * @param nodes  the node set to score
-     **/
-    public Double getScore (Collection<CyNode> nodes) {
-        // We only want to consider each node once, so we pack them into a Set
-        Set<CyNode> nodeSet = new HashSet<>(nodes);
-
-        Double totalScore = 0.0;
-        for (CyNode node: nodeSet) {
-            totalScore += getScore(node);
-        }
-
-        return totalScore;
-    }
-
-    /**
-     * Compute scores and store them in the tables
-     *
-     * @param network  the network to compute on
      * @param pathsToTargets  the paths to the target nodes
      * @param pathsToOffTargets  the paths to the off-target nodes
+     * @param Map assigning to each node its OCSANA score
      **/
-    public void applyScores(Collection<? extends List<CyEdge>> pathsToTargets,
-                            Collection<? extends List<CyEdge>> pathsToOffTargets) {
-        resetScoreColumn(effectsOnTargetsColumn);
-        resetScoreColumn(effectsOnOffTargetsColumn);
-
-        resetCountColumn(pathsToTargetsColumn);
-        resetCountColumn(pathsToOffTargetsColumn);
-
-        resetSUIDListColumn(targetsHitColumn);
-        resetSUIDListColumn(offTargetsHitColumn);
-
-        precomputeScoresForPaths(pathsToTargets, effectsOnTargetsColumn,
-                                 pathsToTargetsColumn,
-                                 targetsHitColumn, targetsHit);
-
-        precomputeScoresForPaths(pathsToOffTargets, effectsOnOffTargetsColumn,
-                                 pathsToOffTargetsColumn,
-                                 offTargetsHitColumn, offTargetsHit);
-
-        pathScoringComplete = true;
-
-        computeScoresForNodes();
-
-        nodeScoringComplete = true;
-    };
-
-    protected void computeScoresForNodes () {
-        if (!pathScoringComplete) {
-            throw new IllegalArgumentException("Cannot score nodes before scoring paths.");
+    public Map<CyNode, Double> computeScores (Collection<? extends List<CyEdge>> pathsToTargets,
+                                              Collection<? extends List<CyEdge>> pathsToOffTargets) {
+        if (!computeScores) {
+            return null;
         }
 
-        resetScoreColumn(ocsanaScoreColumn);
+        // Internal variables
+        // Per-node subscores for target and off-target paths
+        Map<CyNode, Double> effectsOnTargets = new HashMap<>();
+        Map<CyNode, Double> effectsOnOffTargets = new HashMap<>();
 
-        for (CyNode node: elementaryNodes) {
-            CyRow nodeRow = nodeTable.getRow(node.getSUID());
+        // Per-node counts of paths to targets and off-targets
+        Map<CyNode, Integer> countPathsToTargets = new HashMap<>();
+        Map<CyNode, Integer> countPathsToOffTargets = new HashMap<>();
 
-            Double targetEffectScore = 0.0;
-            List<Long> targetsHitByNode = nodeRow.getList(targetsHitColumn, Long.class);
-            Double effectsOnTargetsScore = nodeRow.get(effectsOnTargetsColumn, Double.class);
+        // Per-node sets of targets and off-targets hit
+        Map<CyNode, Set<CyNode>> targetsHitDownstream = new HashMap<>();
+        Map<CyNode, Set<CyNode>> offTargetsHitDownstream = new HashMap<>();
 
-            if ((targetsHit != null) && (!targetsHit.isEmpty()) &&
-                (targetsHitByNode != null) && (!targetsHitByNode.isEmpty()) &&
-                (effectsOnTargetsScore != null)) {
-                Double targetFraction = new Double(targetsHitByNode.size());
-                targetFraction /= targetsHit.size();
+        // Global sets of targets and off-targets hit by paths
+        Set<CyNode> targetsHitByAllPaths = new HashSet<>();
+        Set<CyNode> offTargetsHitByAllPaths = new HashSet<>();
 
-                targetEffectScore = targetFraction * effectsOnTargetsScore;
-            }
+        // Set of all nodes in paths
+        Set<CyNode> elementaryNodes = new HashSet<>();
 
-            Double offTargetEffectScore = 0.0;
-            List<Long> offTargetsHitByNode = nodeRow.getList(offTargetsHitColumn, Long.class);
-            Double effectsOnOffTargetsScore = nodeRow.get(effectsOnOffTargetsColumn, Double.class);
+        // Compute scores for nodes by iterating over paths
+        scoreNodesInPaths(pathsToTargets, effectsOnTargets, countPathsToTargets, targetsHitDownstream, targetsHitByAllPaths, elementaryNodes, true);
+        scoreNodesInPaths(pathsToOffTargets, effectsOnOffTargets, countPathsToOffTargets, offTargetsHitDownstream, offTargetsHitByAllPaths, elementaryNodes, false);
 
-            if ((offTargetsHit != null) && (!offTargetsHit.isEmpty()) &&
-                (offTargetsHitByNode != null) && (!offTargetsHitByNode.isEmpty()) &&
-                (effectsOnOffTargetsScore != null)) {
-                Double offTargetFraction = new Double(offTargetsHitByNode.size());
-                offTargetFraction /= offTargetsHit.size();
+        // Compute total scores for nodes
+        Map<CyNode, Double> ocsanaScores = scoreNodes(effectsOnTargets, countPathsToTargets, targetsHitDownstream, targetsHitByAllPaths, effectsOnOffTargets, countPathsToOffTargets, offTargetsHitDownstream, offTargetsHitByAllPaths, elementaryNodes);
 
-                offTargetEffectScore = offTargetFraction * effectsOnOffTargetsScore;
-            }
-
-            Double totalScore = targetEffectScore - offTargetEffectScore;
-
-            if (totalScore < 0) {
-                totalScore = 0.0;
-            }
-
-            nodeRow.set(ocsanaScoreColumn, totalScore);
-        }
-
-        nodeScoringComplete = true;
+        return ocsanaScores;
     }
 
     /**
-     * Precompute subscores on the specified collection of paths
+     * Compute scores of nodes from the given paths
      *
      * @param paths  the paths to score
-     * @param effectColumn  table column to store EFFECT score
-     * @param pathCountColumn  table column to store path counts
-     * @param targetColumn  table column to store targets hit
-     * @param targetsHitSet  set to store targets hit
+     * @param scoreMap  Map to store scores for nodes (updated in-place)
+     * @param pathCountMap  Map to store number of paths containing each node (updated in-place)
+     * @param endpointDownstreamMap  Map to store endpoints downstream of each node (updated in-place)
+     * @param allEndpointsHit  Set to store endpoints hit by these paths (updated in-place)
+     * @param elementaryNodes  Set to store nodes found in these paths (updated in-place)
+     * @param useEdgeSigns  if true, paths will be weighted ±1 according to the signs of their edges
      **/
-    protected void precomputeScoresForPaths(Collection<? extends List<CyEdge>> paths,
-                                            String effectColumn,
-                                            String pathCountColumn,
-                                            String targetColumn,
-                                            Set<CyNode> targetsHitSet) {
+    protected void scoreNodesInPaths (Collection<? extends List<CyEdge>> paths,
+                                      Map<CyNode, Double> scoreMap,
+                                      Map<CyNode, Integer> pathCountMap,
+                                      Map<CyNode, Set<CyNode>> endpointDownstreamMap,
+                                      Set<CyNode> allEndpointsHit,
+                                      Set<CyNode> elementaryNodes,
+                                      Boolean useEdgeSigns) {
+        // TODO: Handle null arguments
+
+        // Iterate over the paths
         for (List<CyEdge> path: paths) {
-            precomputeScoresForPath(path, effectColumn, pathCountColumn,
-                                    targetColumn, targetsHitSet);
+            // Handle cancellation
+            if (isCanceled()) {
+                return;
+            }
+
+            // Handle empty and null paths
+            // TODO: A null path is probably an error
+            if (path == null || path.size() == 0) {
+                continue;
+            }
+
+            // Handle the endpoint
+            CyNode endpoint = path.get(path.size() - 1).getTarget();
+            allEndpointsHit.add(endpoint);
+            elementaryNodes.add(endpoint);
+
+            // Record the sign of the path
+            // This will always be ±1
+            Integer pathSign = 1;
+
+            // For each path, we walk backwards from the endpoint,
+            // considering the source of each edge
+            for (int i = path.size() - 1; i >= 0; i--) {
+                assert Math.abs(pathSign) == 1;
+
+                CyEdge edge = path.get(i);
+                if (!edge.isDirected()) {
+                    throw new IllegalArgumentException("Undirected edges are not supported.");
+                }
+
+                CyNode edgeSource = edge.getSource();
+                Integer subPathLength = path.size() - i;
+
+                if (useEdgeSigns && edgeIsNegative(edge)) {
+                    pathSign *= -1;
+                }
+
+                // Update the node score
+                Double nodePrevScore = scoreMap.getOrDefault(edgeSource, DEFAULT_SCORE);
+                Double nodeNewScoreTerm = pathSign * 1.0 / subPathLength.doubleValue();
+                scoreMap.put(edgeSource, nodePrevScore + nodeNewScoreTerm);
+
+                // Update the node path records
+                Integer nodePathCount = pathCountMap.getOrDefault(edgeSource, DEFAULT_COUNT);
+                pathCountMap.put(edgeSource, nodePathCount + 1);
+
+                if (!endpointDownstreamMap.containsKey(edgeSource)) {
+                    endpointDownstreamMap.put(edgeSource, new HashSet<>());
+                }
+                endpointDownstreamMap.get(edgeSource).add(endpoint);
+
+                elementaryNodes.add(edgeSource);
+            }
         }
+    }
+
+    protected Boolean edgeIsNegative (CyEdge edge) {
+        // TODO: Write this!
+        return false;
     }
 
     /**
-     * Precompute subscores on the specified single path
+     * Compute the OCSANA scores of the nodes
      *
-     * @param path  the path to score
-     * @param effectColumn  table column to store EFFECT score
-     * @param pathCountColumn  table column to store path counts
-     * @param targetColumn  table column to store targets hit
-     * @param targetsHitSet  set to store targets hit
+     * @param effectsOnTargets  the EFFECTS_ON_TARGETS score of each node
+     * @param countPathsToTargets  the number of paths to targets from each node
+     * @param targetsHitDownstream  the Set of targets downstream of each node
+     * @param targetsHitByAllPaths the Set of targets hit by all paths
+     * @param effectsOnOffTargets  the SIDE_EFFECTS score of each node
+     * @param countPathsToOffTargets  the number of paths to offTargets from each node
+     * @param offTargetsHitDownstream  the Set of off-targets downstream of each node
+     * @param offTargetsHitByAllPaths the Set of off-targets hit by all paths
+     * @param elementaryNodes  the Set of all nodes in the paths
+     * @return Map assigning to each elementary node its OCSANA score
      **/
-    protected void precomputeScoresForPath(List<CyEdge> path,
-                                           String effectColumn,
-                                           String pathCountColumn,
-                                           String targetColumn,
-                                           Set<CyNode> targetsHitSet) {
-        // Walk up the path, starting from the target.
+    protected Map<CyNode, Double> scoreNodes (Map<CyNode, Double> effectsOnTargets,
+                                              Map<CyNode, Integer> countPathsToTargets,
+                                              Map<CyNode, Set<CyNode>> targetsHitDownstream,
+                                              Set<CyNode> targetsHitByAllPaths,
+                                              Map<CyNode, Double> effectsOnOffTargets,
+                                              Map<CyNode, Integer> countPathsToOffTargets,
+                                              Map<CyNode, Set<CyNode>> offTargetsHitDownstream,
+                                              Set<CyNode> offTargetsHitByAllPaths,
+                                              Set<CyNode> elementaryNodes) {
+        Map<CyNode, Double> scores = new HashMap<>();
 
-        // First, we do some one-time processing of the target.
-        CyEdge edgeToTarget = path.get(path.size() - 1);
-        assert edgeToTarget.isDirected();
+        for (CyNode node: elementaryNodes) {
+            // EFFECT_ON_TARGETS term of OVERALL score
+            Double targetSubScore;
+            if (targetsHitByAllPaths.isEmpty()) {
+                targetSubScore = DEFAULT_SCORE;
+            } else {
+                Set<CyNode> targetsHitByNode = targetsHitDownstream.getOrDefault(node, new HashSet<>());
+                targetSubScore = targetsHitByNode.size() / (double) targetsHitByAllPaths.size() * Math.abs(effectsOnTargets.getOrDefault(node, DEFAULT_SCORE));
+            }
 
-        CyNode target = edgeToTarget.getTarget();
-        incrementTableCount(target, pathCountColumn, 1);
-        addToTableSUIDListIfAbsent(target, targetColumn, target.getSUID());
-        targetsHitSet.add(target);
+            // SIDE_EFFECTS term of OVERALL score
+            Double sideEffectSubScore;
+            if (offTargetsHitByAllPaths.isEmpty()) {
+                sideEffectSubScore = DEFAULT_SCORE;
+            } else {
+                Set<CyNode> offTargetsHitByNode = offTargetsHitDownstream.getOrDefault(node, new HashSet<>());
+                sideEffectSubScore = offTargetsHitByNode.size() / (double) offTargetsHitByAllPaths.size() * Math.abs(effectsOnOffTargets.getOrDefault(node, DEFAULT_SCORE));
+            }
 
-        elementaryNodes.add(target);
+            // OVERALL
+            Double overallScore = targetSubScore - sideEffectSubScore;
+            if (overallScore < 0) {
+                overallScore = 0.0;
+            }
 
-        // We score the source of each edge, updating the table
-        // columns appropriately.
-
-        CyNode prevNode = target;
-        for (int edgeIndex = path.size() - 1; edgeIndex >= 0; edgeIndex--) {
-            CyEdge edge = path.get(edgeIndex);
-            assert edge.getTarget().equals(prevNode);
-
-            CyNode currentNode = edge.getSource();
-            prevNode = currentNode;
-            elementaryNodes.add(currentNode);
-
-            // EFFECT_ON_TARGETS
-            // TODO: Handle signed paths
-            Double pathLengthSoFar = new Double(path.size() - edgeIndex);
-            incrementTableScore(currentNode, effectColumn, 1/pathLengthSoFar);
-
-            // Path count
-            incrementTableCount(currentNode, pathCountColumn, 1);
-
-            // Record target hit
-            addToTableSUIDListIfAbsent(currentNode, targetColumn, target.getSUID());
-        }
-    }
-
-
-
-    /**
-     * Initialize (create and clear) a column of scores
-     *
-     * @param columnName  the name of the column
-     **/
-    protected void resetScoreColumn(String columnName) {
-        resetColumn(columnName, Double.class, 0.0);
-    }
-
-    /**
-     * Initialize (create and clear) a column of counts
-     *
-     * @param columnName  the name of the column
-     **/
-    protected void resetCountColumn(String columnName) {
-        resetColumn(columnName, Integer.class, 0);
-    }
-
-    /**
-     * Initialize (create and clear) a column
-     *
-     * @param columnName  the name of the column
-     * @param type  the data type for the column
-     * @param defaultValue  the default value for the column
-     **/
-    private <T extends Number> void resetColumn(String columnName,
-                                                Class <? extends T> type,
-                                                T defaultValue) {
-        // Delete the column if it exists
-        try {
-            nodeTable.deleteColumn(columnName);
-        } catch (IllegalArgumentException e) {
-            // This indicates that the column is immutable, which is very bad.
-            // TODO: Figure out what to do here
-            throw e;
+            // OCSANA
+            Double ocsanaScore = overallScore * targetsHitDownstream.getOrDefault(node, new HashSet<>()).size();
+            scores.put(node, ocsanaScore);
         }
 
-        // Create the column
-        nodeTable.createColumn(columnName, type, false, defaultValue);
-    }
-
-    // Ensure that the specified column exists and is empty
-    protected void resetSUIDListColumn(String columnName) {
-        resetListColumn(columnName, Long.class);
-    }
-
-    /**
-     * Initialize (create and clear) a list column
-     *
-     * @param columnName  the name of the column
-     * @param type  the data type for list entries in the column
-     **/
-    private <T> void resetListColumn(String columnName,
-                                     Class<? extends T> type) {
-        // Delete the column if it exists
-        try {
-            nodeTable.deleteColumn(columnName);
-        } catch (IllegalArgumentException e) {
-            // This indicates that the column is immutable, which is very bad.
-            // TODO: Figure out what to do here
-            throw e;
-        }
-
-        // Create the column
-        nodeTable.createListColumn(columnName, type, false, new ArrayList<>());
-    }
-
-    /**
-     * Increase a count in a table
-     *
-     * @param node  the node to update
-     * @param columnName  the column/attribute to update
-     * @param incrementValue  the amount to add to the node's count
-     **/
-    protected void incrementTableCount(CyNode node,
-                                       String columnName,
-                                       Integer incrementValue) {
-        CyColumn col = nodeTable.getColumn(columnName);
-        Class colType = col.getType();
-
-        if (!colType.isAssignableFrom(Integer.class)) {
-            throw new IllegalArgumentException("Cannot assign " + colType + " from Integer");
-        }
-
-
-        CyRow nodeRow = nodeTable.getRow(node.getSUID());
-        if (nodeRow.isSet(columnName)) {
-            nodeRow.set(columnName, nodeRow.get(columnName, Integer.class) + incrementValue);
-        } else {
-            nodeRow.set(columnName, incrementValue);
-        }
-    }
-
-    /**
-     * Increase a score in a table
-     *
-     * @param node  the node to update
-     * @param columnName  the column/attribute to update
-     * @param incrementValue  the amount to add to the node's score
-     **/
-    protected void incrementTableScore(CyNode node,
-                                       String columnName,
-                                       Double incrementValue) {
-        CyColumn col = nodeTable.getColumn(columnName);
-        Class colType = col.getType();
-
-        if (!colType.isAssignableFrom(Double.class)) {
-            throw new IllegalArgumentException("Cannot assign " + colType + " from Double");
-        }
-
-
-        CyRow nodeRow = nodeTable.getRow(node.getSUID());
-        if (nodeRow.isSet(columnName)) {
-            nodeRow.set(columnName, nodeRow.get(columnName, Double.class) + incrementValue);
-        } else {
-            nodeRow.set(columnName, incrementValue);
-        }
-    }
-
-    /**
-     * Add an SUID to a list column entry if it is not already
-     * there
-     *
-     * @param node  the node to modify
-     * @param columnName  the column/attribute to modify
-     * @param newSUID  the SUID to add to the list
-     **/
-    protected void addToTableSUIDListIfAbsent(CyNode node,
-                                              String columnName,
-                                              Long newSUID) {
-        addToTableListIfAbsent(node, columnName, newSUID, Long.class);
-    }
-
-    /**
-     * Add an element to a list column entry if it is not already
-     * there
-     *
-     * @param node  the node to modify
-     * @param columnName  the column/attribute to modify
-     * @param newElement  the new element to add to the list
-     * @param type  the data type of the elements of the column
-     **/
-    private <T> void addToTableListIfAbsent(CyNode node,
-                                            String columnName,
-                                            T newElement,
-                                            Class <T> type) {
-        CyColumn col = nodeTable.getColumn(columnName);
-        Class colType = col.getListElementType();
-
-        if (!colType.isAssignableFrom(type)) {
-            throw new IllegalArgumentException("Cannot assign " + colType + " from " + type);
-        }
-
-        CyRow nodeRow = nodeTable.getRow(node.getSUID());
-        List<T> nodeList = nodeRow.getList(columnName, type);
-
-        if (nodeList == null) {
-            nodeList = new ArrayList();
-        }
-
-        if (!nodeList.contains(newElement)) {
-            nodeList.add(newElement);
-        }
+        return scores;
     }
 
     // Name methods

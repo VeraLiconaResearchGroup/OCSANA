@@ -41,7 +41,9 @@ public class PresentResultsTask extends AbstractOCSANATask {
     }
 
     public void run (TaskMonitor taskMonitor) {
-        taskMonitor.setTitle("Generating OCSANA results");
+        taskMonitor.setTitle("Results");
+
+        taskMonitor.setStatusMessage("Generating results report.");
 
         resultsPanel.updateResults(results);
     }

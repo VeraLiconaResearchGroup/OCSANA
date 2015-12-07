@@ -164,7 +164,6 @@ public class OCSANARunnerTask extends AbstractNetworkTask
 
     protected void spawnCleanupTask () {
         // Any post-process cleanup should happen here
-        ocsanaAlg.cleanupAfterRun();
     }
 
     public void taskFinished(ObservableTask task) {

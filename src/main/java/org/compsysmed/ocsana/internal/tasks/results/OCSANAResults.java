@@ -41,6 +41,7 @@ public class OCSANAResults {
 
     // Scoring data
     public OCSANAScoringAlgorithm ocsanaAlg;
+    public Map<CyNode, Double> ocsanaScores;
     public Boolean scoringCanceled = false;
 
     // MHS data

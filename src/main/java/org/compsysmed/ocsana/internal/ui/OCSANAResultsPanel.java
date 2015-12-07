@@ -209,7 +209,12 @@ public class OCSANAResultsPanel
             Vector<Object> row = new Vector<>();
             row.add(results.nodeSetString(MHS));
             row.add(MHS.size());
-            row.add(results.ocsanaAlg.getScore(MHS));
+
+            Double mhsScore = 0.0;
+            for (CyNode node: MHS) {
+                mhsScore += results.ocsanaScores.getOrDefault(node, 0.0);
+            }
+            row.add(mhsScore);
 
             rows.add(row);
         }

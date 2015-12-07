@@ -52,7 +52,7 @@ public class OCSANAScoringAlgorithmTask extends AbstractOCSANATask {
 
         taskMonitor.setStatusMessage("Computing scores.");
 
-        results.ocsanaAlg.applyScores(results.pathsToTargets, results.pathsToOffTargets);
+        results.ocsanaScores = results.ocsanaAlg.computeScores(results.pathsToTargets, results.pathsToOffTargets);
     }
 
     public <T> T getResults (Class<? extends T> type) {
