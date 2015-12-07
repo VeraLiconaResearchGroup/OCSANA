@@ -61,7 +61,7 @@ public class Hypergraph extends ArrayList<BitSet> {
      * one per line, as space-separated lists of positive integer
      * indices
      **/
-    public Hypergraph (String inFile)
+    public Hypergraph (File inFile)
         throws FileNotFoundException, IOException, NumberFormatException {
         numVerts = 0;
 

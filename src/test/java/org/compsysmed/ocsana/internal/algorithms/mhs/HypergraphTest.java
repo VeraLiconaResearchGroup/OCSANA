@@ -13,6 +13,7 @@ import static org.junit.Assert.*;
 
 // Java imports
 import java.util.*;
+import java.io.*;
 
 // OCSANA imports
 import org.compsysmed.ocsana.internal.algorithms.mhs.Hypergraph;
@@ -46,5 +47,15 @@ public class HypergraphTest {
 
         Hypergraph example = new Hypergraph(edges);
         assertEquals("Hypergraph list constructor should preserve size", edges.size(), example.numEdges());
+    }
+
+    @Test
+    public void fileConstructorShouldWork ()
+        throws FileNotFoundException, IOException, NumberFormatException {
+        //String HER2File = IOUtils.toString(this.getClass().getResourceAsStream("HER2.all.dat"), "UTF-8");
+        File HER2File = new File(getClass().getResource("/mhs-data/HER2.all.dat").getFile());
+        Hypergraph H = new Hypergraph(HER2File);
+        assertEquals("Hypergraph from file should preserve number of vertices", 320, H.numVerts());
+        assertEquals("Hypergraph from file should preserve number of edges", 69805, H.numEdges());
     }
 }
