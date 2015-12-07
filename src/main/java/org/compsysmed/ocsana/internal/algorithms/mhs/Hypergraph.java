@@ -25,7 +25,7 @@ public class Hypergraph extends ArrayList<BitSet> {
      * Construct an empty Hypergraph
      **/
     public Hypergraph () {
-        this(1);
+        this(0);
     }
 
     /**
@@ -139,10 +139,10 @@ public class Hypergraph extends ArrayList<BitSet> {
      * the hypergraph.
      **/
     public List<List<Integer>> edgesAsList () {
-        List<List<Integer>> result = new ArrayList<List<Integer>> ();
+        List<List<Integer>> result = new ArrayList<> ();
 
         for (BitSet edge: this) {
-            List<Integer> edgeList = new ArrayList<Integer> ();
+            List<Integer> edgeList = new ArrayList<> ();
             for (int i = edge.nextSetBit(0); i >= 0; i = edge.nextSetBit(i+1)) {
                 edgeList.add(i);
             }
@@ -313,7 +313,7 @@ public class Hypergraph extends ArrayList<BitSet> {
      * is the degree of vertex i
      **/
     public List<Integer> vertexDegrees () {
-        List<Integer> result = new ArrayList<Integer> ();
+        List<Integer> result = new ArrayList<> ();
 
         for (BitSet edge: this) {
             for (int v = 0; v < numVerts(); v++) {
