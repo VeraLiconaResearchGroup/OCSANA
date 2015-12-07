@@ -25,7 +25,6 @@ import org.cytoscape.model.CyNode;
 import org.compsysmed.ocsana.internal.tasks.AbstractOCSANATask;
 import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
 
-import org.compsysmed.ocsana.internal.ui.CIResultsPanel;
 import org.compsysmed.ocsana.internal.ui.OCSANAResultsPanel;
 
 public class PresentResultsTask extends AbstractOCSANATask {

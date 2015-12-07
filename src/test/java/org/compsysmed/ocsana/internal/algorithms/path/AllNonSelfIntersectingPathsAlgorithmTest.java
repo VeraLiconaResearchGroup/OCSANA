@@ -93,5 +93,10 @@ public class AllNonSelfIntersectingPathsAlgorithmTest {
     public void toyNetworkShouldHaveSevenPaths () {
         Collection<List<CyEdge>> paths = toyNetworkAlg.paths(toyNetworkSources, toyNetworkTargets);
         assertEquals("Toy network should have seven paths", 7, paths.size());
+
+        for (List<CyEdge> path: paths) {
+            assertTrue("Path should start at a source", toyNetworkSources.contains(path.get(0).getSource()));
+            assertTrue("Path should end at a target", toyNetworkTargets.contains(path.get(path.size() - 1).getTarget()));
+        }
     }
 }
