@@ -80,12 +80,14 @@ public class OCSANAResults {
             return new String();
         }
 
-        List<String> strings = new ArrayList<>();
+        List<String> nodeStrings = new ArrayList<>();
          for (CyNode node: nodes) {
-            strings.add(nodeName(node));
+            nodeStrings.add(nodeName(node));
          }
 
-        return "[" + String.join(", ", strings) + "]";
+         Collections.sort(nodeStrings);
+
+        return "[" + String.join(", ", nodeStrings) + "]";
     }
 
     /**
