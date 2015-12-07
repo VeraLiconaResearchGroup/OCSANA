@@ -6,6 +6,7 @@
         <bundle.namespace>org.compsysmed.ocsana.internal</bundle.namespace>
         <cytoscape.api.version>3.2.1</cytoscape.api.version>
         <osgi.api.version>4.2.0</osgi.api.version>
+        <junit.version>4.12</junit.version>
     </properties>
 
     <modelVersion>4.0.0</modelVersion>
@@ -146,10 +147,23 @@
             <artifactId>session-api</artifactId>
             <version>${cytoscape.api.version}</version>
         </dependency>
-                <dependency>
+        <dependency>
             <groupId>org.cytoscape</groupId>
             <artifactId>core-task-api</artifactId>
             <version>${cytoscape.api.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.cytoscape</groupId>
+            <artifactId>model-impl</artifactId>
+            <version>${cytoscape.api.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
