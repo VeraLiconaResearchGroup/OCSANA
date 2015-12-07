@@ -123,7 +123,7 @@ public class OCSANAResults {
     /**
      * Generate a report of the results of an OCSANA run
      **/
-    public List<String> getReportLines() {
+    public List<String> generateReportLines() {
         // Format based on original OCSANA
         List<String> reportLines = new ArrayList<>();
 

@@ -74,7 +74,6 @@ public class OCSANAResultsPanel
 
     public void updateResults (OCSANAResults results) {
         this.results = results;
-        reportLines = results.getReportLines();
 
         removeAll();
         buildPanel();
@@ -102,6 +101,7 @@ public class OCSANAResultsPanel
         buttonPanel.add(showReportButton);
         showReportButton.addActionListener(new ActionListener() {
                 public void actionPerformed (ActionEvent e) {
+                    ensureResultsReportAvailable();
                     showResultsReport();
                 }
             });
@@ -116,6 +116,7 @@ public class OCSANAResultsPanel
                         File outFile = fileChooser.getSelectedFile();
                         try (BufferedWriter fileWriter =
                              new BufferedWriter(new FileWriter(outFile))) {
+                            ensureResultsReportAvailable();
                             for (String reportLine: reportLines) {
                                 fileWriter.write(reportLine);
                                 fileWriter.newLine();
@@ -137,10 +138,17 @@ public class OCSANAResultsPanel
         return buttonPanel;
     }
 
+    protected void ensureResultsReportAvailable () {
+        if (reportLines == null) {
+            reportLines = results.generateReportLines();
+        }
+    }
+
     protected void showResultsReport () {
-        JTextArea reportTextArea = new JTextArea();
+        JTextArea reportTextArea = new JTextArea(40, 120);
         reportTextArea.setText(String.join("\n", reportLines));
         reportTextArea.setEditable(false);
+        reportTextArea.setCaretPosition(0); // Show top of file initially
 
         JScrollPane reportPane = new JScrollPane(reportTextArea);
         JOptionPane.showMessageDialog(this, reportPane, "OCSANA report", JOptionPane.PLAIN_MESSAGE);
