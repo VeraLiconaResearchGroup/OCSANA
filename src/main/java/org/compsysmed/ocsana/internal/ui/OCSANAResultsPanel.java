@@ -24,21 +24,25 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.AbstractListModel;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultListModel;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
-import javax.swing.JScrollPane;
-import javax.swing.JOptionPane;
+import javax.swing.RowSorter;
 import javax.swing.border.TitledBorder;
-import javax.swing.AbstractListModel;
-import javax.swing.DefaultListModel;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
 // Cytoscape imports
 import org.cytoscape.application.swing.CySwingApplication;
@@ -187,13 +191,26 @@ public class OCSANAResultsPanel
         if (results.MHSes != null) {
             Vector<Vector<Object>> mhsRows = getMHSRows();
 
-            JTable mhsTable = new JTable(mhsRows, mhsCols);
-            mhsTable.setAutoCreateRowSorter(true);
-            mhsTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+            TableModel mhsModel = new DefaultTableModel(mhsRows, mhsCols) {
+                    public Class getColumnClass(int column) {
+                        Class returnValue;
+                        if ((column >= 0) && (column < getColumnCount())) {
+                            returnValue = getValueAt(0, column).getClass();
+                        } else {
+                            returnValue = Object.class;
+                        }
+                        return returnValue;
+                    }
+                };
 
-            // Sort by score in descending order
-            mhsTable.getRowSorter().toggleSortOrder(2);
-            mhsTable.getRowSorter().toggleSortOrder(2);
+            JTable mhsTable = new JTable(mhsModel);
+
+            RowSorter<TableModel> mhsSorter = new TableRowSorter<TableModel>(mhsModel);
+            mhsSorter.toggleSortOrder(2);
+            mhsSorter.toggleSortOrder(2);
+            mhsTable.setRowSorter(mhsSorter);
+
+            mhsTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 
             JScrollPane mhsScrollPane = new JScrollPane(mhsTable);
 
