@@ -56,12 +56,16 @@ public class MHSAlgorithmTask extends AbstractOCSANATask {
         List<Set<CyNode>> nodeSets = new ArrayList<>();
         for (List<CyEdge> path: results.pathsToTargets) {
             Set<CyNode> nodes = new HashSet<>();
-            // The first node is a source and the last is a target, so
-            // we skip them by carefully setting the loop bounds
-            for (int i = 1; i < path.size() - 1; i++) {
+            // We are only interested in nodes which are not sources
+            // or targets. Thus, we ignore the first and last nodes in
+            // the path, then check each remaining node for membership
+            // in those sets.
+            for (int i = 1; i <= path.size() - 1; i++) {
                 CyEdge edge = path.get(i);
-                nodes.add(edge.getSource());
-                nodes.add(edge.getTarget());
+                CyNode node = edge.getSource();
+                if (!results.sourceNodes.contains(node) && !results.targetNodes.contains(node)) {
+                    nodes.add(node);
+                }
             }
 
             if (!nodes.isEmpty()) {
