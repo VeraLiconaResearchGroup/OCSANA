@@ -48,6 +48,20 @@ public class OCSANAScoringAlgorithm
              groups = {CONFIG_GROUP})
     public Boolean computeScores = true;
 
+    // User configuration
+    @Tunable(description = "Store OCSANA score in a table column",
+             gravity = 340,
+             dependsOn = "computeScores=true",
+             groups = {CONFIG_GROUP})
+    public Boolean storeScores = false;
+
+    @Tunable(description = "Name of column to store scores",
+             gravity = 350,
+             dependsOn = "storeScores=true",
+             tooltip = "This column will be overwritten!",
+             groups = {CONFIG_GROUP})
+    public String storeScoresColumn = "ocsanaScore";
+
     protected Boolean nodeScoringComplete = false;
     protected Boolean pathScoringComplete = false;
 
@@ -96,6 +110,10 @@ public class OCSANAScoringAlgorithm
 
         // Compute total scores for nodes
         Map<CyNode, Double> ocsanaScores = scoreNodes(effectsOnTargets, countPathsToTargets, targetsHitDownstream, targetsHitByAllPaths, effectsOnOffTargets, countPathsToOffTargets, offTargetsHitDownstream, offTargetsHitByAllPaths, elementaryNodes);
+
+        if (storeScores) {
+            storeScoresInColumn(ocsanaScores, storeScoresColumn);
+        }
 
         return ocsanaScores;
     }
@@ -239,6 +257,32 @@ public class OCSANAScoringAlgorithm
         }
 
         return scores;
+    }
+
+    /**
+     * Record the OCSANA scores in a table column
+     *
+     * @param ocsanaScores  the node scores
+     * @param storeScoresColumn  the name of the column
+     **/
+    protected void storeScoresInColumn(Map<CyNode, Double> ocsanaScores,
+                                       String storeScoresColumn) {
+        CyTable nodeTable = network.getDefaultNodeTable();
+
+        // Delete the column if it exists
+        nodeTable.deleteColumn(storeScoresColumn);
+
+        // Create the column
+        // TODO: Should we set a default value?
+        nodeTable.createColumn(storeScoresColumn, Double.class, false);
+
+        // Store the values
+        for (Map.Entry<CyNode, Double> entry: ocsanaScores.entrySet()) {
+            CyNode node = entry.getKey();
+            Double score = entry.getValue();
+            CyRow nodeRow = nodeTable.getRow(node.getSUID());
+            nodeRow.set(storeScoresColumn, score);
+        }
     }
 
     // Name methods
