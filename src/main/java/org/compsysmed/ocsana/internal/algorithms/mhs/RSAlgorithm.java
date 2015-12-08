@@ -36,7 +36,6 @@ public class RSAlgorithm extends AbstractMHSAlgorithm {
     public static final String SHORTNAME = "RS";
 
     // Tunables for threading
-    // TODO: Add note that not specifying will use *all* hardware units
     @Tunable(description = "Specify number of threads",
              gravity = 410,
              tooltip="By default, all CPUs will be utilized",
@@ -50,7 +49,6 @@ public class RSAlgorithm extends AbstractMHSAlgorithm {
     public BoundedInteger numThreads;
 
     // Tunables for bounded-cardinality search
-    // TODO: Add note that not using this may take a long time
     @Tunable(description = "Restrict search to small CIs",
              gravity = 420,
              tooltip="Unbounded search may take a very long time!",
