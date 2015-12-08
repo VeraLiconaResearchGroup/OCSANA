@@ -56,6 +56,9 @@ public class OCSANAResults {
 
     public Double mhsExecutionSeconds;
 
+    // Report data
+    private List<String> reportLines;
+
     public OCSANAResults () {};
 
     // Output generation
@@ -123,11 +126,22 @@ public class OCSANAResults {
     }
 
     /**
+     * Get a report of the results of an OCSANA run
+     **/
+    public List<String> getReportLines () {
+        if (reportLines == null) {
+            generateReportLines();
+        }
+
+        return reportLines;
+    }
+
+    /**
      * Generate a report of the results of an OCSANA run
      **/
-    public List<String> generateReportLines() {
+    protected void generateReportLines () {
         // Format based on original OCSANA
-        List<String> reportLines = new ArrayList<>();
+        reportLines = new ArrayList<>();
 
         reportLines.add("--- Optimal cut set search report ---");
         reportLines.add("");
@@ -196,7 +210,5 @@ public class OCSANAResults {
             // TODO: handle scoring information
             reportLines.add(nodeSetString(mhs));
         }
-
-        return reportLines;
     }
 }
