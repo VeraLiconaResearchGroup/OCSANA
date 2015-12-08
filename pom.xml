@@ -82,6 +82,8 @@
                 <version>2.7.1</version>
                 <configuration>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                    <parallel>all</parallel>
+                    <useUnlimitedThreads>true</useUnlimitedThreads>
                 </configuration>
             </plugin>
             <!-- Generates the OSGi metadata based on the osgi.bnd file. -->
