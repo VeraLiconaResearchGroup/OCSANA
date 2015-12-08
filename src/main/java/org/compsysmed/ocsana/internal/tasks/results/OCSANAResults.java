@@ -151,7 +151,7 @@ public class OCSANAResults {
             for (CyNode node: sourceNodes) {
                 sourceNodeNames.add(nodeName(node));
             }
-            String sourceNodeString = "Source nodes: " + String.join(" ", sourceNodeNames);
+            String sourceNodeString = "Source nodes: " + String.join(", ", sourceNodeNames);
             reportLines.add(sourceNodeString);
 
         }
@@ -161,7 +161,7 @@ public class OCSANAResults {
             for (CyNode node: targetNodes) {
                 targetNodeNames.add(nodeName(node));
             }
-            String targetNodeString = "Target nodes: " + String.join(" ", targetNodeNames);
+            String targetNodeString = "Target nodes: " + String.join(", ", targetNodeNames);
             reportLines.add(targetNodeString);
 
         }
@@ -171,7 +171,7 @@ public class OCSANAResults {
             for (CyNode node: offTargetNodes) {
                 offTargetNodeNames.add(nodeName(node));
             }
-            String offTargetNodeString = "Side effect nodes: " + String.join(" ", offTargetNodeNames);
+            String offTargetNodeString = "Side effect nodes: " + String.join(", ", offTargetNodeNames);
             reportLines.add(offTargetNodeString);
         }
 
