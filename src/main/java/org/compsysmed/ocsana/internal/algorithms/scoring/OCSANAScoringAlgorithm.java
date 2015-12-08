@@ -252,7 +252,7 @@ public class OCSANAScoringAlgorithm
             }
 
             // OCSANA
-            Double ocsanaScore = overallScore * targetsHitDownstream.getOrDefault(node, new HashSet<>()).size();
+            Double ocsanaScore = overallScore * countPathsToTargets.getOrDefault(node, 0);
             scores.put(node, ocsanaScore);
         }
 
