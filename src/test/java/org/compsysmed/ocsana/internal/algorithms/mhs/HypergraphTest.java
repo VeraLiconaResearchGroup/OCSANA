@@ -52,7 +52,6 @@ public class HypergraphTest {
     @Test
     public void fileConstructorShouldWork ()
         throws FileNotFoundException, IOException, NumberFormatException {
-        //String HER2File = IOUtils.toString(this.getClass().getResourceAsStream("HER2.all.dat"), "UTF-8");
         File HER2File = new File(getClass().getResource("/mhs-data/HER2.all.dat").getFile());
         Hypergraph H = new Hypergraph(HER2File);
         assertEquals("Hypergraph from file should preserve number of vertices", 320, H.numVerts());
