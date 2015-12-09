@@ -278,24 +278,19 @@ public class OCSANAResultsPanel
                                       String pathType,
                                       Double runTime) {
         if (paths != null) {
-            Vector<Vector<String>> pathRows = new Vector<>();
+            // Get lines to display
+            List<String> pathLines = new ArrayList<>();
             for (List<CyEdge> path: paths) {
-                Vector<String> pathRow = new Vector<String>();
-                pathRow.add(results.pathString(path));
-                pathRows.add(pathRow);
+                pathLines.add(results.pathString(path));
             }
 
-            Vector<String> pathCols = new Vector<>();
-            pathCols.add("Path");
-
-            JTable pathTable = new JTable(pathRows, pathCols);
-            pathTable.setAutoCreateRowSorter(true);
-            pathTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-
             // Sort alphabetically
-            pathTable.getRowSorter().toggleSortOrder(0);
+            Collections.sort(pathLines);
 
-            JScrollPane pathScrollPane = new JScrollPane(pathTable);
+            // Create panel
+            JTextArea pathTextArea = new JTextArea(String.join("\n", pathLines));
+
+            JScrollPane pathScrollPane = new JScrollPane(pathTextArea);
 
             JPanel pathPanel = new JPanel(new BorderLayout());
             String panelText = "Found " + paths.size() + " paths to " + pathType + " in " + runTime + " s.";
