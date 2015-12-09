@@ -56,16 +56,17 @@ public class MHSAlgorithmTask extends AbstractOCSANATask {
         List<Set<CyNode>> nodeSets = new ArrayList<>();
         for (List<CyEdge> path: results.pathsToTargets) {
             Set<CyNode> nodes = new HashSet<>();
-            // We are only interested in nodes which are not sources
-            // or targets. Thus, we ignore the first and last nodes in
-            // the path, then check each remaining node for membership
-            // in those sets.
-            for (int i = 1; i <= path.size() - 1; i++) {
+
+            // Scan every edge in the path, adding its nodes as
+            // appropriate
+            for (int i = 0; i <= path.size() - 1; i++) {
                 CyEdge edge = path.get(i);
-                CyNode node = edge.getSource();
-                if (!results.sourceNodes.contains(node) && !results.targetNodes.contains(node)) {
-                    nodes.add(node);
-                }
+
+                // Since we're using a Set, we don't have to worry
+                // about multiple addition, so we'll just go ahead and
+                // add the source and target every time
+                addNodeWithEndpointChecks(edge.getSource(), nodes);
+                addNodeWithEndpointChecks(edge.getTarget(), nodes);
             }
 
             if (!nodes.isEmpty()) {
@@ -77,7 +78,7 @@ public class MHSAlgorithmTask extends AbstractOCSANATask {
         Double conversionTime = (postConversionTime - preConversionTime) / 1E9;
         taskMonitor.setStatusMessage("Converted paths in " + conversionTime + "s.");
 
-        taskMonitor.setStatusMessage("Finding minimal combinations of interventions in " + conversionTime + "s.");
+        taskMonitor.setStatusMessage("Finding minimal combinations of interventions.");
 
         Long preMHSTime = System.nanoTime();
         results.MHSes = results.mhsAlg.MHSes(nodeSets);
@@ -87,6 +88,23 @@ public class MHSAlgorithmTask extends AbstractOCSANATask {
         taskMonitor.showMessage(TaskMonitor.Level.INFO, "Found " + results.MHSes.size() + " minimal CIs in " + mhsTime + "s.");
 
         results.mhsExecutionSeconds = mhsTime;
+    }
+
+    /**
+     * Add a node to a set if it satisfies the endpoint conditions
+     *
+     * In particular, if the node is a source or target, only add it
+     * if results.includeEndpointsinCIs is true
+     *
+     * @param nodeToAdd  the node to add
+     * @param nodeSet  the set of nodes to (maybe) add to
+     **/
+    private void addNodeWithEndpointChecks (CyNode nodeToAdd,
+                                            Set<CyNode> nodeSet) {
+        if (results.includeEndpointsInCIs ||
+            (!results.sourceNodes.contains(nodeToAdd) && !results.targetNodes.contains(nodeToAdd))) {
+            nodeSet.add(nodeToAdd);
+        }
     }
 
     public Collection<? extends Collection<CyNode>> getMHSes () {

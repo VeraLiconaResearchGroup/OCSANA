@@ -69,10 +69,6 @@ public class OCSANARunnerTask extends AbstractNetworkTask
 
     public OCSANAScoringAlgorithm ocsanaAlg;
 
-    protected Set<CyNode> sourceNodes;
-    protected Set<CyNode> targetNodes;
-    protected Set<CyNode> offTargetNodes;
-
     protected OCSANAResults results;
 
     protected OCSANAResultsPanel resultsPanel;
@@ -85,6 +81,7 @@ public class OCSANARunnerTask extends AbstractNetworkTask
                              AbstractPathFindingAlgorithm pathFindingAlg,
                              OCSANAScoringAlgorithm ocsanaAlg,
                              AbstractMHSAlgorithm mhsAlg,
+                             Boolean includeEndpointsInCIs,
                              Set<CyNode> sourceNodes,
                              Set<CyNode> targetNodes,
                              Set<CyNode> offTargetNodes) {
@@ -96,15 +93,13 @@ public class OCSANARunnerTask extends AbstractNetworkTask
         this.ocsanaAlg = ocsanaAlg;
         this.mhsAlg = mhsAlg;
 
-        this.sourceNodes = sourceNodes;
-        this.targetNodes = targetNodes;
-        this.offTargetNodes = offTargetNodes;
-
         results = new OCSANAResults();
         results.network = network;
         results.pathFindingAlg = pathFindingAlg;
         results.ocsanaAlg = ocsanaAlg;
         results.mhsAlg = mhsAlg;
+
+        results.includeEndpointsInCIs = includeEndpointsInCIs;
 
         results.sourceNodes = sourceNodes;
         results.targetNodes = targetNodes;

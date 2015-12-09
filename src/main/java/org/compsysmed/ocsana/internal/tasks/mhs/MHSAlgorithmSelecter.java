@@ -36,8 +36,15 @@ import org.compsysmed.ocsana.internal.algorithms.mhs.RSAlgorithm;
 public class MHSAlgorithmSelecter {
     @Tunable(description = "MHS algorithm",
              gravity = 350,
+             tooltip = "MMCS is usually the fastest",
              groups = {"Find minimal CIs"})
     public ListSingleSelection<AbstractMHSAlgorithm> algorithmSelecter;
+
+    @Tunable(description = "Allow sources and targets in CIs",
+             gravity = 351,
+             tooltip = "If true, CIs will be allowed to contain source and target nodes.",
+             groups = {"Find minimal CIs"})
+    public Boolean includeEndpointsInCIs = false;
 
     private CyNetwork network;
 
@@ -58,5 +65,9 @@ public class MHSAlgorithmSelecter {
 
     public AbstractMHSAlgorithm getAlgorithm () {
         return algorithmSelecter.getSelectedValue();
+    }
+
+    public Boolean getIncludeEndpointsInCIs () {
+        return includeEndpointsInCIs;
     }
 }

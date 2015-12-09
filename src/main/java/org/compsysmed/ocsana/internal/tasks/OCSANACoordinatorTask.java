@@ -89,6 +89,7 @@ public class OCSANACoordinatorTask extends AbstractNetworkTask {
         // Fetch configuration
         AbstractPathFindingAlgorithm pathAlgorithm = pathAlgSelecter.getAlgorithm();
         AbstractMHSAlgorithm mhsAlgorithm = mhsAlgSelecter.getAlgorithm();
+        Boolean includeEndpointsInCIs = mhsAlgSelecter.getIncludeEndpointsInCIs();
 
         Set<CyNode> sourceNodes = new HashSet<>(nodeSelecter.getSourceNodes());
         Set<CyNode> targetNodes = new HashSet<>(nodeSelecter.getTargetNodes());
@@ -100,6 +101,7 @@ public class OCSANACoordinatorTask extends AbstractNetworkTask {
                                                            pathAlgorithm,
                                                            ocsanaAlgorithm,
                                                            mhsAlgorithm,
+                                                           includeEndpointsInCIs,
                                                            sourceNodes,
                                                            targetNodes,
                                                            offTargetNodes);

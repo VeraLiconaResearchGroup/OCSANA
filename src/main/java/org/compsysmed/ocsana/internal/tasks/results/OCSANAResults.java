@@ -53,6 +53,7 @@ public class OCSANAResults {
     public AbstractMHSAlgorithm mhsAlg;
     public Boolean mhsFindingCanceled = false;
     public Collection<? extends Collection<CyNode>> MHSes;
+    public Boolean includeEndpointsInCIs;
 
     public Double mhsExecutionSeconds;
 
@@ -202,7 +203,11 @@ public class OCSANAResults {
         reportLines.add(scoringSummaryString);
         reportLines.add("");
 
-        String mhsSummaryString = "Found " + MHSes.size() + " CIs using MHS algorithm " + mhsAlg.shortName() + " in " + mhsExecutionSeconds + " s.";
+        String ciInclusionVerb = (includeEndpointsInCIs) ? "include" : "exclude";
+        String mhsSummaryString = "Found " + MHSes.size()
+            + " CIs using MHS algorithm " + mhsAlg.shortName()
+            + " which " + ciInclusionVerb + " endpoints"
+            + " in " + mhsExecutionSeconds + " s.";
         reportLines.add(mhsSummaryString);
         reportLines.add("");
 
