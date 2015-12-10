@@ -30,23 +30,11 @@ import org.compsysmed.ocsana.internal.algorithms.path.AbstractPathFindingAlgorit
  * directed paths up to a specified length
  *
  * @param network  the CyNetwork to compute on
- * @param maxPathLength  the maximum number of nodes allowed in a path
- * (including source and target)
  **/
-public class AllNonSelfIntersectingPathsAlgorithm extends AbstractPathFindingAlgorithm {
+public class AllNonSelfIntersectingPathsAlgorithm
+    extends DijkstraPathAlgorithm {
     public static final String NAME = "All non-self-intersecting paths";
     public static final String SHORTNAME = "ALL";
-
-    @Tunable(description = "Use finite search radius",
-             groups = {AbstractPathFindingAlgorithm.CONFIG_GROUP + ": " + SHORTNAME},
-             gravity=210)
-    public Boolean restrictPathLength = true;
-
-    @Tunable(description = "Find paths with up to this many nodes:",
-             groups = {AbstractPathFindingAlgorithm.CONFIG_GROUP + ": " + SHORTNAME},
-             gravity = 211,
-             dependsOn = "restrictPathLength=true")
-    public Integer maxPathLength = 20;
 
     public AllNonSelfIntersectingPathsAlgorithm(CyNetwork network) {
         super(network);
@@ -57,7 +45,7 @@ public class AllNonSelfIntersectingPathsAlgorithm extends AbstractPathFindingAlg
         assert maxPathLength >= 0;
         Collection<List<CyEdge>> results = null;
 
-        Map<CyEdge, Integer> edgeMinDistances = computeEdgeMinDistances(sources, targets);
+        Map<CyEdge, Integer> edgeMinDistances = edgeMinDistances(sources, targets);
 
         // Only run the next step if the previous succeeded
         if (edgeMinDistances != null) {
@@ -65,73 +53,6 @@ public class AllNonSelfIntersectingPathsAlgorithm extends AbstractPathFindingAlg
         }
 
         return results;
-    }
-
-    /**
-     * Pre-compute the minimum length of a path to the targets from
-     * each edge
-     *
-     * @param sources  the source nodes
-     * @param targets  the target nodes
-     *
-     * @return a Map which assigns to some CyEdges a non-negative
-     * integer representing the minimum number of in a path starting
-     * from the given edge and leading to a target node, as long as
-     * that number is not greater than maxPathLength
-     **/
-    protected Map<CyEdge, Integer> computeEdgeMinDistances (Set<CyNode> sources,
-                                                            Set<CyNode> targets) {
-        // We'll iterate up through the network, starting at the
-        // targets and walking backwards along edges. Each time we
-        // find an edge which has not been marked with a distance, we
-        // mark it with one more than the distance which got us
-        // there. Each time we find an edge which *has* been marked
-        // with a distance, we overwrite it if appropriate.
-        Map<CyEdge, Integer> edgeMinDistances = new HashMap<>();
-        Map<CyNode, Integer> nodeMinDistances = new HashMap<>();
-        Queue<CyNode> nodesToProcess = new LinkedList<>();
-
-        // Bootstrap with the target nodes
-        for (CyNode targetNode: targets) {
-            nodeMinDistances.put(targetNode, 0);
-            nodesToProcess.add(targetNode);
-        }
-
-        // Work through the node queue
-        for (CyNode nodeToProcess; (nodeToProcess = nodesToProcess.poll()) != null;) {
-            // Handle cancellation
-            if (isCanceled()) {
-                return null;
-            }
-
-            assert nodeMinDistances.containsKey(nodeToProcess);
-            // Look at all the edges connected to this node
-            for (CyEdge outEdge: network.getAdjacentEdgeIterable(nodeToProcess, CyEdge.Type.INCOMING)) {
-                if (!outEdge.isDirected()) {
-                    throw new IllegalArgumentException("Undirected edges are not supported.");
-                }
-
-                assert nodeToProcess.equals(outEdge.getTarget());
-                CyNode nextNode = outEdge.getSource();
-
-                // Mark this edge if needed
-                Integer newEdgeDist = nodeMinDistances.get(nodeToProcess) + 1;
-                if ((!edgeMinDistances.containsKey(outEdge))
-                    || (edgeMinDistances.get(outEdge) > newEdgeDist)) {
-                    edgeMinDistances.put(outEdge, newEdgeDist);
-                }
-
-                // Mark the other node if needed
-                if ((!nodeMinDistances.containsKey(nextNode))
-                    || (nodeMinDistances.get(nextNode) > newEdgeDist)) {
-                    nodeMinDistances.put(nextNode, newEdgeDist);
-                    nodesToProcess.add(nextNode);
-                }
-            }
-        }
-
-        assert nodesToProcess.isEmpty();
-        return edgeMinDistances;
     }
 
     /**
