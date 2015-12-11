@@ -53,6 +53,11 @@ import org.compsysmed.ocsana.internal.tasks.mhs.MHSAlgorithmSelecter;
 public class OCSANACoordinatorTask extends AbstractNetworkTask {
     protected TaskManager taskManager;
 
+    // User-configurable options
+
+    // In general, the Coordinator should let the user make
+    // preliminary choices such as which algorithm to use for each
+    // task.
     @ContainsTunables
     public NodeSetSelecter nodeSelecter;
 
@@ -64,6 +69,8 @@ public class OCSANACoordinatorTask extends AbstractNetworkTask {
 
     @ContainsTunables
     public MHSAlgorithmSelecter mhsAlgSelecter;
+
+    // End user configuration
 
     protected OCSANAResultsPanel resultsPanel;
 

@@ -61,11 +61,19 @@ import org.compsysmed.ocsana.internal.ui.OCSANAResultsPanel;
 
 public class OCSANARunnerTask extends AbstractNetworkTask
     implements TaskObserver {
+    // User-configurable options
+
+    // In general, the Runner should only contain configuration
+    // options that are dependent on the choices made in the
+    // Coordinator. For example, if the user chose an algorithm in the
+    // Coordinator, they should configure it here.
     @ContainsTunables
     public AbstractPathFindingAlgorithm pathFindingAlg;
 
     @ContainsTunables
     public AbstractMHSAlgorithm mhsAlg;
+
+    // End user configuration
 
     public OCSANAScoringAlgorithm ocsanaAlg;
 
@@ -168,7 +176,7 @@ public class OCSANARunnerTask extends AbstractNetworkTask
             return;
         }
 
-        // Process the results based on the step just completed
+         // Process the results based on the step just completed
         OCSANAStep currentStep = task.getResults(OCSANAStep.class);
 
         switch (currentStep) {
