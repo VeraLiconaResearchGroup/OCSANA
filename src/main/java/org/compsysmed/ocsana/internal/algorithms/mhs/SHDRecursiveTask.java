@@ -4,7 +4,6 @@
  * Implementations must provide constructor and {@code compute}
  *
  * Copyright Vera-Licona Research Group (C) 2015
- * @author Andrew Gainer-Dewar, Ph.D. <andrew.gainer.dewar@gmail.com>
  **/
 
 package org.compsysmed.ocsana.internal.algorithms.mhs;

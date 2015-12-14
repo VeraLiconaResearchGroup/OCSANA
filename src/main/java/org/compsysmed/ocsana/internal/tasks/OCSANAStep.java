@@ -2,7 +2,6 @@
  * Enum of steps in the OCSANA algorithm
  *
  * Copyright Vera-Licona Research Group (C) 2015
- * @author Andrew Gainer-Dewar, Ph.D. <andrew.gainer.dewar@gmail.com>
  *
  * This software is licensed under the Artistic License 2.0, see the
  * LICENSE file or
