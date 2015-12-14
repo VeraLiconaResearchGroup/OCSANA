@@ -51,7 +51,7 @@ public class MHSAlgorithmTask extends AbstractOCSANATask {
             throw new IllegalStateException("Paths to targets not set.");
         }
 
-        taskMonitor.setStatusMessage("Converting paths to node sets,");
+        taskMonitor.setStatusMessage("Converting " + results.pathsToTargets.size() + " paths to node sets,");
         Long preConversionTime = System.nanoTime();
         List<Set<CyNode>> nodeSets = new ArrayList<>();
         for (List<CyEdge> path: results.pathsToTargets) {
