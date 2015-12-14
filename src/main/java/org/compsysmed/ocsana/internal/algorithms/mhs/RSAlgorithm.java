@@ -148,9 +148,8 @@ public class RSAlgorithm extends AbstractMHSAlgorithm {
 
         // Construct a Hypergraph with the resulting MHSes
         Hypergraph MHSes = new Hypergraph(H.numVerts());
-        Iterator<BitSet> itr = results.iterator();
-        while (itr.hasNext()) {
-            MHSes.add(itr.next());
+        for (BitSet edge: results) {
+            MHSes.add(edge);
         }
 
         return MHSes;
