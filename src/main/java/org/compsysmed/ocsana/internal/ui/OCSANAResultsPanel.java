@@ -212,7 +212,11 @@ public class OCSANAResultsPanel
                     public Class getColumnClass(int column) {
                         Class returnValue;
                         if ((column >= 0) && (column < getColumnCount())) {
-                            returnValue = getValueAt(0, column).getClass();
+                            try {
+                                returnValue = getValueAt(0, column).getClass();
+                            } catch (ArrayIndexOutOfBoundsException exception) {
+                                return Object.class;
+                            }
                         } else {
                             returnValue = Object.class;
                         }
