@@ -48,6 +48,7 @@ public class PresentResultsTask extends AbstractOCSANATask {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> T getResults (Class<? extends T> type) {
         if (type.isAssignableFrom(OCSANAStep.class)) {
             return (T) algStep;
