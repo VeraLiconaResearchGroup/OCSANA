@@ -307,12 +307,12 @@ public class MMCSAlgorithm extends AbstractMHSAlgorithm {
 
     @Override
     public String fullName () {
-        return this.NAME;
+        return NAME;
     }
 
     @Override
     public String shortName () {
-        return this.SHORTNAME;
+        return SHORTNAME;
     }
 
     @Override
