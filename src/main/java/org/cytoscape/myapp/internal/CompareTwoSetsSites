@@ -1,0 +1,251 @@
+/*
+ * Copyright (C) 2015 mkordi
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package org.cytoscape.myapp.internal.Drugeability;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.util.Vector;
+
+/**
+ *
+ * @author mkordi
+ */
+public class CompareTwoSetsSites {
+    
+    private Vector<String> QueryList;
+    
+    private Vector<String> DBD_List;
+        
+    private String outputfileaddress;
+        
+    private String CutOffFile;
+    
+    private String STDFile;
+    
+    private String DBD_path;
+   
+    private String QueryPath;
+    
+    private  File outputfile;
+    
+    private File fileQueryList;
+    
+    private File  fileDBD_List;
+    
+     public String address;
+
+    public CompareTwoSetsSites(Vector<String> QueryList, Vector<String> DBD_List) throws IOException {
+        this.QueryList = QueryList;
+        this.DBD_List = DBD_List;
+        
+        initila();
+    }
+    
+   /**
+     * set address of files of 
+     *
+     * @
+     */
+    private void initila() throws IOException{
+        
+         writeonfile();
+       
+        
+        //set address of cutoff
+        setCutOffFile();
+        
+          //set address of STDfile
+        setSTDFile();
+        
+        //set address of DBD_path
+        setDBD_path();
+        
+          //set address of DBD_path
+        setQueryPath();
+        
+        setOutputfile();
+        
+        address = System.getProperty("user.dir");
+        
+        runscript(address);
+        
+        
+    }
+    
+    
+     /**
+     * run Perl script   *** I should change GenerateCavity.pl to write result on text file
+     *
+     * @return 
+     */
+    private void runscript(String address ) throws IOException {
+        
+        String command = "perl " + address + "Drugability\\CompareTwoSetsSites.pl "+ address + "\\fileQueryList.txt "   + address + "Drugability" + 
+                
+               address + "\\fileDBD_List.txt "   + address + "Drugability\\ParameterFiles\\DrugBindingVectors"+
+                
+                 getSTDFile() + " "+getCutOffFile()+ " " + getCutOffFile()+ " " + getOutputfile()  ;
+                
+        Runtime.getRuntime().exec(command);
+
+       
+    }
+
+    
+    private void writeonfile(){
+        
+        
+          outputfile = new File("results_pair_score.txt");
+         fileQueryList = new File("fileQueryList.txt");
+         fileDBD_List = new File("fileDBD_List.txt");
+        
+        Writer writerQueryList = null,writerfileDBD_List = null;
+        try {
+            writerQueryList = new BufferedWriter(new OutputStreamWriter(
+                    new FileOutputStream("fileQueryList.txt"), "utf-8"));
+            for (int i = 0; i < QueryList.size(); i++) {
+                
+                String string = QueryList.elementAt(i);
+                writerQueryList.write(string);
+            }
+            
+             for (int i = 0; i < DBD_List.size(); i++) {
+                
+                String string = DBD_List.elementAt(i);
+                writerfileDBD_List.write(string);
+            }
+          
+        } catch (IOException ex) {
+         // report
+        } finally {
+            try {
+                writerQueryList.close();
+                writerfileDBD_List.close();
+            } catch (Exception ex) {/*ignore*/
+
+            }
+        }
+        
+    }
+
+    /**
+     * Get the value of QueryPath
+     *
+     * @return the value of QueryPath
+     */
+    public String getQueryPath() {
+        return QueryPath;
+    }
+
+    /**
+     * Set the value of QueryPath
+     *
+     * @param QueryPath new value of QueryPath
+     */
+    public void setQueryPath() {
+        this.QueryPath = System.getProperty("user.dir")+ "\\Drugability";
+    }
+ 
+
+    /**
+     * Get the value of DBD_path
+     *
+     * @return the value of DBD_path
+     */
+    public String getDBD_path() {
+        return DBD_path;
+    }
+
+    /**
+     * Set the value of DBD_path
+     *
+     * @param DBD_path new value of DBD_path
+     */
+    public void setDBD_path() {
+        this.DBD_path = System.getProperty("user.dir")+ "\\Drugability\\ParameterFiles\\DrugBindingVectors";
+    }
+
+
+    /**
+     * Get the value of STDFile
+     *
+     * @return the value of STDFile
+     */
+    public String getSTDFile() {
+        return STDFile;
+    }
+
+    /**
+     * Set the value of STDFile
+     *
+     * @param STDFile new value of STDFile
+     */
+    public void setSTDFile() {
+        
+        this.STDFile = System.getProperty("user.dir")+ "\\All1160Cavity.std";
+    }
+
+    
+
+    /**
+     * Get the value of CutOffFile
+     *
+     * @return the value of CutOffFile
+     */
+    public String getCutOffFile() {
+        return CutOffFile;
+    }
+
+    /**
+     * Set the value of CutOffFile
+     *
+     * @param CutOffFile new value of CutOffFile
+     */
+    public void setCutOffFile() {
+        this.CutOffFile =  System.getProperty("user.dir")+ "\\Drugability\\ParameterFiles\\TcCutoff4Normalize.txt";
+    }
+
+
+    /**
+     * Get the value of outputfile
+     *
+     * @return the value of outputfile
+     */
+    public String getOutputfile() {
+        return outputfileaddress;
+    }
+
+    /**
+     * Set the value of outputfile
+     *
+     * @param outputfile new value of outputfile
+     */
+    public void setOutputfile() {
+         outputfile = new File("results_pair_score.txt");
+        this.outputfileaddress =System.getProperty("user.dir")+ "\\results_pair_score.txt";
+    }
+
+
+    
+
+    
+}
