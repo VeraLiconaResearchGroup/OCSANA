@@ -101,7 +101,6 @@ public class RSAlgorithm extends AbstractMHSAlgorithm {
     public Hypergraph transversalHypergraph(Hypergraph H) {
         // Generate inputs to algorithm
         Hypergraph T = H.transpose();
-        SHDCounters counters = new SHDCounters();
         ConcurrentLinkedQueue<BitSet> results = new ConcurrentLinkedQueue<>();
 
         // Handle argument processing
@@ -133,7 +132,7 @@ public class RSAlgorithm extends AbstractMHSAlgorithm {
         BitSet violatingVertices = new BitSet (H.numVerts());
 
         // Set up and run the calculation
-        RSRecursiveTask calculation = new RSRecursiveTask(H, T, S, crit, uncov, violatingVertices, maxCardinality, maxCandidates, counters, results);
+        RSRecursiveTask calculation = new RSRecursiveTask(H, T, S, crit, uncov, violatingVertices, maxCardinality, maxCandidates, results);
 
         ForkJoinPool pool;
         if (configureThreads) {
@@ -144,7 +143,7 @@ public class RSAlgorithm extends AbstractMHSAlgorithm {
         pool.invoke(calculation);
 
         // Wait for all algorithms to complete
-        pool.invoke(new TaskWaiter());
+        pool.invoke(new SHDRecursiveTask.TaskWaiter());
 
         // Construct a Hypergraph with the resulting MHSes
         Hypergraph MHSes = new Hypergraph(H.numVerts());
@@ -174,7 +173,6 @@ public class RSAlgorithm extends AbstractMHSAlgorithm {
          * otherwise)
          * @param maxCandidates  largest number of candidates to consider before
          * termination (0 to run to termination)
-         * @param counters  to store counts of various subalgorithms
          * @param confirmedMHSes  to store any confirmed MHSes
          **/
         RSRecursiveTask (Hypergraph H,
@@ -185,7 +183,6 @@ public class RSAlgorithm extends AbstractMHSAlgorithm {
                          BitSet violatingVertices,
                          Integer maxCardinality,
                          Integer maxCandidates,
-                         SHDCounters counters,
                          ConcurrentLinkedQueue<BitSet> confirmedMHSes) {
             this.H = H;
             this.T = T;
@@ -195,7 +192,6 @@ public class RSAlgorithm extends AbstractMHSAlgorithm {
             this.violatingVertices = violatingVertices;
             this.maxCardinality = maxCardinality;
             this.maxCandidates = maxCandidates;
-            this.counters = counters;
             this.confirmedMHSes = confirmedMHSes;
 
             // Argument checking
@@ -236,11 +232,6 @@ public class RSAlgorithm extends AbstractMHSAlgorithm {
                 return;
             }
 
-            // Handle maxCandidates
-            if ((counters.iterations.getAndIncrement() >= maxCandidates) && (maxCandidates > 0)) {
-                return;
-            }
-
             // Get an uncovered edge
             Integer searchEdgeIndex = uncov.nextSetBit(0);
             BitSet searchEdge = (BitSet) H.get(searchEdgeIndex).clone();
@@ -254,7 +245,6 @@ public class RSAlgorithm extends AbstractMHSAlgorithm {
             for (int v = searchEdge.nextSetBit(0); v >= 0; v = searchEdge.nextSetBit(v+1)) {
                 if (vertexWouldViolate(v)) {
                     // Remove newfound violators from the search edge
-                    counters.violators.getAndIncrement();
                     newViolatingVertices.set(v);
                     searchEdge.clear(v);
                 }
@@ -262,8 +252,6 @@ public class RSAlgorithm extends AbstractMHSAlgorithm {
 
             // Iterate through the vertices in the search edge in reverse order
             for (int v = searchEdge.length(); (v = searchEdge.previousSetBit(v-1)) >= 0; ) {
-                counters.updateLoopRuns.getAndIncrement();
-
                 // Update crit and uncov
                 Map<Integer, BitSet> critMark = updateCritAndUncov(v);
 
@@ -296,11 +284,11 @@ public class RSAlgorithm extends AbstractMHSAlgorithm {
                         BitSet cloneUncov = (BitSet) uncov.clone();
                         BitSet cloneViolatingVertices = (BitSet) newViolatingVertices.clone();
 
-                        RSRecursiveTask child = new RSRecursiveTask(H, T, cloneS, cloneCrit, cloneUncov, cloneViolatingVertices, maxCardinality, maxCandidates, counters, confirmedMHSes);
+                        RSRecursiveTask child = new RSRecursiveTask(H, T, cloneS, cloneCrit, cloneUncov, cloneViolatingVertices, maxCardinality, maxCandidates, confirmedMHSes);
                         child.fork();
                     } else {
                         // Do the work in this thread without forking or copying
-                        RSRecursiveTask child = new RSRecursiveTask(H, T, S, crit, uncov, newViolatingVertices, maxCardinality, maxCandidates, counters, confirmedMHSes);
+                        RSRecursiveTask child = new RSRecursiveTask(H, T, S, crit, uncov, newViolatingVertices, maxCardinality, maxCandidates, confirmedMHSes);
                         child.invoke();
                     }
                 }

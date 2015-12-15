@@ -101,7 +101,6 @@ public class MMCSAlgorithm extends AbstractMHSAlgorithm {
     public Hypergraph transversalHypergraph (Hypergraph H) {
         // Generate inputs to algorithm
         Hypergraph T = H.transpose();
-        SHDCounters counters = new SHDCounters();
         ConcurrentLinkedQueue<BitSet> results = new ConcurrentLinkedQueue<>();
 
         // Handle argument processing
@@ -134,7 +133,7 @@ public class MMCSAlgorithm extends AbstractMHSAlgorithm {
         uncov.set(0, H.numEdges());
 
         // Set up and run the calculation
-        MMCSRecursiveTask calculation = new MMCSRecursiveTask(H, T, S, CAND, crit, uncov, maxCardinality, maxCandidates, counters, results);
+        MMCSRecursiveTask calculation = new MMCSRecursiveTask(H, T, S, CAND, crit, uncov, maxCardinality, maxCandidates, results);
 
         ForkJoinPool pool;
         if (configureThreads) {
@@ -146,7 +145,7 @@ public class MMCSAlgorithm extends AbstractMHSAlgorithm {
         pool.invoke(calculation);
 
         // Wait for all algorithms to complete
-        pool.invoke(new TaskWaiter());
+        pool.invoke(new SHDRecursiveTask.TaskWaiter());
 
         // Construct a Hypergraph with the resulting MHSes
         Hypergraph MHSes = new Hypergraph(H.numVerts());
@@ -174,7 +173,6 @@ public class MMCSAlgorithm extends AbstractMHSAlgorithm {
          * @param maxCardinality  the maximum size of MHS to consider
          * @param maxCandidates  the maximum number of candidates to
          * consider before returning
-         * @param counters  to store counts of various subalgorithms
          * @param confirmedMHSes  to store any confirmed MHSes
          **/
         MMCSRecursiveTask (Hypergraph H,
@@ -185,7 +183,6 @@ public class MMCSAlgorithm extends AbstractMHSAlgorithm {
                            BitSet uncov,
                            Integer maxCardinality,
                            Integer maxCandidates,
-                           SHDCounters counters,
                            ConcurrentLinkedQueue<BitSet> confirmedMHSes) {
             this.H = H;
             this.T = T;
@@ -195,7 +192,6 @@ public class MMCSAlgorithm extends AbstractMHSAlgorithm {
             this.uncov = uncov;
             this.maxCardinality = maxCardinality;
             this.maxCandidates = maxCandidates;
-            this.counters = counters;
             this.confirmedMHSes = confirmedMHSes;
 
             // Argument checking
@@ -236,11 +232,6 @@ public class MMCSAlgorithm extends AbstractMHSAlgorithm {
                 return;
             }
 
-            // Handle maxCandidates
-            if ((counters.iterations.getAndIncrement() >= maxCandidates) && (maxCandidates > 0)) {
-                return;
-            }
-
             // Prune the vertices to search
             // Per M+U, find the uncovered edge e with the smallest intersection
             // with CAND
@@ -263,10 +254,8 @@ public class MMCSAlgorithm extends AbstractMHSAlgorithm {
 
             // Iterate through the vertices in the intersection (in reverse order)
             for (int v = C.length(); (v = C.previousSetBit(v-1)) >= 0; ) {
-                counters.updateLoopRuns.getAndIncrement();
                 // First, check for violators
                 if (vertexWouldViolate(v)) {
-                    counters.violators.getAndIncrement();
                     violators.set(v);
                     continue;
                 }
@@ -295,11 +284,11 @@ public class MMCSAlgorithm extends AbstractMHSAlgorithm {
                         Hypergraph newcrit = new Hypergraph(crit);
                         BitSet newuncov = (BitSet) uncov.clone();
 
-                        MMCSRecursiveTask child = new MMCSRecursiveTask(H, T, newS, newCAND, newcrit, newuncov, maxCardinality, maxCandidates, counters, confirmedMHSes);
+                        MMCSRecursiveTask child = new MMCSRecursiveTask(H, T, newS, newCAND, newcrit, newuncov, maxCardinality, maxCandidates, confirmedMHSes);
                         child.fork();
                     } else {
                         // Do the work in this thread without forking or copying
-                        MMCSRecursiveTask child = new MMCSRecursiveTask(H, T, S, CAND, crit, uncov, maxCardinality, maxCandidates, counters, confirmedMHSes);
+                        MMCSRecursiveTask child = new MMCSRecursiveTask(H, T, S, CAND, crit, uncov, maxCardinality, maxCandidates, confirmedMHSes);
                         child.invoke();
                     }
                 }

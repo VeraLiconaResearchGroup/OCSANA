@@ -27,7 +27,6 @@ abstract class SHDRecursiveTask extends RecursiveAction {
     Integer maxCardinality;
     Integer maxCandidates;
     ConcurrentLinkedQueue<BitSet> confirmedMHSes;
-    SHDCounters counters;
 
     // Must provide compute()
 
@@ -147,23 +146,14 @@ abstract class SHDRecursiveTask extends RecursiveAction {
             crit.get(w).or(critMark.get(w));
         }
     };
-}
 
-/**
- * Helper class to store the counters for an SHD run
- **/
-class SHDCounters {
-    public AtomicInteger iterations = new AtomicInteger();
-    public AtomicInteger violators = new AtomicInteger();
-    public AtomicInteger updateLoopRuns = new AtomicInteger();
-}
-
-/**
- * Helper RecursiveTask to wait for all computations
- **/
-class TaskWaiter extends RecursiveAction {
-    @Override
-    public void compute () {
-        helpQuiesce();
+    /**
+     * Helper RecursiveTask to wait for all computations
+     **/
+    static public class TaskWaiter extends RecursiveAction {
+        @Override
+        public void compute () {
+            helpQuiesce();
+        }
     }
 }
