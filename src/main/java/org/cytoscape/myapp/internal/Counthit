@@ -1,0 +1,134 @@
+/*
+ * Copyright (C) 2015 mkordi
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package org.cytoscape.myapp.internal.Drugeability;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.util.Vector;
+
+/**
+ *
+ * @author mkordi
+ */
+public class Counthit {
+    
+    private Vector<String> target_list;
+    
+    private String targetlistfile;
+    
+    private File target_listfile;
+    
+    private String address;
+    
+    private int scoreCutoff;
+    
+    private String resultFile;
+
+    public Counthit(Vector<String> target_list, int scoreCutoff, String resultFile) {
+        this.target_list = target_list;
+        this.scoreCutoff = scoreCutoff;
+        this.resultFile = resultFile;
+        
+        initila();
+    }
+    
+    
+    public  void initila(){
+        
+        setTargetlistfile();
+        
+        setResultFile();
+        
+        address = System.getProperty("user.dir");
+        
+    }
+    
+    private void runscript(String address ) throws IOException {
+        
+        String command = "perl " + address + "Drugability\\CountHit.pl "+ getTargetlistfile()+" "+  getResultFile()+"  "+ "-2" ;
+                
+        Runtime.getRuntime().exec(command);
+
+       
+    }
+    
+ public String getTargetlistfile() {
+        return targetlistfile;
+    }
+
+    public void setTargetlistfile() {
+         target_listfile = new File("target_listfile.txt");
+         
+        
+        Writer writerQueryList = null,writerfileDBD_List = null;
+        try {
+            writerQueryList = new BufferedWriter(new OutputStreamWriter(
+                    new FileOutputStream("target_listfile.txt"), "utf-8"));
+            for (int i = 0; i < target_list.size(); i++) {
+                
+                String string = target_list.elementAt(i);
+                writerQueryList.write(string);
+            }
+            
+             
+        } catch (IOException ex) {
+         // report
+        } finally {
+            try {
+                writerQueryList.close();
+                writerfileDBD_List.close();
+            } catch (Exception ex) {/*ignore*/
+
+            }
+        }
+        
+         this.targetlistfile =  System.getProperty("user.dir")+ "\\target_listfile.txt";
+    }
+    public int getScoreCutoff() {
+        return scoreCutoff;
+    }
+
+    public void setScoreCutoff(int scoreCutoff) {
+        this.scoreCutoff = scoreCutoff;
+    }
+
+    public String getResultFile() {
+        return resultFile;
+    }
+
+    public Vector<String> getTarget_list() {
+        return target_list;
+    }
+
+    public void setTarget_list(Vector<String> target_list) {
+        this.target_list = target_list;
+    }
+
+    public void setResultFile() {
+        this.resultFile = System.getProperty("user.dir")+ "\\results_pair_score.txt";
+    }
+    
+    
+    
+    
+    
+}
