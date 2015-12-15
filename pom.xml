@@ -62,6 +62,7 @@
                     <showDeprecation>true</showDeprecation>
                     <compilerArgs>
                         <arg>-Xlint:all</arg>
+                        <arg>-Xlint:-serial</arg>
                     </compilerArgs>
                 </configuration>
             </plugin>
