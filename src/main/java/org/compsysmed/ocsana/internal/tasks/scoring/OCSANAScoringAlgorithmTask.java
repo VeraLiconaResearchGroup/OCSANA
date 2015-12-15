@@ -38,6 +38,7 @@ public class OCSANAScoringAlgorithmTask extends AbstractOCSANATask {
         this.results = results;
     }
 
+    @Override
     public void run (TaskMonitor taskMonitor) {
         if (results.pathFindingCanceled) {
             return;
@@ -61,6 +62,7 @@ public class OCSANAScoringAlgorithmTask extends AbstractOCSANATask {
         results.scoringExecutionSeconds = runTime;
     }
 
+    @Override
     public <T> T getResults (Class<? extends T> type) {
         if (type.isAssignableFrom(OCSANAStep.class)) {
             return (T) algStep;
@@ -69,6 +71,7 @@ public class OCSANAScoringAlgorithmTask extends AbstractOCSANATask {
         }
     }
 
+    @Override
     public void cancel () {
         super.cancel();
         results.ocsanaAlg.cancel();

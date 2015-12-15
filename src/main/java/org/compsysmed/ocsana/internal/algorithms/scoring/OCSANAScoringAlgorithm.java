@@ -285,14 +285,17 @@ public class OCSANAScoringAlgorithm
     }
 
     // Name methods
+    @Override
     public String fullName () {
         return this.NAME;
     }
 
+    @Override
     public String shortName () {
         return this.SHORTNAME;
     }
 
+    @Override
     public String toString () {
         return this.shortName();
     }

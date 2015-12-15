@@ -29,7 +29,7 @@ abstract class SHDRecursiveTask extends RecursiveAction {
     ConcurrentLinkedQueue<BitSet> confirmedMHSes;
     SHDCounters counters;
 
-    abstract protected void compute ();
+    // Must provide compute()
 
     /**
      * Determine whether an addition would violate any vertices in a candidate HS.
@@ -162,6 +162,7 @@ class SHDCounters {
  * Helper RecursiveTask to wait for all computations
  **/
 class TaskWaiter extends RecursiveAction {
+    @Override
     public void compute () {
         helpQuiesce();
     }

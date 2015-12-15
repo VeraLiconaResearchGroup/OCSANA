@@ -48,9 +48,4 @@ public abstract class AbstractPathFindingAlgorithm
      **/
     abstract public Collection<List<CyEdge>> paths (Set<CyNode> sources,
                                                     Set<CyNode> targets);
-
-    /**
-     * Return a name suitable for printing in a menu or status message
-     **/
-    abstract public String toString ();
 }

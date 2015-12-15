@@ -36,6 +36,7 @@ public class MHSAlgorithmTaskFactory extends AbstractTaskFactory {
         this.results = results;
     }
 
+    @Override
     public TaskIterator createTaskIterator () {
         TaskIterator tasks = new TaskIterator();
         tasks.append(new MHSAlgorithmTask(results));

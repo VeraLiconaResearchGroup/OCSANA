@@ -20,10 +20,6 @@ import org.cytoscape.model.CyNode;
 
 // OCSANA imports
 
-/**
- * The 'MMCS' algorithm for finding minimal hitting sets
- **/
-
 public class HypergraphOfSetsOfCyNodes extends Hypergraph {
     private Map<CyNode, Integer> mapNodeToHash;
     private Map<Integer, CyNode> mapHashToNode;

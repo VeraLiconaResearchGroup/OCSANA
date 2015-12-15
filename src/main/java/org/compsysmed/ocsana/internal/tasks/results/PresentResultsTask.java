@@ -38,6 +38,7 @@ public class PresentResultsTask extends AbstractOCSANATask {
         this.resultsPanel = resultsPanel;
     }
 
+    @Override
     public void run (TaskMonitor taskMonitor) {
         taskMonitor.setTitle("Results");
 
@@ -46,6 +47,7 @@ public class PresentResultsTask extends AbstractOCSANATask {
         resultsPanel.updateResults(results);
     }
 
+    @Override
     public <T> T getResults (Class<? extends T> type) {
         if (type.isAssignableFrom(OCSANAStep.class)) {
             return (T) algStep;

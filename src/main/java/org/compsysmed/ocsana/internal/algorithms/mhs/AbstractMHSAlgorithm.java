@@ -39,9 +39,4 @@ public abstract class AbstractMHSAlgorithm
      * @return the collection of MHSes of the input sets
      **/
     abstract public List<Set<CyNode>> MHSes (Collection<? extends Collection<CyNode>> sets);
-
-    /**
-     * Return a name suitable for printing in a menu or status message
-     **/
-    abstract public String toString ();
 }

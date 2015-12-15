@@ -42,6 +42,7 @@ public class PresentResultsTaskFactory extends AbstractTaskFactory {
         this.resultsPanel = resultsPanel;
     }
 
+    @Override
     public TaskIterator createTaskIterator () {
         TaskIterator tasks = new TaskIterator();
         tasks.append(new PresentResultsTask(results, resultsPanel));

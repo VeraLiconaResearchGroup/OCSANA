@@ -38,6 +38,7 @@ public class PathFindingAlgorithmTaskFactory extends AbstractTaskFactory {
         this.algStep = algStep;
     }
 
+    @Override
     public TaskIterator createTaskIterator () {
         TaskIterator tasks = new TaskIterator();
         tasks.append(new PathFindingAlgorithmTask(results, algStep));

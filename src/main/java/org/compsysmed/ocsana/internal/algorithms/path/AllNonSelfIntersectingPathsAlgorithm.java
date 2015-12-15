@@ -39,19 +39,20 @@ public class AllNonSelfIntersectingPathsAlgorithm
         super(network);
     }
 
+    @Override
     public Collection<List<CyEdge>> paths (Set<CyNode> sources,
                                            Set<CyNode> targets) {
         assert maxPathLength >= 0;
-        Collection<List<CyEdge>> results = null;
 
         Map<CyEdge, Integer> edgeMinDistances = edgeMinDistances(sources, targets);
 
         // Only run the next step if the previous succeeded
         if (edgeMinDistances != null) {
-            results = computePaths(sources, targets, edgeMinDistances);
+            Collection<List<CyEdge>> results = computePaths(sources, targets, edgeMinDistances);
+            return results;
+        } else {
+            return null;
         }
-
-        return results;
     }
 
     /**
@@ -65,6 +66,7 @@ public class AllNonSelfIntersectingPathsAlgorithm
      * @return a List of paths, each given as a List of CyEdges in
      * order from a source to a target
      **/
+    @Override
     protected List<List<CyEdge>> computePaths (Set<CyNode> sources,
                                                Set<CyNode> targets,
                                                Map<CyEdge, Integer> edgeMinDistances) {
@@ -163,14 +165,17 @@ public class AllNonSelfIntersectingPathsAlgorithm
         return completePaths;
     }
 
+    @Override
     public String fullName () {
         return this.NAME;
     }
 
+    @Override
     public String shortName () {
         return this.SHORTNAME;
     }
 
+    @Override
     public String toString () {
         return this.shortName();
     }

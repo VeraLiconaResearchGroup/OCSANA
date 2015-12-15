@@ -39,6 +39,7 @@ public class PathFindingAlgorithmTask extends AbstractOCSANATask {
         this.algStep = algStep;
     }
 
+    @Override
     public void run (TaskMonitor taskMonitor) {
         String targetType;
         Set<CyNode> targetsForThisRun;
@@ -95,6 +96,7 @@ public class PathFindingAlgorithmTask extends AbstractOCSANATask {
         return paths;
     }
 
+    @Override
     public <T> T getResults (Class<? extends T> type) {
         if (type.isAssignableFrom(OCSANAStep.class)) {
             return (T) algStep;
@@ -103,6 +105,7 @@ public class PathFindingAlgorithmTask extends AbstractOCSANATask {
         }
     }
 
+    @Override
     public void cancel () {
         super.cancel();
         results.pathFindingAlg.cancel();

@@ -50,4 +50,9 @@ public abstract class AbstractOCSANAAlgorithm {
      * Return a short name
      **/
     abstract public String shortName ();
+
+    /**
+     * Return a name suitable for printing in a menu or status message
+     **/
+    abstract public String toString ();
 }
