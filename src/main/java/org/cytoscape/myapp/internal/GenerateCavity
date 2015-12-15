@@ -1,0 +1,215 @@
+/*
+ * Copyright (C) 2015 mkordi
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package org.cytoscape.myapp.internal.Drugeability;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.util.Vector;
+
+/**
+ *
+ * @author mkordi
+ */
+public class GenerateCavity {
+
+    public GenerateCavity() {
+    }
+
+    private String pdbid;
+
+    private String ligandtype;
+
+    private String ligandchain;
+
+    private int ligandid;
+
+    private double cutoff;
+    
+    public String address;
+
+    public GenerateCavity(String pdbid, String ligandtype, String ligandchain, int ligandid, double cutoff) throws IOException {
+        this.pdbid = pdbid;
+        this.ligandtype = ligandtype;
+        this.ligandchain = ligandchain;
+        this.ligandid = ligandid;
+        this.cutoff = cutoff;
+        
+        run();
+    }
+    
+    private void run() throws IOException{
+        
+        writeonfile();
+        address = System.getProperty("user.dir");
+        runscript(address, getCutoff());
+        
+        
+    }
+    
+  /**
+     * make and write a txt file that contains pdbid,ligandtype, ligandchain,
+     * ligandid.
+     *
+     * @return the value of cutoff
+     */
+    private void writeonfile() {
+
+        // create new file 
+        
+         try {
+    		 
+	      File file = new File("GenerateCavity.txt");
+	      
+	      if (file.createNewFile()){
+	        //System.out.println("File is created!");
+	      }else{
+	        //System.out.println("File already exists.");
+	      }
+	      
+    	} catch (IOException e) {
+	      e.printStackTrace();
+	} 
+        
+        
+        Writer writer = null;
+
+        try {
+            writer = new BufferedWriter(new OutputStreamWriter(
+                    new FileOutputStream("GenerateCavity.txt"), "utf-8"));
+            writer.write(getPdbid() + "\t" + getLigandtype() + "\t" +  getLigandchain() + "\t" +Integer.toString(getLigandid()));
+        } catch (IOException ex) {
+         // report
+        } finally {
+            try {
+                writer.close();
+            } catch (Exception ex) {/*ignore*/
+
+            }
+        }
+
+    }
+
+    
+    /**
+     * run Perl script   *** I should change GenerateCavity.pl to write result on text file
+     *
+     * @return 
+     */
+    private void runscript(String address, double cutoff ) throws IOException {
+        
+        String command = "perl " + address + "Drugability\\GenerateCavity.pl "+ address + "Drugability\\GenerateCavity.txt" + Double.toString(cutoff);
+                
+        Runtime.getRuntime().exec(command);
+
+       
+    }
+
+    /**
+     * Get the value of cutoff
+     *
+     * @return the value of cutoff
+     */
+    public double getCutoff() {
+        return cutoff;
+    }
+
+    /**
+     * Set the value of cutoff
+     *
+     * @param cutoff new value of cutoff
+     */
+    public void setCutoff(double cutoff) {
+        this.cutoff = cutoff;
+    }
+
+    /**
+     * Get the value of ligandid
+     *
+     * @return the value of ligandid
+     */
+    public int getLigandid() {
+        return ligandid;
+    }
+
+    /**
+     * Set the value of ligandid
+     *
+     * @param ligandid new value of ligandid
+     */
+    public void setLigandid(int ligandid) {
+        this.ligandid = ligandid;
+    }
+
+    /**
+     * Get the value of ligandchain
+     *
+     * @return the value of ligandchain
+     */
+    public String getLigandchain() {
+        return ligandchain;
+    }
+
+    /**
+     * Set the value of ligandchain
+     *
+     * @param ligandchain new value of ligandchain
+     */
+    public void setLigandchain(String ligandchain) {
+        this.ligandchain = ligandchain;
+    }
+
+    /**
+     * Get the value of ligandtype
+     *
+     * @return the value of ligandtype
+     */
+    public String getLigandtype() {
+        return ligandtype;
+    }
+
+    /**
+     * Set the value of ligandtype
+     *
+     * @param ligandtype new value of ligandtype
+     */
+    public void setLigandtype(String ligandtype) {
+        this.ligandtype = ligandtype;
+    }
+
+    /**
+     * Get the value of pdbid
+     *
+     * @return the value of pdbid
+     */
+    public String getPdbid() {
+        return pdbid;
+    }
+
+    /**
+     * Set the value of pdbid
+     *
+     * @param pdbid new value of pdbid
+     */
+    public void setPdbid(String pdbid) {
+        this.pdbid = pdbid;
+    }
+
+}
