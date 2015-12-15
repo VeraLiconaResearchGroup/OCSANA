@@ -50,7 +50,7 @@ import org.compsysmed.ocsana.internal.tasks.mhs.MHSAlgorithmSelecter;
  **/
 
 public class OCSANACoordinatorTask extends AbstractNetworkTask {
-    private TaskManager taskManager;
+    private TaskManager<?, ?> taskManager;
 
     // User-configurable options
 
@@ -74,7 +74,7 @@ public class OCSANACoordinatorTask extends AbstractNetworkTask {
     private OCSANAResultsPanel resultsPanel;
 
     public OCSANACoordinatorTask (CyNetwork network,
-                                  TaskManager taskManager,
+                                  TaskManager<?, ?> taskManager,
                                   OCSANAResultsPanel resultsPanel) {
         super(network);
 

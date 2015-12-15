@@ -80,10 +80,10 @@ public class OCSANARunnerTask extends AbstractNetworkTask
 
     private OCSANAResultsPanel resultsPanel;
 
-    private TaskManager taskManager;
+    private TaskManager<?, ?> taskManager;
 
     public OCSANARunnerTask (CyNetwork network,
-                             TaskManager taskManager,
+                             TaskManager<?, ?> taskManager,
                              OCSANAResultsPanel resultsPanel,
                              AbstractPathFindingAlgorithm pathFindingAlg,
                              OCSANAScoringAlgorithm ocsanaAlg,

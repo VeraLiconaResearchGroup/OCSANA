@@ -32,7 +32,7 @@ import org.compsysmed.ocsana.internal.ui.OCSANAResultsPanel;
 public class CyActivator extends AbstractCyActivator {
     public void start (BundleContext bc) throws Exception {
         // Get a TaskManager
-        TaskManager taskManager = getService(bc, TaskManager.class);
+        TaskManager<?, ?> taskManager = getService(bc, TaskManager.class);
 
         // Results panel registration
         CySwingApplication cySwingApplicationService = getService(bc,CySwingApplication.class);
