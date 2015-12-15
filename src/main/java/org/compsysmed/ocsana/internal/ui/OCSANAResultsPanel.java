@@ -208,18 +208,12 @@ public class OCSANAResultsPanel
             Vector<Vector<Object>> mhsRows = getMHSRows();
 
             TableModel mhsModel = new DefaultTableModel(mhsRows, mhsCols) {
-                    public Class getColumnClass(int column) {
-                        Class returnValue;
-                        if ((column >= 0) && (column < getColumnCount())) {
-                            try {
-                                returnValue = getValueAt(0, column).getClass();
-                            } catch (ArrayIndexOutOfBoundsException exception) {
-                                return Object.class;
-                            }
-                        } else {
-                            returnValue = Object.class;
+                    public Class<?> getColumnClass(int column) {
+                        try {
+                            return getValueAt(0, column).getClass();
+                        } catch (ArrayIndexOutOfBoundsException exception) {
+                            return Object.class;
                         }
-                        return returnValue;
                     }
                 };
 
