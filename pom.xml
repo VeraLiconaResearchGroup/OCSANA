@@ -10,6 +10,11 @@
         <junit.version>4.12</junit.version>
         <mockito.version>1.10.19</mockito.version>
         <slf4j.version>1.7.13</slf4j.version>
+        <maven.compiler.version>3.3</maven.compiler.version>
+        <maven.jar.version>2.6</maven.jar.version>
+        <maven.surefire.version>2.19</maven.surefire.version>
+        <maven.bundle.version>3.0.1</maven.bundle.version>
+        <ekstazi.version>4.6.1</ekstazi.version>
     </properties>
 
     <modelVersion>4.0.0</modelVersion>
@@ -32,7 +37,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
+                <version>${maven.compiler.version}</version>
                 <executions>
                     <execution>
                         <id>default-testCompile</id>
@@ -63,7 +68,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>2.3.2</version>
+                <version>${maven.jar.version}</version>
                 <configuration>
                     <archive>
                         <manifestEntries>
@@ -78,13 +83,13 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.7.1</version>
+                <version>${maven.surefire.version}</version>
             </plugin>
             <!-- Generates the OSGi metadata based on the osgi.bnd file. -->
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>2.3.7</version>
+                <version>${maven.bundle.version}</version>
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
@@ -103,7 +108,7 @@
             <plugin>
                 <groupId>org.ekstazi</groupId>
                 <artifactId>ekstazi-maven-plugin</artifactId>
-                <version>4.6.0</version>
+                <version>${ekstazi.version}</version>
                 <executions>
                     <execution>
                         <id>ekstazi</id>
