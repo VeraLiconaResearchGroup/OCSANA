@@ -39,8 +39,8 @@ public class OCSANAScoringAlgorithm
     public static final String NAME = "OCSANA scoring";
     public static final String SHORTNAME = "OCSANA";
 
-    protected static final Double DEFAULT_SCORE = 0.0;
-    protected static final Integer DEFAULT_COUNT = 0;
+    private static final Double DEFAULT_SCORE = 0.0;
+    private static final Integer DEFAULT_COUNT = 0;
 
     @Tunable(description = "Compute OCSANA scores",
              gravity = 330,
@@ -61,10 +61,10 @@ public class OCSANAScoringAlgorithm
              groups = {CONFIG_GROUP})
     public String storeScoresColumn = "ocsanaScore";
 
-    protected Boolean nodeScoringComplete = false;
-    protected Boolean pathScoringComplete = false;
+    private Boolean nodeScoringComplete = false;
+    private Boolean pathScoringComplete = false;
 
-    protected CyNetwork network;
+    private CyNetwork network;
 
     public OCSANAScoringAlgorithm (CyNetwork network) {
         this.network = network;
@@ -128,13 +128,13 @@ public class OCSANAScoringAlgorithm
      * @param elementaryNodes  Set to store nodes found in these paths (updated in-place)
      * @param useEdgeSigns  if true, paths will be weighted ±1 according to the signs of their edges
      **/
-    protected void scoreNodesInPaths (Collection<? extends List<CyEdge>> paths,
-                                      Map<CyNode, Double> scoreMap,
-                                      Map<CyNode, Integer> pathCountMap,
-                                      Map<CyNode, Set<CyNode>> endpointDownstreamMap,
-                                      Set<CyNode> allEndpointsHit,
-                                      Set<CyNode> elementaryNodes,
-                                      Boolean useEdgeSigns) {
+    private void scoreNodesInPaths (Collection<? extends List<CyEdge>> paths,
+                                    Map<CyNode, Double> scoreMap,
+                                    Map<CyNode, Integer> pathCountMap,
+                                    Map<CyNode, Set<CyNode>> endpointDownstreamMap,
+                                    Set<CyNode> allEndpointsHit,
+                                    Set<CyNode> elementaryNodes,
+                                    Boolean useEdgeSigns) {
         // TODO: Handle null arguments
 
         // Iterate over the paths
@@ -195,7 +195,7 @@ public class OCSANAScoringAlgorithm
         }
     }
 
-    protected Boolean edgeIsNegative (CyEdge edge) {
+    private Boolean edgeIsNegative (CyEdge edge) {
         // TODO: Write this!
         return false;
     }
@@ -214,15 +214,15 @@ public class OCSANAScoringAlgorithm
      * @param elementaryNodes  the Set of all nodes in the paths
      * @return Map assigning to each elementary node its OCSANA score
      **/
-    protected Map<CyNode, Double> scoreNodes (Map<CyNode, Double> effectsOnTargets,
-                                              Map<CyNode, Integer> countPathsToTargets,
-                                              Map<CyNode, Set<CyNode>> targetsHitDownstream,
-                                              Set<CyNode> targetsHitByAllPaths,
-                                              Map<CyNode, Double> effectsOnOffTargets,
-                                              Map<CyNode, Integer> countPathsToOffTargets,
-                                              Map<CyNode, Set<CyNode>> offTargetsHitDownstream,
-                                              Set<CyNode> offTargetsHitByAllPaths,
-                                              Set<CyNode> elementaryNodes) {
+    private Map<CyNode, Double> scoreNodes (Map<CyNode, Double> effectsOnTargets,
+                                            Map<CyNode, Integer> countPathsToTargets,
+                                            Map<CyNode, Set<CyNode>> targetsHitDownstream,
+                                            Set<CyNode> targetsHitByAllPaths,
+                                            Map<CyNode, Double> effectsOnOffTargets,
+                                            Map<CyNode, Integer> countPathsToOffTargets,
+                                            Map<CyNode, Set<CyNode>> offTargetsHitDownstream,
+                                            Set<CyNode> offTargetsHitByAllPaths,
+                                            Set<CyNode> elementaryNodes) {
         Map<CyNode, Double> scores = new HashMap<>();
 
         for (CyNode node: elementaryNodes) {
@@ -264,8 +264,8 @@ public class OCSANAScoringAlgorithm
      * @param ocsanaScores  the node scores
      * @param storeScoresColumn  the name of the column
      **/
-    protected void storeScoresInColumn(Map<CyNode, Double> ocsanaScores,
-                                       String storeScoresColumn) {
+    private void storeScoresInColumn(Map<CyNode, Double> ocsanaScores,
+                                     String storeScoresColumn) {
         CyTable nodeTable = network.getDefaultNodeTable();
 
         // Delete the column if it exists

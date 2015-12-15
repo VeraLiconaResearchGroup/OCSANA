@@ -28,8 +28,8 @@ import org.compsysmed.ocsana.internal.ui.OCSANAResultsPanel;
 
 public class PresentResultsTask extends AbstractOCSANATask {
     private static final OCSANAStep algStep = OCSANAStep.PRESENT_RESULTS;
-    protected OCSANAResults results;
-    protected OCSANAResultsPanel resultsPanel;
+    private OCSANAResults results;
+    private OCSANAResultsPanel resultsPanel;
 
     public PresentResultsTask (OCSANAResults results,
                                OCSANAResultsPanel resultsPanel) {

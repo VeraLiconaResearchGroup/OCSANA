@@ -62,8 +62,8 @@ import org.compsysmed.ocsana.internal.tasks.results.OCSANAResults;
 public class OCSANAResultsPanel
     extends JPanel
     implements CytoPanelComponent {
-    protected CySwingApplication cySwingApplication;
-    protected CytoPanel cyResultsPanel;
+    private CySwingApplication cySwingApplication;
+    private CytoPanel cyResultsPanel;
 
     OCSANAResults results;
 
@@ -90,7 +90,7 @@ public class OCSANAResultsPanel
     /**
      * Build the panel using the stored data
      **/
-    protected void buildPanel () {
+    private void buildPanel () {
         setLayout(new BorderLayout());
 
         JPanel resultsPanel = getResultsPanel();
@@ -108,7 +108,7 @@ public class OCSANAResultsPanel
      * This is the part of the results panel with buttons and other
      * user operations
      **/
-    protected JPanel getOperationsPanel () {
+    private JPanel getOperationsPanel () {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
 
@@ -154,7 +154,7 @@ public class OCSANAResultsPanel
     /**
      * Show the results report in a dialog
      **/
-    protected void showResultsReport () {
+    private void showResultsReport () {
         JTextArea reportTextArea = new JTextArea(40, 120);
         reportTextArea.setText(String.join("\n", results.getReportLines()));
         reportTextArea.setEditable(false);
@@ -170,7 +170,7 @@ public class OCSANAResultsPanel
      * This is the panel that displays the results of the OCSANA
      * operations
      **/
-    protected JPanel getResultsPanel () {
+    private JPanel getResultsPanel () {
         JPanel resultsPanel = new JPanel(new BorderLayout());
 
         if (results == null) {
@@ -203,7 +203,7 @@ public class OCSANAResultsPanel
     /**
      * Build the CI results panel
      **/
-    protected JPanel buildCIPanel () {
+    private JPanel buildCIPanel () {
         if (results.MHSes != null) {
             Vector<Vector<Object>> mhsRows = getMHSRows();
 
@@ -246,13 +246,13 @@ public class OCSANAResultsPanel
     }
 
     // Column names for the CI results table
-    protected static final Vector<String> mhsCols =
+    private static final Vector<String> mhsCols =
         new Vector<>(Arrays.asList(new String[] {"CI", "Size", "Score"}));
 
     /**
      * Get the rows of the CI results table
      **/
-    protected Vector<Vector<Object>> getMHSRows () {
+    private Vector<Vector<Object>> getMHSRows () {
         Vector<Vector<Object>> rows = new Vector<>();
         for (Collection<CyNode> MHS: results.MHSes) {
             Vector<Object> row = new Vector<>();
@@ -277,9 +277,9 @@ public class OCSANAResultsPanel
      * @param pathType  a string to follow "Found n paths to "
      * @param runTime  the running time of the path-finding process in seconds
      **/
-    protected JPanel buildPathsPanel (Collection<? extends List<CyEdge>> paths,
-                                      String pathType,
-                                      Double runTime) {
+    private JPanel buildPathsPanel (Collection<? extends List<CyEdge>> paths,
+                                    String pathType,
+                                    Double runTime) {
         if (paths != null) {
             // Get lines to display
             List<String> pathLines = new ArrayList<>();

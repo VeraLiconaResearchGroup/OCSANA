@@ -139,7 +139,7 @@ public class OCSANAResults {
     /**
      * Generate a report of the results of an OCSANA run
      **/
-    protected void generateReportLines () {
+    private void generateReportLines () {
         // Format based on original OCSANA
         reportLines = new ArrayList<>();
 

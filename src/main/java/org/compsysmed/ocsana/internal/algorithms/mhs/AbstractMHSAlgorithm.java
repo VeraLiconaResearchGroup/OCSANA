@@ -28,7 +28,7 @@ import org.compsysmed.ocsana.internal.algorithms.AbstractOCSANAAlgorithm;
 
 public abstract class AbstractMHSAlgorithm
     extends AbstractOCSANAAlgorithm {
-    protected static final String CONFIG_GROUP = "CI search algorithm";
+    public static final String CONFIG_GROUP = "CI search algorithm";
 
     public AbstractMHSAlgorithm () {};
 

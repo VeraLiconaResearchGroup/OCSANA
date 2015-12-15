@@ -63,7 +63,7 @@ public class HypergraphOfSetsOfCyNodes extends Hypergraph {
     /**
      * Convert a BitSet back into a Set of CyNodes
      **/
-    protected Set<CyNode> getCyNodesFromBitSet (BitSet edge) {
+    private Set<CyNode> getCyNodesFromBitSet (BitSet edge) {
         Set<CyNode> nodes = new HashSet<>();
         for (int i = edge.nextSetBit(0); i >= 0; i = edge.nextSetBit(i+1)) {
             nodes.add(nodeOfHash(i));
@@ -74,11 +74,11 @@ public class HypergraphOfSetsOfCyNodes extends Hypergraph {
     /**
      * Return the next available key
      **/
-    protected Integer nextKey () {
+    private Integer nextKey () {
         return nextKey++;
     }
 
-    protected Integer hashOfNode (CyNode node) {
+    private Integer hashOfNode (CyNode node) {
         if (!mapNodeToHash.containsKey(node)) {
             Integer hash = nextKey();
             mapNodeToHash.put(node, hash);
@@ -88,7 +88,7 @@ public class HypergraphOfSetsOfCyNodes extends Hypergraph {
         return mapNodeToHash.get(node);
     }
 
-    protected CyNode nodeOfHash (Integer hash) {
+    private CyNode nodeOfHash (Integer hash) {
         if (!mapHashToNode.containsKey(hash)) {
             throw new IllegalArgumentException("Hash " + hash + " not used!");
         }

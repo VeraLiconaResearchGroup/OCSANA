@@ -76,9 +76,9 @@ public class OCSANARunnerTask extends AbstractNetworkTask
 
     public OCSANAScoringAlgorithm ocsanaAlg;
 
-    protected OCSANAResults results;
+    private OCSANAResults results;
 
-    protected OCSANAResultsPanel resultsPanel;
+    private OCSANAResultsPanel resultsPanel;
 
     private TaskManager taskManager;
 
@@ -125,7 +125,7 @@ public class OCSANARunnerTask extends AbstractNetworkTask
         // The rest of the tasks will be spawned by taskFinished().
     }
 
-    protected void spawnPathsToTargetsTask () {
+    private void spawnPathsToTargetsTask () {
         PathFindingAlgorithmTaskFactory pathsToTargetsTaskFactory =
             new PathFindingAlgorithmTaskFactory(results,
                                                 OCSANAStep.FIND_PATHS_TO_TARGETS);
@@ -134,7 +134,7 @@ public class OCSANARunnerTask extends AbstractNetworkTask
                             this);
     }
 
-    protected void spawnPathsToOffTargetsTask () {
+    private void spawnPathsToOffTargetsTask () {
         PathFindingAlgorithmTaskFactory pathsToOffTargetsTaskFactory =
             new PathFindingAlgorithmTaskFactory(results,
                                                 OCSANAStep.FIND_PATHS_TO_OFF_TARGETS);
@@ -143,28 +143,28 @@ public class OCSANARunnerTask extends AbstractNetworkTask
                             this);
     }
 
-    protected void spawnScoringTask () {
+    private void spawnScoringTask () {
         OCSANAScoringAlgorithmTaskFactory scoringTaskFactory =
             new OCSANAScoringAlgorithmTaskFactory(results);
 
         taskManager.execute(scoringTaskFactory.createTaskIterator(), this);
     }
 
-    protected void spawnMHSTask () {
+    private void spawnMHSTask () {
         MHSAlgorithmTaskFactory mhsTaskFactory =
             new MHSAlgorithmTaskFactory(results);
 
         taskManager.execute(mhsTaskFactory.createTaskIterator(), this);
     }
 
-    protected void spawnPresentResultsTask () {
+    private void spawnPresentResultsTask () {
         PresentResultsTaskFactory presentResultsTaskFactory =
             new PresentResultsTaskFactory(results, resultsPanel);
 
         taskManager.execute(presentResultsTaskFactory.createTaskIterator(), this);
     }
 
-    protected void spawnCleanupTask () {
+    private void spawnCleanupTask () {
         // Any post-process cleanup should happen here
     }
 

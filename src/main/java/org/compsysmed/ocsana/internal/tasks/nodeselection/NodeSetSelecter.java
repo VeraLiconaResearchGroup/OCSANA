@@ -31,13 +31,13 @@ import org.cytoscape.model.CyNetwork;
  **/
 
 public class NodeSetSelecter {
-    public static final String configGroup = "Select nodes";
-    public static final String configGroupSources = "Source nodes";
-    public static final String configGroupTargets = "Target nodes";
-    public static final String configGroupOffTargets = "Off-target nodes";
+    private static final String configGroup = "Select nodes";
+    private static final String configGroupSources = "Source nodes";
+    private static final String configGroupTargets = "Target nodes";
+    private static final String configGroupOffTargets = "Off-target nodes";
 
-    protected static final String listSelectDescription = "Use Ctrl+click to select multiple nodes:";
-    protected static final String stringSelectDescription = "Comma-separated list of node names:";
+    private static final String listSelectDescription = "Use Ctrl+click to select multiple nodes:";
+    private static final String stringSelectDescription = "Comma-separated list of node names:";
 
     @Tunable(description = "Node selection mode",
              gravity = 110,

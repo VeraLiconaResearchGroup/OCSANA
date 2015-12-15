@@ -34,7 +34,7 @@ public class HypergraphTest {
     @Test
     public void defaultConstructorShouldHaveNoVertices () {
         Hypergraph example = new Hypergraph();
-        assertEquals("Default Hypergraph should have no vertices", 0, example.numVerts);
+        assertEquals("Default Hypergraph should have no vertices", 0, example.numVerts());
     }
 
     @Test

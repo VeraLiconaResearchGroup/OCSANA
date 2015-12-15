@@ -317,7 +317,7 @@ public class RSAlgorithm extends AbstractMHSAlgorithm {
          *
          * @param v  the vertex to search from
          **/
-        protected Boolean anyEdgeCriticalAfter(Integer v) {
+        private Boolean anyEdgeCriticalAfter(Integer v) {
             // Iterate through vertices in S
             for (int i = S.nextSetBit(0); i >= 0; i = S.nextSetBit(i+1)) {
                 // Check first critical edge for vertex i

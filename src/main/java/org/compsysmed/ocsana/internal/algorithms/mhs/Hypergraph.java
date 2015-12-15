@@ -18,7 +18,7 @@ public class Hypergraph extends ArrayList<BitSet> {
     // TODO: Do we need a no-arg constructor?
     // TODO: Document throws
 
-    protected int numVerts;
+    private int numVerts;
 
     /**
      * Construct an empty Hypergraph
