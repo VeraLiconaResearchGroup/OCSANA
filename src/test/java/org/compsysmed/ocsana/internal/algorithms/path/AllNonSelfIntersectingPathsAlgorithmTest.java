@@ -23,8 +23,6 @@ import org.cytoscape.model.CyEdge;
 import org.compsysmed.ocsana.internal.algorithms.path.AllNonSelfIntersectingPathsAlgorithm;
 
 public class AllNonSelfIntersectingPathsAlgorithmTest {
-    NetworkTestSupport nts;
-
     CyNetwork toyNetwork;
     Set<CyNode> toyNetworkSources;
     Set<CyNode> toyNetworkTargets;
@@ -35,7 +33,7 @@ public class AllNonSelfIntersectingPathsAlgorithmTest {
     public void setUp () {
         // Set up the test environment here
         // In particular, initialize any shared variables
-        nts = new NetworkTestSupport();
+        NetworkTestSupport nts = new NetworkTestSupport();
 
         // Set up test network
         toyNetwork = nts.getNetwork();
@@ -80,8 +78,6 @@ public class AllNonSelfIntersectingPathsAlgorithmTest {
         // Tear down the test environment here
         // In particular, null out any shared variables so the garbage
         // collector can trash them
-        nts = null;
-
         toyNetwork = null;
         toyNetworkAlg = null;
         toyNetworkSources = null;
