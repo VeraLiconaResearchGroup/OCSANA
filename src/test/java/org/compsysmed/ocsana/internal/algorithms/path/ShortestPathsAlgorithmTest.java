@@ -85,7 +85,7 @@ public class ShortestPathsAlgorithmTest {
     }
 
     @Test
-    public void toyNetworkShouldHaveSevenPaths () {
+    public void toyNetworkShouldHaveRightNumberOfPaths () {
         Collection<List<CyEdge>> paths = toyNetworkAlg.paths(toyNetworkSources, toyNetworkTargets);
         assertEquals("Toy network should have correct number of paths", 4, paths.size());
 
