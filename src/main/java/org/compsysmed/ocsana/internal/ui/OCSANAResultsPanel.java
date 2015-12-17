@@ -254,8 +254,10 @@ public class OCSANAResultsPanel
             row.add(MHS.size());
 
             Double mhsScore = 0.0;
-            for (CyNode node: MHS) {
-                mhsScore += results.ocsanaScores.getOrDefault(node, 0.0);
+            if (results.ocsanaScores != null) {
+                for (CyNode node: MHS) {
+                    mhsScore += results.ocsanaScores.getOrDefault(node, 0.0);
+                }
             }
             row.add(mhsScore);
 
