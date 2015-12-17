@@ -12,9 +12,9 @@ import static org.junit.Assert.*;
 
 // Java imports
 import java.util.*;
+import java.io.*;
 
 // Cytoscape imports
-import org.cytoscape.model.NetworkTestSupport;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.model.CyEdge;
@@ -22,55 +22,60 @@ import org.cytoscape.model.CyEdge;
 // OCSANA imports
 import org.compsysmed.ocsana.internal.algorithms.path.ShortestPathsAlgorithm;
 
+import org.compsysmed.ocsana.internal.helpers.SIFFileConverter;
+
 public class ShortestPathsAlgorithmTest {
     CyNetwork toyNetwork;
     Set<CyNode> toyNetworkSources;
     Set<CyNode> toyNetworkTargets;
 
-    ShortestPathsAlgorithm toyNetworkAlg;
+    CyNetwork HER2Network;
+    Set<CyNode> HER2NetworkSources;
+    Set<CyNode> HER2NetworkTargets;
 
     @Before
-    public void setUp () {
+    public void setUp ()
+        throws IOException {
         // Set up the test environment here
         // In particular, initialize any shared variables
-        NetworkTestSupport nts = new NetworkTestSupport();
 
-        // Set up test network
-        toyNetwork = nts.getNetwork();
-        toyNetworkAlg = new ShortestPathsAlgorithm(toyNetwork);
-
-        CyNode I1 = toyNetwork.addNode();
-        CyNode I2 = toyNetwork.addNode();
-        CyNode A = toyNetwork.addNode();
-        CyNode B = toyNetwork.addNode();
-        CyNode C = toyNetwork.addNode();
-        CyNode D = toyNetwork.addNode();
-        CyNode E = toyNetwork.addNode();
-        CyNode F = toyNetwork.addNode();
-        CyNode O1 = toyNetwork.addNode();
-        CyNode O2 = toyNetwork.addNode();
-
-        toyNetwork.addEdge(I1, A, true);
-        toyNetwork.addEdge(I1, B, true);
-        toyNetwork.addEdge(I2, B, true);
-        toyNetwork.addEdge(I2, C, true);
-        toyNetwork.addEdge(A, D, true);
-        toyNetwork.addEdge(A, B, true);
-        toyNetwork.addEdge(B, E, true);
-        toyNetwork.addEdge(C, E, true);
-        toyNetwork.addEdge(C, F, true);
-        toyNetwork.addEdge(D, E, true);
-        toyNetwork.addEdge(F, B, true);
-        toyNetwork.addEdge(E, O1, true);
-        toyNetwork.addEdge(F, O2, true);
+        // Toy network
+        File toyFile = new File(getClass().getResource("/network-data/ToyNetwork.sif").getFile());
+        SIFFileConverter toyConverter = new SIFFileConverter(toyFile);
+        toyNetwork = toyConverter.getNetwork();
 
         toyNetworkSources = new HashSet<>();
-        toyNetworkSources.add(I1);
-        toyNetworkSources.add(I2);
+        List<String> toyNetworkSourceNames = Arrays.asList("I1", "I2");
+        for (String sourceName: toyNetworkSourceNames) {
+            toyNetworkSources.add(toyConverter.getNode(sourceName));
+        }
+        assert toyNetworkSources.size() == 2;
 
         toyNetworkTargets = new HashSet<>();
-        toyNetworkTargets.add(O1);
-        toyNetworkTargets.add(O2);
+        List<String> toyNetworkTargetNames = Arrays.asList("O1", "O2");
+        for (String targetName: toyNetworkTargetNames) {
+            toyNetworkTargets.add(toyConverter.getNode(targetName));
+        }
+        assert toyNetworkTargets.size() == 2;
+
+        // HER2 network
+        File HER2File = new File(getClass().getResource("/network-data/HER2.sif").getFile());
+        SIFFileConverter HER2Converter = new SIFFileConverter(HER2File);
+        HER2Network = HER2Converter.getNetwork();
+
+        HER2NetworkSources = new HashSet<>();
+        List<String> HER2NetworkSourceNames = Arrays.asList("n1064", "n1065", "n1066", "n1067", "n1069", "n1071", "n1073", "n1092", "n1093", "n1748", "n1855", "n1869", "n2270", "n2274", "n2276", "n2277", "n2679", "n2693", "n2695", "n2701", "n2704", "n2712", "n2727", "n2753", "n2758", "n2766", "n2781", "n66", "n76");
+        for (String sourceName: HER2NetworkSourceNames) {
+            HER2NetworkSources.add(HER2Converter.getNode(sourceName));
+        }
+        assert HER2NetworkSources.size() == 29;
+
+        HER2NetworkTargets = new HashSet<>();
+        List<String> HER2NetworkTargetNames = Arrays.asList("n1000", "n1034", "n1115", "n1119", "n1126", "n1158", "n1173", "n1177", "n1878", "n2492", "n2615", "n2652", "n839", "n940", "n983", "n996");
+        for (String targetName: HER2NetworkTargetNames) {
+            HER2NetworkTargets.add(HER2Converter.getNode(targetName));
+        }
+        assert HER2NetworkTargets.size() == 16;
     }
 
     @After
@@ -79,19 +84,43 @@ public class ShortestPathsAlgorithmTest {
         // In particular, null out any shared variables so the garbage
         // collector can trash them
         toyNetwork = null;
-        toyNetworkAlg = null;
         toyNetworkSources = null;
         toyNetworkTargets = null;
+
+        HER2Network = null;
+        HER2NetworkSources = null;
+        HER2NetworkTargets = null;
     }
 
     @Test
     public void toyNetworkShouldHaveRightNumberOfPaths () {
-        Collection<List<CyEdge>> paths = toyNetworkAlg.paths(toyNetworkSources, toyNetworkTargets);
+        // Algorithm
+        ShortestPathsAlgorithm pathAlg = new ShortestPathsAlgorithm(toyNetwork);
+        pathAlg.dijkstra.restrictPathLength = false;
+
+        // path-finding
+        Collection<List<CyEdge>> paths = pathAlg.paths(toyNetworkSources, toyNetworkTargets);
         assertEquals("Toy network should have correct number of paths", 4, paths.size());
 
         for (List<CyEdge> path: paths) {
             assertTrue("Path should start at a source", toyNetworkSources.contains(path.get(0).getSource()));
             assertTrue("Path should end at a target", toyNetworkTargets.contains(path.get(path.size() - 1).getTarget()));
+        }
+    }
+
+    @Test
+    public void HER2NetworkShouldHaveRightNumberOfPaths () {
+        // Algorithm
+        ShortestPathsAlgorithm pathAlg = new ShortestPathsAlgorithm(HER2Network);
+        pathAlg.dijkstra.restrictPathLength = false;
+
+        // Path-finding
+        Collection<List<CyEdge>> paths = pathAlg.paths(HER2NetworkSources, HER2NetworkTargets);
+        assertEquals("HER2 network should have correct number of paths", 534, paths.size());
+
+        for (List<CyEdge> path: paths) {
+            assertTrue("Path should start at a source", HER2NetworkSources.contains(path.get(0).getSource()));
+            assertTrue("Path should end at a target", HER2NetworkTargets.contains(path.get(path.size() - 1).getTarget()));
         }
     }
 }
