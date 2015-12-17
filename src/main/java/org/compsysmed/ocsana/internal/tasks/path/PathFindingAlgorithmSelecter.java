@@ -26,6 +26,7 @@ import org.cytoscape.model.CyNetwork;
 // OCSANA imports
 import org.compsysmed.ocsana.internal.algorithms.path.AbstractPathFindingAlgorithm;
 import org.compsysmed.ocsana.internal.algorithms.path.AllNonSelfIntersectingPathsAlgorithm;
+import org.compsysmed.ocsana.internal.algorithms.path.ShortestPathsAlgorithm;
 
 /**
  * Interface handler for path-finding algorithms
@@ -49,6 +50,7 @@ public class PathFindingAlgorithmSelecter {
         // order from fastest to most complete..
         List<AbstractPathFindingAlgorithm> algorithms = new ArrayList<>();
         algorithms.add(new AllNonSelfIntersectingPathsAlgorithm(network));
+        algorithms.add(new ShortestPathsAlgorithm(network));
 
         // Then we populate the ListSingleSelection.
         algorithmSelecter = new ListSingleSelection<>(algorithms);

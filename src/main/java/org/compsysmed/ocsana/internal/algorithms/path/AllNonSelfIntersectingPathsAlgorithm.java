@@ -16,13 +16,13 @@ import java.util.*;
 
 // Cytoscape imports
 import org.cytoscape.work.Tunable;
+import org.cytoscape.work.ContainsTunables;
 
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNode;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.algorithms.path.AbstractPathFindingAlgorithm;
 
 /**
  * Use depth-first search to generate all non-self-intersecting
@@ -31,24 +31,27 @@ import org.compsysmed.ocsana.internal.algorithms.path.AbstractPathFindingAlgorit
  * @param network  the CyNetwork to compute on
  **/
 public class AllNonSelfIntersectingPathsAlgorithm
-    extends DijkstraPathAlgorithm {
+    extends AbstractPathFindingAlgorithm {
     public static final String NAME = "All non-self-intersecting paths";
     public static final String SHORTNAME = "ALL";
 
-    public AllNonSelfIntersectingPathsAlgorithm(CyNetwork network) {
+    @ContainsTunables
+    public DijkstraPathDecoratorAlgorithm dijkstra;
+
+    public AllNonSelfIntersectingPathsAlgorithm (CyNetwork network) {
         super(network);
+        dijkstra = new DijkstraPathDecoratorAlgorithm(network);
     }
 
     @Override
     public Collection<List<CyEdge>> paths (Set<CyNode> sources,
                                            Set<CyNode> targets) {
-        assert maxPathLength >= 0;
-
-        Map<CyEdge, Integer> edgeMinDistances = edgeMinDistances(sources, targets);
+        Map<CyEdge, Integer> edgeMinDistances
+            = dijkstra.edgeMinDistances(sources, targets);
 
         // Only run the next step if the previous succeeded
         if (edgeMinDistances != null) {
-            Collection<List<CyEdge>> results = computePaths(sources, targets, edgeMinDistances);
+            Collection<List<CyEdge>> results = computeAllPaths(sources, targets, edgeMinDistances);
             return results;
         } else {
             return null;
@@ -66,10 +69,9 @@ public class AllNonSelfIntersectingPathsAlgorithm
      * @return a List of paths, each given as a List of CyEdges in
      * order from a source to a target
      **/
-    @Override
-    protected List<List<CyEdge>> computePaths (Set<CyNode> sources,
-                                               Set<CyNode> targets,
-                                               Map<CyEdge, Integer> edgeMinDistances) {
+    private Collection<List<CyEdge>> computeAllPaths (Set<CyNode> sources,
+                                                      Set<CyNode> targets,
+                                                      Map<CyEdge, Integer> edgeMinDistances) {
         // This time, we'll iterate down through the network, starting
         // at the sources and walking forwards along edges. As we
         // walk, we'll extend the incomplete paths we find along any
@@ -77,11 +79,6 @@ public class AllNonSelfIntersectingPathsAlgorithm
         // keep the total path length no larger than maxPathLength.
         List<List<CyEdge>> completePaths = new ArrayList<>();
         Queue<List<CyEdge>> incompletePaths = new LinkedList<>();
-
-        // Invalid state: abort!
-        if (maxPathLength <= 0) {
-            return null;
-        }
 
         // Bootstrap the queue with the edges coming out of the sources
         for (CyNode sourceNode: sources) {
@@ -112,7 +109,7 @@ public class AllNonSelfIntersectingPathsAlgorithm
             Integer pathLength = incompletePath.size();
 
             // Consider all edges coming out of the leaf of the path
-            CyEdge leafEdge = incompletePath.get(incompletePath.size() - 1);
+            CyEdge leafEdge = incompletePath.get(pathLength - 1);
 
             if (!leafEdge.isDirected()) {
                 throw new IllegalArgumentException("Undirected edges are not supported.");
@@ -130,8 +127,8 @@ public class AllNonSelfIntersectingPathsAlgorithm
                 }
 
                 if ((edgeMinDistances.containsKey(outEdge)) &&
-                    ((edgeMinDistances.get(outEdge) + pathLength <= maxPathLength) || (!restrictPathLength))
-                        ) {
+                    ((edgeMinDistances.get(outEdge) + pathLength <= dijkstra.maxPathLength) || (!dijkstra.restrictPathLength))
+                    ) {
                     // Make sure this doesn't create a self-intersecting path
                     boolean pathIsSelfIntersecting = false;
                     for (CyEdge pathEdge: incompletePath) {
@@ -163,6 +160,12 @@ public class AllNonSelfIntersectingPathsAlgorithm
 
         assert incompletePaths.size() == 0;
         return completePaths;
+    }
+
+    @Override
+    public void cancel () {
+        super.cancel();
+        dijkstra.cancel();
     }
 
     @Override

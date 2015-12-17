@@ -1,5 +1,5 @@
 /**
- * Test cases for the AllNonSelfIntersectingPathsAlgorithm class
+ * Test cases for the ShortestPathsAlgorithm class
  *
  * Copyright Vera-Licona Research Group (C) 2015
  **/
@@ -20,14 +20,14 @@ import org.cytoscape.model.CyNode;
 import org.cytoscape.model.CyEdge;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.algorithms.path.AllNonSelfIntersectingPathsAlgorithm;
+import org.compsysmed.ocsana.internal.algorithms.path.ShortestPathsAlgorithm;
 
-public class AllNonSelfIntersectingPathsAlgorithmTest {
+public class ShortestPathsAlgorithmTest {
     CyNetwork toyNetwork;
     Set<CyNode> toyNetworkSources;
     Set<CyNode> toyNetworkTargets;
 
-    AllNonSelfIntersectingPathsAlgorithm toyNetworkAlg;
+    ShortestPathsAlgorithm toyNetworkAlg;
 
     @Before
     public void setUp () {
@@ -37,7 +37,7 @@ public class AllNonSelfIntersectingPathsAlgorithmTest {
 
         // Set up test network
         toyNetwork = nts.getNetwork();
-        toyNetworkAlg = new AllNonSelfIntersectingPathsAlgorithm(toyNetwork);
+        toyNetworkAlg = new ShortestPathsAlgorithm(toyNetwork);
 
         CyNode I1 = toyNetwork.addNode();
         CyNode I2 = toyNetwork.addNode();
@@ -87,7 +87,7 @@ public class AllNonSelfIntersectingPathsAlgorithmTest {
     @Test
     public void toyNetworkShouldHaveSevenPaths () {
         Collection<List<CyEdge>> paths = toyNetworkAlg.paths(toyNetworkSources, toyNetworkTargets);
-        assertEquals("Toy network should have correct number of paths", 7, paths.size());
+        assertEquals("Toy network should have correct number of paths", 4, paths.size());
 
         for (List<CyEdge> path: paths) {
             assertTrue("Path should start at a source", toyNetworkSources.contains(path.get(0).getSource()));

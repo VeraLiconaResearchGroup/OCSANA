@@ -22,38 +22,27 @@ import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNode;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.algorithms.path.AbstractPathFindingAlgorithm;
+import org.compsysmed.ocsana.internal.algorithms.AbstractOCSANAAlgorithm;
 
-public abstract class DijkstraPathAlgorithm
-    extends AbstractPathFindingAlgorithm {
+public class DijkstraPathDecoratorAlgorithm
+    extends AbstractOCSANAAlgorithm {
     @Tunable(description = "Use finite search radius",
              groups = {AbstractPathFindingAlgorithm.CONFIG_GROUP},
              gravity=210)
-             public Boolean restrictPathLength = true;
+    public Boolean restrictPathLength = true;
 
+    // TODO: require non-negative
     @Tunable(description = "Find paths with up to this many nodes:",
              groups = {AbstractPathFindingAlgorithm.CONFIG_GROUP},
              gravity = 211,
              dependsOn = "restrictPathLength=true")
-             public Integer maxPathLength = 20;
+    public Integer maxPathLength = 20;
 
-    public DijkstraPathAlgorithm (CyNetwork network) {
-        super(network);
+    private CyNetwork network;
+
+    public DijkstraPathDecoratorAlgorithm (CyNetwork network) {
+        this.network = network;
     }
-
-    /**
-     * Use the pre-computed minimal distances to find the paths
-     *
-     * @param sources  the source nodes
-     * @param targets  the target nodes
-     * @param edgeMinDistances  the minimum number of edges in a path
-     * to a target beginning with the given edge
-     * @return a List of paths, each given as a List of CyEdges in
-     * order from a source to a target
-     **/
-    abstract protected List<List<CyEdge>> computePaths (Set<CyNode> sources,
-                                                        Set<CyNode> targets,
-                                                        Map<CyEdge, Integer> edgeMinDistances);
 
     /**
      * Compute the minimum length of a path to the targets from
@@ -120,5 +109,19 @@ public abstract class DijkstraPathAlgorithm
 
         assert nodesToProcess.isEmpty();
         return edgeMinDistances;
+    }
+
+    @Override
+    public String fullName () {
+        return "Generalized Dijkstra's path-decorating algorithm";
+    }
+
+    @Override
+    public String shortName () {
+        return "DIJKSTRA";
+    }
+
+    @Override public String toString() {
+        return fullName();
     }
 }
