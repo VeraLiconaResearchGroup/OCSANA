@@ -72,8 +72,8 @@ public class HER2IntegrationTest {
     @Test
     public void HER2NetworkIsCorrectSize ()
         throws Exception {
-        assertEquals("HER2 network should have correct number of nodes", 2753, network.getNodeCount());
-        assertEquals("HER2 network should have correct number of edges", 3812, network.getEdgeCount());
+        assertEquals("Node count", 2753, network.getNodeCount());
+        assertEquals("Edge count", 3812, network.getEdgeCount());
     }
 
     @Test
@@ -83,7 +83,7 @@ public class HER2IntegrationTest {
         AbstractPathFindingAlgorithm pathAlg = new AllNonSelfIntersectingPathsAlgorithm(network);
 
         Collection<List<CyEdge>> paths = pathAlg.paths(sources, targets);
-        assertEquals("HER2 network should have correct number of paths", 69805, paths.size());
+        assertEquals("Path count", 69805, paths.size());
 
         // Find CIs
         List<Set<CyNode>> nodeSets = new ArrayList<>();
@@ -99,6 +99,6 @@ public class HER2IntegrationTest {
         AbstractMHSAlgorithm mhsAlg = new MMCSAlgorithm();
         List<Set<CyNode>> MHSes = mhsAlg.MHSes(nodeSets);
 
-        assertEquals("HER2 network should have correct number of CIs", 320, MHSes.size());
+        assertEquals("CI count", 320, MHSes.size());
     }
 }

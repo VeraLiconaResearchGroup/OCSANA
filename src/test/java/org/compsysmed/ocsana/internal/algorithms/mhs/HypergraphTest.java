@@ -53,7 +53,7 @@ public class HypergraphTest {
         throws FileNotFoundException, IOException, NumberFormatException {
         File HER2File = new File(getClass().getResource("/mhs-data/HER2.all.dat").getFile());
         Hypergraph H = new Hypergraph(HER2File);
-        assertEquals("Hypergraph from file should preserve number of vertices", 320, H.numVerts());
-        assertEquals("Hypergraph from file should preserve number of edges", 69805, H.numEdges());
+        assertEquals("Vertex count (file)", 320, H.numVerts());
+        assertEquals("Edge count (file)", 69805, H.numEdges());
     }
 }

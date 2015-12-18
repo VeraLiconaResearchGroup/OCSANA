@@ -101,11 +101,11 @@ public class AllNonSelfIntersectingPathsAlgorithmTest {
 
         // path-finding
         Collection<List<CyEdge>> paths = pathAlg.paths(toyNetworkSources, toyNetworkTargets);
-        assertEquals("Toy network should have correct number of paths", 7, paths.size());
+        assertEquals("Path count", 7, paths.size());
 
         for (List<CyEdge> path: paths) {
-            assertTrue("Path should start at a source", toyNetworkSources.contains(path.get(0).getSource()));
-            assertTrue("Path should end at a target", toyNetworkTargets.contains(path.get(path.size() - 1).getTarget()));
+            assertTrue("Path starts at a source", toyNetworkSources.contains(path.get(0).getSource()));
+            assertTrue("Path ends at a target", toyNetworkTargets.contains(path.get(path.size() - 1).getTarget()));
         }
     }
 
@@ -118,11 +118,11 @@ public class AllNonSelfIntersectingPathsAlgorithmTest {
 
         // Path-finding
         Collection<List<CyEdge>> paths = pathAlg.paths(HER2NetworkSources, HER2NetworkTargets);
-        assertEquals("HER2 network should have correct number of paths", 69805, paths.size());
+        assertEquals("Path count", 69805, paths.size());
 
         for (List<CyEdge> path: paths) {
-            assertTrue("Path should start at a source", HER2NetworkSources.contains(path.get(0).getSource()));
-            assertTrue("Path should end at a target", HER2NetworkTargets.contains(path.get(path.size() - 1).getTarget()));
+            assertTrue("Path starts at a source", HER2NetworkSources.contains(path.get(0).getSource()));
+            assertTrue("Path ends at a target", HER2NetworkTargets.contains(path.get(path.size() - 1).getTarget()));
         }
     }
 }

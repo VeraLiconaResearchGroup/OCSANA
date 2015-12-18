@@ -72,7 +72,7 @@ public class HypergraphOfSetsOfCyNodesTest {
 
         HypergraphOfSetsOfCyNodes H = new HypergraphOfSetsOfCyNodes(sets);
 
-        assertEquals("Hypergraph constructed from sets of CyNodes should preserve size", sets.size(), H.numEdges());
-        assertEquals("Hypergraph constructed from sets of CyNodes should preserve vertex count", 5, H.numVerts());
+        assertEquals("Edge count", sets.size(), H.numEdges());
+        assertEquals("Vertex count", 5, H.numVerts());
     }
 }

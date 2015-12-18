@@ -54,11 +54,11 @@ public class RSAlgorithmTest {
 
     @Test
     public void smallHypergraphTransversalShouldWork () {
-        Hypergraph smallHypergraphTransversal = algFull.transversalHypergraph(smallHypergraph);
-        assertEquals("Small hypergraph transversal should have 5 edges", 5, smallHypergraphTransversal.numEdges());
+        Hypergraph T = algFull.transversalHypergraph(smallHypergraph);
+        assertEquals("Transversal count", 5, T.numEdges());
 
-        for (BitSet transversal: smallHypergraphTransversal) {
-            assertTrue("Small hypergraph should be transversed by each element of its transversal", smallHypergraph.isTransversedBy(transversal));
+        for (BitSet transversal: T) {
+            assertTrue("Transversal condition", smallHypergraph.isTransversedBy(transversal));
         }
     }
 
@@ -70,6 +70,10 @@ public class RSAlgorithmTest {
 
         Hypergraph T = algCutoff.transversalHypergraph(H);
 
-        assertEquals("Huge hypergraph transversal with cutoff 6 should have 320 edges", 320, T.numEdges());
+        assertEquals("Transversal count", 320, T.numEdges());
+
+        for (BitSet transversal: T) {
+            assertTrue("Transversal condition", H.isTransversedBy(transversal));
+        }
     }
 }
