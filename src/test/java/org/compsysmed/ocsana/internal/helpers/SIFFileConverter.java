@@ -43,11 +43,15 @@ public class SIFFileConverter {
                 // NOTE: we do not handle the multi-target case, which
                 // is supported by SIF
                 String[] lineWords = line.split("\t");
+                if (lineWords.length != 3) {
+                    throw new IllegalArgumentException("Invalid SIF file");
+                }
+
                 CyNode head = getNode(lineWords[0]);
                 CyNode tail = getNode(lineWords[2]);
 
                 // Create the edge
-                CyEdge newEdge = network.addEdge(head, tail, true);
+                CyEdge newEdge = getEdge(head, tail);
             }
         }
     }
@@ -60,7 +64,7 @@ public class SIFFileConverter {
     }
 
     /**
-     * Get the node with the specified name
+     * Get the node with the specified name, creating it if necessary
      *
      * @param nodeName  the node name
      **/
@@ -73,5 +77,45 @@ public class SIFFileConverter {
             nodeMap.put(nodeName, newNode);
             return newNode;
         }
+    }
+
+    /**
+     * Get the edge with the specified source and target node names,
+     * creating it if necessary
+     *
+     * @param sourceNodeName  the source node
+     * @param targetNodeName  the target node
+     **/
+    public CyEdge getEdge(CyNode sourceNode, CyNode targetNode) {
+        // Messy, goofy check for known edges because
+        // CyNetwork.getConnectingEdgeList seems to be broken
+        List<CyEdge> knownEdges = new ArrayList<>();
+        for (CyEdge outEdge: network.getAdjacentEdgeIterable(sourceNode, CyEdge.Type.OUTGOING)) {
+            assert outEdge.getSource() == sourceNode;
+            if (outEdge.getTarget() == targetNode) {
+                knownEdges.add(outEdge);
+            }
+        };
+
+        if (!knownEdges.isEmpty()) {
+            assert knownEdges.size() == 1;
+            return knownEdges.get(0);
+        } else {
+            return network.addEdge(sourceNode, targetNode, true);
+        }
+    }
+
+    /**
+     * Get the edges in a path given by a sequence of nodes, creating
+     * the edges if necessary
+     *
+     * @param nodeNames  the nodes
+     **/
+    public List<CyEdge> getPath(CyNode... nodeNames) {
+        List<CyEdge> path = new ArrayList<>();
+        for (int i = 0; i < nodeNames.length - 1; i++) {
+            path.add(getEdge(nodeNames[i], nodeNames[i+1]));
+        }
+        return path;
     }
 }
