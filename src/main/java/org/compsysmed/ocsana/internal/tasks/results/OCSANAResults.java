@@ -96,7 +96,7 @@ public class OCSANAResults {
     /**
      * Get a string representation of a path of (directed) edges
      *
-     * The current format is "node1 -> node2 -> node3".
+     * The current format is "node1 -> node2 -| node3".
      *
      * @param path  the path
      **/
@@ -118,7 +118,11 @@ public class OCSANAResults {
         // Each other node is a target
         for (CyEdge edge: path) {
             // TODO: Handle activation and inhibition symbols
-            result += " -> ";
+            if (ocsanaAlg.edgeIsNegative(edge)) {
+                result += " -| ";
+            } else {
+                result += " -> ";
+            }
             result += nodeName(edge.getTarget());
         }
 

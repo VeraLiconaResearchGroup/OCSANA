@@ -195,7 +195,12 @@ public class OCSANAScoringAlgorithm
         }
     }
 
-    private Boolean edgeIsNegative (CyEdge edge) {
+    /**
+     * Determine whether an edge is negative (inhibitory)
+     *
+     * NOTE: Not yet implemented; always returns false.
+     **/
+    public Boolean edgeIsNegative (CyEdge edge) {
         // TODO: Write this!
         return false;
     }
