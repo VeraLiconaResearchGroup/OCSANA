@@ -32,7 +32,7 @@ public class DijkstraPathDecoratorAlgorithm
     public Boolean restrictPathLength = true;
 
     // TODO: require non-negative
-    @Tunable(description = "Find paths with up to this many nodes:",
+    @Tunable(description = "Find paths with up to this many edges:",
              groups = {AbstractPathFindingAlgorithm.CONFIG_GROUP},
              gravity = 211,
              dependsOn = "restrictPathLength=true")
