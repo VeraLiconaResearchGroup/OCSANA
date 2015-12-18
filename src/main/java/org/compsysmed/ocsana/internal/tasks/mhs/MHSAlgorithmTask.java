@@ -107,7 +107,7 @@ public class MHSAlgorithmTask extends AbstractOCSANATask {
         }
     }
 
-    public Collection<? extends Collection<CyNode>> getMHSes () {
+    public Collection<Set<CyNode>> getMHSes () {
         return results.MHSes;
     }
 

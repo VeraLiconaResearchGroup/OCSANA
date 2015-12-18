@@ -35,7 +35,7 @@ public class HypergraphOfSetsOfCyNodes extends Hypergraph {
      * @param sets  the sets to transform into edges of the Hypergraph
      **/
 
-    public HypergraphOfSetsOfCyNodes (Collection<? extends Collection<CyNode>> sets) {
+    public HypergraphOfSetsOfCyNodes (Collection<Set<CyNode>> sets) {
         mapNodeToHash = new HashMap<>();
         mapHashToNode = new HashMap<>();
 

@@ -35,8 +35,8 @@ public class OCSANAResults {
     // Paths data
     public AbstractPathFindingAlgorithm pathFindingAlg;
     public Boolean pathFindingCanceled = false;
-    public Collection<? extends List<CyEdge>> pathsToTargets;
-    public Collection<? extends List<CyEdge>> pathsToOffTargets;
+    public Collection<List<CyEdge>> pathsToTargets;
+    public Collection<List<CyEdge>> pathsToOffTargets;
 
     public Double pathsToTargetsExecutionSeconds;
     public Double pathsToOffTargetsExecutionSeconds;
@@ -51,7 +51,7 @@ public class OCSANAResults {
     // MHS data
     public AbstractMHSAlgorithm mhsAlg;
     public Boolean mhsFindingCanceled = false;
-    public Collection<? extends Collection<CyNode>> MHSes;
+    public Collection<Set<CyNode>> MHSes;
     public Boolean includeEndpointsInCIs;
 
     public Double mhsExecutionSeconds;
@@ -210,7 +210,7 @@ public class OCSANAResults {
         reportLines.add(mhsSummaryString);
         reportLines.add("");
 
-        for (Collection<CyNode> mhs: MHSes) {
+        for (Set<CyNode> mhs: MHSes) {
             // TODO: handle scoring information
             reportLines.add(nodeSetString(mhs));
         }

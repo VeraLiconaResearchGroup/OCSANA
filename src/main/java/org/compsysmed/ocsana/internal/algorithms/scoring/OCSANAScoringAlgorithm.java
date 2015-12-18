@@ -77,8 +77,8 @@ public class OCSANAScoringAlgorithm
      * @param pathsToOffTargets  the paths to the off-target nodes
      * @param Map assigning to each node its OCSANA score
      **/
-    public Map<CyNode, Double> computeScores (Collection<? extends List<CyEdge>> pathsToTargets,
-                                              Collection<? extends List<CyEdge>> pathsToOffTargets) {
+    public Map<CyNode, Double> computeScores (Collection<List<CyEdge>> pathsToTargets,
+                                              Collection<List<CyEdge>> pathsToOffTargets) {
         if (!computeScores) {
             return null;
         }
@@ -128,7 +128,7 @@ public class OCSANAScoringAlgorithm
      * @param elementaryNodes  Set to store nodes found in these paths (updated in-place)
      * @param useEdgeSigns  if true, paths will be weighted ±1 according to the signs of their edges
      **/
-    private void scoreNodesInPaths (Collection<? extends List<CyEdge>> paths,
+    private void scoreNodesInPaths (Collection<List<CyEdge>> paths,
                                     Map<CyNode, Double> scoreMap,
                                     Map<CyNode, Integer> pathCountMap,
                                     Map<CyNode, Set<CyNode>> endpointDownstreamMap,

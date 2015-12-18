@@ -81,7 +81,7 @@ public class MMCSAlgorithm extends AbstractMHSAlgorithm {
 
     // No docstring because the interface has one
     @Override
-    public List<Set<CyNode>> MHSes (Collection<? extends Collection<CyNode>> sets) {
+    public List<Set<CyNode>> MHSes (Collection<Set<CyNode>> sets) {
         HypergraphOfSetsOfCyNodes inputHypergraph
             = new HypergraphOfSetsOfCyNodes(sets);
 

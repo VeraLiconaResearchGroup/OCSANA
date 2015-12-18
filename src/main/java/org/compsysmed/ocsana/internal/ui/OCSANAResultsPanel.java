@@ -273,7 +273,7 @@ public class OCSANAResultsPanel
      * @param pathType  a string to follow "Found n paths to "
      * @param runTime  the running time of the path-finding process in seconds
      **/
-    private JPanel buildPathsPanel (Collection<? extends List<CyEdge>> paths,
+    private JPanel buildPathsPanel (Collection<List<CyEdge>> paths,
                                     String pathType,
                                     Double runTime) {
         if (paths != null) {

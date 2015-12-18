@@ -38,5 +38,5 @@ public abstract class AbstractMHSAlgorithm
      * @param sets  the sets to hit
      * @return the collection of MHSes of the input sets
      **/
-    abstract public List<Set<CyNode>> MHSes (Collection<? extends Collection<CyNode>> sets);
+    abstract public List<Set<CyNode>> MHSes (Collection<Set<CyNode>> sets);
 }
