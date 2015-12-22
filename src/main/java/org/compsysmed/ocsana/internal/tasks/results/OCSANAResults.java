@@ -181,8 +181,6 @@ public class OCSANAResults {
 
         reportLines.add("");
 
-        // TODO: handle activation conversion
-
         Set<CyNode> elementaryNodes = new HashSet<>();
         for (List<CyEdge> path: pathsToTargets) {
             for (CyEdge edge: path) {
@@ -202,9 +200,14 @@ public class OCSANAResults {
         reportLines.add("");
 
         // TODO: Proper reporting for scoring
-        String scoringSummaryString = "Scored elementary nodes in " + scoringExecutionSeconds + " s.";
-        reportLines.add(scoringSummaryString);
-        reportLines.add("");
+        if (results.ocsanaScores != null) {
+            String scoringSummaryString = "Scored elementary nodes in " + scoringExecutionSeconds + " s.";
+            reportLines.add(scoringSummaryString);
+            reportLines.add("");
+        } else {
+            reportLines.add("Scoring disabled.");
+            reportLines.add("");
+        }
 
         String ciInclusionString = (includeEndpointsInCIs) ? "(including endpoints)" : "(excluding endpoints)";
         String mhsSummaryString = "Found " + MHSes.size()
