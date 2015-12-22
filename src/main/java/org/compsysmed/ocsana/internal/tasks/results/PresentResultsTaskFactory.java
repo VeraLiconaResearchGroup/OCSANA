@@ -30,7 +30,7 @@ import org.compsysmed.ocsana.internal.algorithms.scoring.OCSANAScoringAlgorithm;
 
 import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
 
-import org.compsysmed.ocsana.internal.ui.OCSANAResultsPanel;
+import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
 
 public class PresentResultsTaskFactory extends AbstractTaskFactory {
     private OCSANAResults results;

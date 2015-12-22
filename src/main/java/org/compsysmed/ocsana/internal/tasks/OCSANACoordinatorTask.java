@@ -27,7 +27,7 @@ import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.ui.OCSANAResultsPanel;
+import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
 
 import org.compsysmed.ocsana.internal.algorithms.path.AbstractPathFindingAlgorithm;
 import org.compsysmed.ocsana.internal.algorithms.scoring.OCSANAScoringAlgorithm;

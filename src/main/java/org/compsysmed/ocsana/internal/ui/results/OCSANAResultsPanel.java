@@ -9,7 +9,7 @@
  * details
  **/
 
-package org.compsysmed.ocsana.internal.ui;
+package org.compsysmed.ocsana.internal.ui.results;
 
 // Java imports
 import java.util.*;
@@ -23,35 +23,23 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.AbstractListModel;
 import javax.swing.BoxLayout;
-import javax.swing.DefaultListModel;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTable;
 import javax.swing.JTextArea;
-import javax.swing.RowSorter;
+
 import javax.swing.border.TitledBorder;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
 
 // Cytoscape imports
 import org.cytoscape.application.swing.CySwingApplication;
 import org.cytoscape.application.swing.CytoPanel;
 import org.cytoscape.application.swing.CytoPanelComponent;
 import org.cytoscape.application.swing.CytoPanelName;
-
-import org.cytoscape.model.CyNetwork;
-import org.cytoscape.model.CyNode;
-import org.cytoscape.model.CyEdge;
 
 // OCSANA imports
 import org.compsysmed.ocsana.internal.tasks.results.OCSANAResults;
@@ -182,124 +170,21 @@ public class OCSANAResultsPanel
         resultsPanel.setBorder(new TitledBorder("Results"));
 
         if (results.MHSes != null) {
-            JPanel ciPanel = buildCIPanel();
+            CIPanel ciPanel = new CIPanel(results);
             resultsTabbedPane.addTab("Optimal CIs", ciPanel);
         }
 
         if (results.pathsToTargets != null) {
-            JPanel targetPathsPanel = buildPathsPanel(results.pathsToTargets, "targets", results.pathsToTargetsExecutionSeconds);
+            PathsPanel targetPathsPanel = new PathsPanel(results, PathsPanel.PathType.TO_TARGETS);
             resultsTabbedPane.addTab("Paths to targets", targetPathsPanel);
         }
 
         if (results.pathsToOffTargets != null) {
-            JPanel targetPathsPanel = buildPathsPanel(results.pathsToOffTargets, "off-targets", results.pathsToOffTargetsExecutionSeconds);
+            PathsPanel targetPathsPanel = new PathsPanel(results, PathsPanel.PathType.TO_OFF_TARGETS);
             resultsTabbedPane.addTab("Paths to Off-targets", targetPathsPanel);
         }
 
         return resultsPanel;
-    }
-
-
-    /**
-     * Build the CI results panel
-     **/
-    private JPanel buildCIPanel () {
-        if (results.MHSes != null) {
-            Vector<Vector<Object>> mhsRows = getMHSRows();
-
-            TableModel mhsModel = new DefaultTableModel(mhsRows, mhsCols) {
-                    public Class<?> getColumnClass(int column) {
-                        try {
-                            return getValueAt(0, column).getClass();
-                        } catch (ArrayIndexOutOfBoundsException exception) {
-                            return Object.class;
-                        }
-                    }
-                };
-
-            JTable mhsTable = new JTable(mhsModel);
-
-            RowSorter<TableModel> mhsSorter = new TableRowSorter<TableModel>(mhsModel);
-            mhsSorter.toggleSortOrder(2);
-            mhsSorter.toggleSortOrder(2);
-            mhsTable.setRowSorter(mhsSorter);
-
-            mhsTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-
-            JScrollPane mhsScrollPane = new JScrollPane(mhsTable);
-
-            JPanel mhsPanel = new JPanel(new BorderLayout());
-            String mhsText = "<html>" + "Found " + results.MHSes.size() + " optimal CIs in " + results.mhsExecutionSeconds + " s." + "<br />" + "Scored them in " + results.scoringExecutionSeconds + " s." + "</html>";
-            mhsPanel.add(new JLabel(mhsText), BorderLayout.PAGE_START);
-            mhsPanel.add(mhsScrollPane, BorderLayout.CENTER);
-
-            return mhsPanel;
-        } else {
-            return null;
-        }
-    }
-
-    // Column names for the CI results table
-    private static final Vector<String> mhsCols =
-        new Vector<>(Arrays.asList(new String[] {"CI", "Size", "Score"}));
-
-    /**
-     * Get the rows of the CI results table
-     **/
-    private Vector<Vector<Object>> getMHSRows () {
-        Vector<Vector<Object>> rows = new Vector<>();
-        for (Collection<CyNode> MHS: results.MHSes) {
-            Vector<Object> row = new Vector<>();
-            row.add(results.nodeSetString(MHS));
-            row.add(MHS.size());
-
-            Double mhsScore = 0.0;
-            if (results.ocsanaScores != null) {
-                for (CyNode node: MHS) {
-                    mhsScore += results.ocsanaScores.getOrDefault(node, 0.0);
-                }
-            }
-            row.add(mhsScore);
-
-            rows.add(row);
-        }
-        return rows;
-    }
-
-    /**
-     * Build a panel displaying the given paths
-     *
-     * @param paths  the paths to display
-     * @param pathType  a string to follow "Found n paths to "
-     * @param runTime  the running time of the path-finding process in seconds
-     **/
-    private JPanel buildPathsPanel (Collection<List<CyEdge>> paths,
-                                    String pathType,
-                                    Double runTime) {
-        if (paths != null) {
-            // Get lines to display
-            List<String> pathLines = new ArrayList<>();
-            for (List<CyEdge> path: paths) {
-                pathLines.add(results.pathString(path));
-            }
-
-            // Sort alphabetically
-            Collections.sort(pathLines);
-
-            // Create panel
-            JTextArea pathTextArea = new JTextArea(String.join("\n", pathLines));
-
-            JScrollPane pathScrollPane = new JScrollPane(pathTextArea);
-
-            JPanel pathPanel = new JPanel(new BorderLayout());
-            String panelText = "Found " + paths.size() + " paths to " + pathType + " in " + runTime + " s.";
-            pathPanel.add(new JLabel(panelText), BorderLayout.PAGE_START);
-            pathPanel.add(pathScrollPane, BorderLayout.CENTER);
-
-            return pathPanel;
-        } else {
-            return null;
-        }
     }
 
     // Helper functions to get information about the panel

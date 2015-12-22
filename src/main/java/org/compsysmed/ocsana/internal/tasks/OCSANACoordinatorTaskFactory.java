@@ -21,7 +21,7 @@ import org.cytoscape.work.TaskManager;
 import org.cytoscape.model.CyNetwork;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.ui.OCSANAResultsPanel;
+import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
 
 public class OCSANACoordinatorTaskFactory extends AbstractNetworkTaskFactory {
     private TaskManager<?, ?> taskManager;

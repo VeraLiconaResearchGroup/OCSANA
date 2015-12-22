@@ -48,7 +48,7 @@ import org.compsysmed.ocsana.internal.tasks.results.PresentResultsTask;
 import org.compsysmed.ocsana.internal.tasks.results.PresentResultsTaskFactory;
 import org.compsysmed.ocsana.internal.tasks.results.OCSANAResults;
 
-import org.compsysmed.ocsana.internal.ui.OCSANAResultsPanel;
+import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
 
 /**
  * Runner task for OCSANA

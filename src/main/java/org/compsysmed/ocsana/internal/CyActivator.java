@@ -27,7 +27,7 @@ import org.cytoscape.task.NetworkTaskFactory;
 
 // OCSANA imports
 import org.compsysmed.ocsana.internal.tasks.OCSANACoordinatorTaskFactory;
-import org.compsysmed.ocsana.internal.ui.OCSANAResultsPanel;
+import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
 
 public class CyActivator extends AbstractCyActivator {
     public void start (BundleContext bc) throws Exception {
