@@ -131,7 +131,8 @@ public class OCSANAResults {
     }
 
     /**
-     * Get a report of the results of an OCSANA run
+     * Get a report of the results of an OCSANA run (from the cache if
+     * possible)
      **/
     public List<String> getReportLines () {
         if (reportLines == null) {
@@ -142,7 +143,11 @@ public class OCSANAResults {
     }
 
     /**
-     * Generate a report of the results of an OCSANA run
+     * Generate a report of the results of an OCSANA run and store it in
+     * reportLines
+     *
+     * This should only be called by getReportLines, which handles
+     * caching the results of this construction
      **/
     private void generateReportLines () {
         // Format based on original OCSANA
