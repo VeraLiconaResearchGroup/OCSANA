@@ -44,6 +44,10 @@ public class OCSANAScoringAlgorithmTask extends AbstractOCSANATask {
             return;
         }
 
+        if (!results.ocsanaAlg.computeScores) {
+            return;
+        }
+
         if (results.pathsToTargets == null || results.pathsToOffTargets == null) {
             throw new IllegalStateException("Paths have not been computed.");
         }

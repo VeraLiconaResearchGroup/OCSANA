@@ -53,9 +53,18 @@ public class CIPanel
 
             JTable mhsTable = new JTable(mhsModel);
 
+            // Sort the rows
             RowSorter<TableModel> mhsSorter = new TableRowSorter<TableModel>(mhsModel);
-            mhsSorter.toggleSortOrder(2);
-            mhsSorter.toggleSortOrder(2);
+
+            if (results.ocsanaScores != null) {
+                // If we have OCSANA scores, sort in decreasing order with respect to them
+                mhsSorter.toggleSortOrder(2);
+                mhsSorter.toggleSortOrder(2);
+            } else {
+                // Otherwise, sort in increasing order of CI size
+                mhsSorter.toggleSortOrder(1);
+            }
+
             mhsTable.setRowSorter(mhsSorter);
 
             mhsTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
