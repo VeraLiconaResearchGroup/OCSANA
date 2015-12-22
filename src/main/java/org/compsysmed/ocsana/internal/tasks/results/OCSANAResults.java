@@ -206,10 +206,10 @@ public class OCSANAResults {
         reportLines.add(scoringSummaryString);
         reportLines.add("");
 
-        String ciInclusionVerb = (includeEndpointsInCIs) ? "include" : "exclude";
+        String ciInclusionString = (includeEndpointsInCIs) ? "(including endpoints)" : "(excluding endpoints)";
         String mhsSummaryString = "Found " + MHSes.size()
             + " CIs using MHS algorithm " + mhsAlg.shortName()
-            + " which " + ciInclusionVerb + " endpoints"
+            + ciInclusionString
             + " in " + mhsExecutionSeconds + " s.";
         reportLines.add(mhsSummaryString);
         reportLines.add("");
