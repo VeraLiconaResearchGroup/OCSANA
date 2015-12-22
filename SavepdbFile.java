@@ -1,4 +1,4 @@
-package org.cytoscape.myapp.internal.Drugeability;
+package javaapplication3;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -88,16 +88,28 @@ public class SavepdbFile {
                 new FileReader(fileaddress));
 
         String inputLine;
-        String s = "SITE_DESCRIPTION: BINDING SITE FOR RESIDUE";
+        String s = "SITE_DESCRIPTION: BINDING SITE FOR RESIDUE", s1 = "REMARK";
         int indexNumber = 0;
         inputLine = in.readLine();
 
-        while (inputLine.indexOf(s, indexNumber) != -1 && inputLine.indexOf(s, indexNumber) > indexNumber) {
+        while ((inputLine.indexOf(s, indexNumber) != -1)) {
 
             if (inputLine.contains(s) == true) {
 
-                String re = pdbID + " " + inputLine.substring(inputLine.indexOf(s, indexNumber) + 43, inputLine.indexOf("REMARK ", inputLine.indexOf(s, indexNumber)));
-                indexNumber = inputLine.indexOf("REMARK ", inputLine.indexOf(s, indexNumber));
+                if (inputLine.indexOf(s1, inputLine.indexOf(s, indexNumber)) == -1) {
+                    s1 = "DBREF";
+                }
+                String re = pdbID + " " + inputLine.substring(inputLine.indexOf(s, indexNumber) + 43, inputLine.indexOf(s1, inputLine.indexOf(s, indexNumber)));
+
+                if (inputLine.indexOf(s1, inputLine.indexOf(s, indexNumber)) != -1) {
+                    indexNumber = inputLine.indexOf(s1, inputLine.indexOf(s, indexNumber));
+                } else {
+
+                    s1 = "DBREF";
+                    indexNumber = inputLine.indexOf(s1, inputLine.indexOf(s, indexNumber));
+                }
+
+               // System.out.print(re + "\n");
                 resuList.add(re);
             }
         }
