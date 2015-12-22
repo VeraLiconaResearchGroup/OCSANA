@@ -13,6 +13,7 @@ package org.compsysmed.ocsana.internal.tasks.scoring;
 
 // Java imports
 import java.util.*;
+import java.util.function.Predicate;
 
 // Cytoscape imports
 import org.cytoscape.task.AbstractNetworkTask;
@@ -52,12 +53,14 @@ public class OCSANAScoringAlgorithmTask extends AbstractOCSANATask {
             throw new IllegalStateException("Paths have not been computed.");
         }
 
+        Predicate<CyEdge> inhibitionEdgeTester = (CyEdge edge) -> results.edgeProcessor.edgeIsInhibition(edge);
+
         taskMonitor.setTitle("Scoring");
 
         taskMonitor.setStatusMessage("Computing scores.");
 
         Long preTime = System.nanoTime();
-        results.ocsanaScores = results.ocsanaAlg.computeScores(results.pathsToTargets, results.pathsToOffTargets);
+        results.ocsanaScores = results.ocsanaAlg.computeScores(results.pathsToTargets, results.pathsToOffTargets, inhibitionEdgeTester);
         Long postTime = System.nanoTime();
 
         Double runTime = (postTime - preTime) / 1E9;

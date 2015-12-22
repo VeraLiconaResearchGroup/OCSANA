@@ -14,6 +14,8 @@ import static org.junit.Assert.*;
 import java.util.*;
 import java.io.*;
 
+import java.util.function.Predicate;
+
 // Cytoscape imports
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyEdge;
@@ -73,14 +75,34 @@ public class OCSANAScoringAlgorithmTest {
 
         Collection<List<CyEdge>> pathsToOffTargets = Arrays.asList(toyConverter.getPath(I1, A, D));
 
+        // Hand-coded method to test whether edges are activation or inhibition
+        Predicate<CyEdge> inhibitionEdgeTester = (CyEdge edge) -> {
+            CyNode source = edge.getSource();
+            CyNode target = edge.getTarget();
+
+            if (source.equals(I1) && target.equals(B)) {
+                return true;
+            }
+
+            if (source.equals(A) && target.equals(D)) {
+                return true;
+            }
+
+            if (source.equals(D) && target.equals(E)) {
+                return true;
+            }
+
+            return false;
+        };
+
         // Compute scores
-        Map<CyNode, Double> scores = scoringAlg.computeScores(pathsToTargets, pathsToOffTargets);
+        Map<CyNode, Double> scores = scoringAlg.computeScores(pathsToTargets, pathsToOffTargets, inhibitionEdgeTester);
 
         // Tests
-        //assertEquals("Toy network score: A", -2.0d, scores.get(A), 0.0d);
+        assertEquals("Toy network score: A", 0.0d, scores.get(A), 0.0d);
         assertEquals("Toy network score: B", 4.0d, scores.get(B), 0.0d);
         assertEquals("Toy network score: C", 3.75d, scores.get(C), 0.0d);
-        //assertEquals("Toy network score: D", -1.0d, scores.get(D), 0.0d);
+        //assertEquals("Toy network score: D", -1.0d, scores.get(D), 0.0d); // TODO: write a test once this case is defined
         assertEquals("Toy network score: E", 18.0d, scores.get(E), 0.0d);
         assertEquals("Toy network score: F", 2.66d, scores.get(F), 0.01d);
     }

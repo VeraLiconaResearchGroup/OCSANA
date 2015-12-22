@@ -12,6 +12,7 @@ package org.compsysmed.ocsana.internal.algorithms.scoring;
 
 // Java imports
 import java.util.*;
+import java.util.function.Predicate;
 
 // Cytoscape imports
 import org.cytoscape.work.Tunable;
@@ -75,10 +76,13 @@ public class OCSANAScoringAlgorithm
      *
      * @param pathsToTargets  the paths to the target nodes
      * @param pathsToOffTargets  the paths to the off-target nodes
+     * @param inhibitionEdgeTester function which returns true if the given
+     * edge is negative (i.e. inhibition)
      * @param Map assigning to each node its OCSANA score
      **/
     public Map<CyNode, Double> computeScores (Collection<List<CyEdge>> pathsToTargets,
-                                              Collection<List<CyEdge>> pathsToOffTargets) {
+                                              Collection<List<CyEdge>> pathsToOffTargets,
+                                              Predicate<CyEdge> inhibitionEdgeTester) {
         if (!computeScores) {
             return null;
         }
@@ -104,8 +108,8 @@ public class OCSANAScoringAlgorithm
         Set<CyNode> elementaryNodes = new HashSet<>();
 
         // Compute scores for nodes by iterating over paths
-        scoreNodesInPaths(pathsToTargets, effectsOnTargets, countPathsToTargets, targetsHitDownstream, targetsHitByAllPaths, elementaryNodes, true);
-        scoreNodesInPaths(pathsToOffTargets, effectsOnOffTargets, countPathsToOffTargets, offTargetsHitDownstream, offTargetsHitByAllPaths, elementaryNodes, false);
+        scoreNodesInPaths(pathsToTargets, effectsOnTargets, countPathsToTargets, targetsHitDownstream, targetsHitByAllPaths, elementaryNodes, inhibitionEdgeTester);
+        scoreNodesInPaths(pathsToOffTargets, effectsOnOffTargets, countPathsToOffTargets, offTargetsHitDownstream, offTargetsHitByAllPaths, elementaryNodes, (CyEdge edge) -> false);
 
         // Compute total scores for nodes
         Map<CyNode, Double> ocsanaScores = scoreNodes(effectsOnTargets, countPathsToTargets, targetsHitDownstream, targetsHitByAllPaths, effectsOnOffTargets, countPathsToOffTargets, offTargetsHitDownstream, offTargetsHitByAllPaths, elementaryNodes);
@@ -126,7 +130,8 @@ public class OCSANAScoringAlgorithm
      * @param endpointDownstreamMap  Map to store endpoints downstream of each node (updated in-place)
      * @param allEndpointsHit  Set to store endpoints hit by these paths (updated in-place)
      * @param elementaryNodes  Set to store nodes found in these paths (updated in-place)
-     * @param useEdgeSigns  if true, paths will be weighted ±1 according to the signs of their edges
+     * @param inhibitionEdgeTester  should return true if the given
+     * edge is negative (i.e. inhibition)
      **/
     private void scoreNodesInPaths (Collection<List<CyEdge>> paths,
                                     Map<CyNode, Double> scoreMap,
@@ -134,7 +139,7 @@ public class OCSANAScoringAlgorithm
                                     Map<CyNode, Set<CyNode>> endpointDownstreamMap,
                                     Set<CyNode> allEndpointsHit,
                                     Set<CyNode> elementaryNodes,
-                                    Boolean useEdgeSigns) {
+                                    Predicate<CyEdge> inhibitionEdgeTester) {
         // TODO: Handle null arguments
 
         // Iterate over the paths
@@ -172,7 +177,7 @@ public class OCSANAScoringAlgorithm
                 CyNode edgeSource = edge.getSource();
                 Integer subPathLength = path.size() - i;
 
-                if (useEdgeSigns && edgeIsNegative(edge)) {
+                if (inhibitionEdgeTester.test(edge)) {
                     pathSign *= -1;
                 }
 
@@ -193,16 +198,6 @@ public class OCSANAScoringAlgorithm
                 elementaryNodes.add(edgeSource);
             }
         }
-    }
-
-    /**
-     * Determine whether an edge is negative (inhibitory)
-     *
-     * NOTE: Not yet implemented; always returns false.
-     **/
-    public Boolean edgeIsNegative (CyEdge edge) {
-        // TODO: Write this!
-        return false;
     }
 
     /**
@@ -231,6 +226,7 @@ public class OCSANAScoringAlgorithm
         Map<CyNode, Double> scores = new HashMap<>();
 
         for (CyNode node: elementaryNodes) {
+            // TODO: Handle case that node is an off/target
             // EFFECT_ON_TARGETS term of OVERALL score
             Double targetSubScore;
             if (targetsHitByAllPaths.isEmpty()) {
@@ -251,13 +247,14 @@ public class OCSANAScoringAlgorithm
 
             // OVERALL
             Double overallScore = targetSubScore - sideEffectSubScore;
-            if (overallScore < 0) {
-                overallScore = 0.0;
-            }
 
             // OCSANA
-            Double ocsanaScore = overallScore * countPathsToTargets.getOrDefault(node, 0);
-            scores.put(node, ocsanaScore);
+            if (overallScore > 0d) {
+                Double ocsanaScore = overallScore * countPathsToTargets.getOrDefault(node, 0);
+                scores.put(node, ocsanaScore);
+            } else {
+                scores.put(node, 0d);
+            }
         }
 
         return scores;
