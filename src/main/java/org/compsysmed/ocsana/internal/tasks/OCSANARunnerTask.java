@@ -31,6 +31,7 @@ import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNode;
 
 // OCSANA imports
+import org.compsysmed.ocsana.internal.tasks.edgeprocessing.EdgeProcessor;
 import org.compsysmed.ocsana.internal.algorithms.path.AbstractPathFindingAlgorithm;
 import org.compsysmed.ocsana.internal.algorithms.mhs.AbstractMHSAlgorithm;
 import org.compsysmed.ocsana.internal.algorithms.scoring.OCSANAScoringAlgorithm;
@@ -85,6 +86,7 @@ public class OCSANARunnerTask extends AbstractNetworkTask
     public OCSANARunnerTask (CyNetwork network,
                              TaskManager<?, ?> taskManager,
                              OCSANAResultsPanel resultsPanel,
+                             EdgeProcessor edgeProcessor,
                              AbstractPathFindingAlgorithm pathFindingAlg,
                              OCSANAScoringAlgorithm ocsanaAlg,
                              AbstractMHSAlgorithm mhsAlg,
@@ -102,6 +104,7 @@ public class OCSANARunnerTask extends AbstractNetworkTask
 
         results = new OCSANAResults();
         results.network = network;
+        results.edgeProcessor = edgeProcessor;
         results.pathFindingAlg = pathFindingAlg;
         results.ocsanaAlg = ocsanaAlg;
         results.mhsAlg = mhsAlg;

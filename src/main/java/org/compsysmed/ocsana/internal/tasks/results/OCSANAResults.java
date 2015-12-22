@@ -21,6 +21,7 @@ import org.cytoscape.model.CyIdentifiable;
 import org.cytoscape.model.CyNetwork;
 
 // OCSANA imports
+import org.compsysmed.ocsana.internal.tasks.edgeprocessing.EdgeProcessor;
 import org.compsysmed.ocsana.internal.algorithms.path.AbstractPathFindingAlgorithm;
 import org.compsysmed.ocsana.internal.algorithms.mhs.AbstractMHSAlgorithm;
 import org.compsysmed.ocsana.internal.algorithms.scoring.OCSANAScoringAlgorithm;
@@ -28,6 +29,7 @@ import org.compsysmed.ocsana.internal.algorithms.scoring.OCSANAScoringAlgorithm;
 public class OCSANAResults {
     // User inputs
     public CyNetwork network;
+    public EdgeProcessor edgeProcessor;
     public Set<CyNode> sourceNodes;
     public Set<CyNode> targetNodes;
     public Set<CyNode> offTargetNodes;
@@ -117,8 +119,7 @@ public class OCSANAResults {
 
         // Each other node is a target
         for (CyEdge edge: path) {
-            // TODO: Handle activation and inhibition symbols
-            if (ocsanaAlg.edgeIsNegative(edge)) {
+            if (edgeProcessor.edgeIsInhibition(edge)) {
                 result += " -| ";
             } else {
                 result += " -> ";
@@ -200,7 +201,7 @@ public class OCSANAResults {
         reportLines.add("");
 
         // TODO: Proper reporting for scoring
-        if (results.ocsanaScores != null) {
+        if (ocsanaScores != null) {
             String scoringSummaryString = "Scored elementary nodes in " + scoringExecutionSeconds + " s.";
             reportLines.add(scoringSummaryString);
             reportLines.add("");

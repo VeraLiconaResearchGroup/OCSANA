@@ -35,6 +35,7 @@ import org.compsysmed.ocsana.internal.algorithms.mhs.AbstractMHSAlgorithm;
 
 import org.compsysmed.ocsana.internal.tasks.OCSANARunnerTask;
 import org.compsysmed.ocsana.internal.tasks.nodeselection.NodeSetSelecter;
+import org.compsysmed.ocsana.internal.tasks.edgeprocessing.EdgeProcessor;
 import org.compsysmed.ocsana.internal.tasks.path.PathFindingAlgorithmSelecter;
 import org.compsysmed.ocsana.internal.tasks.mhs.MHSAlgorithmSelecter;
 
@@ -61,6 +62,9 @@ public class OCSANACoordinatorTask extends AbstractNetworkTask {
     public NodeSetSelecter nodeSelecter;
 
     @ContainsTunables
+    public EdgeProcessor edgeProcessor;
+
+    @ContainsTunables
     public PathFindingAlgorithmSelecter pathAlgSelecter;
 
     @ContainsTunables
@@ -82,6 +86,7 @@ public class OCSANACoordinatorTask extends AbstractNetworkTask {
         this.resultsPanel = resultsPanel;
 
         nodeSelecter = new NodeSetSelecter(network);
+        edgeProcessor = new EdgeProcessor(network);
         pathAlgSelecter = new PathFindingAlgorithmSelecter(network);
         mhsAlgSelecter = new MHSAlgorithmSelecter(network);
         ocsanaAlgorithm = new OCSANAScoringAlgorithm(network);
@@ -104,6 +109,7 @@ public class OCSANACoordinatorTask extends AbstractNetworkTask {
         OCSANARunnerTask runnerTask = new OCSANARunnerTask(network,
                                                            taskManager,
                                                            resultsPanel,
+                                                           edgeProcessor,
                                                            pathAlgorithm,
                                                            ocsanaAlgorithm,
                                                            mhsAlgorithm,
