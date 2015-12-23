@@ -42,12 +42,19 @@ public class CIPanel
             Vector<Vector<Object>> mhsRows = getMHSRows(results);
 
             TableModel mhsModel = new DefaultTableModel(mhsRows, mhsCols) {
+                    @Override
                     public Class<?> getColumnClass(int column) {
                         try {
                             return getValueAt(0, column).getClass();
                         } catch (ArrayIndexOutOfBoundsException exception) {
                             return Object.class;
                         }
+                    }
+
+                    // Disable cell editing
+                    @Override
+                    public boolean isCellEditable(int row, int column) {
+                        return false;
                     }
                 };
 
