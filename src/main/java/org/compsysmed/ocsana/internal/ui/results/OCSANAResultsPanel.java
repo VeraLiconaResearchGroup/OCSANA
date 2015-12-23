@@ -33,13 +33,12 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 
-import javax.swing.border.TitledBorder;
-
 // Cytoscape imports
 import org.cytoscape.application.swing.CySwingApplication;
 import org.cytoscape.application.swing.CytoPanel;
 import org.cytoscape.application.swing.CytoPanelComponent;
 import org.cytoscape.application.swing.CytoPanelName;
+import org.cytoscape.application.swing.CytoPanelState;
 
 // OCSANA imports
 import org.compsysmed.ocsana.internal.tasks.results.OCSANAResults;
@@ -73,6 +72,10 @@ public class OCSANAResultsPanel
         buildPanel();
         revalidate();
         repaint();
+
+        if (cyResultsPanel.getState() == CytoPanelState.HIDE) {
+            cyResultsPanel.setState(CytoPanelState.DOCK);
+        }
     }
 
     /**
@@ -167,7 +170,7 @@ public class OCSANAResultsPanel
 
         JTabbedPane resultsTabbedPane = new JTabbedPane();
         resultsPanel.add(resultsTabbedPane, BorderLayout.CENTER);
-        resultsPanel.setBorder(new TitledBorder("Results"));
+        resultsPanel.setBorder(null);
 
         if (results.MHSes != null) {
             CIPanel ciPanel = new CIPanel(results);
