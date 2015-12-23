@@ -81,6 +81,10 @@ public class EdgeProcessor {
     }
 
     public Boolean edgeIsInhibition (CyEdge edge) {
+        if (!processEdgeSigns) {
+            return false;
+        }
+
         assert network.containsEdge(edge);
 
         CyRow edgeRow = network.getDefaultEdgeTable().getRow(edge.getSUID());
