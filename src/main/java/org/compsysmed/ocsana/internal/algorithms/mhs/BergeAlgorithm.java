@@ -105,14 +105,14 @@ public class BergeAlgorithm extends AbstractMHSAlgorithm {
             // Extend each transversal with each element of the edge
             Hypergraph newTransversals = new Hypergraph();
             for (BitSet transversal: transversals) {
-                if (useMaxCardinality && transversal.cardinality() >= maxCardinalityBInt.getValue()) {
-                    continue;
-                }
-
                 for (int e = edge.nextSetBit(0); e >= 0; e = edge.nextSetBit(e+1)) {
                     BitSet newTransversal = (BitSet) transversal.clone();
                     newTransversal.set(e);
-                    newTransversals.add(newTransversal);
+
+                    // Keep the new transversal if the cardinality conditions are satisfied (if applicable)
+                    if (!useMaxCardinality || newTransversal.cardinality() <= maxCardinalityBInt.getValue()) {
+                        newTransversals.add(newTransversal);
+                    }
                 }
             }
 
