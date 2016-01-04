@@ -24,6 +24,7 @@ import org.cytoscape.model.CyNetwork;
 
 // OCSANA imports
 import org.compsysmed.ocsana.internal.algorithms.mhs.AbstractMHSAlgorithm;
+import org.compsysmed.ocsana.internal.algorithms.mhs.BergeAlgorithm;
 import org.compsysmed.ocsana.internal.algorithms.mhs.MMCSAlgorithm;
 import org.compsysmed.ocsana.internal.algorithms.mhs.RSAlgorithm;
 
@@ -35,7 +36,7 @@ import org.compsysmed.ocsana.internal.algorithms.mhs.RSAlgorithm;
 public class MHSAlgorithmSelecter {
     @Tunable(description = "MHS algorithm",
              gravity = 350,
-             tooltip = "MMCS is usually the fastest",
+             tooltip = "MMCS is usually the fastest. Berge's algorithm is very slow and is included here only for comparison purposes.",
              groups = {"Find minimal CIs"})
     public ListSingleSelection<AbstractMHSAlgorithm> algorithmSelecter;
 
@@ -57,6 +58,7 @@ public class MHSAlgorithmSelecter {
         List<AbstractMHSAlgorithm> algorithms = new ArrayList<>();
         algorithms.add(new MMCSAlgorithm());
         algorithms.add(new RSAlgorithm());
+        algorithms.add(new BergeAlgorithm());
 
         // Then we populate the ListSingleSelection.
         algorithmSelecter = new ListSingleSelection<>(algorithms);

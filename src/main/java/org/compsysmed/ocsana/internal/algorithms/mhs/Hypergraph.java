@@ -246,7 +246,7 @@ public class Hypergraph extends ArrayList<BitSet> {
                 BitSet intersection = (BitSet) confirmedEdge.clone();
                 intersection.and(edge);
 
-                if (intersection == confirmedEdge) {
+                if (intersection.equals(confirmedEdge)) {
                     edgeIsMinimal = false;
                     break;
                 }
