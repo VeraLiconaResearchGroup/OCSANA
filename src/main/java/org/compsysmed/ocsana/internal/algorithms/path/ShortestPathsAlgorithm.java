@@ -193,7 +193,7 @@ public class ShortestPathsAlgorithm
             }
         }
 
-        assert incompletePaths.size() == 0;
+        assert incompletePaths.isEmpty();
         return completePaths;
     }
 
