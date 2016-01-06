@@ -100,6 +100,7 @@ public class BergeAlgorithm extends AbstractMHSAlgorithm {
             for (int e = edge.nextSetBit(0); e >= 0; e = edge.nextSetBit(e+1)) {
                 // Handle cancellation
                 if (isCanceled()) {
+                    transversals.clear();
                     return;
                 }
 
@@ -107,23 +108,40 @@ public class BergeAlgorithm extends AbstractMHSAlgorithm {
                 newTransversal.set(e);
                 transversals.add(newTransversal);
             }
+
+            assert transversals.size() == edge.cardinality();
         } else {
             // Extend each transversal with each element of the edge
             Hypergraph newTransversals = new Hypergraph();
             for (BitSet transversal: transversals) {
-                for (int e = edge.nextSetBit(0); e >= 0; e = edge.nextSetBit(e+1)) {
-                    // Handle cancellation
-                    if (isCanceled()) {
-                        transversals.clear();
-                        return;
-                    }
+                // Handle cancellation
+                if (isCanceled()) {
+                    transversals.clear();
+                    return;
+                }
 
-                    BitSet newTransversal = (BitSet) transversal.clone();
-                    newTransversal.set(e);
+                if (transversal.intersects(edge)) {
+                    // If the transversal hits this edge, we don't need to extend it
+                    newTransversals.add(transversal);
+                } else {
+                    // Otherwise, we extend it by adding the elements
+                    // of the edge, one at a time
+                    for (int e = edge.nextSetBit(0); e >= 0; e = edge.nextSetBit(e+1)) {
+                        // Handle cancellation
+                        if (isCanceled()) {
+                            transversals.clear();
+                            return;
+                        }
 
-                    // Keep the new transversal if the cardinality conditions are satisfied (if applicable)
-                    if (!useMaxCardinality || newTransversal.cardinality() <= maxCardinalityBInt.getValue()) {
-                        newTransversals.add(newTransversal);
+                        BitSet newTransversal = (BitSet) transversal.clone();
+                        newTransversal.set(e);
+
+                        assert newTransversal.cardinality() == transversal.cardinality() + 1;
+
+                        // Keep the new transversal if the cardinality conditions are satisfied (if applicable)
+                        if (!useMaxCardinality || newTransversal.cardinality() <= maxCardinalityBInt.getValue()) {
+                            newTransversals.add(newTransversal);
+                        }
                     }
                 }
             }
