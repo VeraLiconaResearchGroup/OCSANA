@@ -208,20 +208,15 @@ public class Hypergraph extends ArrayList<BitSet> {
     };
 
     /**
-     * Return the minimization of this {@code Hypergraph}.
+     * Minimize this {@code Hypergraph} in place.
      *
-     * The result has the same vertices as this and all the
-     * inclusion-minimal edges of this.
+     * That is, discard any edge which is a superset of any other edge.
      *
-     * Note: this algorithm is O(n²) and should be used with caution
-     * in performance-sensitive contexts.
-     *
-     * @return a new {@code Hypergraph} which is the minimization of
-     * this
+     * NOTE: The implementation of this algorithm will re-order edges.
      **/
-    public Hypergraph minimization () {
+    public void minimize () {
         if (size() == 0) {
-            return this;
+            return;
         }
 
         // Sort edges by increasing cardinality, since subsets must be
@@ -234,7 +229,7 @@ public class Hypergraph extends ArrayList<BitSet> {
             });
 
         // Build a new hypergraph with only the inclusion-minimal edges
-        Hypergraph result = new Hypergraph(numVerts);
+        this.clear();
         for (BitSet edge: edgesSortedByIncreasingCardinality) {
             if (edge.isEmpty()) {
                 continue;
@@ -242,7 +237,7 @@ public class Hypergraph extends ArrayList<BitSet> {
 
             // Check whether any confirmed edge is a subset of this edge
             boolean edgeIsMinimal = true;
-            for (BitSet confirmedEdge: result) {
+            for (BitSet confirmedEdge: this) {
                 BitSet intersection = (BitSet) confirmedEdge.clone();
                 intersection.and(edge);
 
@@ -254,10 +249,28 @@ public class Hypergraph extends ArrayList<BitSet> {
 
             // Add the edge if appropriate
             if (edgeIsMinimal) {
-                result.add(edge);
+                add(edge);
             }
         }
 
+        updateNumVerts();
+    }
+
+    /**
+     * Return the minimization of this {@code Hypergraph}.
+     *
+     * The result has the same vertices as this and all the
+     * inclusion-minimal edges of this.
+     *
+     * Note: this algorithm is O(n²) and should be used with caution
+     * in performance-sensitive contexts.
+     *
+     * @return a new {@code Hypergraph} which is the minimization of
+     * this
+     **/
+    public Hypergraph minimization () {
+        Hypergraph result = new Hypergraph(this);
+        result.minimize();
         return result;
     };
 
