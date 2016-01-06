@@ -46,7 +46,8 @@ public class HypergraphOfSetsOfCyNodes extends Hypergraph {
             }
             add(newEdge);
         }
-        updateNumVerts();
+
+        minimize();
     }
 
     /**
