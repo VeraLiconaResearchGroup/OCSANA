@@ -67,10 +67,11 @@ public class MMCSAlgorithmTest {
         throws FileNotFoundException, IOException, NumberFormatException {
         File HER2File = new File(getClass().getResource("/mhs-data/HER2.all.dat").getFile());
         Hypergraph H = new Hypergraph(HER2File);
+        H.minimize(); // Algorithm is much faster with minimized input
 
         Hypergraph T = algCutoff.transversalHypergraph(H);
 
-        assertEquals("Transversal count", 320, T.numEdges());
+        assertEquals("Transversal count (cutoff 6)", 320, T.numEdges());
 
         for (BitSet transversal: T) {
             assertTrue("Transversal condition", H.isTransversedBy(transversal));

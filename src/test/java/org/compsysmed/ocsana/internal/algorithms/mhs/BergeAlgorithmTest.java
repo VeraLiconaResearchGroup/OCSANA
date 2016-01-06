@@ -32,7 +32,7 @@ public class BergeAlgorithmTest {
 
         algCutoff = new BergeAlgorithm();
         algCutoff.useMaxCardinality = true;
-        algCutoff.maxCardinalityBInt.setValue(6);
+        algCutoff.maxCardinalityBInt.setValue(5);
 
         List<List<Integer>> smallHypergraphEdges = new ArrayList<>();
         smallHypergraphEdges.add(Arrays.asList(1, 2, 5));
@@ -62,15 +62,16 @@ public class BergeAlgorithmTest {
         }
     }
 
-    @Ignore("Berge's algorithm is too slow for this input")
+    @Test
     public void hugeHypergraphCutoffTransversalShouldWork ()
         throws FileNotFoundException, IOException, NumberFormatException {
         File HER2File = new File(getClass().getResource("/mhs-data/HER2.all.dat").getFile());
         Hypergraph H = new Hypergraph(HER2File);
+        H.minimize(); // Algorithm is much faster with minimized input
 
         Hypergraph T = algCutoff.transversalHypergraph(H);
 
-        assertEquals("Transversal count", 320, T.numEdges());
+        assertEquals("Transversal count (cutoff 5)", 40, T.numEdges());
 
         for (BitSet transversal: T) {
             assertTrue("Transversal condition", H.isTransversedBy(transversal));
