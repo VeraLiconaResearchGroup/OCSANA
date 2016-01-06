@@ -62,11 +62,9 @@ public class PathFindingAlgorithmTask extends AbstractOCSANATask {
             throw new IllegalStateException("Nodes not set by user.");
         }
 
-        taskMonitor.setTitle("Paths to " + targetType + "s");
+        taskMonitor.setTitle(String.format("Paths to %ss", targetType));
 
-        taskMonitor.setStatusMessage("Finding paths from " +
-                                     results.sourceNodes.size() + " source nodes to to " +
-                                     targetsForThisRun.size() + " " + targetType + " nodes.");
+        taskMonitor.setStatusMessage(String.format("Finding paths from %d source nodes to %d %s nodes (algorithm: %s).", results.sourceNodes.size(), targetsForThisRun.size(), targetType, results.pathFindingAlg.shortName()));
 
         Long preTime = System.nanoTime();
         paths = results.pathFindingAlg.paths(results.sourceNodes, targetsForThisRun);
@@ -89,7 +87,7 @@ public class PathFindingAlgorithmTask extends AbstractOCSANATask {
             throw new IllegalStateException("Invalid algorithm step for path-finding");
         }
 
-        taskMonitor.showMessage(TaskMonitor.Level.INFO, "Found " + paths.size() + " paths in " + runTime + "s.");
+        taskMonitor.showMessage(TaskMonitor.Level.INFO, String.format("Found %d paths in %fs.", paths.size(), runTime));
     }
 
     public Collection<List<CyEdge>> getPaths () {

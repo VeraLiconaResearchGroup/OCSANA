@@ -51,7 +51,7 @@ public class MHSAlgorithmTask extends AbstractOCSANATask {
             throw new IllegalStateException("Paths to targets not set.");
         }
 
-        taskMonitor.setStatusMessage("Converting " + results.pathsToTargets.size() + " paths to node sets,");
+        taskMonitor.setStatusMessage(String.format("Converting %d paths to node sets.", results.pathsToTargets.size()));
         Long preConversionTime = System.nanoTime();
         List<Set<CyNode>> nodeSets = new ArrayList<>();
         for (List<CyEdge> path: results.pathsToTargets) {
@@ -76,16 +76,16 @@ public class MHSAlgorithmTask extends AbstractOCSANATask {
         Long postConversionTime = System.nanoTime();
 
         Double conversionTime = (postConversionTime - preConversionTime) / 1E9;
-        taskMonitor.setStatusMessage("Converted paths in " + conversionTime + "s.");
+        taskMonitor.setStatusMessage(String.format("Converted paths in %f s.", conversionTime));
 
-        taskMonitor.setStatusMessage("Finding minimal combinations of interventions.");
+        taskMonitor.setStatusMessage(String.format("Finding minimal combinations of interventions (algorithm: %s).", results.mhsAlg.shortName()));
 
         Long preMHSTime = System.nanoTime();
         results.MHSes = results.mhsAlg.MHSes(nodeSets);
         Long postMHSTime = System.nanoTime();
 
         Double mhsTime = (postMHSTime - preMHSTime) / 1E9;
-        taskMonitor.showMessage(TaskMonitor.Level.INFO, "Found " + results.MHSes.size() + " minimal CIs in " + mhsTime + "s.");
+        taskMonitor.showMessage(TaskMonitor.Level.INFO, String.format("Found %d minimal CIs in %f s.", results.MHSes.size(), mhsTime));
 
         results.mhsExecutionSeconds = mhsTime;
     }

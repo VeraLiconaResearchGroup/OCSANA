@@ -55,16 +55,16 @@ public class OCSANAScoringAlgorithmTask extends AbstractOCSANATask {
 
         Predicate<CyEdge> inhibitionEdgeTester = (CyEdge edge) -> results.edgeProcessor.edgeIsInhibition(edge);
 
-        taskMonitor.setTitle("Scoring");
+        taskMonitor.setTitle("OCSANA scoring");
 
-        taskMonitor.setStatusMessage("Computing scores.");
+        taskMonitor.setStatusMessage("Computing OCSANA scores.");
 
         Long preTime = System.nanoTime();
         results.ocsanaScores = results.ocsanaAlg.computeScores(results.pathsToTargets, results.pathsToOffTargets, inhibitionEdgeTester);
         Long postTime = System.nanoTime();
 
         Double runTime = (postTime - preTime) / 1E9;
-        taskMonitor.setStatusMessage("Scored nodes in " + runTime + "s.");
+        taskMonitor.setStatusMessage(String.format("Scored nodes in %fs.", runTime));
 
         results.scoringExecutionSeconds = runTime;
     }
