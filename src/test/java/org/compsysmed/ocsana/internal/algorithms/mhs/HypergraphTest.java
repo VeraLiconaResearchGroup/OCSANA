@@ -43,9 +43,11 @@ public class HypergraphTest {
         edges.add(Arrays.asList(1, 2, 5));
         edges.add(Arrays.asList(2, 3, 4));
         edges.add(Arrays.asList(1, 3));
+        edges.add(Arrays.asList(1, 3, 4));
 
         Hypergraph example = new Hypergraph(edges);
-        assertEquals("Hypergraph list constructor should preserve size", edges.size(), example.numEdges());
+        assertEquals("Edge count", edges.size(), example.numEdges());
+        assertEquals("Edge count (minimized)", 3, example.minimization().numEdges());
     }
 
     @Test
@@ -53,7 +55,9 @@ public class HypergraphTest {
         throws FileNotFoundException, IOException, NumberFormatException {
         File HER2File = new File(getClass().getResource("/mhs-data/HER2.all.dat").getFile());
         Hypergraph H = new Hypergraph(HER2File);
+
         assertEquals("Vertex count (file)", 320, H.numVerts());
         assertEquals("Edge count (file)", 69805, H.numEdges());
+        assertEquals("Edge count (minimized)", 5330, H.minimization().numEdges());
     }
 }
