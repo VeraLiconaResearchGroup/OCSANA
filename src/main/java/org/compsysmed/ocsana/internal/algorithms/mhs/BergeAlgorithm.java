@@ -80,6 +80,7 @@ public class BergeAlgorithm extends AbstractMHSAlgorithm {
             }
         }
 
+        // Handle cancellation
         return transversals;
     }
 
@@ -97,6 +98,11 @@ public class BergeAlgorithm extends AbstractMHSAlgorithm {
         if (transversals.isEmpty()) {
             // Create a singleton transversal from each element of edge
             for (int e = edge.nextSetBit(0); e >= 0; e = edge.nextSetBit(e+1)) {
+                // Handle cancellation
+                if (isCanceled()) {
+                    return;
+                }
+
                 BitSet newTransversal = new BitSet();
                 newTransversal.set(e);
                 transversals.add(newTransversal);
@@ -106,6 +112,12 @@ public class BergeAlgorithm extends AbstractMHSAlgorithm {
             Hypergraph newTransversals = new Hypergraph();
             for (BitSet transversal: transversals) {
                 for (int e = edge.nextSetBit(0); e >= 0; e = edge.nextSetBit(e+1)) {
+                    // Handle cancellation
+                    if (isCanceled()) {
+                        transversals.clear();
+                        return;
+                    }
+
                     BitSet newTransversal = (BitSet) transversal.clone();
                     newTransversal.set(e);
 
