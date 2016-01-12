@@ -25,6 +25,7 @@ import org.cytoscape.work.TaskIterator;
 import org.cytoscape.work.ObservableTask;
 import org.cytoscape.work.FinishStatus;
 import org.cytoscape.work.ContainsTunables;
+import org.cytoscape.work.ProvidesTitle;
 
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyEdge;
@@ -61,6 +62,11 @@ import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
 
 public class OCSANARunnerTask extends AbstractNetworkTask
     implements TaskObserver {
+    @ProvidesTitle
+    public String getTitle() {
+        return "OCSANA parameters II";
+    }
+
     // User-configurable options
 
     // In general, the Runner should only contain configuration

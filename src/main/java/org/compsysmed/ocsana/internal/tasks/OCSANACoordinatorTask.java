@@ -22,6 +22,7 @@ import org.cytoscape.work.TaskManager;
 import org.cytoscape.work.TaskMonitor;
 import org.cytoscape.work.TaskIterator;
 import org.cytoscape.work.ContainsTunables;
+import org.cytoscape.work.ProvidesTitle;
 
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
@@ -52,6 +53,11 @@ import org.compsysmed.ocsana.internal.tasks.mhs.MHSAlgorithmSelecter;
 
 public class OCSANACoordinatorTask extends AbstractNetworkTask {
     private TaskManager<?, ?> taskManager;
+
+    @ProvidesTitle
+    public String getTitle() {
+        return "OCSANA parameters I";
+    }
 
     // User-configurable options
 
