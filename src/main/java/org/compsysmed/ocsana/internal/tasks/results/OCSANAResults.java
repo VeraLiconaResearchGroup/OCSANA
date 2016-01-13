@@ -210,7 +210,6 @@ public class OCSANAResults {
         }
         reportLines.add("");
 
-        // TODO: Proper reporting for scoring
         if (ocsanaScores != null) {
             reportLines.add(String.format("Computed OCSANA scores in %fs.", OCSANAScoringExecutionSeconds));
             reportLines.add("");
@@ -232,8 +231,21 @@ public class OCSANAResults {
         reportLines.add("");
 
         for (Set<CyNode> mhs: MHSes) {
-            // TODO: handle scoring information
-            reportLines.add(nodeSetString(mhs));
+            String scoreReport = new String();
+
+            if (ocsanaScores != null) {
+                scoreReport += String.format("OCSANA: %f", mhs.stream().mapToDouble(node -> ocsanaScores.getOrDefault(node, 0d)).sum());
+            }
+
+            if (ocsanaScores != null && drugBankScores != null) {
+                scoreReport += ", ";
+            }
+
+            if (drugBankScores != null) {
+                scoreReport += String.format("DrugBank: %f", mhs.stream().mapToDouble(node -> drugBankScores.getOrDefault(node, 0d)).sum());
+            }
+
+            reportLines.add(String.format("%s (%s)", nodeSetString(mhs), scoreReport));
         }
     }
 }
