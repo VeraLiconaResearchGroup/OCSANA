@@ -35,13 +35,15 @@ import org.cytoscape.model.CyNode;
 import org.compsysmed.ocsana.internal.tasks.edgeprocessing.EdgeProcessor;
 import org.compsysmed.ocsana.internal.algorithms.path.AbstractPathFindingAlgorithm;
 import org.compsysmed.ocsana.internal.algorithms.mhs.AbstractMHSAlgorithm;
+
 import org.compsysmed.ocsana.internal.algorithms.scoring.OCSANAScoringAlgorithm;
+import org.compsysmed.ocsana.internal.algorithms.scoring.DrugBankScoringAlgorithm;
 
 import org.compsysmed.ocsana.internal.tasks.path.PathFindingAlgorithmTask;
 import org.compsysmed.ocsana.internal.tasks.path.PathFindingAlgorithmTaskFactory;
 
-import org.compsysmed.ocsana.internal.tasks.scoring.OCSANAScoringAlgorithmTask;
-import org.compsysmed.ocsana.internal.tasks.scoring.OCSANAScoringAlgorithmTaskFactory;
+import org.compsysmed.ocsana.internal.tasks.scoring.ScoringTask;
+import org.compsysmed.ocsana.internal.tasks.scoring.ScoringTaskFactory;
 
 import org.compsysmed.ocsana.internal.tasks.mhs.MHSAlgorithmTask;
 import org.compsysmed.ocsana.internal.tasks.mhs.MHSAlgorithmTaskFactory;
@@ -95,6 +97,7 @@ public class OCSANARunnerTask extends AbstractNetworkTask
                              EdgeProcessor edgeProcessor,
                              AbstractPathFindingAlgorithm pathFindingAlg,
                              OCSANAScoringAlgorithm ocsanaAlg,
+                             DrugBankScoringAlgorithm drugBankAlg,
                              AbstractMHSAlgorithm mhsAlg,
                              Boolean includeEndpointsInCIs,
                              Set<CyNode> sourceNodes,
@@ -113,6 +116,7 @@ public class OCSANARunnerTask extends AbstractNetworkTask
         results.edgeProcessor = edgeProcessor;
         results.pathFindingAlg = pathFindingAlg;
         results.ocsanaAlg = ocsanaAlg;
+        results.drugBankAlg = drugBankAlg;
         results.mhsAlg = mhsAlg;
 
         results.includeEndpointsInCIs = includeEndpointsInCIs;
@@ -153,8 +157,8 @@ public class OCSANARunnerTask extends AbstractNetworkTask
     }
 
     private void spawnScoringTask () {
-        OCSANAScoringAlgorithmTaskFactory scoringTaskFactory =
-            new OCSANAScoringAlgorithmTaskFactory(results);
+        ScoringTaskFactory scoringTaskFactory =
+            new ScoringTaskFactory(results);
 
         taskManager.execute(scoringTaskFactory.createTaskIterator(), this);
     }

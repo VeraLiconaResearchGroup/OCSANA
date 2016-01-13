@@ -32,6 +32,7 @@ import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
 
 import org.compsysmed.ocsana.internal.algorithms.path.AbstractPathFindingAlgorithm;
 import org.compsysmed.ocsana.internal.algorithms.scoring.OCSANAScoringAlgorithm;
+import org.compsysmed.ocsana.internal.algorithms.scoring.DrugBankScoringAlgorithm;
 import org.compsysmed.ocsana.internal.algorithms.mhs.AbstractMHSAlgorithm;
 
 import org.compsysmed.ocsana.internal.tasks.OCSANARunnerTask;
@@ -77,6 +78,9 @@ public class OCSANACoordinatorTask extends AbstractNetworkTask {
     public OCSANAScoringAlgorithm ocsanaAlgorithm;
 
     @ContainsTunables
+    public DrugBankScoringAlgorithm drugBankAlgorithm;
+
+    @ContainsTunables
     public MHSAlgorithmSelecter mhsAlgSelecter;
 
     // End user configuration
@@ -96,6 +100,7 @@ public class OCSANACoordinatorTask extends AbstractNetworkTask {
         pathAlgSelecter = new PathFindingAlgorithmSelecter(network);
         mhsAlgSelecter = new MHSAlgorithmSelecter(network);
         ocsanaAlgorithm = new OCSANAScoringAlgorithm(network);
+        drugBankAlgorithm = new DrugBankScoringAlgorithm(network);
     }
 
     public void run (TaskMonitor taskMonitor) {
@@ -118,6 +123,7 @@ public class OCSANACoordinatorTask extends AbstractNetworkTask {
                                                            edgeProcessor,
                                                            pathAlgorithm,
                                                            ocsanaAlgorithm,
+                                                           drugBankAlgorithm,
                                                            mhsAlgorithm,
                                                            includeEndpointsInCIs,
                                                            sourceNodes,

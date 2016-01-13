@@ -22,9 +22,13 @@ import org.cytoscape.model.CyNetwork;
 
 // OCSANA imports
 import org.compsysmed.ocsana.internal.tasks.edgeprocessing.EdgeProcessor;
+
 import org.compsysmed.ocsana.internal.algorithms.path.AbstractPathFindingAlgorithm;
+
 import org.compsysmed.ocsana.internal.algorithms.mhs.AbstractMHSAlgorithm;
+
 import org.compsysmed.ocsana.internal.algorithms.scoring.OCSANAScoringAlgorithm;
+import org.compsysmed.ocsana.internal.algorithms.scoring.DrugBankScoringAlgorithm;
 
 public class OCSANAResults {
     // User inputs
@@ -46,9 +50,11 @@ public class OCSANAResults {
     // Scoring data
     public OCSANAScoringAlgorithm ocsanaAlg;
     public Map<CyNode, Double> ocsanaScores;
-    public Boolean scoringCanceled = false;
+    public Double OCSANAScoringExecutionSeconds;
 
-    public Double scoringExecutionSeconds;
+    public DrugBankScoringAlgorithm drugBankAlg;
+    public Map<CyNode, Double> drugBankScores;
+    public Double drugBankScoringExecutionSeconds;
 
     // MHS data
     public AbstractMHSAlgorithm mhsAlg;
@@ -207,11 +213,18 @@ public class OCSANAResults {
 
         // TODO: Proper reporting for scoring
         if (ocsanaScores != null) {
-            String scoringSummaryString = "Scored elementary nodes in " + scoringExecutionSeconds + " s.";
-            reportLines.add(scoringSummaryString);
+            reportLines.add(String.format("Computed OCSANA scores in %fs.", OCSANAScoringExecutionSeconds));
             reportLines.add("");
         } else {
-            reportLines.add("Scoring disabled.");
+            reportLines.add("OCSANA scoring disabled.");
+            reportLines.add("");
+        }
+
+        if (drugBankScores != null) {
+            reportLines.add(String.format("Computed DrugBank scores in %fs.", drugBankScoringExecutionSeconds));
+            reportLines.add("");
+        } else {
+            reportLines.add("DrugBank scoring disabled.");
             reportLines.add("");
         }
 

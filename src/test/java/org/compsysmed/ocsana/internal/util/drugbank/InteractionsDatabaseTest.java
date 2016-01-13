@@ -7,6 +7,7 @@
 package org.compsysmed.ocsana.internal.util.drugbank;
 
 // Java imports
+import java.util.*;
 import java.io.IOException;
 
 // JUnit imports
@@ -20,6 +21,14 @@ public class InteractionsDatabaseTest {
     @Test
     public void buildDatabaseShouldWork () {
         InteractionsDatabase db = InteractionsDatabase.getDB();
-        assertEquals("Number of genes in database", 1142, db.genes.size());
+        assertEquals("Number of genes in database", 1142, db.numGenes());
+    }
+
+    @Test
+    public void emptyDrugNamesForBadGene () {
+        InteractionsDatabase db = InteractionsDatabase.getDB();
+        Set<String> bogusGeneNames = db.drugNamesForGene("BogusGene");
+        assertNotNull("Set of gene names", bogusGeneNames);
+        assertTrue("Set of gene names should be empty", bogusGeneNames.isEmpty());
     }
 }

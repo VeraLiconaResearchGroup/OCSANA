@@ -29,12 +29,12 @@ import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
 
 import org.compsysmed.ocsana.internal.tasks.results.OCSANAResults;
 
-public class OCSANAScoringAlgorithmTask extends AbstractOCSANATask {
+public class ScoringTask extends AbstractOCSANATask {
     private static final OCSANAStep algStep = OCSANAStep.SCORE_PATHS;
 
     private OCSANAResults results;
 
-    public OCSANAScoringAlgorithmTask (OCSANAResults results) {
+    public ScoringTask (OCSANAResults results) {
         super(results.network);
         this.results = results;
     }
@@ -42,10 +42,6 @@ public class OCSANAScoringAlgorithmTask extends AbstractOCSANATask {
     @Override
     public void run (TaskMonitor taskMonitor) {
         if (results.pathFindingCanceled) {
-            return;
-        }
-
-        if (!results.ocsanaAlg.computeScores) {
             return;
         }
 
@@ -59,14 +55,23 @@ public class OCSANAScoringAlgorithmTask extends AbstractOCSANATask {
 
         taskMonitor.setStatusMessage("Computing OCSANA scores.");
 
-        Long preTime = System.nanoTime();
+        Long OCSANAPreTime = System.nanoTime();
         results.ocsanaScores = results.ocsanaAlg.computeScores(results.pathsToTargets, results.pathsToOffTargets, inhibitionEdgeTester);
-        Long postTime = System.nanoTime();
+        Long OCSANAPostTime = System.nanoTime();
 
-        Double runTime = (postTime - preTime) / 1E9;
-        taskMonitor.setStatusMessage(String.format("Scored nodes in %fs.", runTime));
+        Double OCSANARunTime = (OCSANAPostTime - OCSANAPreTime) / 1E9;
+        results.OCSANAScoringExecutionSeconds = OCSANARunTime;
+        taskMonitor.setStatusMessage(String.format("Computed OCSANA scores in %fs.", OCSANARunTime));
 
-        results.scoringExecutionSeconds = runTime;
+        taskMonitor.setStatusMessage("Computing DrugBank scores.");
+
+        Long DBPreTime = System.nanoTime();
+        results.drugBankScores = results.drugBankAlg.computeScores();
+        Long DBPostTime = System.nanoTime();
+
+        Double DBRunTime = (DBPostTime - DBPreTime) / 1E9;
+        results.drugBankScoringExecutionSeconds = DBRunTime;
+        taskMonitor.setStatusMessage(String.format("computed DrugBank scores in %fs.", DBRunTime));
     }
 
     @Override
@@ -83,6 +88,5 @@ public class OCSANAScoringAlgorithmTask extends AbstractOCSANATask {
     public void cancel () {
         super.cancel();
         results.ocsanaAlg.cancel();
-        results.scoringCanceled = true;
     }
 }

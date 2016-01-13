@@ -35,7 +35,7 @@ import org.compsysmed.ocsana.internal.tasks.results.OCSANAResults;
 public class CIPanel
     extends JPanel {
     private static final Vector<String> mhsCols =
-        new Vector<>(Arrays.asList(new String[] {"CI", "Size", "Score"}));
+        new Vector<>(Arrays.asList(new String[] {"CI", "Size", "OCSANA Score", "Undruggable nodes (DrugBank)"}));
 
     public CIPanel (OCSANAResults results) {
         if (results.MHSes != null) {
@@ -63,7 +63,10 @@ public class CIPanel
             // Sort the rows
             RowSorter<TableModel> mhsSorter = new TableRowSorter<TableModel>(mhsModel);
 
-            if (results.ocsanaScores != null) {
+            if (results.drugBankScores != null) {
+                // If we have DrugBank scores, sort in increasing order with respect to them
+                mhsSorter.toggleSortOrder(3);
+            } else if (results.ocsanaScores != null) {
                 // If we have OCSANA scores, sort in decreasing order with respect to them
                 mhsSorter.toggleSortOrder(2);
                 mhsSorter.toggleSortOrder(2);
@@ -79,7 +82,7 @@ public class CIPanel
             JScrollPane mhsScrollPane = new JScrollPane(mhsTable);
 
             setLayout(new BorderLayout());
-            String mhsText = "<html>" + "Found " + results.MHSes.size() + " optimal CIs in " + results.mhsExecutionSeconds + " s." + "<br />" + "Scored them in " + results.scoringExecutionSeconds + " s." + "</html>";
+            String mhsText = "<html>" + "Found " + results.MHSes.size() + " optimal CIs in " + results.mhsExecutionSeconds + " s." + "<br />" + "Scored them in " + results.OCSANAScoringExecutionSeconds + results.drugBankScoringExecutionSeconds + " s." + "</html>";
             add(new JLabel(mhsText), BorderLayout.PAGE_START);
             add(mhsScrollPane, BorderLayout.CENTER);
         }
@@ -95,13 +98,19 @@ public class CIPanel
             row.add(results.nodeSetString(MHS));
             row.add(MHS.size());
 
-            Double mhsScore = 0.0;
             if (results.ocsanaScores != null) {
-                for (CyNode node: MHS) {
-                    mhsScore += results.ocsanaScores.getOrDefault(node, 0.0);
-                }
+                // Sum OCSANA scores over all nodes in the MHS
+                row.add(MHS.stream().mapToDouble(node -> results.ocsanaScores.getOrDefault(node, 0d)).sum());
+            } else {
+                row.add(0d);
             }
-            row.add(mhsScore);
+
+            if (results.drugBankScores != null) {
+                // Sum DrugBank scores over all nodes in the MHS
+                row.add(MHS.stream().mapToDouble(node -> results.drugBankScores.getOrDefault(node, 0d)).sum());
+            } else {
+                row.add(0d);
+            }
 
             rows.add(row);
         }

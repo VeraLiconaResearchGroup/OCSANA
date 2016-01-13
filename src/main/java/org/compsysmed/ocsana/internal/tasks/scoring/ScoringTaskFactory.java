@@ -28,20 +28,20 @@ import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
 
 import org.compsysmed.ocsana.internal.tasks.results.OCSANAResults;
 
-public class OCSANAScoringAlgorithmTaskFactory extends AbstractTaskFactory {
+public class ScoringTaskFactory extends AbstractTaskFactory {
     private CyNetwork network;
 
     // User inputs
     private OCSANAResults results;
 
-    public OCSANAScoringAlgorithmTaskFactory (OCSANAResults results) {
+    public ScoringTaskFactory (OCSANAResults results) {
         this.results = results;
     }
 
     @Override
     public TaskIterator createTaskIterator () {
         TaskIterator tasks = new TaskIterator();
-        tasks.append(new OCSANAScoringAlgorithmTask(results));
+        tasks.append(new ScoringTask(results));
         return tasks;
     }
 }

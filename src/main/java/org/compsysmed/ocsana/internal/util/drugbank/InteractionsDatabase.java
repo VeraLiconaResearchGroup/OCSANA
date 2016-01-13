@@ -24,7 +24,8 @@ public class InteractionsDatabase {
     private static final String drugBankPath = "/drugbank/drugbank.json";
     private static InteractionsDatabase internalDB;
 
-    public List<Gene> genes = new ArrayList<>();
+    private List<Gene> genes = new ArrayList<>();
+    private Map<String, Gene> geneNameMap = new HashMap<>();
 
     public Set<String> interactionTypes = new HashSet<>();
 
@@ -60,6 +61,7 @@ public class InteractionsDatabase {
             }
 
             genes.add(gene);
+            geneNameMap.put(geneName, gene);
         }
     }
 
@@ -69,6 +71,40 @@ public class InteractionsDatabase {
         }
 
         return internalDB;
+    }
+
+    public Set<String> geneNames () {
+        Set<String> result = new HashSet<>();
+        for (Gene gene: genes) {
+            result.add(gene.name);
+        }
+        return result;
+    }
+
+    public int numGenes () {
+        return genes.size();
+    }
+
+    private Gene getGene (String geneName) {
+        return geneNameMap.get(geneName.toUpperCase());
+    }
+
+    public Set<String> drugNamesForGene (String geneName) {
+        Gene gene = getGene(geneName);
+        if (gene == null) {
+            return new HashSet<>();
+        } else {
+            return gene.drugNames();
+        }
+    }
+
+    public Map<String, Set<String>> drugInteractionGroupsForGene (String geneName) {
+        Gene gene = getGene(geneName);
+        if (gene == null) {
+            return new HashMap<>();
+        } else {
+            return gene.drugInteractionGroups();
+        }
     }
 
     // Prevent cloning to avoid goofy corner-case synchronization problems
@@ -99,6 +135,14 @@ public class InteractionsDatabase {
         public String toString () {
             return type;
         }
+
+        public Set<String> drugNames () {
+            Set<String> result = new HashSet<>();
+            for (Drug drug: drugs) {
+                result.add(drug.name);
+            }
+            return result;
+        }
     }
 
     private class Gene {
@@ -111,6 +155,22 @@ public class InteractionsDatabase {
 
         public String toString () {
             return name;
+        }
+
+        public Map<String, Set<String>> drugInteractionGroups () {
+            Map<String, Set<String>> result = new HashMap<>();
+            for (Interaction interaction: interactions) {
+                result.put(interaction.type, interaction.drugNames());
+            }
+            return result;
+        }
+
+        public Set<String> drugNames () {
+            Set<String> result = new HashSet<>();
+            for (Interaction interaction: interactions) {
+                result.addAll(interaction.drugNames());
+            }
+            return result;
         }
     }
 }

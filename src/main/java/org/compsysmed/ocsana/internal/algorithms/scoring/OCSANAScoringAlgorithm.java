@@ -8,6 +8,7 @@
  * http://www.opensource.org/licenses/artistic-license-2.0.php for
  * details
  **/
+
 package org.compsysmed.ocsana.internal.algorithms.scoring;
 
 // Java imports
@@ -23,7 +24,6 @@ import org.cytoscape.model.CyNode;
 
 import org.cytoscape.model.CyTable;
 import org.cytoscape.model.CyRow;
-import org.cytoscape.model.CyColumn;
 
 // OCSANA imports
 import org.compsysmed.ocsana.internal.algorithms.AbstractOCSANAAlgorithm;
@@ -43,20 +43,14 @@ public class OCSANAScoringAlgorithm
     private static final Double DEFAULT_SCORE = 0.0;
     private static final Integer DEFAULT_COUNT = 0;
 
-    @Tunable(description = "Compute OCSANA scores",
-             gravity = 330,
-             groups = {CONFIG_GROUP})
-    public Boolean computeScores = true;
-
     // User configuration
     @Tunable(description = "Store OCSANA score in a table column",
-             gravity = 340,
-             dependsOn = "computeScores=true",
+             gravity = 335,
              groups = {CONFIG_GROUP})
     public Boolean storeScores = false;
 
-    @Tunable(description = "Name of column to store scores",
-             gravity = 350,
+    @Tunable(description = "Name of column to store OCSANA scores",
+             gravity = 336,
              dependsOn = "storeScores=true",
              tooltip = "This column will be overwritten!",
              groups = {CONFIG_GROUP})
@@ -83,10 +77,6 @@ public class OCSANAScoringAlgorithm
     public Map<CyNode, Double> computeScores (Collection<List<CyEdge>> pathsToTargets,
                                               Collection<List<CyEdge>> pathsToOffTargets,
                                               Predicate<CyEdge> inhibitionEdgeTester) {
-        if (!computeScores) {
-            return null;
-        }
-
         // Internal variables
         // Per-node subscores for target and off-target paths
         Map<CyNode, Double> effectsOnTargets = new HashMap<>();
@@ -115,7 +105,7 @@ public class OCSANAScoringAlgorithm
         Map<CyNode, Double> ocsanaScores = scoreNodes(effectsOnTargets, countPathsToTargets, targetsHitDownstream, targetsHitByAllPaths, effectsOnOffTargets, countPathsToOffTargets, offTargetsHitDownstream, offTargetsHitByAllPaths, elementaryNodes);
 
         if (storeScores) {
-            storeScoresInColumn(ocsanaScores, storeScoresColumn);
+            storeScoresInColumn(ocsanaScores);
         }
 
         return ocsanaScores;
@@ -264,10 +254,8 @@ public class OCSANAScoringAlgorithm
      * Record the OCSANA scores in a table column
      *
      * @param ocsanaScores  the node scores
-     * @param storeScoresColumn  the name of the column
      **/
-    private void storeScoresInColumn(Map<CyNode, Double> ocsanaScores,
-                                     String storeScoresColumn) {
+    private void storeScoresInColumn(Map<CyNode, Double> ocsanaScores) {
         CyTable nodeTable = network.getDefaultNodeTable();
 
         // Delete the column if it exists
