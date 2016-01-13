@@ -97,6 +97,10 @@ public class DrugBankScoringAlgorithm
      * Compute the scores for all nodes of the network.
      **/
     public Map<CyNode, Double> computeScores () {
+        if (!computeScores || isCanceled()) {
+            return null;
+        }
+
         return computeScores(network.getNodeList());
     }
 
@@ -106,6 +110,10 @@ public class DrugBankScoringAlgorithm
      * @param nodes  the nodes
      **/
     public Map<CyNode, Double> computeScores (Collection<CyNode> nodes) {
+        if (!computeScores || isCanceled()) {
+            return null;
+        }
+
         Map<CyNode, Double> result = new HashMap<>();
         for (CyNode node: nodes) {
             result.put(node, computeScore(node));
@@ -124,6 +132,10 @@ public class DrugBankScoringAlgorithm
      * @param node  the node
      **/
     public Double computeScore (CyNode node) {
+        if (!computeScores || isCanceled()) {
+            return null;
+        }
+
         // TODO: decide how this algorithm should work!
         if (scoreCache.containsKey(node)) {
             return scoreCache.get(node);

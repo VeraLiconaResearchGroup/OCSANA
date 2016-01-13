@@ -46,7 +46,7 @@ public class CIPanel
                     public Class<?> getColumnClass(int column) {
                         try {
                             return getValueAt(0, column).getClass();
-                        } catch (ArrayIndexOutOfBoundsException exception) {
+                        } catch (ArrayIndexOutOfBoundsException|NullPointerException exception) {
                             return Object.class;
                         }
                     }
@@ -102,14 +102,14 @@ public class CIPanel
                 // Sum OCSANA scores over all nodes in the MHS
                 row.add(MHS.stream().mapToDouble(node -> results.ocsanaScores.getOrDefault(node, 0d)).sum());
             } else {
-                row.add(0d);
+                row.add(null);
             }
 
             if (results.drugBankScores != null) {
                 // Sum DrugBank scores over all nodes in the MHS
                 row.add(MHS.stream().mapToDouble(node -> results.drugBankScores.getOrDefault(node, 0d)).sum());
             } else {
-                row.add(0d);
+                row.add(null);
             }
 
             rows.add(row);

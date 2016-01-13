@@ -63,15 +63,17 @@ public class ScoringTask extends AbstractOCSANATask {
         results.OCSANAScoringExecutionSeconds = OCSANARunTime;
         taskMonitor.setStatusMessage(String.format("Computed OCSANA scores in %fs.", OCSANARunTime));
 
-        taskMonitor.setStatusMessage("Computing DrugBank scores.");
+        if (results.drugBankAlg.computeScores) {
+            taskMonitor.setStatusMessage("Computing DrugBank scores.");
 
-        Long DBPreTime = System.nanoTime();
-        results.drugBankScores = results.drugBankAlg.computeScores();
-        Long DBPostTime = System.nanoTime();
+            Long DBPreTime = System.nanoTime();
+            results.drugBankScores = results.drugBankAlg.computeScores();
+            Long DBPostTime = System.nanoTime();
 
-        Double DBRunTime = (DBPostTime - DBPreTime) / 1E9;
-        results.drugBankScoringExecutionSeconds = DBRunTime;
-        taskMonitor.setStatusMessage(String.format("computed DrugBank scores in %fs.", DBRunTime));
+            Double DBRunTime = (DBPostTime - DBPreTime) / 1E9;
+            results.drugBankScoringExecutionSeconds = DBRunTime;
+            taskMonitor.setStatusMessage(String.format("computed DrugBank scores in %fs.", DBRunTime));
+        }
     }
 
     @Override
