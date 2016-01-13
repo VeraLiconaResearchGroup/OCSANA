@@ -201,9 +201,8 @@ public class OCSANAResults {
             }
         }
 
-        String pathSummaryString = "Found " + pathsToTargets.size() + " elementary paths with search strategy " + pathFindingAlg.shortName() +  " and " + elementaryNodes.size() + " elementary nodes.\n" +
-            "Search times: " + pathsToTargetsExecutionSeconds + " s. for targets, " + pathsToOffTargetsExecutionSeconds + " s. for off-targets.";
-        reportLines.add(pathSummaryString);
+        reportLines.add(String.format("Found %d elementary paths with search strategy %s and %d elementary nodes.", pathsToTargets.size(), pathFindingAlg.shortName(), elementaryNodes.size()));
+        reportLines.add(String.format("Search times: %fs. for targets, %fs. for off-targets.", pathsToTargetsExecutionSeconds, pathsToOffTargetsExecutionSeconds));
         reportLines.add("");
 
         for (List<CyEdge> path: pathsToTargets) {
@@ -228,12 +227,8 @@ public class OCSANAResults {
             reportLines.add("");
         }
 
-        String ciInclusionString = (includeEndpointsInCIs) ? "(including endpoints)" : "(excluding endpoints)";
-        String mhsSummaryString = "Found " + MHSes.size()
-            + " CIs using MHS algorithm " + mhsAlg.shortName()
-            + ciInclusionString
-            + " in " + mhsExecutionSeconds + " s.";
-        reportLines.add(mhsSummaryString);
+        String ciInclusionVerb = (includeEndpointsInCIs) ? "including" : "excluding";
+        reportLines.add(String.format("Found %d CIs using MHS algorithm %s (%s endpoints) in %fs.", MHSes.size(), mhsAlg.shortName(), ciInclusionVerb, mhsExecutionSeconds));
         reportLines.add("");
 
         for (Set<CyNode> mhs: MHSes) {
