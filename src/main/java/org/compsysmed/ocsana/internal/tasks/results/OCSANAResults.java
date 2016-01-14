@@ -49,11 +49,9 @@ public class OCSANAResults {
 
     // Scoring data
     public OCSANAScoringAlgorithm ocsanaAlg;
-    public Map<CyNode, Double> ocsanaScores;
     public Double OCSANAScoringExecutionSeconds;
 
     public DrugBankScoringAlgorithm drugBankAlg;
-    public Map<CyNode, Double> drugBankScores;
     public Double drugBankScoringExecutionSeconds;
 
     // MHS data
@@ -210,7 +208,7 @@ public class OCSANAResults {
         }
         reportLines.add("");
 
-        if (ocsanaScores != null) {
+        if (ocsanaAlg.hasScores()) {
             reportLines.add(String.format("Computed OCSANA scores in %fs.", OCSANAScoringExecutionSeconds));
             reportLines.add("");
         } else {
@@ -218,7 +216,7 @@ public class OCSANAResults {
             reportLines.add("");
         }
 
-        if (drugBankScores != null) {
+        if (drugBankAlg.hasScores()) {
             reportLines.add(String.format("Computed DrugBank scores in %fs.", drugBankScoringExecutionSeconds));
             reportLines.add("");
         } else {
@@ -233,16 +231,16 @@ public class OCSANAResults {
         for (Set<CyNode> mhs: MHSes) {
             String scoreReport = new String();
 
-            if (ocsanaScores != null) {
-                scoreReport += String.format("OCSANA: %f", mhs.stream().mapToDouble(node -> ocsanaScores.getOrDefault(node, 0d)).sum());
+            if (ocsanaAlg.hasScores()) {
+                scoreReport += String.format("OCSANA: %f", ocsanaAlg.scoreNodeSet(mhs));
             }
 
-            if (ocsanaScores != null && drugBankScores != null) {
+            if (ocsanaAlg.hasScores() && drugBankAlg.hasScores()) {
                 scoreReport += ", ";
             }
 
-            if (drugBankScores != null) {
-                scoreReport += String.format("DrugBank: %f", mhs.stream().mapToDouble(node -> drugBankScores.getOrDefault(node, 0d)).sum());
+            if (drugBankAlg.hasScores()) {
+                scoreReport += String.format("DrugBank: %f", drugBankAlg.scoreNodeSet(mhs));
             }
 
             reportLines.add(String.format("%s (%s)", nodeSetString(mhs), scoreReport));

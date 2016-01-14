@@ -96,14 +96,15 @@ public class OCSANAScoringAlgorithmTest {
         };
 
         // Compute scores
-        Map<CyNode, Double> scores = scoringAlg.computeScores(pathsToTargets, pathsToOffTargets, inhibitionEdgeTester);
+        scoringAlg.computeScores(pathsToTargets, pathsToOffTargets, inhibitionEdgeTester);
 
         // Tests
-        assertEquals("Toy network score: A", 0.0d, scores.get(A), 0.0d);
-        assertEquals("Toy network score: B", 4.0d, scores.get(B), 0.0d);
-        assertEquals("Toy network score: C", 3.75d, scores.get(C), 0.0d);
-        //assertEquals("Toy network score: D", -1.0d, scores.get(D), 0.0d); // TODO: write a test once this case is defined
-        assertEquals("Toy network score: E", 18.0d, scores.get(E), 0.0d);
-        assertEquals("Toy network score: F", 2.66d, scores.get(F), 0.01d);
+        assertEquals("Toy network score: A", 0.0d, scoringAlg.scoreNode(A), 0.0d);
+        assertEquals("Toy network score: B", 4.0d, scoringAlg.scoreNode(B), 0.0d);
+        assertEquals("Toy network score: C", 3.75d, scoringAlg.scoreNode(C), 0.0d);
+        //assertEquals("Toy network score: D", -1.0d, scoringAlg.scoreNode(D), 0.0d); // TODO: write a test once this case is defined
+        assertEquals("Toy network score: E", 18.0d, scoringAlg.scoreNode(E), 0.0d);
+        assertEquals("Toy network score: F", 2.66d, scoringAlg.scoreNode(F), 0.01d);
+        assertEquals("Toy network score: C+E", 21.75d, scoringAlg.scoreNodeSet(new HashSet<CyNode>(Arrays.asList(C, E))), 0.01d);
     }
 }

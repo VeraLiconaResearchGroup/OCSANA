@@ -56,7 +56,7 @@ public class ScoringTask extends AbstractOCSANATask {
         taskMonitor.setStatusMessage("Computing OCSANA scores.");
 
         Long OCSANAPreTime = System.nanoTime();
-        results.ocsanaScores = results.ocsanaAlg.computeScores(results.pathsToTargets, results.pathsToOffTargets, inhibitionEdgeTester);
+        results.ocsanaAlg.computeScores(results.pathsToTargets, results.pathsToOffTargets, inhibitionEdgeTester);
         Long OCSANAPostTime = System.nanoTime();
 
         Double OCSANARunTime = (OCSANAPostTime - OCSANAPreTime) / 1E9;
@@ -67,7 +67,7 @@ public class ScoringTask extends AbstractOCSANATask {
             taskMonitor.setStatusMessage("Computing DrugBank scores.");
 
             Long DBPreTime = System.nanoTime();
-            results.drugBankScores = results.drugBankAlg.computeScores();
+            results.drugBankAlg.computeScores();
             Long DBPostTime = System.nanoTime();
 
             Double DBRunTime = (DBPostTime - DBPreTime) / 1E9;

@@ -87,12 +87,6 @@ public class DrugBankScoringAlgorithm
         scoreCache = new HashMap<>();
     }
 
-    public Double scoreNodeSet (Set<CyNode> nodes) {
-        // TODO: write a proper aggregation function once the scoring is sorted out
-        // Sum the individual node scores
-        return nodes.stream().mapToDouble(node -> computeScore(node)).sum();
-    }
-
     /**
      * Compute the scores for all nodes of the network.
      **/
@@ -116,7 +110,7 @@ public class DrugBankScoringAlgorithm
 
         Map<CyNode, Double> result = new HashMap<>();
         for (CyNode node: nodes) {
-            result.put(node, computeScore(node));
+            result.put(node, scoreNode(node));
         }
 
         if (storeScores) {
@@ -131,7 +125,7 @@ public class DrugBankScoringAlgorithm
      *
      * @param node  the node
      **/
-    public Double computeScore (CyNode node) {
+    public Double scoreNode (CyNode node) {
         if (!computeScores || isCanceled()) {
             return null;
         }
@@ -151,6 +145,25 @@ public class DrugBankScoringAlgorithm
 
         scoreCache.put(node, score);
         return score;
+    }
+
+    /**
+     * Compute the score for a set of nodes
+     *
+     * @param nodes  the nodes
+     * @return  score of the node set
+     **/
+    public Double scoreNodeSet (Set<CyNode> nodes) {
+        // TODO: write a proper aggregation function once the scoring is sorted out
+        // Sum the individual node scores
+        return nodes.stream().mapToDouble(node -> scoreNode(node)).sum();
+    }
+
+    /**
+     * Return true if scores are available, false otherwise
+     **/
+    public Boolean hasScores () {
+        return computeScores;
     }
 
     /**

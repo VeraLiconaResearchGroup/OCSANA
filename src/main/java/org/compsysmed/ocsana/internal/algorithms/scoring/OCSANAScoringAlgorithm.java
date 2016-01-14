@@ -56,28 +56,32 @@ public class OCSANAScoringAlgorithm
              groups = {CONFIG_GROUP})
     public String storeScoresColumn = "ocsanaScore";
 
-    private Boolean nodeScoringComplete = false;
-    private Boolean pathScoringComplete = false;
-
     private CyNetwork network;
+
+    private Map<CyNode, Double> scoreCache;
+
+    private Boolean scoresComputed = false;
 
     public OCSANAScoringAlgorithm (CyNetwork network) {
         this.network = network;
+        scoreCache = new HashMap<>();
     }
 
     /**
-     * Compute the OCSANA scores for the specified paths
+     * Compute the OCSANA scores for the specified paths and cache the
+     * results
      *
      * @param pathsToTargets  the paths to the target nodes
      * @param pathsToOffTargets  the paths to the off-target nodes
      * @param inhibitionEdgeTester function which returns true if the given
      * edge is negative (i.e. inhibition)
-     * @param Map assigning to each node its OCSANA score
      **/
-    public Map<CyNode, Double> computeScores (Collection<List<CyEdge>> pathsToTargets,
-                                              Collection<List<CyEdge>> pathsToOffTargets,
-                                              Predicate<CyEdge> inhibitionEdgeTester) {
+    public void computeScores (Collection<List<CyEdge>> pathsToTargets,
+                               Collection<List<CyEdge>> pathsToOffTargets,
+                               Predicate<CyEdge> inhibitionEdgeTester) {
         // Internal variables
+        scoresComputed = false;
+
         // Per-node subscores for target and off-target paths
         Map<CyNode, Double> effectsOnTargets = new HashMap<>();
         Map<CyNode, Double> effectsOnOffTargets = new HashMap<>();
@@ -102,13 +106,13 @@ public class OCSANAScoringAlgorithm
         scoreNodesInPaths(pathsToOffTargets, effectsOnOffTargets, countPathsToOffTargets, offTargetsHitDownstream, offTargetsHitByAllPaths, elementaryNodes, (CyEdge edge) -> false);
 
         // Compute total scores for nodes
-        Map<CyNode, Double> ocsanaScores = scoreNodes(effectsOnTargets, countPathsToTargets, targetsHitDownstream, targetsHitByAllPaths, effectsOnOffTargets, countPathsToOffTargets, offTargetsHitDownstream, offTargetsHitByAllPaths, elementaryNodes);
+        scoreCache = scoreNodes(effectsOnTargets, countPathsToTargets, targetsHitDownstream, targetsHitByAllPaths, effectsOnOffTargets, countPathsToOffTargets, offTargetsHitDownstream, offTargetsHitByAllPaths, elementaryNodes);
 
         if (storeScores) {
-            storeScoresInColumn(ocsanaScores);
+            storeScoresInColumn();
         }
 
-        return ocsanaScores;
+        scoresComputed = true;
     }
 
     /**
@@ -251,11 +255,43 @@ public class OCSANAScoringAlgorithm
     }
 
     /**
-     * Record the OCSANA scores in a table column
+     * Compute the score of a single node (based on the most recent
+     * parameters to computeScores)
      *
-     * @param ocsanaScores  the node scores
+     * @param node  the node
+     * @return the node's score, or null if the node has not been scored
      **/
-    private void storeScoresInColumn(Map<CyNode, Double> ocsanaScores) {
+    public Double scoreNode (CyNode node) {
+        if (isCanceled()) {
+            return null;
+        }
+
+        // Will return null
+        return scoreCache.get(node);
+    }
+
+    /**
+     * Compute the score for a set of nodes
+     *
+     * @param nodes  the nodes
+     * @return  score of the node set
+     **/
+    public Double scoreNodeSet (Set<CyNode> nodes) {
+        // Sum the individual node scores
+        return nodes.stream().mapToDouble(node -> scoreNode(node)).sum();
+    }
+
+    /**
+     * Return true if scores are available, false otherwise
+     **/
+    public Boolean hasScores () {
+        return scoresComputed;
+    }
+
+    /**
+     * Record the OCSANA scores in a table column
+     **/
+    private void storeScoresInColumn() {
         CyTable nodeTable = network.getDefaultNodeTable();
 
         // Delete the column if it exists
@@ -266,7 +302,7 @@ public class OCSANAScoringAlgorithm
         nodeTable.createColumn(storeScoresColumn, Double.class, false);
 
         // Store the values
-        for (Map.Entry<CyNode, Double> entry: ocsanaScores.entrySet()) {
+        for (Map.Entry<CyNode, Double> entry: scoreCache.entrySet()) {
             CyNode node = entry.getKey();
             Double score = entry.getValue();
             CyRow nodeRow = nodeTable.getRow(node.getSUID());

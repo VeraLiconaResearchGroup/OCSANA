@@ -63,10 +63,10 @@ public class CIPanel
             // Sort the rows
             RowSorter<TableModel> mhsSorter = new TableRowSorter<TableModel>(mhsModel);
 
-            if (results.drugBankScores != null) {
+            if (results.drugBankAlg.hasScores()) {
                 // If we have DrugBank scores, sort in increasing order with respect to them
                 mhsSorter.toggleSortOrder(3);
-            } else if (results.ocsanaScores != null) {
+            } else if (results.ocsanaAlg.hasScores()) {
                 // If we have OCSANA scores, sort in decreasing order with respect to them
                 mhsSorter.toggleSortOrder(2);
                 mhsSorter.toggleSortOrder(2);
@@ -93,21 +93,19 @@ public class CIPanel
      **/
     private static Vector<Vector<Object>> getMHSRows (OCSANAResults results) {
         Vector<Vector<Object>> rows = new Vector<>();
-        for (Collection<CyNode> MHS: results.MHSes) {
+        for (Set<CyNode> MHS: results.MHSes) {
             Vector<Object> row = new Vector<>();
             row.add(results.nodeSetString(MHS));
             row.add(MHS.size());
 
-            if (results.ocsanaScores != null) {
-                // Sum OCSANA scores over all nodes in the MHS
-                row.add(MHS.stream().mapToDouble(node -> results.ocsanaScores.getOrDefault(node, 0d)).sum());
+            if (results.ocsanaAlg.hasScores()) {
+                row.add(results.ocsanaAlg.scoreNodeSet(MHS));
             } else {
                 row.add(null);
             }
 
-            if (results.drugBankScores != null) {
-                // Sum DrugBank scores over all nodes in the MHS
-                row.add(MHS.stream().mapToDouble(node -> results.drugBankScores.getOrDefault(node, 0d)).sum());
+            if (results.drugBankAlg.hasScores()) {
+                row.add(results.drugBankAlg.scoreNodeSet(MHS));
             } else {
                 row.add(null);
             }
