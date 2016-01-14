@@ -46,14 +46,14 @@ public class OCSANAScoringAlgorithm
     // User configuration
     @Tunable(description = "Store OCSANA score in a table column",
              gravity = 335,
-             groups = {CONFIG_GROUP})
+             groups = {CONFIG_GROUP, NAME})
     public Boolean storeScores = false;
 
     @Tunable(description = "Name of column to store OCSANA scores",
              gravity = 336,
              dependsOn = "storeScores=true",
              tooltip = "This column will be overwritten!",
-             groups = {CONFIG_GROUP})
+             groups = {CONFIG_GROUP, NAME})
     public String storeScoresColumn = "ocsanaScore";
 
     private CyNetwork network;

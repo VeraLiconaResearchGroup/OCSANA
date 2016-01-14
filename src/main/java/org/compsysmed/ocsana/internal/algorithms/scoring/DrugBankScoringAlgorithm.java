@@ -51,14 +51,14 @@ public class DrugBankScoringAlgorithm
     // User configuration
     @Tunable(description = "Compute DrugBank drugability scores",
              gravity = 340,
-             groups = {CONFIG_GROUP})
+             groups = {CONFIG_GROUP, NAME})
     public Boolean computeScores = false;
 
     @Tunable(description = "Column storing gene names",
              gravity = 342,
              dependsOn = "computeScores=true",
              tooltip = "Gene names must match HUGO/HGNC names (see drugbank.ca)",
-             groups = {CONFIG_GROUP})
+             groups = {CONFIG_GROUP, NAME})
     public ListSingleSelection<CyColumn> geneColumnSelecter;
 
     @Tunable(description = "Store DrugBank score in a table column",
@@ -71,7 +71,7 @@ public class DrugBankScoringAlgorithm
              gravity = 346,
              dependsOn = "storeScores=true",
              tooltip = "This column will be overwritten!",
-             groups = {CONFIG_GROUP})
+             groups = {CONFIG_GROUP, NAME})
     public String storeScoresColumn = "ocsanaScore";
 
     private CyNetwork network;
