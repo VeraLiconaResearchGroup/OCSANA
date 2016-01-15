@@ -52,8 +52,14 @@ public class InteractionsDatabase {
 
                 JSONArray drugs = geneInteractions.getJSONArray(interactionType);
                 for (int i = 0; i < drugs.length(); i++) {
-                    String drugName = drugs.getString(i);
-                    Drug drug = new Drug(drugName);
+                    JSONObject drugObject = drugs.getJSONObject(i);
+
+                    String drugName = drugObject.getString("name");
+                    Boolean approved = drugObject.getBoolean("approved");
+                    Boolean investigational = drugObject.getBoolean("investigational");
+
+
+                    Drug drug = new Drug(drugName, approved, investigational);
                     interaction.drugs.add(drug);
                 }
 
@@ -114,9 +120,15 @@ public class InteractionsDatabase {
 
     private class Drug {
         public final String name;
+        public final Boolean isApproved;
+        public final Boolean isInvestigational;
 
-        public Drug (String name) {
+        public Drug (String name,
+                     Boolean isApproved,
+                     Boolean isInvestigational) {
             this.name = name;
+            this.isApproved = isApproved;
+            this.isInvestigational = isInvestigational;
         }
 
         public String toString () {
