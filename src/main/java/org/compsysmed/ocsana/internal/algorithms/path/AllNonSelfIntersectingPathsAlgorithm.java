@@ -127,7 +127,8 @@ public class AllNonSelfIntersectingPathsAlgorithm
                 }
 
                 if ((edgeMinDistances.containsKey(outEdge)) &&
-                    ((edgeMinDistances.get(outEdge) + pathLength <= dijkstra.maxPathLength) || (!dijkstra.restrictPathLength))
+                    ((!dijkstra.restrictPathLength) ||
+                     (edgeMinDistances.get(outEdge) + pathLength <= dijkstra.maxPathLength))
                     ) {
                     // Make sure this doesn't create a self-intersecting path
                     boolean pathIsSelfIntersecting = false;
