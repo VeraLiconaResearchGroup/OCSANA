@@ -14,6 +14,7 @@ package org.compsysmed.ocsana.internal.util.drugbank;
 // Java imports
 import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 // JSON imports
 import org.json.JSONArray;
@@ -55,11 +56,9 @@ public class InteractionsDatabase {
                     JSONObject drugObject = drugs.getJSONObject(i);
 
                     String drugName = drugObject.getString("name");
-                    Boolean approved = drugObject.getBoolean("approved");
-                    Boolean investigational = drugObject.getBoolean("investigational");
 
-
-                    Drug drug = new Drug(drugName, approved, investigational);
+                    Drug drug = new Drug(drugName);
+                    drug.setGroups(drugObject.getJSONArray("groups"));
                     interaction.drugs.add(drug);
                 }
 
@@ -118,17 +117,26 @@ public class InteractionsDatabase {
         throw new CloneNotSupportedException();
     }
 
+    private static final Set<String> knownDrugGroups = new HashSet<>(Arrays.asList("approved", "investigational", "experimental", "nutraceutical", "illicit", "withdrawn"));
+
     private class Drug {
         public final String name;
-        public final Boolean isApproved;
-        public final Boolean isInvestigational;
+        public Set<String> groups = new HashSet<>();
 
-        public Drug (String name,
-                     Boolean isApproved,
-                     Boolean isInvestigational) {
+        public Drug (String name) {
             this.name = name;
-            this.isApproved = isApproved;
-            this.isInvestigational = isInvestigational;
+        }
+
+        public void setGroups (JSONArray groupsArray) {
+            for (int i = 0; i < groupsArray.length(); i++) {
+                String group = groupsArray.getString(i);
+                assert knownDrugGroups.contains(group);
+                groups.add(group);
+            }
+        }
+
+        public Set<String> getGroupNames () {
+            return groups.stream().map(group -> group.toString()).collect(Collectors.toSet());
         }
 
         public String toString () {

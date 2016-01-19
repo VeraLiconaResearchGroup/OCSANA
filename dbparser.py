@@ -34,18 +34,9 @@ def parse_xml(filename):
 
     for drug in root.findall(DB + 'drug'):
         drugname = drug.find(DB + 'name').text
-        druggroups = drug.find(DB + 'groups').findall(DB + 'group')
+        druggroups = [group.text for group in drug.find(DB + 'groups').findall(DB + 'group')]
 
-        approved = False;
-        investigational = False;
-
-        for group in druggroups:
-            if group.text == 'approved':
-                approved = True
-            if group.text == 'investigational':
-                investigational = True
-
-        drugdict = {'name': drugname, 'approved': approved, 'investigational': investigational}
+        drugdict = {'name': drugname, 'groups': druggroups}
 
         for target in drug.find(DB + 'targets').findall(DB + 'target'):
             polypeptide = target.find(DB + 'polypeptide')
