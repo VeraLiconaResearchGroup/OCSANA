@@ -78,7 +78,7 @@ public class AllNonSelfIntersectingPathsAlgorithm
         // edges whose minimum distance to a target is small enough to
         // keep the total path length no larger than maxPathLength.
         List<List<CyEdge>> completePaths = new ArrayList<>();
-        Queue<List<CyEdge>> incompletePaths = new LinkedList<>();
+        Deque<List<CyEdge>> incompletePaths = new LinkedList<>();
 
         // Bootstrap the queue with the edges coming out of the sources
         for (CyNode sourceNode: sources) {
@@ -144,17 +144,18 @@ public class AllNonSelfIntersectingPathsAlgorithm
                     }
 
                     // Otherwise, create the new path
-                    List<CyEdge> newPath = new ArrayList<>(incompletePath);
+                    ArrayList<CyEdge> newPath = new ArrayList<>(incompletePath); // Typed to ArrayList so we can trimToSize() later
                     newPath.add(outEdge);
 
                     if (targets.contains(outEdge.getTarget())) {
+                        newPath.trimToSize();
                         completePaths.add(newPath);
                     }
 
                     // Note: we allow paths to pass through targets.
                     // To exclude this case, use "else if" on the
                     // previous conditional.
-                    incompletePaths.add(newPath);
+                    incompletePaths.addFirst(newPath);
                 }
             }
         }
