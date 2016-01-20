@@ -67,7 +67,7 @@ public class PathsPanel
             JScrollPane pathScrollPane = new JScrollPane(pathTextArea);
 
             setLayout(new BorderLayout());
-            String panelText = "Found " + paths.size() + " paths to " + pathType + " in " + pathFindingTime + " s.";
+            String panelText = String.format("Found %d paths to %s in %fs.", paths.size(), pathType, pathFindingTime);
             add(new JLabel(panelText), BorderLayout.PAGE_START);
             add(pathScrollPane, BorderLayout.CENTER);
         }

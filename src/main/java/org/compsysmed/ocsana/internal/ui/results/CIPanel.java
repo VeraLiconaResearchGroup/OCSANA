@@ -82,7 +82,7 @@ public class CIPanel
             JScrollPane mhsScrollPane = new JScrollPane(mhsTable);
 
             setLayout(new BorderLayout());
-            String mhsText = "<html>" + "Found " + results.MHSes.size() + " optimal CIs in " + results.mhsExecutionSeconds + " s." + "<br />" + "Scored them in " + results.OCSANAScoringExecutionSeconds + results.drugBankScoringExecutionSeconds + " s." + "</html>";
+            String mhsText = String.format("<html>Found %d optimal CIs in %f s.</html>", results.MHSes.size(), results.mhsExecutionSeconds);
             add(new JLabel(mhsText), BorderLayout.PAGE_START);
             add(mhsScrollPane, BorderLayout.CENTER);
         }
