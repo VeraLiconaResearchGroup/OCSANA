@@ -40,6 +40,12 @@ public class AllNonSelfIntersectingPathsAlgorithm
     @ContainsTunables
     public DijkstraPathDecoratorAlgorithm dijkstra;
 
+    @Tunable(description="Discard node-redundant paths",
+             groups = {AbstractPathFindingAlgorithm.CONFIG_GROUP},
+             gravity=220,
+             tooltip="If selected, scan for and discard paths which are nodewise supersets of other paths. This saves (possibly substantial) memory but adds computation time.")
+    public Boolean discardNodeRedundantPaths = true;
+
     public AllNonSelfIntersectingPathsAlgorithm (CyNetwork network) {
         super(network);
         dijkstra = new DijkstraPathDecoratorAlgorithm(network);
@@ -119,6 +125,7 @@ public class AllNonSelfIntersectingPathsAlgorithm
 
             CyNode leafNode = leafEdge.getTarget();
 
+            edgeTestingLoop:
             for (CyEdge outEdge: network.getAdjacentEdgeIterable(leafNode, CyEdge.Type.OUTGOING)) {
                 // Handle cancellation
                 if (isCanceled()) {
@@ -150,7 +157,18 @@ public class AllNonSelfIntersectingPathsAlgorithm
                     assert pathNodes.contains(outEdge.getSource());
 
                     if (pathNodes.contains(outEdge.getTarget())) {
-                        continue;
+                        continue edgeTestingLoop;
+                    }
+
+                    // Make sure this path doesn't "take the long way"
+                    // around a single edge
+                    if (discardNodeRedundantPaths) {
+                        for (CyEdge inEdge: network.getAdjacentEdgeIterable(outEdge.getTarget(), CyEdge.Type.INCOMING)) {
+                            if (!inEdge.getSource().equals(outEdge.getSource()) &&
+                                pathNodes.contains(inEdge.getSource())) {
+                                continue edgeTestingLoop;
+                            }
+                        }
                     }
 
                     // Otherwise, create the new path
