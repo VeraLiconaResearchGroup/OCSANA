@@ -83,7 +83,7 @@ public class HER2IntegrationTest {
         AbstractPathFindingAlgorithm pathAlg = new AllNonSelfIntersectingPathsAlgorithm(network);
 
         Collection<List<CyEdge>> paths = pathAlg.paths(sources, targets);
-        assertEquals("Path count", 69805, paths.size());
+        assertEquals("Path count", 9589, paths.size());
 
         // Find CIs
         List<Set<CyNode>> nodeSets = new ArrayList<>();

@@ -118,7 +118,7 @@ public class AllNonSelfIntersectingPathsAlgorithmTest {
 
         // Path-finding
         Collection<List<CyEdge>> paths = pathAlg.paths(HER2NetworkSources, HER2NetworkTargets);
-        assertEquals("Path count", 69805, paths.size());
+        assertEquals("Path count", 9589, paths.size());
 
         for (List<CyEdge> path: paths) {
             assertTrue("Path starts at a source", HER2NetworkSources.contains(path.get(0).getSource()));

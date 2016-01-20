@@ -13,6 +13,8 @@ package org.compsysmed.ocsana.internal.algorithms.path;
 
 // Java imports
 import java.util.*;
+import java.util.stream.Collectors;
+
 
 // Cytoscape imports
 import org.cytoscape.work.Tunable;
@@ -92,12 +94,12 @@ public class AllNonSelfIntersectingPathsAlgorithm
                     throw new IllegalArgumentException("Undirected edges are not supported.");
                 }
 
-                assert outEdge.getSource() == sourceNode;
+                assert outEdge.getSource().equals(sourceNode);
 
-                if (edgeMinDistances.containsKey(outEdge)) {
-                    List<CyEdge> newPath = new ArrayList<>();
-                    newPath.add(outEdge);
-
+                // Ignore edges that aren't marked or that connect a source to another source that isn't a target
+                if (edgeMinDistances.containsKey(outEdge) &&
+                    (!sources.contains(outEdge.getTarget()) || targets.contains(outEdge.getTarget()))) {
+                    List<CyEdge> newPath = Arrays.asList(outEdge);
                     incompletePaths.add(newPath);
                 }
             }
@@ -116,51 +118,65 @@ public class AllNonSelfIntersectingPathsAlgorithm
             }
 
             CyNode leafNode = leafEdge.getTarget();
+
             for (CyEdge outEdge: network.getAdjacentEdgeIterable(leafNode, CyEdge.Type.OUTGOING)) {
                 // Handle cancellation
                 if (isCanceled()) {
                     return null;
                 }
 
+                // Handle undirected edge (error case)
                 if (!outEdge.isDirected()) {
                     throw new IllegalArgumentException("Undirected edges are not supported.");
                 }
 
+                // Handle loop case (ignore this edge)
+                if (outEdge.getSource().equals(outEdge.getTarget())) {
+                    break;
+                }
+
+                // Only consider the edge if it's marked and its
+                // shortest descending path satisfies the length bound
+                // (if applicable)
                 if ((edgeMinDistances.containsKey(outEdge)) &&
                     ((!dijkstra.restrictPathLength) ||
                      (edgeMinDistances.get(outEdge) + pathLength <= dijkstra.maxPathLength))
                     ) {
                     // Make sure this doesn't create a self-intersecting path
-                    boolean pathIsSelfIntersecting = false;
-                    for (CyEdge pathEdge: incompletePath) {
-                        if (pathEdge.getSource().equals(outEdge.getTarget()) || (pathEdge.getTarget().equals(outEdge.getTarget()))) {
-                            pathIsSelfIntersecting = true;
-                            break;
-                        }
-                    }
+                    Set<CyNode> pathNodes = incompletePath.stream()
+                        .map(edge -> Arrays.asList(edge.getSource(), edge.getTarget()))
+                        .flatMap(List::stream).collect(Collectors.toSet());
 
-                    if (pathIsSelfIntersecting) {
+                    assert pathNodes.contains(outEdge.getSource());
+
+                    if (pathNodes.contains(outEdge.getTarget())) {
                         continue;
                     }
 
                     // Otherwise, create the new path
-                    ArrayList<CyEdge> newPath = new ArrayList<>(incompletePath); // Typed to ArrayList so we can trimToSize() later
+                    List<CyEdge> newPath = new ArrayList<>(incompletePath.size() + 1);
+                    newPath.addAll(incompletePath);
                     newPath.add(outEdge);
 
+                    // Process the new path appropriately
                     if (targets.contains(outEdge.getTarget())) {
-                        newPath.trimToSize();
+                        // If the new path ends at a target, it's complete
+                        assert (!dijkstra.restrictPathLength || newPath.size() <= dijkstra.maxPathLength);
+                        assert sources.contains(newPath.get(0).getSource());
+                        assert targets.contains(newPath.get(newPath.size() - 1).getTarget());
                         completePaths.add(newPath);
+                    } else if (!sources.contains(outEdge.getTarget())) {
+                        // If the new path doesn't end at a source or
+                        // a target, we should consider further
+                        // extensions of it
+                        incompletePaths.addFirst(newPath);
                     }
-
-                    // Note: we allow paths to pass through targets.
-                    // To exclude this case, use "else if" on the
-                    // previous conditional.
-                    incompletePaths.addFirst(newPath);
                 }
             }
         }
 
         assert incompletePaths.isEmpty();
+
         return completePaths;
     }
 
