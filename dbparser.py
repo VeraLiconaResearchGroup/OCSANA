@@ -27,6 +27,9 @@ def parse_xml(filename):
 
     DB = "{http://www.drugbank.ca}"
 
+    found_action_types = set()
+    found_genes = set()
+
     logging.info("Parsing XML tree")
     root = tree.getroot()
 
@@ -45,11 +48,19 @@ def parse_xml(filename):
                 if geneXML is not None:
                     genename = geneXML.text
                     if genename is not None:
-                        for action in target.find(DB + 'actions').getchildren():
-                            actionname = action.text
+                        found_genes.add(genename)
+                        actions = target.find(DB + 'actions').getchildren()
+
+                        if len(actions) == 0:
+                            interactions[genename]["UNKNOWN"].append(drugdict)
+
+                        for action in actions:
+                            actionname = action.text.lower()
+                            found_action_types.add(actionname)
                             interactions[genename][actionname].append(drugdict)
 
-    logging.info("Found {0} drugs in DrugBank XML file".format(len(interactions)))
+    logging.info("Found {0} drugs, {1} genes in DrugBank XML file".format(len(interactions), len(found_genes)))
+    logging.info("Found interaction types: {0}".format(found_action_types))
     return interactions
 
 def write_json(interactions, filename):
