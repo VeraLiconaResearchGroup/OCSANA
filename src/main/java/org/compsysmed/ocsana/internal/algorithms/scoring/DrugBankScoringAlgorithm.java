@@ -64,7 +64,7 @@ public class DrugBankScoringAlgorithm
     @Tunable(description = "Store DrugBank score in a table column",
              gravity = 345,
              dependsOn = "computeScores=true",
-             groups = {CONFIG_GROUP})
+             groups = {CONFIG_GROUP, NAME})
     public Boolean storeScores = false;
 
     @Tunable(description = "Name of column to store DrugBank scores",
@@ -72,7 +72,7 @@ public class DrugBankScoringAlgorithm
              dependsOn = "storeScores=true",
              tooltip = "This column will be overwritten!",
              groups = {CONFIG_GROUP, NAME})
-    public String storeScoresColumn = "ocsanaScore";
+    public String storeScoresColumn = "drugBankScore";
 
     private CyNetwork network;
     private Map<CyNode, Double> scoreCache;
