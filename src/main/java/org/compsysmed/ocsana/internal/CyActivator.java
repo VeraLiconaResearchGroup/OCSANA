@@ -51,5 +51,4 @@ public class CyActivator extends AbstractCyActivator {
                         NetworkTaskFactory.class,
                         properties);
     }
-
 }
