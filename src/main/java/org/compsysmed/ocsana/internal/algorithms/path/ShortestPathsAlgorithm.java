@@ -48,14 +48,14 @@ public class ShortestPathsAlgorithm
     public Collection<List<CyEdge>> paths (Set<CyNode> sources,
                                            Set<CyNode> targets) {
         Collection<List<CyEdge>> shortestPaths = new ArrayList<>();
-
         for (CyNode source: sources) {
-            for (CyNode target: targets) {
-                Collection<List<CyEdge>> newPaths = computeShortestPaths(source, target);
-                // TODO: handle null?
-                if (newPaths != null) {
-                    shortestPaths.addAll(newPaths);
-                }
+            if (isCanceled()) {
+                return null;
+            }
+
+            Collection<List<CyEdge>> newPaths = shortestPaths(source, targets);
+            if (newPaths != null) {
+                shortestPaths.addAll(newPaths);
             }
         }
 
@@ -63,137 +63,89 @@ public class ShortestPathsAlgorithm
     }
 
     /**
-     * Find all shortest paths from one source to one target node, as
-     * long as they satisfy the constraints on the underlying Dijkstra
-     * decorator algorithm
+     * Find all shortest paths from one source to each of the target
+     * nodes, as long as they satisfy the constraints on the
+     * underlying Dijkstra decorator algorithm
+     *
+     * @param source  the source node
+     * @param targets  the target nodes
+     * @return a list of all shortest paths from the source to the
+     * targets, each given as a List of CyEdges in order from source to
+     * target, or null if the operation was canceled
+     **/
+    private Collection<List<CyEdge>> shortestPaths (CyNode source,
+                                                    Set<CyNode> targets) {
+        Set<CyNode> sourceSet = Collections.singleton(source);
+
+        // Decorate graph with minimal distances to target
+        Map<CyEdge, Integer> edgeMinDistancesFromSource = dijkstra.edgeMinDistancesForwards(sourceSet);
+
+        // Walk backwards from each target
+        Collection<List<CyEdge>> shortestPaths = new ArrayList<>();
+        for (CyNode target: targets) {
+            if (isCanceled()) {
+                return null;
+            }
+            Collection<List<CyEdge>> shortestPathsToTarget = shortestPaths(source, target, edgeMinDistancesFromSource);
+            shortestPaths.addAll(shortestPathsToTarget);
+        }
+
+        return shortestPaths;
+    }
+
+    /**
+     * Find all shortest paths from one source to one target node
+     * using pre-computed edge decorations.
      *
      * @param source  the source node
      * @param target  the target node
-     * @return a list of all shortest paths from the source to the
-     * target, each given as a List of CyEdges in order from source to
-     * target, or null if the operation was canceled
+     * @param edgeMinDistancesFromSource map assigning to each
+     * relevant CyEdge the minimum number of edges in a path from the
+     * source to that edge
+     * @return a collection of all the shortest paths from the source
+     * to the target, each given as a list of CyEdges in order from
+     * source to target
      **/
-    private Collection<List<CyEdge>> computeShortestPaths (CyNode source,
-                                                           CyNode target) {
-        Set<CyNode> sourceSet = Collections.singleton(source);
-        Set<CyNode> targetSet = Collections.singleton(target);
+    private Collection<List<CyEdge>> shortestPaths (CyNode source,
+                                                    CyNode target,
+                                                    Map<CyEdge, Integer> edgeMinDistancesFromSource) {
+        if (source.equals(target)) {
+            Collection<List<CyEdge>> result = new ArrayList<>();
+            result.add(new ArrayList<>());
+            return result;
+        }
 
-        // Decorate graph with minimal distances to target
-        Map<CyEdge, Integer> edgeMinDistances = dijkstra.edgeMinDistances(targetSet);
-
-        // Find shortest path length
-        Integer shortestPathLength = null;
-        for (CyEdge outEdge: network.getAdjacentEdgeIterable(source, CyEdge.Type.OUTGOING)) {
-            // Handle cancellation
-            if (isCanceled()) {
-                return null;
+        // Find all incoming edges with least weight
+        Set<CyEdge> closestIncomingEdges = new HashSet<>();
+        Integer closestIncomingEdgeWeight = null;
+        for (CyEdge incomingEdge: network.getAdjacentEdgeIterable(target, CyEdge.Type.INCOMING)) {
+            if (!edgeMinDistancesFromSource.containsKey(incomingEdge)) {
+                continue;
             }
 
-            if (!outEdge.isDirected()) {
-                throw new IllegalArgumentException(UNDIRECTED_ERROR_MESSAGE);
-            }
-
-            assert outEdge.getSource() == source;
-
-            if (edgeMinDistances.containsKey(outEdge)) {
-                Integer shortestPathLengthThroughEdge = edgeMinDistances.get(outEdge);
-                if ((shortestPathLength == null) || (shortestPathLengthThroughEdge < shortestPathLength)) {
-                    shortestPathLength = shortestPathLengthThroughEdge;
-                }
+            if (closestIncomingEdges.isEmpty() ||
+                edgeMinDistancesFromSource.get(incomingEdge) < closestIncomingEdgeWeight) {
+                closestIncomingEdges.clear();
+                closestIncomingEdges.add(incomingEdge);
+                closestIncomingEdgeWeight = edgeMinDistancesFromSource.get(incomingEdge);
+            } else if (edgeMinDistancesFromSource.get(incomingEdge).equals(closestIncomingEdgeWeight)) {
+                closestIncomingEdges.add(incomingEdge);
             }
         }
 
-        if (shortestPathLength == null) {
-            // No path was found within the length bounds or the
-            // source had no out edges. Either way, we give back an
-            // empty list.
-            return new ArrayList<>();
-        }
+        Collection<List<CyEdge>> shortestPaths = new ArrayList<>();
+        // Recurse to find the upstream paths
+        for (CyEdge incomingEdge: closestIncomingEdges) {
+            Collection<List<CyEdge>> upstreamPaths = shortestPaths(source, incomingEdge.getSource(), edgeMinDistancesFromSource);
 
-        // If we make it this far, there is at least one shortest
-        // path, so let's find them!
-        List<List<CyEdge>> completePaths = new ArrayList<>();
-        Queue<List<CyEdge>> incompletePaths = new LinkedList<>();
-
-        // Bootstrap the queue with edges out of the source
-        for (CyEdge outEdge: network.getAdjacentEdgeIterable(source, CyEdge.Type.OUTGOING)) {
-            // Handle cancellation
-            if (isCanceled()) {
-                return null;
-            }
-
-            if (!outEdge.isDirected()) {
-                throw new IllegalArgumentException(UNDIRECTED_ERROR_MESSAGE);
-            }
-
-            assert outEdge.getSource() == source;
-
-            if (edgeMinDistances.containsKey(outEdge)) {
-                Integer shortestPathLengthThroughEdge = edgeMinDistances.get(outEdge);
-                assert shortestPathLengthThroughEdge >= shortestPathLength;
-
-                if (shortestPathLengthThroughEdge.equals(shortestPathLength)) {
-                    List<CyEdge> newPath = new ArrayList<>();
-                    newPath.add(outEdge);
-
-                    if (outEdge.getTarget() == target) {
-                        assert shortestPathLengthThroughEdge == 1;
-                        completePaths.add(newPath);
-                    } else {
-                        incompletePaths.add(newPath);
-                    }
-                }
+            for (List<CyEdge> upstreamPath: upstreamPaths) {
+                List<CyEdge> result = new ArrayList<>(upstreamPath);
+                result.add(incomingEdge);
+                shortestPaths.add(result);
             }
         }
 
-        // Work through the queue, extending paths along edges that
-        // preserve shortestness
-        for (List<CyEdge> incompletePath; (incompletePath = incompletePaths.poll()) != null;) {
-            // Number of edges in path
-            Integer pathLength = incompletePath.size();
-            assert pathLength > 0;
-
-            // Consider all edges coming out of the leaf of the path
-            CyEdge leafEdge = incompletePath.get(pathLength - 1);
-
-            if (!leafEdge.isDirected()) {
-                throw new IllegalArgumentException(UNDIRECTED_ERROR_MESSAGE);
-            }
-
-            CyNode leafNode = leafEdge.getTarget();
-            for (CyEdge outEdge: network.getAdjacentEdgeIterable(leafNode, CyEdge.Type.OUTGOING)) {
-                // Handle cancellation
-                if (isCanceled()) {
-                    return null;
-                }
-
-                if (!outEdge.isDirected()) {
-                    throw new IllegalArgumentException(UNDIRECTED_ERROR_MESSAGE);
-                }
-
-                Integer shortestPathLengthRemaining = shortestPathLength - pathLength;
-
-                if (edgeMinDistances.containsKey(outEdge)) {
-                    Integer shortestPathLengthThroughEdge = edgeMinDistances.get(outEdge);
-                    assert shortestPathLengthThroughEdge >= shortestPathLengthRemaining;
-
-                    if (shortestPathLengthThroughEdge.equals(shortestPathLengthRemaining)) {
-                        List<CyEdge> newPath = new ArrayList<>(incompletePath);
-                        newPath.add(outEdge);
-
-                        if (outEdge.getTarget() == target) {
-                            assert shortestPathLengthThroughEdge == 1;
-                            completePaths.add(newPath);
-                        } else {
-                            incompletePaths.add(newPath);
-                        }
-                    }
-                }
-            }
-        }
-
-        assert incompletePaths.isEmpty();
-        return completePaths;
+        return shortestPaths;
     }
 
     @Override

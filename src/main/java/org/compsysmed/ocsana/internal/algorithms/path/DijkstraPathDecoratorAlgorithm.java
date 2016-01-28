@@ -13,6 +13,7 @@ package org.compsysmed.ocsana.internal.algorithms.path;
 
 // Java imports
 import java.util.*;
+import java.util.function.Function;
 
 // Cytoscape imports
 import org.cytoscape.work.Tunable;
@@ -45,31 +46,63 @@ public class DijkstraPathDecoratorAlgorithm
     }
 
     /**
-     * Compute the minimum length of a path to the targets from
-     * each edge
+     * Compute the minimum length of a path from the sources to each edge
+     *
+     * @param sources  the source nodes
+     * @return a Map which assigns to some CyEdges a non-negative
+     * integer representing the minimum number of edges in a path
+     * starting from the sources and leading to the given edge, as long
+     * as that number is not greater than maxPathLength
+     **/
+    protected Map<CyEdge, Integer> edgeMinDistancesForwards (Set<CyNode> sources) {
+        return edgeMinDistances(sources, CyEdge.Type.OUTGOING);
+    }
+
+    /**
+     * Compute the minimum length of a path to the targets from each edge
      *
      * @param targets  the target nodes
+     * @return a Map which assigns to some CyEdges a non-negative
+     * integer representing the minimum number of edges in a path
+     * passing through that edge and reaching some target, so long as
+     * that number is not greater than maxPathLength
+     **/
+    protected Map<CyEdge, Integer> edgeMinDistancesBackwards (Set<CyNode> targets) {
+        return edgeMinDistances(targets, CyEdge.Type.INCOMING);
+    }
+
+    /**
+     * Decorate edges with distances to/from nodes
+     *
+     * @param nodes  the target nodes
+     * @param edgeType  the type of edge to follow (INCOMING for
+     * backward iteration, OUTGOING for forward)
      *
      * @return a Map which assigns to some CyEdges a non-negative
      * integer representing the minimum number of edges in a path
-     * starting from the given edge and leading to a target node, as
-     * long as that number is not greater than maxPathLength
+     * to/from the nodes and including that edge, so long as that
+     * number is not greater than maxPathLength
      **/
-    protected Map<CyEdge, Integer> edgeMinDistances (Set<CyNode> targets) {
-        // We'll iterate up through the network, starting at the
-        // targets and walking backwards along edges. Each time we
-        // find an edge which has not been marked with a distance, we
-        // mark it with one more than the distance which got us
+    private Map<CyEdge, Integer> edgeMinDistances (Set<CyNode> nodes,
+                                                   CyEdge.Type edgeType) {
+        // We'll walk through the network, starting at the nodes and
+        // walking in the specified direction along edges. Each time
+        // we find an edge which has not been marked with a distance,
+        // we mark it with one more than the distance which got us
         // there. Each time we find an edge which *has* been marked
         // with a distance, we overwrite it if appropriate.
         Map<CyEdge, Integer> edgeMinDistances = new HashMap<>();
         Map<CyNode, Integer> nodeMinDistances = new HashMap<>();
         Queue<CyNode> nodesToProcess = new LinkedList<>();
 
-        // Bootstrap with the target nodes
-        for (CyNode targetNode: targets) {
-            nodeMinDistances.put(targetNode, 0);
-            nodesToProcess.add(targetNode);
+        // Helper function to retrieve the other end of an edge in the specified direction
+        Function<CyEdge, CyNode> edgeEndGetter = (edgeType == CyEdge.Type.OUTGOING) ?
+            (edge -> edge.getTarget()) : (edge -> edge.getSource());
+
+        // Bootstrap with the nodes
+        for (CyNode node: nodes) {
+            nodeMinDistances.put(node, 0);
+            nodesToProcess.add(node);
         }
 
         // Work through the node queue
@@ -81,19 +114,18 @@ public class DijkstraPathDecoratorAlgorithm
 
             assert nodeMinDistances.containsKey(nodeToProcess);
             // Look at all the edges connected to this node
-            for (CyEdge outEdge: network.getAdjacentEdgeIterable(nodeToProcess, CyEdge.Type.INCOMING)) {
-                if (!outEdge.isDirected()) {
+            for (CyEdge edge: network.getAdjacentEdgeIterable(nodeToProcess, edgeType)) {
+                if (!edge.isDirected()) {
                     throw new IllegalArgumentException("Undirected edges are not supported.");
                 }
 
-                assert nodeToProcess.equals(outEdge.getTarget());
-                CyNode nextNode = outEdge.getSource();
+                CyNode nextNode = edgeEndGetter.apply(edge);
 
                 // Mark this edge if needed
                 Integer newEdgeDist = nodeMinDistances.get(nodeToProcess) + 1;
-                if ((!edgeMinDistances.containsKey(outEdge))
-                    || (edgeMinDistances.get(outEdge) > newEdgeDist)) {
-                    edgeMinDistances.put(outEdge, newEdgeDist);
+                if ((!edgeMinDistances.containsKey(edge))
+                    || (edgeMinDistances.get(edge) > newEdgeDist)) {
+                    edgeMinDistances.put(edge, newEdgeDist);
                 }
 
                 // Mark the other node if needed

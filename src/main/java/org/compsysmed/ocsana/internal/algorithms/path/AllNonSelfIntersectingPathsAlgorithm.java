@@ -54,11 +54,11 @@ public class AllNonSelfIntersectingPathsAlgorithm
     @Override
     public Collection<List<CyEdge>> paths (Set<CyNode> sources,
                                            Set<CyNode> targets) {
-        Map<CyEdge, Integer> edgeMinDistances = dijkstra.edgeMinDistances(targets);
+        Map<CyEdge, Integer> edgeMinDistancesFromTargets = dijkstra.edgeMinDistancesBackwards(targets);
 
         // Only run the next step if the previous succeeded
-        if (edgeMinDistances != null) {
-            return computeAllPaths(sources, targets, edgeMinDistances);
+        if (edgeMinDistancesFromTargets != null) {
+            return computeAllPaths(sources, targets, edgeMinDistancesFromTargets);
         } else {
             return null;
         }
@@ -70,14 +70,14 @@ public class AllNonSelfIntersectingPathsAlgorithm
      *
      * @param sources  the source nodes
      * @param targets  the target nodes
-     * @param edgeMinDistances  the minimum number of edges in a path
+     * @param edgeMinDistancesFromTargets  the minimum number of edges in a path
      * to a target beginning with the given edge
      * @return a List of paths, each given as a List of CyEdges in
      * order from a source to a target
      **/
     private Collection<List<CyEdge>> computeAllPaths (Set<CyNode> sources,
                                                       Set<CyNode> targets,
-                                                      Map<CyEdge, Integer> edgeMinDistances) {
+                                                      Map<CyEdge, Integer> edgeMinDistancesFromTargets) {
         // This time, we'll iterate down through the network, starting
         // at the sources and walking forwards along edges. As we
         // walk, we'll extend the incomplete paths we find along any
@@ -101,7 +101,7 @@ public class AllNonSelfIntersectingPathsAlgorithm
                 assert outEdge.getSource().equals(sourceNode);
 
                 // Ignore edges that aren't marked or that connect a source to another source that isn't a target
-                if (edgeMinDistances.containsKey(outEdge) &&
+                if (edgeMinDistancesFromTargets.containsKey(outEdge) &&
                     (!discardNodeRedundantPaths || (!sources.contains(outEdge.getTarget()) || targets.contains(outEdge.getTarget())))) {
                     List<CyEdge> newPath = Arrays.asList(outEdge);
                     incompletePaths.add(newPath);
@@ -143,9 +143,9 @@ public class AllNonSelfIntersectingPathsAlgorithm
                 // Only consider the edge if it's marked and its
                 // shortest descending path satisfies the length bound
                 // (if applicable)
-                if ((edgeMinDistances.containsKey(outEdge)) &&
+                if ((edgeMinDistancesFromTargets.containsKey(outEdge)) &&
                     ((!dijkstra.restrictPathLength) ||
-                     (edgeMinDistances.get(outEdge) + pathLength <= dijkstra.maxPathLength))
+                     (edgeMinDistancesFromTargets.get(outEdge) + pathLength <= dijkstra.maxPathLength))
                     ) {
                     // Make sure this doesn't create a self-intersecting path
                     Set<CyNode> pathNodes = incompletePath.stream()
