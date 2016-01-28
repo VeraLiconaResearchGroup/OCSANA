@@ -133,7 +133,7 @@ public class ShortestPathsAlgorithm
                 Integer shortestPathLengthThroughEdge = edgeMinDistances.get(outEdge);
                 assert shortestPathLengthThroughEdge >= shortestPathLength;
 
-                if (shortestPathLengthThroughEdge == shortestPathLength) {
+                if (shortestPathLengthThroughEdge.equals(shortestPathLength)) {
                     List<CyEdge> newPath = new ArrayList<>();
                     newPath.add(outEdge);
 
@@ -178,7 +178,7 @@ public class ShortestPathsAlgorithm
                     Integer shortestPathLengthThroughEdge = edgeMinDistances.get(outEdge);
                     assert shortestPathLengthThroughEdge >= shortestPathLengthRemaining;
 
-                    if (shortestPathLengthThroughEdge == shortestPathLengthRemaining) {
+                    if (shortestPathLengthThroughEdge.equals(shortestPathLengthRemaining)) {
                         List<CyEdge> newPath = new ArrayList<>(incompletePath);
                         newPath.add(outEdge);
 

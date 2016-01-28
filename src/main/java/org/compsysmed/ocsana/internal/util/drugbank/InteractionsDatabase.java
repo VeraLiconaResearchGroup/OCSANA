@@ -119,7 +119,7 @@ public class InteractionsDatabase {
 
     private static final Set<String> knownDrugGroups = new HashSet<>(Arrays.asList("approved", "investigational", "experimental", "nutraceutical", "illicit", "withdrawn"));
 
-    private class Drug {
+    private static class Drug {
         public final String name;
         public Set<String> groups = new HashSet<>();
 
@@ -144,7 +144,7 @@ public class InteractionsDatabase {
         }
     }
 
-    private class Interaction {
+    private static class Interaction {
         public final String type;
         public List<Drug> drugs = new ArrayList<>();
 
@@ -165,7 +165,7 @@ public class InteractionsDatabase {
         }
     }
 
-    private class Gene {
+    private static class Gene {
         public final String name;
         public List<Interaction> interactions = new ArrayList<>();
 

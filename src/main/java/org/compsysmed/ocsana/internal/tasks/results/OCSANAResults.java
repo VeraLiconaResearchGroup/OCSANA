@@ -86,7 +86,7 @@ public class OCSANAResults {
      **/
     public String nodeSetString(Collection<CyNode> nodes) {
         if (nodes == null) {
-            return new String();
+            return "";
         }
 
         List<String> nodeStrings = new ArrayList<>();
@@ -108,30 +108,30 @@ public class OCSANAResults {
      **/
     public String pathString(List<CyEdge> path) {
         if (path == null) {
-            return new String();
+            return "";
         }
 
-        String result = new String();
+        StringBuilder result = new StringBuilder();
 
         // Handle first node
         try {
             CyNode firstNode = path.iterator().next().getSource();
-            result += nodeName(firstNode);
+            result.append(nodeName(firstNode));
         } catch (NoSuchElementException e) {
-            return result;
+            return result.toString();
         }
 
         // Each other node is a target
         for (CyEdge edge: path) {
             if (edgeProcessor.edgeIsInhibition(edge)) {
-                result += " -| ";
+                result.append(" -| ");
             } else {
-                result += " -> ";
+                result.append(" -> ");
             }
-            result += nodeName(edge.getTarget());
+            result.append(nodeName(edge.getTarget()));
         }
 
-        return result;
+        return result.toString();
     }
 
     /**
@@ -229,7 +229,7 @@ public class OCSANAResults {
         reportLines.add("");
 
         for (Set<CyNode> mhs: MHSes) {
-            String scoreReport = new String();
+            String scoreReport = "";
 
             if (ocsanaAlg.hasScores()) {
                 scoreReport += String.format("OCSANA: %f", ocsanaAlg.scoreNodeSet(mhs));

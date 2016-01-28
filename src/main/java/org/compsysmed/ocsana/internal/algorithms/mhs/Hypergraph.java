@@ -164,12 +164,12 @@ public class Hypergraph extends ArrayList<BitSet> {
         try (PrintWriter outFileWriter
              = new PrintWriter(new BufferedWriter(new FileWriter(outFile)))) {
             for (BitSet edge: this) {
-                String line = new String();
+                StringBuilder lineBuilder = new StringBuilder();
                 for (int i = edge.nextSetBit(0); i >= 0; i = edge.nextSetBit(i+1)) {
-                    line += i + " ";
+                    lineBuilder.append(i + " ");
                 }
-                line += "\n";
-                outFileWriter.write(line);
+                lineBuilder.append("\n");
+                outFileWriter.write(lineBuilder.toString());
             }
         }
     };
