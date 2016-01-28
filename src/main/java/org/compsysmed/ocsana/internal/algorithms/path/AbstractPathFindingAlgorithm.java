@@ -32,6 +32,8 @@ public abstract class AbstractPathFindingAlgorithm
     extends AbstractOCSANAAlgorithm {
     protected static final String CONFIG_GROUP = "Path-finding algorithm";
 
+    protected static final String UNDIRECTED_ERROR_MESSAGE = "Undirected edges are not supported";
+
     protected CyNetwork network;
 
     public AbstractPathFindingAlgorithm (CyNetwork network) {
@@ -46,6 +48,6 @@ public abstract class AbstractPathFindingAlgorithm
      * @return the paths, each of which is given as a List of
      * CyEdges, in order from source to target
      **/
-    abstract public Collection<List<CyEdge>> paths (Set<CyNode> sources,
+    public abstract Collection<List<CyEdge>> paths (Set<CyNode> sources,
                                                     Set<CyNode> targets);
 }

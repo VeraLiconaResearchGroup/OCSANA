@@ -145,7 +145,7 @@ public class OCSANAScoringAlgorithm
 
             // Handle empty and null paths
             // TODO: A null path is probably an error
-            if (path == null || path.size() == 0) {
+            if (path == null || path.isEmpty()) {
                 continue;
             }
 

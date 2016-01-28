@@ -19,7 +19,6 @@ import org.cytoscape.work.Tunable;
 import org.cytoscape.work.util.BoundedInteger;
 
 import org.cytoscape.model.CyNode;
-import org.cytoscape.model.CyNetwork;
 
 // OCSANA imports
 
@@ -56,10 +55,7 @@ public class BergeAlgorithm extends AbstractMHSAlgorithm {
 
         Hypergraph resultHypergraph = transversalHypergraph(inputHypergraph);
 
-        List<Set<CyNode>> result =
-            inputHypergraph.getCyNodeSetsFromHypergraph(resultHypergraph);
-
-        return result;
+        return inputHypergraph.getCyNodeSetsFromHypergraph(resultHypergraph);
     };
 
     /**

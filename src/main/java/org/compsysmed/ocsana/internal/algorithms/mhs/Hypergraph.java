@@ -61,7 +61,7 @@ public class Hypergraph extends ArrayList<BitSet> {
      * indices
      **/
     public Hypergraph (File inFile)
-        throws FileNotFoundException, IOException, NumberFormatException {
+        throws IOException {
         numVerts = 0;
 
         try (BufferedReader inFileReader
@@ -223,6 +223,7 @@ public class Hypergraph extends ArrayList<BitSet> {
         // smaller than their supersets
         List<BitSet> edgesSortedByIncreasingCardinality = new ArrayList<> (this);
         Collections.sort(edgesSortedByIncreasingCardinality, new Comparator<BitSet>() {
+                @Override
                 public int compare(BitSet left, BitSet right) {
                     return left.cardinality() - right.cardinality();
                 }

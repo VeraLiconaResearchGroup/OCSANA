@@ -10,7 +10,6 @@ package org.compsysmed.ocsana.internal.algorithms.mhs;
 
 import java.util.*;
 
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.RecursiveAction;
 
@@ -150,7 +149,7 @@ abstract class SHDRecursiveTask extends RecursiveAction {
     /**
      * Helper RecursiveTask to wait for all computations
      **/
-    static public class TaskWaiter extends RecursiveAction {
+    public static class TaskWaiter extends RecursiveAction {
         @Override
         public void compute () {
             helpQuiesce();

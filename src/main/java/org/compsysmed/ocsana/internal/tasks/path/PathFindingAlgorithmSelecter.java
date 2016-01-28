@@ -15,12 +15,9 @@ package org.compsysmed.ocsana.internal.tasks.path;
 import java.util.*;
 
 // Cytoscape imports
-import org.cytoscape.work.TaskMonitor;
 import org.cytoscape.work.Tunable;
-import org.cytoscape.work.ContainsTunables;
 import org.cytoscape.work.util.ListSingleSelection;
 
-import org.cytoscape.model.CyNode;
 import org.cytoscape.model.CyNetwork;
 
 // OCSANA imports

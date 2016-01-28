@@ -17,7 +17,6 @@ import java.util.*;
 // Cytoscape imports
 import org.cytoscape.model.CyNode;
 import org.cytoscape.model.CyEdge;
-import org.cytoscape.model.CyIdentifiable;
 import org.cytoscape.model.CyNetwork;
 
 // OCSANA imports
@@ -64,8 +63,6 @@ public class OCSANAResults {
 
     // Report data
     private List<String> reportLines;
-
-    public OCSANAResults () {};
 
     // Output generation
     /**

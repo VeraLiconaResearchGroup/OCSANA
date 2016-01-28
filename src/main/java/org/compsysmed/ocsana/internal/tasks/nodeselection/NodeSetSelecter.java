@@ -31,52 +31,52 @@ import org.cytoscape.model.CyNetwork;
  **/
 
 public class NodeSetSelecter {
-    private static final String configGroup = "Select nodes";
-    private static final String configGroupSources = "Source nodes";
-    private static final String configGroupTargets = "Target nodes";
-    private static final String configGroupOffTargets = "Off-target nodes";
+    private static final String CONFIG_GROUP = "Select nodes";
+    private static final String CONFIG_GROUP_SOURCES = "Source nodes";
+    private static final String CONFIG_GROUP_TARGETS = "Target nodes";
+    private static final String CONFIG_GROUP_OFF_TARGETS = "Off-target nodes";
 
-    private static final String listSelectDescription = "Use Ctrl+click to select multiple nodes:";
-    private static final String stringSelectDescription = "Comma-separated list of node names:";
+    private static final String LIST_SELECT_DESCRIPTION = "Use Ctrl+click to select multiple nodes:";
+    private static final String STRING_SELECT_DESCRIPTION = "Comma-separated list of node names:";
 
     @Tunable(description = "Node selection mode",
              gravity = 110,
-             groups = {configGroup})
+             groups = {CONFIG_GROUP})
     public ListSingleSelection<String> selectMode = new ListSingleSelection<>("List", "String");
 
     @Tunable(gravity = 141,
-             description = listSelectDescription,
-             groups = {configGroup, configGroupSources},
+             description = LIST_SELECT_DESCRIPTION,
+             groups = {CONFIG_GROUP, CONFIG_GROUP_SOURCES},
              dependsOn = "selectMode=List")
     public ListMultipleSelection<NodeWithName> sourceNodeList;
 
     @Tunable(gravity = 142,
-             description = stringSelectDescription,
-             groups = {configGroup, configGroupSources},
+             description = STRING_SELECT_DESCRIPTION,
+             groups = {CONFIG_GROUP, CONFIG_GROUP_SOURCES},
              dependsOn = "selectMode=String")
     public String sourceNodeString;
 
     @Tunable(gravity = 151,
-             description = listSelectDescription,
-             groups = {configGroup, configGroupTargets},
+             description = LIST_SELECT_DESCRIPTION,
+             groups = {CONFIG_GROUP, CONFIG_GROUP_TARGETS},
              dependsOn = "selectMode=List")
     public ListMultipleSelection<NodeWithName> targetNodeList;
 
     @Tunable(gravity = 152,
-             description = stringSelectDescription,
-             groups = {configGroup, configGroupTargets},
+             description = STRING_SELECT_DESCRIPTION,
+             groups = {CONFIG_GROUP, CONFIG_GROUP_TARGETS},
              dependsOn = "selectMode=String")
     public String targetNodeString;
 
     @Tunable(gravity = 161,
-             description = listSelectDescription,
-             groups = {configGroup, configGroupOffTargets},
+             description = LIST_SELECT_DESCRIPTION,
+             groups = {CONFIG_GROUP, CONFIG_GROUP_OFF_TARGETS},
              dependsOn = "selectMode=List")
     public ListMultipleSelection<NodeWithName> offTargetNodeList;
 
     @Tunable(gravity = 162,
-             description = stringSelectDescription,
-             groups = {configGroup, configGroupOffTargets},
+             description = STRING_SELECT_DESCRIPTION,
+             groups = {CONFIG_GROUP, CONFIG_GROUP_OFF_TARGETS},
              dependsOn = "selectMode=String")
     public String offTargetNodeString;
 
@@ -171,30 +171,30 @@ public class NodeSetSelecter {
             if (node != null) {
                 nodes.add(node);
             } else {
-                System.out.println(nodeNames);
                 throw new IllegalArgumentException("No node named " + trimmedName + " could be found.");
             }
         }
         return nodes;
     }
-}
 
-class NodeWithName implements Comparable<NodeWithName> {
-    public CyNode node;
-    public String name;
+    private static class NodeWithName implements Comparable<NodeWithName> {
+        public final CyNode node;
+        public final String name;
 
-    public NodeWithName (CyNode node, String name) {
-        this.node = node;
-        this.name = name;
+        public NodeWithName (CyNode node, String name) {
+            this.node = node;
+            this.name = name;
+        }
+
+        @Override
+        public String toString () {
+            return name;
+        }
+
+        @Override
+        public int compareTo (NodeWithName otherNode) {
+            return name.compareTo(otherNode.name);
+        }
     }
 
-    @Override
-    public String toString () {
-        return name;
-    }
-
-    @Override
-    public int compareTo (NodeWithName otherNode) {
-        return name.compareTo(otherNode.name);
-    }
 }

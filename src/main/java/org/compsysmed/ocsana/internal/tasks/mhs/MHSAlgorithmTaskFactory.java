@@ -16,16 +16,9 @@ import java.util.*;
 
 // Cytoscape imports
 import org.cytoscape.work.AbstractTaskFactory;
-import org.cytoscape.work.TaskMonitor;
 import org.cytoscape.work.TaskIterator;
 
-import org.cytoscape.model.CyNetwork;
-import org.cytoscape.model.CyEdge;
-import org.cytoscape.model.CyNode;
-
 // OCSANA imports
-import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
-
 import org.compsysmed.ocsana.internal.tasks.results.OCSANAResults;
 
 public class MHSAlgorithmTaskFactory extends AbstractTaskFactory {

@@ -22,7 +22,9 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 public class InteractionsDatabase {
-    private static final String drugBankPath = "/drugbank/drugbank.json";
+    private static final Set<String> KNOWN_DRUG_GROUPS = new HashSet<>(Arrays.asList("approved", "investigational", "experimental", "nutraceutical", "illicit", "withdrawn"));
+
+    private static final String DRUGBANK_PATH = "/drugbank/drugbank.json";
     private static InteractionsDatabase internalDB;
 
     private List<Gene> genes = new ArrayList<>();
@@ -32,7 +34,7 @@ public class InteractionsDatabase {
 
     private InteractionsDatabase () {
         JSONObject drugBankJSON;
-        try (InputStream jsonFileStream = getClass().getResourceAsStream(drugBankPath)) {
+        try (InputStream jsonFileStream = getClass().getResourceAsStream(DRUGBANK_PATH)) {
             drugBankJSON = new JSONObject(new JSONTokener(jsonFileStream));
         }
         catch (IOException e) {
@@ -113,15 +115,14 @@ public class InteractionsDatabase {
     }
 
     // Prevent cloning to avoid goofy corner-case synchronization problems
+    @Override
     public Object clone() throws CloneNotSupportedException {
         throw new CloneNotSupportedException();
     }
 
-    private static final Set<String> knownDrugGroups = new HashSet<>(Arrays.asList("approved", "investigational", "experimental", "nutraceutical", "illicit", "withdrawn"));
-
     private static class Drug {
         public final String name;
-        public Set<String> groups = new HashSet<>();
+        public final Set<String> groups = new HashSet<>();
 
         public Drug (String name) {
             this.name = name;
@@ -130,7 +131,7 @@ public class InteractionsDatabase {
         public void setGroups (JSONArray groupsArray) {
             for (int i = 0; i < groupsArray.length(); i++) {
                 String group = groupsArray.getString(i);
-                assert knownDrugGroups.contains(group);
+                assert KNOWN_DRUG_GROUPS.contains(group);
                 groups.add(group);
             }
         }
@@ -139,6 +140,7 @@ public class InteractionsDatabase {
             return groups.stream().map(group -> group.toString()).collect(Collectors.toSet());
         }
 
+        @Override
         public String toString () {
             return name;
         }
@@ -146,12 +148,13 @@ public class InteractionsDatabase {
 
     private static class Interaction {
         public final String type;
-        public List<Drug> drugs = new ArrayList<>();
+        public final List<Drug> drugs = new ArrayList<>();
 
         public Interaction (String type) {
             this.type = type;
         }
 
+        @Override
         public String toString () {
             return type;
         }
@@ -167,12 +170,13 @@ public class InteractionsDatabase {
 
     private static class Gene {
         public final String name;
-        public List<Interaction> interactions = new ArrayList<>();
+        public final List<Interaction> interactions = new ArrayList<>();
 
         public Gene (String name) {
             this.name = name;
         }
 
+        @Override
         public String toString () {
             return name;
         }

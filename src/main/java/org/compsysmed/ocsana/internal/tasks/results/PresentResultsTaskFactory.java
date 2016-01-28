@@ -16,20 +16,9 @@ import java.util.*;
 
 // Cytoscape imports
 import org.cytoscape.work.AbstractTaskFactory;
-import org.cytoscape.work.TaskMonitor;
 import org.cytoscape.work.TaskIterator;
 
-import org.cytoscape.model.CyNetwork;
-import org.cytoscape.model.CyNode;
-import org.cytoscape.model.CyEdge;
-
 // OCSANA imports
-import org.compsysmed.ocsana.internal.algorithms.path.AbstractPathFindingAlgorithm;
-import org.compsysmed.ocsana.internal.algorithms.mhs.AbstractMHSAlgorithm;
-import org.compsysmed.ocsana.internal.algorithms.scoring.OCSANAScoringAlgorithm;
-
-import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
-
 import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
 
 public class PresentResultsTaskFactory extends AbstractTaskFactory {

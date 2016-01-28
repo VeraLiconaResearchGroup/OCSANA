@@ -16,9 +16,6 @@ import java.util.*;
 
 // Cytoscape imports
 import org.cytoscape.work.TaskMonitor;
-import org.cytoscape.model.CyNetwork;
-import org.cytoscape.model.CyEdge;
-import org.cytoscape.model.CyNode;
 
 // OCSANA imports
 import org.compsysmed.ocsana.internal.tasks.AbstractOCSANATask;

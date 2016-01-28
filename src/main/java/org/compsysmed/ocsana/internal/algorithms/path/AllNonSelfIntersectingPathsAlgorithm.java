@@ -54,13 +54,11 @@ public class AllNonSelfIntersectingPathsAlgorithm
     @Override
     public Collection<List<CyEdge>> paths (Set<CyNode> sources,
                                            Set<CyNode> targets) {
-        Map<CyEdge, Integer> edgeMinDistances
-            = dijkstra.edgeMinDistances(sources, targets);
+        Map<CyEdge, Integer> edgeMinDistances = dijkstra.edgeMinDistances(targets);
 
         // Only run the next step if the previous succeeded
         if (edgeMinDistances != null) {
-            Collection<List<CyEdge>> results = computeAllPaths(sources, targets, edgeMinDistances);
-            return results;
+            return computeAllPaths(sources, targets, edgeMinDistances);
         } else {
             return null;
         }
@@ -97,7 +95,7 @@ public class AllNonSelfIntersectingPathsAlgorithm
                 }
 
                 if (!outEdge.isDirected()) {
-                    throw new IllegalArgumentException("Undirected edges are not supported.");
+                    throw new IllegalArgumentException(UNDIRECTED_ERROR_MESSAGE);
                 }
 
                 assert outEdge.getSource().equals(sourceNode);
@@ -120,7 +118,7 @@ public class AllNonSelfIntersectingPathsAlgorithm
             CyEdge leafEdge = incompletePath.get(pathLength - 1);
 
             if (!leafEdge.isDirected()) {
-                throw new IllegalArgumentException("Undirected edges are not supported.");
+                throw new IllegalArgumentException(UNDIRECTED_ERROR_MESSAGE);
             }
 
             CyNode leafNode = leafEdge.getTarget();
@@ -134,7 +132,7 @@ public class AllNonSelfIntersectingPathsAlgorithm
 
                 // Handle undirected edge (error case)
                 if (!outEdge.isDirected()) {
-                    throw new IllegalArgumentException("Undirected edges are not supported.");
+                    throw new IllegalArgumentException(UNDIRECTED_ERROR_MESSAGE);
                 }
 
                 // Handle loop case (ignore this edge)

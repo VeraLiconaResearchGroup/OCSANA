@@ -19,7 +19,6 @@ import org.cytoscape.work.TaskMonitor;
 
 import org.cytoscape.model.CyNode;
 import org.cytoscape.model.CyEdge;
-import org.cytoscape.model.CyNetwork;
 
 // OCSANA imports
 import org.compsysmed.ocsana.internal.tasks.AbstractOCSANATask;

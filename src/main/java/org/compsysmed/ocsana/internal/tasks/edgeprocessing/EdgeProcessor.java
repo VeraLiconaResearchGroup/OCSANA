@@ -17,7 +17,6 @@ import java.util.*;
 // Cytoscape imports
 import org.cytoscape.work.Tunable;
 import org.cytoscape.work.util.ListSingleSelection;
-import org.cytoscape.work.util.ListMultipleSelection;
 
 import org.cytoscape.model.CyColumn;
 import org.cytoscape.model.CyEdge;
@@ -34,25 +33,25 @@ import org.cytoscape.model.CyTable;
  **/
 
 public class EdgeProcessor {
-    private static final String configGroup = "Process edges";
+    private static final String CONFIG_GROUP = "Process edges";
 
     // User configuration
     @Tunable(description = "Process edge activation and inhibition",
              tooltip = "If enabled, consider whether each edge represents an activation or an inhibition, using information from an edge attribute in the table",
              gravity = 190,
-             groups = {configGroup})
+             groups = {CONFIG_GROUP})
     public Boolean processEdgeSigns = false;
 
     @Tunable(description = "Column storing edge interactions",
              gravity = 191,
-             groups = {configGroup},
+             groups = {CONFIG_GROUP},
              dependsOn = "processEdgeSigns=true")
     public ListSingleSelection<CyColumn> edgeSignColumnSelecter;
 
     @Tunable(description = "Column value representing inhibition",
              tooltip = "All other values will be interpreted as activation",
              gravity = 192,
-             groups = {configGroup},
+             groups = {CONFIG_GROUP},
              dependsOn = "processEdgeSigns=true",
              listenForChange = "edgeSignColumnSelecter")
     public ListSingleSelection<Object> getEdgeInhibitionValue () {

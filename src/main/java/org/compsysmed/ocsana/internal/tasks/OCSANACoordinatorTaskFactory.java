@@ -34,6 +34,7 @@ public class OCSANACoordinatorTaskFactory extends AbstractNetworkTaskFactory {
         this.resultsPanel = resultsPanel;
     }
 
+    @Override
     public TaskIterator createTaskIterator (CyNetwork network) {
         TaskIterator tasks = new TaskIterator();
         tasks.append(new OCSANACoordinatorTask(network, taskManager, resultsPanel));

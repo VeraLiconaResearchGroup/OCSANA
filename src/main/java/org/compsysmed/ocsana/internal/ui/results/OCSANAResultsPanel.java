@@ -17,8 +17,6 @@ import java.io.*;
 
 import java.awt.Component;
 import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Toolkit;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -106,6 +104,7 @@ public class OCSANAResultsPanel
         JButton showReportButton = new JButton("Show report");
         buttonPanel.add(showReportButton);
         showReportButton.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed (ActionEvent e) {
                     showResultsReport();
                 }
@@ -115,6 +114,7 @@ public class OCSANAResultsPanel
         buttonPanel.add(saveReportButton);
 
         saveReportButton.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed (ActionEvent event) {
                     JFileChooser fileChooser = new JFileChooser();
                     if (fileChooser.showSaveDialog(buttonPanel) == JFileChooser.APPROVE_OPTION) {
@@ -194,6 +194,7 @@ public class OCSANAResultsPanel
     /**
      * Get the results panel component
      */
+    @Override
     public Component getComponent() {
         return this;
     }
@@ -201,6 +202,7 @@ public class OCSANAResultsPanel
     /**
      * Get the results panel name
      */
+    @Override
     public CytoPanelName getCytoPanelName () {
         return CytoPanelName.EAST;
     }
@@ -208,6 +210,7 @@ public class OCSANAResultsPanel
     /**
      * Get the results panel title
      */
+    @Override
     public String getTitle() {
         return "OCSANA";
     }
@@ -215,6 +218,7 @@ public class OCSANAResultsPanel
     /**
      * Get the results panel icon
      */
+    @Override
     public Icon getIcon() {
         return null;
     }

@@ -21,7 +21,6 @@ import org.cytoscape.work.Task;
 import org.cytoscape.work.TaskMonitor;
 import org.cytoscape.work.TaskManager;
 import org.cytoscape.work.TaskObserver;
-import org.cytoscape.work.TaskIterator;
 import org.cytoscape.work.ObservableTask;
 import org.cytoscape.work.FinishStatus;
 import org.cytoscape.work.ContainsTunables;
@@ -39,16 +38,9 @@ import org.compsysmed.ocsana.internal.algorithms.mhs.AbstractMHSAlgorithm;
 import org.compsysmed.ocsana.internal.algorithms.scoring.OCSANAScoringAlgorithm;
 import org.compsysmed.ocsana.internal.algorithms.scoring.DrugBankScoringAlgorithm;
 
-import org.compsysmed.ocsana.internal.tasks.path.PathFindingAlgorithmTask;
 import org.compsysmed.ocsana.internal.tasks.path.PathFindingAlgorithmTaskFactory;
-
-import org.compsysmed.ocsana.internal.tasks.scoring.ScoringTask;
 import org.compsysmed.ocsana.internal.tasks.scoring.ScoringTaskFactory;
-
-import org.compsysmed.ocsana.internal.tasks.mhs.MHSAlgorithmTask;
 import org.compsysmed.ocsana.internal.tasks.mhs.MHSAlgorithmTaskFactory;
-
-import org.compsysmed.ocsana.internal.tasks.results.PresentResultsTask;
 import org.compsysmed.ocsana.internal.tasks.results.PresentResultsTaskFactory;
 import org.compsysmed.ocsana.internal.tasks.results.OCSANAResults;
 
@@ -64,11 +56,6 @@ import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
 
 public class OCSANARunnerTask extends AbstractNetworkTask
     implements TaskObserver {
-    @ProvidesTitle
-    public String getTitle() {
-        return "OCSANA parameters II";
-    }
-
     // User-configurable options
 
     // In general, the Runner should only contain configuration
@@ -83,7 +70,7 @@ public class OCSANARunnerTask extends AbstractNetworkTask
 
     // End user configuration
 
-    public OCSANAScoringAlgorithm ocsanaAlg;
+    private OCSANAScoringAlgorithm ocsanaAlg;
 
     private OCSANAResults results;
 
@@ -126,6 +113,12 @@ public class OCSANARunnerTask extends AbstractNetworkTask
         results.offTargetNodes = offTargetNodes;
     }
 
+    @ProvidesTitle
+    public String getTitle() {
+        return "OCSANA parameters II";
+    }
+
+    @Override
     public void run (TaskMonitor taskMonitor) {
         // TODO: Handle null members
 
@@ -181,6 +174,7 @@ public class OCSANARunnerTask extends AbstractNetworkTask
         // Any post-process cleanup should happen here
     }
 
+    @Override
     public void taskFinished(ObservableTask task) {
         // Make sure the task returned non-null
          if (task.getResults(Object.class) == null) {
@@ -220,6 +214,7 @@ public class OCSANARunnerTask extends AbstractNetworkTask
         }
     }
 
+    @Override
     public void allFinished(FinishStatus finishStatus) {
         // Called after the TaskManager finished up a TaskIterator.
         // Currently, we don't do anything with this information.

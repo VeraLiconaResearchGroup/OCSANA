@@ -20,7 +20,6 @@ import org.cytoscape.task.AbstractNetworkTask;
 import org.cytoscape.work.Task;
 import org.cytoscape.work.TaskManager;
 import org.cytoscape.work.TaskMonitor;
-import org.cytoscape.work.TaskIterator;
 import org.cytoscape.work.ContainsTunables;
 import org.cytoscape.work.ProvidesTitle;
 
@@ -54,11 +53,6 @@ import org.compsysmed.ocsana.internal.tasks.mhs.MHSAlgorithmSelecter;
 
 public class OCSANACoordinatorTask extends AbstractNetworkTask {
     private TaskManager<?, ?> taskManager;
-
-    @ProvidesTitle
-    public String getTitle() {
-        return "OCSANA parameters I";
-    }
 
     // User-configurable options
 
@@ -103,6 +97,12 @@ public class OCSANACoordinatorTask extends AbstractNetworkTask {
         drugBankAlgorithm = new DrugBankScoringAlgorithm(network);
     }
 
+    @ProvidesTitle
+    public String getTitle() {
+        return "OCSANA parameters I";
+    }
+
+    @Override
     public void run (TaskMonitor taskMonitor) {
         // TODO: Handle null members
         // Give the task a title.

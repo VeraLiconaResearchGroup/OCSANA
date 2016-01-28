@@ -15,7 +15,6 @@ package org.compsysmed.ocsana.internal.algorithms.path;
 import java.util.*;
 
 // Cytoscape imports
-import org.cytoscape.work.Tunable;
 import org.cytoscape.work.ContainsTunables;
 
 import org.cytoscape.model.CyNetwork;
@@ -80,7 +79,7 @@ public class ShortestPathsAlgorithm
         Set<CyNode> targetSet = Collections.singleton(target);
 
         // Decorate graph with minimal distances to target
-        Map<CyEdge, Integer> edgeMinDistances = dijkstra.edgeMinDistances(sourceSet, targetSet);
+        Map<CyEdge, Integer> edgeMinDistances = dijkstra.edgeMinDistances(targetSet);
 
         // Find shortest path length
         Integer shortestPathLength = null;
@@ -91,7 +90,7 @@ public class ShortestPathsAlgorithm
             }
 
             if (!outEdge.isDirected()) {
-                throw new IllegalArgumentException("Undirected edges are not supported.");
+                throw new IllegalArgumentException(UNDIRECTED_ERROR_MESSAGE);
             }
 
             assert outEdge.getSource() == source;
@@ -124,7 +123,7 @@ public class ShortestPathsAlgorithm
             }
 
             if (!outEdge.isDirected()) {
-                throw new IllegalArgumentException("Undirected edges are not supported.");
+                throw new IllegalArgumentException(UNDIRECTED_ERROR_MESSAGE);
             }
 
             assert outEdge.getSource() == source;
@@ -158,7 +157,7 @@ public class ShortestPathsAlgorithm
             CyEdge leafEdge = incompletePath.get(pathLength - 1);
 
             if (!leafEdge.isDirected()) {
-                throw new IllegalArgumentException("Undirected edges are not supported.");
+                throw new IllegalArgumentException(UNDIRECTED_ERROR_MESSAGE);
             }
 
             CyNode leafNode = leafEdge.getTarget();
@@ -169,7 +168,7 @@ public class ShortestPathsAlgorithm
                 }
 
                 if (!outEdge.isDirected()) {
-                    throw new IllegalArgumentException("Undirected edges are not supported.");
+                    throw new IllegalArgumentException(UNDIRECTED_ERROR_MESSAGE);
                 }
 
                 Integer shortestPathLengthRemaining = shortestPathLength - pathLength;

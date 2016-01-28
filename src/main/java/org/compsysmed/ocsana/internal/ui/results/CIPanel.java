@@ -27,7 +27,6 @@ import javax.swing.table.TableRowSorter;
 
 // Cytoscape imports
 import org.cytoscape.model.CyNode;
-import org.cytoscape.model.CyEdge;
 
 // OCSANA imports
 import org.compsysmed.ocsana.internal.tasks.results.OCSANAResults;

@@ -30,6 +30,7 @@ import org.compsysmed.ocsana.internal.tasks.OCSANACoordinatorTaskFactory;
 import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
 
 public class CyActivator extends AbstractCyActivator {
+    @Override
     public void start (BundleContext bc) throws Exception {
         // Get a TaskManager
         TaskManager<?, ?> taskManager = getService(bc, TaskManager.class);

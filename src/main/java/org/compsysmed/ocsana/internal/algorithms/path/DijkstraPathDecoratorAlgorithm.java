@@ -48,7 +48,6 @@ public class DijkstraPathDecoratorAlgorithm
      * Compute the minimum length of a path to the targets from
      * each edge
      *
-     * @param sources  the source nodes
      * @param targets  the target nodes
      *
      * @return a Map which assigns to some CyEdges a non-negative
@@ -56,8 +55,7 @@ public class DijkstraPathDecoratorAlgorithm
      * starting from the given edge and leading to a target node, as
      * long as that number is not greater than maxPathLength
      **/
-    protected Map<CyEdge, Integer> edgeMinDistances (Set<CyNode> sources,
-                                                     Set<CyNode> targets) {
+    protected Map<CyEdge, Integer> edgeMinDistances (Set<CyNode> targets) {
         // We'll iterate up through the network, starting at the
         // targets and walking backwards along edges. Each time we
         // find an edge which has not been marked with a distance, we

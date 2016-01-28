@@ -21,7 +21,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 // Cytoscape imports
-import org.cytoscape.model.CyNode;
 import org.cytoscape.model.CyEdge;
 
 // OCSANA imports
@@ -29,9 +28,6 @@ import org.compsysmed.ocsana.internal.tasks.results.OCSANAResults;
 
 public class PathsPanel
     extends JPanel {
-    private static final Vector<String> mhsCols =
-        new Vector<>(Arrays.asList(new String[] {"CI", "Size", "Score"}));
-
     public PathsPanel (OCSANAResults results,
                        PathType pathType) {
         Collection<List<CyEdge>> paths;
@@ -83,6 +79,7 @@ public class PathsPanel
             this.pluralName = pluralName;
         }
 
+        @Override
         public String toString() {
             return pluralName;
         }

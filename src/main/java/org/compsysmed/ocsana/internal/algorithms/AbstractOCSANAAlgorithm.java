@@ -44,15 +44,16 @@ public abstract class AbstractOCSANAAlgorithm {
     /**
      * Return a long, explanatory name
      **/
-    abstract public String fullName ();
+    public abstract String fullName ();
 
     /**
      * Return a short name
      **/
-    abstract public String shortName ();
+    public abstract String shortName ();
 
     /**
      * Return a name suitable for printing in a menu or status message
      **/
-    abstract public String toString ();
+    @Override
+    public abstract String toString ();
 }

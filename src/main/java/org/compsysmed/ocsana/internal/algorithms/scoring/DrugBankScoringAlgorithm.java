@@ -20,7 +20,6 @@ import org.cytoscape.work.Tunable;
 import org.cytoscape.work.util.ListSingleSelection;
 
 import org.cytoscape.model.CyNetwork;
-import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNode;
 
 import org.cytoscape.model.CyTable;
