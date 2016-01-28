@@ -93,7 +93,7 @@ public class AllNonSelfIntersectingPathsAlgorithmTest {
     }
 
     @Test
-    public void toyNetworkShouldHaveRightNumberOfPaths () {
+    public void toyNetworkShouldHaveRightNumberOfShortPaths () {
         // Algorithm
         AllNonSelfIntersectingPathsAlgorithm pathAlg = new AllNonSelfIntersectingPathsAlgorithm(toyNetwork);
         pathAlg.dijkstra.restrictPathLength = true;
@@ -110,7 +110,25 @@ public class AllNonSelfIntersectingPathsAlgorithmTest {
     }
 
     @Test
-    public void HER2NetworkShouldHaveRightNumberOfPaths () {
+    public void toyNetworkShouldHaveRightNumberOfLongPaths () {
+        // Algorithm
+        AllNonSelfIntersectingPathsAlgorithm pathAlg = new AllNonSelfIntersectingPathsAlgorithm(toyNetwork);
+        pathAlg.discardNodeRedundantPaths = false;
+        pathAlg.dijkstra.restrictPathLength = true;
+        pathAlg.dijkstra.maxPathLength = 20;
+
+        // path-finding
+        Collection<List<CyEdge>> paths = pathAlg.paths(toyNetworkSources, toyNetworkTargets);
+        assertEquals("Path count", 7, paths.size());
+
+        for (List<CyEdge> path: paths) {
+            assertTrue("Path starts at a source", toyNetworkSources.contains(path.get(0).getSource()));
+            assertTrue("Path ends at a target", toyNetworkTargets.contains(path.get(path.size() - 1).getTarget()));
+        }
+    }
+
+    @Test
+    public void HER2NetworkShouldHaveRightNumberOfShortPaths () {
         // Algorithm
         AllNonSelfIntersectingPathsAlgorithm pathAlg = new AllNonSelfIntersectingPathsAlgorithm(HER2Network);
         pathAlg.dijkstra.restrictPathLength = true;
@@ -119,6 +137,24 @@ public class AllNonSelfIntersectingPathsAlgorithmTest {
         // Path-finding
         Collection<List<CyEdge>> paths = pathAlg.paths(HER2NetworkSources, HER2NetworkTargets);
         assertEquals("Path count", 5330, paths.size());
+
+        for (List<CyEdge> path: paths) {
+            assertTrue("Path starts at a source", HER2NetworkSources.contains(path.get(0).getSource()));
+            assertTrue("Path ends at a target", HER2NetworkTargets.contains(path.get(path.size() - 1).getTarget()));
+        }
+    }
+
+    @Test
+    public void HER2NetworkShouldHaveRightNumberOfLongPaths () {
+        // Algorithm
+        AllNonSelfIntersectingPathsAlgorithm pathAlg = new AllNonSelfIntersectingPathsAlgorithm(HER2Network);
+        pathAlg.discardNodeRedundantPaths = false;
+        pathAlg.dijkstra.restrictPathLength = true;
+        pathAlg.dijkstra.maxPathLength = 20;
+
+        // Path-finding
+        Collection<List<CyEdge>> paths = pathAlg.paths(HER2NetworkSources, HER2NetworkTargets);
+        assertEquals("Path count", 69805, paths.size());
 
         for (List<CyEdge> path: paths) {
             assertTrue("Path starts at a source", HER2NetworkSources.contains(path.get(0).getSource()));

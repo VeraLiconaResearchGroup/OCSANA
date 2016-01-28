@@ -104,7 +104,7 @@ public class AllNonSelfIntersectingPathsAlgorithm
 
                 // Ignore edges that aren't marked or that connect a source to another source that isn't a target
                 if (edgeMinDistances.containsKey(outEdge) &&
-                    (!sources.contains(outEdge.getTarget()) || targets.contains(outEdge.getTarget()))) {
+                    (!discardNodeRedundantPaths || (!sources.contains(outEdge.getTarget()) || targets.contains(outEdge.getTarget())))) {
                     List<CyEdge> newPath = Arrays.asList(outEdge);
                     incompletePaths.add(newPath);
                 }
@@ -183,9 +183,10 @@ public class AllNonSelfIntersectingPathsAlgorithm
                         assert sources.contains(newPath.get(0).getSource());
                         assert targets.contains(newPath.get(newPath.size() - 1).getTarget());
                         completePaths.add(newPath);
-                    } else if (!sources.contains(outEdge.getTarget())) {
-                        // If the new path doesn't end at a source or
-                        // a target, we should consider further
+                    }
+
+                    if (!discardNodeRedundantPaths || (!sources.contains(outEdge.getTarget()) && !targets.contains(outEdge.getTarget()))) {
+                        // Otherwise, we should consider further
                         // extensions of it
                         incompletePaths.addFirst(newPath);
                     }
