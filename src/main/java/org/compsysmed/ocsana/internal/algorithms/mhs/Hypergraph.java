@@ -6,9 +6,10 @@
 
 package org.compsysmed.ocsana.internal.algorithms.mhs;
 
+// Java imports
 import java.util.*;
-
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Impelementation of hypergraphs/set families
@@ -65,7 +66,7 @@ public class Hypergraph extends ArrayList<BitSet> {
         numVerts = 0;
 
         try (BufferedReader inFileReader
-             = new BufferedReader(new FileReader(inFile))) {
+             = new BufferedReader(new InputStreamReader(new FileInputStream(inFile), StandardCharsets.UTF_8))) {
             String line;
             while ((line = inFileReader.readLine()) != null) {
                 String[] lineWords = line.trim().split(" ");
@@ -161,15 +162,15 @@ public class Hypergraph extends ArrayList<BitSet> {
      **/
     public void writeToFile(String outFile)
         throws IOException {
-        try (PrintWriter outFileWriter
-             = new PrintWriter(new BufferedWriter(new FileWriter(outFile)))) {
+        try (BufferedWriter fileWriter =
+             new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFile), StandardCharsets.UTF_8))) {
             for (BitSet edge: this) {
                 StringBuilder lineBuilder = new StringBuilder();
                 for (int i = edge.nextSetBit(0); i >= 0; i = edge.nextSetBit(i+1)) {
                     lineBuilder.append(i + " ");
                 }
                 lineBuilder.append("\n");
-                outFileWriter.write(lineBuilder.toString());
+                fileWriter.write(lineBuilder.toString());
             }
         }
     };

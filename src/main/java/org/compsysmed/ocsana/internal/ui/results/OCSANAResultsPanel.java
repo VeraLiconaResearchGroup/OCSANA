@@ -14,6 +14,7 @@ package org.compsysmed.ocsana.internal.ui.results;
 // Java imports
 import java.util.*;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 import java.awt.Component;
 import java.awt.BorderLayout;
@@ -120,7 +121,7 @@ public class OCSANAResultsPanel
                     if (fileChooser.showSaveDialog(buttonPanel) == JFileChooser.APPROVE_OPTION) {
                         File outFile = fileChooser.getSelectedFile();
                         try (BufferedWriter fileWriter =
-                             new BufferedWriter(new FileWriter(outFile))) {
+                             new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFile), StandardCharsets.UTF_8))) {
                             for (String reportLine: results.getReportLines()) {
                                 fileWriter.write(reportLine);
                                 fileWriter.newLine();
