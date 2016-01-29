@@ -21,6 +21,8 @@ import org.cytoscape.work.TaskIterator;
 // OCSANA imports
 import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
 
+import org.compsysmed.ocsana.internal.util.results.OCSANAResults;
+
 public class PresentResultsTaskFactory extends AbstractTaskFactory {
     private OCSANAResults results;
     private OCSANAResultsPanel resultsPanel;

@@ -9,7 +9,7 @@
  * details
  **/
 
-package org.compsysmed.ocsana.internal.tasks.results;
+package org.compsysmed.ocsana.internal.util.results;
 
 // Java imports
 import java.util.*;

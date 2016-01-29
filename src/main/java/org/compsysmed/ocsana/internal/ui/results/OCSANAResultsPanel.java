@@ -40,7 +40,7 @@ import org.cytoscape.application.swing.CytoPanelName;
 import org.cytoscape.application.swing.CytoPanelState;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.tasks.results.OCSANAResults;
+import org.compsysmed.ocsana.internal.util.results.OCSANAResults;
 
 /**
  * Panel to display OCSANA results

@@ -24,7 +24,7 @@ import org.cytoscape.model.CyEdge;
 import org.compsysmed.ocsana.internal.tasks.AbstractOCSANATask;
 import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
 
-import org.compsysmed.ocsana.internal.tasks.results.OCSANAResults;
+import org.compsysmed.ocsana.internal.util.results.OCSANAResults;
 
 public class PathFindingAlgorithmTask extends AbstractOCSANATask {
     private OCSANAResults results;

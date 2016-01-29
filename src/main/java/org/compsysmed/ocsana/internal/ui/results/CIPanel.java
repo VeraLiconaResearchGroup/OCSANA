@@ -29,7 +29,7 @@ import javax.swing.table.TableRowSorter;
 import org.cytoscape.model.CyNode;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.tasks.results.OCSANAResults;
+import org.compsysmed.ocsana.internal.util.results.OCSANAResults;
 
 public class CIPanel
     extends JPanel {

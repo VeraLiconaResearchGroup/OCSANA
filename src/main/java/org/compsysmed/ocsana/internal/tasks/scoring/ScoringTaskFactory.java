@@ -21,7 +21,7 @@ import org.cytoscape.work.TaskIterator;
 import org.cytoscape.model.CyNetwork;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.tasks.results.OCSANAResults;
+import org.compsysmed.ocsana.internal.util.results.OCSANAResults;
 
 public class ScoringTaskFactory extends AbstractTaskFactory {
     private CyNetwork network;

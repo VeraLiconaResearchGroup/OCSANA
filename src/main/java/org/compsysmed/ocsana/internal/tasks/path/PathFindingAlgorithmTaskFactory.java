@@ -21,7 +21,7 @@ import org.cytoscape.work.TaskIterator;
 // OCSANA imports
 import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
 
-import org.compsysmed.ocsana.internal.tasks.results.OCSANAResults;
+import org.compsysmed.ocsana.internal.util.results.OCSANAResults;
 
 public class PathFindingAlgorithmTaskFactory extends AbstractTaskFactory {
     private OCSANAResults results;

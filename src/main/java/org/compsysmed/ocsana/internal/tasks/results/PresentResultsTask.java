@@ -23,6 +23,8 @@ import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
 
 import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
 
+import org.compsysmed.ocsana.internal.util.results.OCSANAResults;
+
 public class PresentResultsTask extends AbstractOCSANATask {
     private static final OCSANAStep algStep = OCSANAStep.PRESENT_RESULTS;
     private OCSANAResults results;

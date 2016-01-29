@@ -24,7 +24,7 @@ import javax.swing.JTextArea;
 import org.cytoscape.model.CyEdge;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.tasks.results.OCSANAResults;
+import org.compsysmed.ocsana.internal.util.results.OCSANAResults;
 
 public class PathsPanel
     extends JPanel {

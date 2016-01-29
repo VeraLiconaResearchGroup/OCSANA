@@ -42,7 +42,7 @@ import org.compsysmed.ocsana.internal.tasks.path.PathFindingAlgorithmTaskFactory
 import org.compsysmed.ocsana.internal.tasks.scoring.ScoringTaskFactory;
 import org.compsysmed.ocsana.internal.tasks.mhs.MHSAlgorithmTaskFactory;
 import org.compsysmed.ocsana.internal.tasks.results.PresentResultsTaskFactory;
-import org.compsysmed.ocsana.internal.tasks.results.OCSANAResults;
+import org.compsysmed.ocsana.internal.util.results.OCSANAResults;
 
 import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
 
