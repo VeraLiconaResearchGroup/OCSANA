@@ -157,6 +157,9 @@ public class OCSANAResults {
         reportLines.add("--- Optimal cut set search report ---");
         reportLines.add("");
 
+        reportLines.add(String.format("Network name: %s", network.getRow(network).get(CyNetwork.NAME, String.class)));
+        reportLines.add("");
+
         if (sourceNodes != null) {
             List<String> sourceNodeNames = new ArrayList<>();
             for (CyNode node: sourceNodes) {
