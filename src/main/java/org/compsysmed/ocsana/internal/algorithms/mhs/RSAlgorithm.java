@@ -303,4 +303,26 @@ public class RSAlgorithm extends AbstractMHSAlgorithm {
     public String toString () {
         return this.shortName();
     }
+
+    @Override
+    public String description () {
+        StringBuilder result = new StringBuilder(fullName());
+
+        result.append(" (");
+
+        if (useMaxCardinality) {
+            result.append(String.format("max CI size: %d; ", maxCardinalityBInt.getValue()));
+        } else {
+            result.append("no max CI size; ");
+        }
+
+        if (configureThreads) {
+            result.append(String.format("threads: %d", numThreads.getValue()));
+        } else {
+            result.append("all cores");
+        }
+
+        result.append(")");
+        return result.toString();
+    }
 }

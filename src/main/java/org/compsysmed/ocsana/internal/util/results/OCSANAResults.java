@@ -199,7 +199,8 @@ public class OCSANAResults {
             }
         }
 
-        reportLines.add(String.format("Found %d elementary paths with search strategy %s and %d elementary nodes.", pathsToTargets.size(), pathFindingAlg.shortName(), elementaryNodes.size()));
+        reportLines.add(String.format("Path-finding algorithm: %s", pathFindingAlg.description()));
+        reportLines.add(String.format("Found %d elementary paths and %d elementary nodes.", pathsToTargets.size(), elementaryNodes.size()));
         reportLines.add(String.format("Search times: %fs. for targets, %fs. for off-targets.", pathsToTargetsExecutionSeconds, pathsToOffTargetsExecutionSeconds));
         reportLines.add("");
 
@@ -208,7 +209,11 @@ public class OCSANAResults {
         }
         reportLines.add("");
 
+        reportLines.add(edgeProcessor.description());
+        reportLines.add("");
+
         if (ocsanaAlg.hasScores()) {
+            reportLines.add(String.format("Scoring algorithm: %s", ocsanaAlg.description()));
             reportLines.add(String.format("Computed OCSANA scores in %fs.", OCSANAScoringExecutionSeconds));
             reportLines.add("");
         } else {
@@ -217,6 +222,7 @@ public class OCSANAResults {
         }
 
         if (drugBankAlg.hasScores()) {
+            reportLines.add(String.format("Scoring algorithm: %s", drugBankAlg.description()));
             reportLines.add(String.format("Computed DrugBank scores in %fs.", drugBankScoringExecutionSeconds));
             reportLines.add("");
         } else {
@@ -224,8 +230,8 @@ public class OCSANAResults {
             reportLines.add("");
         }
 
-        String ciInclusionVerb = (includeEndpointsInCIs) ? "including" : "excluding";
-        reportLines.add(String.format("Found %d CIs using MHS algorithm %s (%s endpoints) in %fs.", MHSes.size(), mhsAlg.shortName(), ciInclusionVerb, mhsExecutionSeconds));
+        reportLines.add(String.format("CI-finding algorithm: %s", mhsAlg.description()));
+        reportLines.add(String.format("Found %d CIs in %fs.", MHSes.size(), mhsExecutionSeconds));
         reportLines.add("");
 
         for (Set<CyNode> mhs: MHSes) {

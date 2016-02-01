@@ -168,4 +168,21 @@ public class ShortestPathsAlgorithm
     public String toString () {
         return this.shortName();
     }
+
+    @Override
+    public String description () {
+        StringBuilder result = new StringBuilder(fullName());
+
+        result.append(" (");
+
+        if (dijkstra.restrictPathLength) {
+            result.append(String.format("max path length: %d", dijkstra.maxPathLength));
+        } else {
+            result.append("no max path length");
+        }
+
+
+        result.append(")");
+        return result.toString();
+   }
 }

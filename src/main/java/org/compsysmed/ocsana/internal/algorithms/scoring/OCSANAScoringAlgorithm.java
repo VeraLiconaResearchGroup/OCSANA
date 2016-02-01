@@ -325,4 +325,9 @@ public class OCSANAScoringAlgorithm
     public String toString () {
         return this.shortName();
     }
+
+    @Override
+    public String description () {
+        return fullName();
+    }
 }

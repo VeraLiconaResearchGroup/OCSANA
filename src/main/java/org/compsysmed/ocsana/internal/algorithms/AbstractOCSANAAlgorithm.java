@@ -56,4 +56,9 @@ public abstract class AbstractOCSANAAlgorithm {
      **/
     @Override
     public abstract String toString ();
+
+    /**
+     * Return a descriptive string suitable for printing in a report
+     **/
+    public abstract String description ();
 }

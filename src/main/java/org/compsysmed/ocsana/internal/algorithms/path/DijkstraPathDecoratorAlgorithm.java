@@ -154,4 +154,20 @@ public class DijkstraPathDecoratorAlgorithm
     @Override public String toString() {
         return fullName();
     }
+
+    public String description () {
+        StringBuilder result = new StringBuilder(fullName());
+
+        result.append(" (");
+
+        if (restrictPathLength) {
+            result.append(String.format("max path length: %d", maxPathLength));
+        } else {
+            result.append("no max path length");
+        }
+
+
+        result.append(")");
+        return result.toString();
+    }
 }

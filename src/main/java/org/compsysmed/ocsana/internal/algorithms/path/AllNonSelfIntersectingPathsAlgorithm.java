@@ -217,4 +217,27 @@ public class AllNonSelfIntersectingPathsAlgorithm
     public String toString () {
         return this.shortName();
     }
+
+    @Override
+    public String description () {
+        StringBuilder result = new StringBuilder(fullName());
+
+        result.append(" (");
+
+        if (discardNodeRedundantPaths) {
+            result.append("discard redundant paths; ");
+        } else {
+            result.append("include redundant paths; ");
+        }
+
+        if (dijkstra.restrictPathLength) {
+            result.append(String.format("max path length: %d", dijkstra.maxPathLength));
+        } else {
+            result.append("no max path length");
+        }
+
+
+        result.append(")");
+        return result.toString();
+   }
 }

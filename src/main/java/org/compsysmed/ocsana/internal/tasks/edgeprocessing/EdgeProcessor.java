@@ -79,6 +79,13 @@ public class EdgeProcessor {
         edgeSignColumnSelecter = new ListSingleSelection<>(new ArrayList<>(edgeTable.getColumns()));
     }
 
+    /**
+     * Test whether this edge is inhibitory.
+     *
+     * NOTE: if processEdgeSigns is false, this always returns false
+     *
+     * @param edge  the edge
+     **/
     public Boolean edgeIsInhibition (CyEdge edge) {
         if (!processEdgeSigns) {
             return false;
@@ -93,5 +100,21 @@ public class EdgeProcessor {
         Object inhibitionValue = edgeInhibitionValueSelecter.getSelectedValue();
 
         return edgeValue.equals(inhibitionValue);
+    }
+
+    /**
+     * Return a descriptive string suitable for printing in a report
+     **/
+    public String description () {
+        StringBuilder result = new StringBuilder("Edge effect processor (");
+
+        if (processEdgeSigns) {
+            result.append(String.format("edge column: %s, inhibition value: %s", edgeSignColumnSelecter.getSelectedValue().toString(), edgeInhibitionValueSelecter.getSelectedValue().toString()));
+        } else {
+            result.append("no processing, all edges activation");
+        }
+
+        result.append(")");
+        return result.toString();
     }
 }

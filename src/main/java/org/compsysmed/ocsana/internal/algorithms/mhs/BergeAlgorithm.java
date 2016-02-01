@@ -163,4 +163,20 @@ public class BergeAlgorithm extends AbstractMHSAlgorithm {
     public String toString () {
         return this.shortName();
     }
+
+    @Override
+    public String description () {
+        StringBuilder result = new StringBuilder(fullName());
+
+        result.append(" (");
+
+        if (useMaxCardinality) {
+            result.append(String.format("max CI size: %d", maxCardinalityBInt.getValue()));
+        } else {
+            result.append("no max CI size");
+        }
+
+        result.append(")");
+        return result.toString();
+    }
 }

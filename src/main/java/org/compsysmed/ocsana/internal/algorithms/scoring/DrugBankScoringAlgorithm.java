@@ -204,4 +204,13 @@ public class DrugBankScoringAlgorithm
     public String toString () {
         return this.shortName();
     }
+
+    @Override
+    public String description () {
+        if (computeScores) {
+            return "";
+        } else {
+            return fullName() + String.format(" (gene names column: %s)", geneColumnSelecter.getSelectedValue().toString());
+        }
+    }
 }
