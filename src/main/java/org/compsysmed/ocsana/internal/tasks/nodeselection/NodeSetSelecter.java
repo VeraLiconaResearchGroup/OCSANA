@@ -32,52 +32,63 @@ import org.cytoscape.model.CyNetwork;
 
 public class NodeSetSelecter {
     private static final String CONFIG_GROUP = "Select nodes";
+    private static final String CONFIG_GROUP_LIST = "List";
+    private static final String CONFIG_GROUP_STRING = "String";
     private static final String CONFIG_GROUP_SOURCES = "Source nodes";
     private static final String CONFIG_GROUP_TARGETS = "Target nodes";
     private static final String CONFIG_GROUP_OFF_TARGETS = "Off-target nodes";
+
+    private static final String CONFIG_GROUP_TITLE_PARAM = "groupTitles=displayed,hidden,displayed";
 
     private static final String LIST_SELECT_DESCRIPTION = "Use Ctrl+click to select multiple nodes:";
     private static final String STRING_SELECT_DESCRIPTION = "Comma-separated list of node names:";
 
     @Tunable(description = "Node selection mode",
-             gravity = 110,
-             groups = {CONFIG_GROUP})
-    public ListSingleSelection<String> selectMode = new ListSingleSelection<>("List", "String");
+             gravity = 141,
+             groups = {CONFIG_GROUP},
+             xorChildren = true)
+    public ListSingleSelection<String> selectMode = new ListSingleSelection<>(CONFIG_GROUP_LIST, CONFIG_GROUP_STRING);
 
-    @Tunable(gravity = 141,
+    @Tunable(gravity = 145,
              description = LIST_SELECT_DESCRIPTION,
-             groups = {CONFIG_GROUP, CONFIG_GROUP_SOURCES},
-             dependsOn = "selectMode=List")
+             groups = {CONFIG_GROUP, CONFIG_GROUP_LIST, CONFIG_GROUP_SOURCES},
+             params = CONFIG_GROUP_TITLE_PARAM,
+             xorKey = CONFIG_GROUP_LIST)
     public ListMultipleSelection<NodeWithName> sourceNodeList;
 
-    @Tunable(gravity = 142,
+    @Tunable(gravity = 145,
              description = STRING_SELECT_DESCRIPTION,
-             groups = {CONFIG_GROUP, CONFIG_GROUP_SOURCES},
-             dependsOn = "selectMode=String")
+             groups = {CONFIG_GROUP, CONFIG_GROUP_STRING, CONFIG_GROUP_SOURCES},
+             params = CONFIG_GROUP_TITLE_PARAM,
+             xorKey = CONFIG_GROUP_STRING)
     public String sourceNodeString;
 
-    @Tunable(gravity = 151,
+    @Tunable(gravity = 155,
              description = LIST_SELECT_DESCRIPTION,
-             groups = {CONFIG_GROUP, CONFIG_GROUP_TARGETS},
-             dependsOn = "selectMode=List")
+             groups = {CONFIG_GROUP, CONFIG_GROUP_LIST, CONFIG_GROUP_TARGETS},
+             params = CONFIG_GROUP_TITLE_PARAM,
+             xorKey = CONFIG_GROUP_LIST)
     public ListMultipleSelection<NodeWithName> targetNodeList;
 
-    @Tunable(gravity = 152,
+    @Tunable(gravity = 155,
              description = STRING_SELECT_DESCRIPTION,
-             groups = {CONFIG_GROUP, CONFIG_GROUP_TARGETS},
-             dependsOn = "selectMode=String")
+             groups = {CONFIG_GROUP, CONFIG_GROUP_STRING, CONFIG_GROUP_TARGETS},
+             params = CONFIG_GROUP_TITLE_PARAM,
+             xorKey = CONFIG_GROUP_STRING)
     public String targetNodeString;
 
     @Tunable(gravity = 161,
              description = LIST_SELECT_DESCRIPTION,
-             groups = {CONFIG_GROUP, CONFIG_GROUP_OFF_TARGETS},
-             dependsOn = "selectMode=List")
+             groups = {CONFIG_GROUP, CONFIG_GROUP_LIST, CONFIG_GROUP_OFF_TARGETS},
+             params = CONFIG_GROUP_TITLE_PARAM,
+             xorKey = CONFIG_GROUP_LIST)
     public ListMultipleSelection<NodeWithName> offTargetNodeList;
 
     @Tunable(gravity = 162,
              description = STRING_SELECT_DESCRIPTION,
-             groups = {CONFIG_GROUP, CONFIG_GROUP_OFF_TARGETS},
-             dependsOn = "selectMode=String")
+             groups = {CONFIG_GROUP, CONFIG_GROUP_STRING, CONFIG_GROUP_OFF_TARGETS},
+             params = CONFIG_GROUP_TITLE_PARAM,
+             xorKey = CONFIG_GROUP_STRING)
     public String offTargetNodeString;
 
     private CyNetwork network;
