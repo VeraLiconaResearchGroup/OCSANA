@@ -13,10 +13,12 @@ package org.compsysmed.ocsana.internal.tasks.edgeprocessing;
 
 // Java imports
 import java.util.*;
+import java.util.stream.Collectors;
 
 // Cytoscape imports
 import org.cytoscape.work.Tunable;
 import org.cytoscape.work.util.ListSingleSelection;
+import org.cytoscape.work.util.ListMultipleSelection;
 
 import org.cytoscape.model.CyColumn;
 import org.cytoscape.model.CyEdge;
@@ -46,28 +48,24 @@ public class EdgeProcessor {
              gravity = 191,
              groups = {CONFIG_GROUP},
              dependsOn = "processEdgeSigns=true")
-    public ListSingleSelection<CyColumn> edgeSignColumnSelecter;
+    public ListSingleSelection<CyColumn> getEdgeSignColumnSelecter () {
+        return edgeSignColumnSelecter;
+    };
+
+    public void setEdgeSignColumnSelecter (ListSingleSelection<CyColumn> edgeSignColumnSelecter) {
+        this.edgeSignColumnSelecter = edgeSignColumnSelecter;
+        populateWithEdgeSignColumn();
+    }
+
+    private ListSingleSelection<CyColumn> edgeSignColumnSelecter;
 
     @Tunable(description = "Column value representing inhibition",
              tooltip = "All other values will be interpreted as activation",
              gravity = 192,
              groups = {CONFIG_GROUP},
              dependsOn = "processEdgeSigns=true",
-             listenForChange = "edgeSignColumnSelecter")
-    public ListSingleSelection<Object> getEdgeInhibitionValue () {
-        CyColumn selectedColumn = edgeSignColumnSelecter.getSelectedValue();
-        List<Object> columnValuesList = selectedColumn.getValues(selectedColumn.getType());
-        Set<Object> columnValues = new HashSet<>(columnValuesList);
-
-        edgeInhibitionValueSelecter = new ListSingleSelection<Object>(new ArrayList<>(columnValues));
-        return edgeInhibitionValueSelecter;
-    };
-
-    public void setEdgeInhibitionValue (ListSingleSelection<Object> edgeInhibitionValueSelecter) {
-        this.edgeInhibitionValueSelecter = edgeInhibitionValueSelecter;
-    }
-
-    private ListSingleSelection<Object> edgeInhibitionValueSelecter;
+             listenForChange = "EdgeSignColumnSelecter")
+    public ListMultipleSelection<Object> edgeInhibitionValueSelecter;
 
     // End user configuration
 
@@ -77,6 +75,20 @@ public class EdgeProcessor {
 
         CyTable edgeTable = network.getDefaultEdgeTable();
         edgeSignColumnSelecter = new ListSingleSelection<>(new ArrayList<>(edgeTable.getColumns()));
+        populateWithEdgeSignColumn();
+    }
+
+    private CyColumn selectedColumn;
+    private void populateWithEdgeSignColumn () {
+        CyColumn selectedColumn = edgeSignColumnSelecter.getSelectedValue();
+        if (selectedColumn.equals(this.selectedColumn)) {
+            return;
+        }
+        this.selectedColumn = selectedColumn;
+
+        Set<Object> columnValues = selectedColumn.getValues(selectedColumn.getType()).stream().collect(Collectors.toSet());
+
+        edgeInhibitionValueSelecter = new ListMultipleSelection<Object>(new ArrayList<>(columnValues));
     }
 
     /**
@@ -97,9 +109,9 @@ public class EdgeProcessor {
         CyColumn signColumn = edgeSignColumnSelecter.getSelectedValue();
         Object edgeValue = edgeRow.get(signColumn.getName(), signColumn.getType());
 
-        Object inhibitionValue = edgeInhibitionValueSelecter.getSelectedValue();
+        List<Object> inhibitionValues = edgeInhibitionValueSelecter.getSelectedValues();
 
-        return edgeValue.equals(inhibitionValue);
+        return inhibitionValues.contains(edgeValue);
     }
 
     /**
@@ -109,7 +121,7 @@ public class EdgeProcessor {
         StringBuilder result = new StringBuilder("Edge effect processor (");
 
         if (processEdgeSigns) {
-            result.append(String.format("edge column: %s, inhibition value: %s", edgeSignColumnSelecter.getSelectedValue().toString(), edgeInhibitionValueSelecter.getSelectedValue().toString()));
+            result.append(String.format("edge column: %s, inhibition values: %s", edgeSignColumnSelecter.getSelectedValue().toString(), edgeInhibitionValueSelecter.getSelectedValues().toString()));
         } else {
             result.append("no processing, all edges activation");
         }
