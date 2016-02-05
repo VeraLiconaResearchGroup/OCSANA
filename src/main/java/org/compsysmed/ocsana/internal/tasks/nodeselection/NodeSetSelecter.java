@@ -59,6 +59,10 @@ public class NodeSetSelecter {
 
     private ListSingleSelection<CyColumn> nodeNameColumnSelecter;
 
+    public CyColumn getNodeNameColumn () {
+        return nodeNameColumnSelecter.getSelectedValue();
+    }
+
     @Tunable(description = "Node selection mode",
              gravity = 141,
              groups = {CONFIG_GROUP},
@@ -135,10 +139,8 @@ public class NodeSetSelecter {
         nodesWithNames = new ArrayList<>(nodes.size());
         nodeNamesMap = new HashMap<>(nodes.size());
 
-        String nodeNameColumn = nodeNameColumnSelecter.getSelectedValue().getName();
-
         for (CyNode node: nodes) {
-            String nodeName = network.getRow(node).get(nodeNameColumn, String.class);
+            String nodeName = getNodeName(node);
             NodeWithName namedNode = new NodeWithName(node, nodeName);
             nodesWithNames.add(namedNode);
             nodeNamesMap.put(nodeName, node);
@@ -165,6 +167,10 @@ public class NodeSetSelecter {
         }
     }
 
+    public Set<CyNode> getSourceNodeSet () {
+        return new HashSet<>(getSourceNodes());
+    }
+
     public List<CyNode> getTargetNodes () {
         switch (selectMode.getSelectedValue()) {
         case "List":
@@ -178,6 +184,10 @@ public class NodeSetSelecter {
         }
     }
 
+    public Set<CyNode> getTargetNodeSet () {
+        return new HashSet<>(getTargetNodes());
+    }
+
     public List<CyNode> getOffTargetNodes () {
         switch (selectMode.getSelectedValue()) {
         case "List":
@@ -189,6 +199,15 @@ public class NodeSetSelecter {
         default:
             throw new IllegalStateException("Invalid node selection mode");
         }
+    }
+
+    public Set<CyNode> getOffTargetNodeSet () {
+        return new HashSet<>(getOffTargetNodes());
+    }
+
+    public String getNodeName (CyNode node) {
+        String nodeNameColumn = nodeNameColumnSelecter.getSelectedValue().getName();
+        return network.getRow(node).get(nodeNameColumn, String.class);
     }
 
     private List<CyNode> getNodesFromList (List<NodeWithName> nodesWithNames) {

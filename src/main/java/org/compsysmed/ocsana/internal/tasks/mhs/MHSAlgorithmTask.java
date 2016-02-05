@@ -99,7 +99,7 @@ public class MHSAlgorithmTask extends AbstractOCSANATask {
     private void addNodeWithEndpointChecks (CyNode nodeToAdd,
                                             Set<CyNode> nodeSet) {
         if (results.includeEndpointsInCIs ||
-            (!results.sourceNodes.contains(nodeToAdd) && !results.targetNodes.contains(nodeToAdd))) {
+            (!results.nodeSetSelecter.getSourceNodes().contains(nodeToAdd) && !results.nodeSetSelecter.getTargetNodes().contains(nodeToAdd))) {
             nodeSet.add(nodeToAdd);
         }
     }

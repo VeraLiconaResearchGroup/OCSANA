@@ -60,7 +60,7 @@ public class OCSANACoordinatorTask extends AbstractNetworkTask {
     // preliminary choices such as which algorithm to use for each
     // task.
     @ContainsTunables
-    public NodeSetSelecter nodeSelecter;
+    public NodeSetSelecter nodeSetSelecter;
 
     @ContainsTunables
     public EdgeProcessor edgeProcessor;
@@ -89,7 +89,7 @@ public class OCSANACoordinatorTask extends AbstractNetworkTask {
         this.taskManager = taskManager;
         this.resultsPanel = resultsPanel;
 
-        nodeSelecter = new NodeSetSelecter(network);
+        nodeSetSelecter = new NodeSetSelecter(network);
         edgeProcessor = new EdgeProcessor(network);
         pathAlgSelecter = new PathFindingAlgorithmSelecter(network);
         mhsAlgSelecter = new MHSAlgorithmSelecter(network);
@@ -113,22 +113,16 @@ public class OCSANACoordinatorTask extends AbstractNetworkTask {
         AbstractMHSAlgorithm mhsAlgorithm = mhsAlgSelecter.getAlgorithm();
         Boolean includeEndpointsInCIs = mhsAlgSelecter.getIncludeEndpointsInCIs();
 
-        Set<CyNode> sourceNodes = new HashSet<>(nodeSelecter.getSourceNodes());
-        Set<CyNode> targetNodes = new HashSet<>(nodeSelecter.getTargetNodes());
-        Set<CyNode> offTargetNodes = new HashSet<>(nodeSelecter.getOffTargetNodes());
-
         OCSANARunnerTask runnerTask = new OCSANARunnerTask(network,
                                                            taskManager,
                                                            resultsPanel,
                                                            edgeProcessor,
+                                                           nodeSetSelecter,
                                                            pathAlgorithm,
                                                            ocsanaAlgorithm,
                                                            drugBankAlgorithm,
                                                            mhsAlgorithm,
-                                                           includeEndpointsInCIs,
-                                                           sourceNodes,
-                                                           targetNodes,
-                                                           offTargetNodes);
+                                                           includeEndpointsInCIs);
 
         insertTasksAfterCurrentTask(runnerTask);
     }

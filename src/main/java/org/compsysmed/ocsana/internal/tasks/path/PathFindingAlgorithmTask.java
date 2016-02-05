@@ -41,32 +41,33 @@ public class PathFindingAlgorithmTask extends AbstractOCSANATask {
     @Override
     public void run (TaskMonitor taskMonitor) {
         String targetType;
+        Set<CyNode> sourceNodes = results.nodeSetSelecter.getSourceNodeSet();
         Set<CyNode> targetsForThisRun;
         switch (algStep) {
         case FIND_PATHS_TO_TARGETS:
             targetType = "target";
-            targetsForThisRun = results.targetNodes;
+            targetsForThisRun = results.nodeSetSelecter.getTargetNodeSet();
             break;
 
         case FIND_PATHS_TO_OFF_TARGETS:
             targetType = "off-target";
-            targetsForThisRun = results.offTargetNodes;
+            targetsForThisRun = results.nodeSetSelecter.getOffTargetNodeSet();
             break;
 
         default:
             throw new IllegalStateException("Invalid algorithm step for path-finding");
         }
 
-        if (targetsForThisRun == null || results.sourceNodes == null) {
+        if (targetsForThisRun == null || sourceNodes == null) {
             throw new IllegalStateException("Nodes not set by user.");
         }
 
         taskMonitor.setTitle(String.format("Paths to %ss", targetType));
 
-        taskMonitor.setStatusMessage(String.format("Finding paths from %d source nodes to %d %s nodes (algorithm: %s).", results.sourceNodes.size(), targetsForThisRun.size(), targetType, results.pathFindingAlg.shortName()));
+        taskMonitor.setStatusMessage(String.format("Finding paths from %d source nodes to %d %s nodes (algorithm: %s).", sourceNodes.size(), targetsForThisRun.size(), targetType, results.pathFindingAlg.shortName()));
 
         Long preTime = System.nanoTime();
-        paths = results.pathFindingAlg.paths(results.sourceNodes, targetsForThisRun);
+        paths = results.pathFindingAlg.paths(sourceNodes, targetsForThisRun);
         Long postTime = System.nanoTime();
 
         Double runTime = (postTime - preTime) / 1E9;

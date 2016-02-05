@@ -31,6 +31,7 @@ import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNode;
 
 // OCSANA imports
+import org.compsysmed.ocsana.internal.tasks.nodeselection.NodeSetSelecter;
 import org.compsysmed.ocsana.internal.tasks.edgeprocessing.EdgeProcessor;
 import org.compsysmed.ocsana.internal.algorithms.path.AbstractPathFindingAlgorithm;
 import org.compsysmed.ocsana.internal.algorithms.mhs.AbstractMHSAlgorithm;
@@ -82,14 +83,12 @@ public class OCSANARunnerTask extends AbstractNetworkTask
                              TaskManager<?, ?> taskManager,
                              OCSANAResultsPanel resultsPanel,
                              EdgeProcessor edgeProcessor,
+                             NodeSetSelecter nodeSetSelecter,
                              AbstractPathFindingAlgorithm pathFindingAlg,
                              OCSANAScoringAlgorithm ocsanaAlg,
                              DrugBankScoringAlgorithm drugBankAlg,
                              AbstractMHSAlgorithm mhsAlg,
-                             Boolean includeEndpointsInCIs,
-                             Set<CyNode> sourceNodes,
-                             Set<CyNode> targetNodes,
-                             Set<CyNode> offTargetNodes) {
+                             Boolean includeEndpointsInCIs) {
         super(network);
         this.taskManager = taskManager;
         this.resultsPanel = resultsPanel;
@@ -101,16 +100,13 @@ public class OCSANARunnerTask extends AbstractNetworkTask
         results = new OCSANAResults();
         results.network = network;
         results.edgeProcessor = edgeProcessor;
+        results.nodeSetSelecter = nodeSetSelecter;
         results.pathFindingAlg = pathFindingAlg;
         results.ocsanaAlg = ocsanaAlg;
         results.drugBankAlg = drugBankAlg;
         results.mhsAlg = mhsAlg;
 
         results.includeEndpointsInCIs = includeEndpointsInCIs;
-
-        results.sourceNodes = sourceNodes;
-        results.targetNodes = targetNodes;
-        results.offTargetNodes = offTargetNodes;
     }
 
     @ProvidesTitle

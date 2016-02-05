@@ -13,6 +13,7 @@ package org.compsysmed.ocsana.internal.util.results;
 
 // Java imports
 import java.util.*;
+import java.util.stream.Collectors;
 
 // Cytoscape imports
 import org.cytoscape.model.CyNode;
@@ -20,6 +21,7 @@ import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNetwork;
 
 // OCSANA imports
+import org.compsysmed.ocsana.internal.tasks.nodeselection.NodeSetSelecter;
 import org.compsysmed.ocsana.internal.tasks.edgeprocessing.EdgeProcessor;
 
 import org.compsysmed.ocsana.internal.algorithms.path.AbstractPathFindingAlgorithm;
@@ -33,9 +35,7 @@ public class OCSANAResults {
     // User inputs
     public CyNetwork network;
     public EdgeProcessor edgeProcessor;
-    public Set<CyNode> sourceNodes;
-    public Set<CyNode> targetNodes;
-    public Set<CyNode> offTargetNodes;
+    public NodeSetSelecter nodeSetSelecter;
 
     // Paths data
     public AbstractPathFindingAlgorithm pathFindingAlg;
@@ -66,15 +66,6 @@ public class OCSANAResults {
 
     // Output generation
     /**
-     * Get the name of a node
-     *
-     * @param node  the node
-     **/
-    public String nodeName(CyNode node) {
-        return network.getRow(node).get(CyNetwork.NAME, String.class);
-    }
-
-    /**
      * Get a string representation of a set of nodes
      *
      * The current format is "[node1, node2, node3]".
@@ -88,7 +79,7 @@ public class OCSANAResults {
 
         List<String> nodeStrings = new ArrayList<>();
          for (CyNode node: nodes) {
-            nodeStrings.add(nodeName(node));
+            nodeStrings.add(nodeSetSelecter.getNodeName(node));
          }
 
          Collections.sort(nodeStrings);
@@ -113,7 +104,7 @@ public class OCSANAResults {
         // Handle first node
         try {
             CyNode firstNode = path.iterator().next().getSource();
-            result.append(nodeName(firstNode));
+            result.append(nodeSetSelecter.getNodeName(firstNode));
         } catch (NoSuchElementException e) {
             return result.toString();
         }
@@ -125,7 +116,7 @@ public class OCSANAResults {
             } else {
                 result.append(" -> ");
             }
-            result.append(nodeName(edge.getTarget()));
+            result.append(nodeSetSelecter.getNodeName(edge.getTarget()));
         }
 
         return result.toString();
@@ -160,33 +151,24 @@ public class OCSANAResults {
         reportLines.add(String.format("Network name: %s", network.getRow(network).get(CyNetwork.NAME, String.class)));
         reportLines.add("");
 
+        reportLines.add(String.format("Node names from column: %s", nodeSetSelecter.getNodeNameColumn()));
+
+        List<CyNode> sourceNodes = nodeSetSelecter.getSourceNodes();
         if (sourceNodes != null) {
-            List<String> sourceNodeNames = new ArrayList<>();
-            for (CyNode node: sourceNodes) {
-                sourceNodeNames.add(nodeName(node));
-            }
-            String sourceNodeString = "Source nodes: " + String.join(", ", sourceNodeNames);
-            reportLines.add(sourceNodeString);
-
+            String sourceNodeNameList = sourceNodes.stream().map(node -> nodeSetSelecter.getNodeName(node)).collect(Collectors.joining(", "));
+            reportLines.add(String.format("Source nodes: %s", sourceNodeNameList));
         }
 
+        List<CyNode> targetNodes = nodeSetSelecter.getTargetNodes();
         if (targetNodes != null) {
-            List<String> targetNodeNames = new ArrayList<>();
-            for (CyNode node: targetNodes) {
-                targetNodeNames.add(nodeName(node));
-            }
-            String targetNodeString = "Target nodes: " + String.join(", ", targetNodeNames);
-            reportLines.add(targetNodeString);
-
+            String targetNodeNameList = targetNodes.stream().map(node -> nodeSetSelecter.getNodeName(node)).collect(Collectors.joining(", "));
+            reportLines.add(String.format("Target nodes: %s", targetNodeNameList));
         }
 
+        List<CyNode> offTargetNodes = nodeSetSelecter.getOffTargetNodes();
         if (offTargetNodes != null) {
-            List<String> offTargetNodeNames = new ArrayList<>();
-            for (CyNode node: offTargetNodes) {
-                offTargetNodeNames.add(nodeName(node));
-            }
-            String offTargetNodeString = "Side effect nodes: " + String.join(", ", offTargetNodeNames);
-            reportLines.add(offTargetNodeString);
+            String offTargetNodeNameList = offTargetNodes.stream().map(node -> nodeSetSelecter.getNodeName(node)).collect(Collectors.joining(", "));
+            reportLines.add(String.format("Off-target nodes: %s", offTargetNodeNameList));
         }
 
         reportLines.add("");
