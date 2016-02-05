@@ -19,8 +19,10 @@ import org.cytoscape.work.Tunable;
 import org.cytoscape.work.util.ListSingleSelection;
 import org.cytoscape.work.util.ListMultipleSelection;
 
+import org.cytoscape.model.CyColumn;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.model.CyNetwork;
+import org.cytoscape.model.CyTable;
 
 // OCSANA imports
 
@@ -43,53 +45,70 @@ public class NodeSetSelecter {
     private static final String LIST_SELECT_DESCRIPTION = "Use Ctrl+click to select multiple nodes:";
     private static final String STRING_SELECT_DESCRIPTION = "Comma-separated list of node names:";
 
+    @Tunable(description = "Column containing node names",
+             tooltip = "<html><b>Warning</b>: changing this may be slow if your network has a lot of vertices!</html>",
+             gravity = 140)
+    public ListSingleSelection<CyColumn> getNodeNameColumnSelecter () {
+        return nodeNameColumnSelecter;
+    }
+
+    public void setNodeNameColumnSelecter (ListSingleSelection<CyColumn> nodeNameColumnSelecter) {
+        this.nodeNameColumnSelecter = nodeNameColumnSelecter;
+        populateWithNodeNames();
+    }
+
+    private ListSingleSelection<CyColumn> nodeNameColumnSelecter;
+
     @Tunable(description = "Node selection mode",
              gravity = 141,
              groups = {CONFIG_GROUP},
              xorChildren = true)
     public ListSingleSelection<String> selectMode = new ListSingleSelection<>(CONFIG_GROUP_LIST, CONFIG_GROUP_STRING);
 
-    @Tunable(gravity = 145,
+    @Tunable(gravity = 151,
              description = LIST_SELECT_DESCRIPTION,
              groups = {CONFIG_GROUP, CONFIG_GROUP_LIST, CONFIG_GROUP_SOURCES},
              params = CONFIG_GROUP_TITLE_PARAM,
-             xorKey = CONFIG_GROUP_LIST)
+             xorKey = CONFIG_GROUP_LIST,
+             listenForChange = "NodeNameColumnSelecter")
     public ListMultipleSelection<NodeWithName> sourceNodeList;
 
-    @Tunable(gravity = 145,
+    @Tunable(gravity = 151,
              description = STRING_SELECT_DESCRIPTION,
              groups = {CONFIG_GROUP, CONFIG_GROUP_STRING, CONFIG_GROUP_SOURCES},
              params = CONFIG_GROUP_TITLE_PARAM,
              xorKey = CONFIG_GROUP_STRING)
-    public String sourceNodeString;
+    public String sourceNodeString = "";
 
-    @Tunable(gravity = 155,
+    @Tunable(gravity = 152,
              description = LIST_SELECT_DESCRIPTION,
              groups = {CONFIG_GROUP, CONFIG_GROUP_LIST, CONFIG_GROUP_TARGETS},
              params = CONFIG_GROUP_TITLE_PARAM,
-             xorKey = CONFIG_GROUP_LIST)
+             xorKey = CONFIG_GROUP_LIST,
+             listenForChange = "NodeNameColumnSelecter")
     public ListMultipleSelection<NodeWithName> targetNodeList;
 
-    @Tunable(gravity = 155,
+    @Tunable(gravity = 152,
              description = STRING_SELECT_DESCRIPTION,
              groups = {CONFIG_GROUP, CONFIG_GROUP_STRING, CONFIG_GROUP_TARGETS},
              params = CONFIG_GROUP_TITLE_PARAM,
              xorKey = CONFIG_GROUP_STRING)
-    public String targetNodeString;
+    public String targetNodeString = "";
 
-    @Tunable(gravity = 161,
+    @Tunable(gravity = 153,
              description = LIST_SELECT_DESCRIPTION,
              groups = {CONFIG_GROUP, CONFIG_GROUP_LIST, CONFIG_GROUP_OFF_TARGETS},
              params = CONFIG_GROUP_TITLE_PARAM,
-             xorKey = CONFIG_GROUP_LIST)
+             xorKey = CONFIG_GROUP_LIST,
+             listenForChange = "NodeNameColumnSelecter")
     public ListMultipleSelection<NodeWithName> offTargetNodeList;
 
-    @Tunable(gravity = 162,
+    @Tunable(gravity = 153,
              description = STRING_SELECT_DESCRIPTION,
              groups = {CONFIG_GROUP, CONFIG_GROUP_STRING, CONFIG_GROUP_OFF_TARGETS},
              params = CONFIG_GROUP_TITLE_PARAM,
              xorKey = CONFIG_GROUP_STRING)
-    public String offTargetNodeString;
+    public String offTargetNodeString = "";
 
     private CyNetwork network;
     private List<NodeWithName> nodesWithNames;
@@ -98,12 +117,28 @@ public class NodeSetSelecter {
     public NodeSetSelecter (CyNetwork network) {
         this.network = network;
 
+        CyTable nodeTable = network.getDefaultNodeTable();
+        List<CyColumn> nodeColumns = new ArrayList<>(nodeTable.getColumns());
+        List<CyColumn> nodeStringColumns = new ArrayList<>();
+        for (CyColumn column: nodeColumns) {
+            if (String.class.isAssignableFrom(column.getType())) {
+                nodeStringColumns.add(column);
+            }
+        }
+        nodeNameColumnSelecter = new ListSingleSelection<>(nodeStringColumns);
+
+        populateWithNodeNames();
+    }
+
+    private void populateWithNodeNames () {
         List<CyNode> nodes = network.getNodeList();
         nodesWithNames = new ArrayList<>(nodes.size());
         nodeNamesMap = new HashMap<>(nodes.size());
 
+        String nodeNameColumn = nodeNameColumnSelecter.getSelectedValue().getName();
+
         for (CyNode node: nodes) {
-            String nodeName = network.getRow(node).get(CyNetwork.NAME, String.class);
+            String nodeName = network.getRow(node).get(nodeNameColumn, String.class);
             NodeWithName namedNode = new NodeWithName(node, nodeName);
             nodesWithNames.add(namedNode);
             nodeNamesMap.put(nodeName, node);
@@ -113,13 +148,8 @@ public class NodeSetSelecter {
         Collections.sort(nodesWithNames);
 
         sourceNodeList = new ListMultipleSelection<>(nodesWithNames);
-        sourceNodeString = "";
-
         targetNodeList = new ListMultipleSelection<>(nodesWithNames);
-        targetNodeString = "";
-
         offTargetNodeList = new ListMultipleSelection<>(nodesWithNames);
-        offTargetNodeString = "";
     }
 
     public List<CyNode> getSourceNodes () {
