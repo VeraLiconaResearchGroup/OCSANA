@@ -149,9 +149,15 @@ public class InteractionsDatabase {
     private static class Interaction {
         public final String type;
         public final List<Drug> drugs = new ArrayList<>();
+        public final DrugActionSign sign;
 
         public Interaction (String type) {
             this.type = type;
+            if (ACTION_SIGN.containsKey(type)) {
+                sign = ACTION_SIGN.get(type);
+            } else {
+                throw new IllegalStateException(String.format("Interaction %s is not in ontology", type));
+            }
         }
 
         @Override
@@ -197,4 +203,49 @@ public class InteractionsDatabase {
             return result;
         }
     }
+
+    private static final Map<String, DrugActionSign> ACTION_SIGN
+        = Arrays.asList(
+                        new AbstractMap.SimpleImmutableEntry<>("acetylation", DrugActionSign.UNSIGNED),
+                        new AbstractMap.SimpleImmutableEntry<>("activator", DrugActionSign.POSITIVE),
+                        new AbstractMap.SimpleImmutableEntry<>("adduct", DrugActionSign.NEGATIVE),
+                        new AbstractMap.SimpleImmutableEntry<>("agonist", DrugActionSign.POSITIVE),
+                        new AbstractMap.SimpleImmutableEntry<>("allosteric modulator", DrugActionSign.UNSIGNED),
+                        new AbstractMap.SimpleImmutableEntry<>("antagonist", DrugActionSign.NEGATIVE),
+                        new AbstractMap.SimpleImmutableEntry<>("antibody", DrugActionSign.NEGATIVE),
+                        new AbstractMap.SimpleImmutableEntry<>("blocker", DrugActionSign.NEGATIVE),
+                        new AbstractMap.SimpleImmutableEntry<>("binder", DrugActionSign.UNSIGNED),
+                        new AbstractMap.SimpleImmutableEntry<>("binding", DrugActionSign.UNSIGNED),
+                        new AbstractMap.SimpleImmutableEntry<>("chaperone", DrugActionSign.UNSIGNED),
+                        new AbstractMap.SimpleImmutableEntry<>("chelator", DrugActionSign.NEGATIVE),
+                        new AbstractMap.SimpleImmutableEntry<>("cleavage", DrugActionSign.NEGATIVE),
+                        new AbstractMap.SimpleImmutableEntry<>("cofactor", DrugActionSign.UNSIGNED),
+                        new AbstractMap.SimpleImmutableEntry<>("cross-linking/alkylation", DrugActionSign.NEGATIVE),
+                        new AbstractMap.SimpleImmutableEntry<>("desensitize the target", DrugActionSign.NEGATIVE),
+                        new AbstractMap.SimpleImmutableEntry<>("incorporation into and destabilization", DrugActionSign.NEGATIVE),
+                        new AbstractMap.SimpleImmutableEntry<>("inducer", DrugActionSign.POSITIVE),
+                        new AbstractMap.SimpleImmutableEntry<>("inhibitor", DrugActionSign.NEGATIVE),
+                        new AbstractMap.SimpleImmutableEntry<>("inhibitor, competitive", DrugActionSign.NEGATIVE),
+                        new AbstractMap.SimpleImmutableEntry<>("inhibitory allosteric modulator", DrugActionSign.NEGATIVE),
+                        new AbstractMap.SimpleImmutableEntry<>("intercalation", DrugActionSign.NEGATIVE),
+                        new AbstractMap.SimpleImmutableEntry<>("inverse agonist", DrugActionSign.NEGATIVE),
+                        new AbstractMap.SimpleImmutableEntry<>("ligand", DrugActionSign.POSITIVE),
+                        new AbstractMap.SimpleImmutableEntry<>("modulator", DrugActionSign.UNSIGNED),
+                        new AbstractMap.SimpleImmutableEntry<>("multitarget", DrugActionSign.UNSIGNED),
+                        new AbstractMap.SimpleImmutableEntry<>("negative modulator", DrugActionSign.NEGATIVE),
+                        new AbstractMap.SimpleImmutableEntry<>("neutralizer", DrugActionSign.NEGATIVE),
+                        new AbstractMap.SimpleImmutableEntry<>("other", DrugActionSign.UNSIGNED),
+                        new AbstractMap.SimpleImmutableEntry<>("other/unknown", DrugActionSign.UNSIGNED),
+                        new AbstractMap.SimpleImmutableEntry<>("partial agonist", DrugActionSign.POSITIVE),
+                        new AbstractMap.SimpleImmutableEntry<>("partial antagonist", DrugActionSign.UNSIGNED),
+                        new AbstractMap.SimpleImmutableEntry<>("positive allosteric modulator", DrugActionSign.POSITIVE),
+                        new AbstractMap.SimpleImmutableEntry<>("positive modulator", DrugActionSign.POSITIVE),
+                        new AbstractMap.SimpleImmutableEntry<>("potentiator", DrugActionSign.POSITIVE),
+                        new AbstractMap.SimpleImmutableEntry<>("product of", DrugActionSign.UNSIGNED),
+                        new AbstractMap.SimpleImmutableEntry<>("reducer", DrugActionSign.NEGATIVE),
+                        new AbstractMap.SimpleImmutableEntry<>("stimulator", DrugActionSign.POSITIVE),
+                        new AbstractMap.SimpleImmutableEntry<>("suppressor", DrugActionSign.NEGATIVE),
+                        new AbstractMap.SimpleImmutableEntry<>("unknown", DrugActionSign.UNSIGNED),
+                        new AbstractMap.SimpleImmutableEntry<>("UNKNOWN", DrugActionSign.UNSIGNED)
+                        ).stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 }
