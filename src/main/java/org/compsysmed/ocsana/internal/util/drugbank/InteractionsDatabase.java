@@ -29,6 +29,7 @@ public class InteractionsDatabase {
 
     private List<Gene> genes = new ArrayList<>();
     private Map<String, Gene> geneNameMap = new HashMap<>();
+    private Map<String, Gene> uniProtIDMap = new HashMap<>();
 
     public Set<String> interactionTypes = new HashSet<>();
 
@@ -41,12 +42,14 @@ public class InteractionsDatabase {
             throw new IllegalStateException("Could not find or read DrugBank JSON file");
         }
 
-        Iterator<String> geneNamesIterator = drugBankJSON.keys();
+        JSONObject interactionsJSON = drugBankJSON.getJSONObject("interactions");
+
+        Iterator<String> geneNamesIterator = interactionsJSON.keys();
         while (geneNamesIterator.hasNext()) {
             String geneName = geneNamesIterator.next();
             Gene gene = new Gene(geneName);
 
-            JSONObject geneInteractions = drugBankJSON.getJSONObject(geneName);
+            JSONObject geneInteractions = interactionsJSON.getJSONObject(geneName);
             Iterator<String> interactionsIterator = geneInteractions.keys();
             while (interactionsIterator.hasNext()) {
                 String interactionType = interactionsIterator.next();
@@ -70,6 +73,24 @@ public class InteractionsDatabase {
             genes.add(gene);
             geneNameMap.put(geneName, gene);
         }
+
+        JSONObject uniProtIDJSON = drugBankJSON.getJSONObject("geneNames");
+        Iterator<String> uniProtIDIterator = uniProtIDJSON.keys();
+        while (uniProtIDIterator.hasNext()) {
+            String uniProtID = uniProtIDIterator.next();
+            String geneName = uniProtIDJSON.optString(uniProtID);
+            if (geneName == "") {
+                continue;
+            }
+
+            Gene gene = geneNameMap.get(geneName);
+
+            if (gene == null) {
+                throw new IllegalStateException(String.format("UniProt ID %s has gene name %s, which is not known", uniProtID, geneName));
+            }
+
+            uniProtIDMap.put(uniProtID, gene);
+        }
     }
 
     public static synchronized InteractionsDatabase getDB () {
@@ -81,11 +102,11 @@ public class InteractionsDatabase {
     }
 
     public Set<String> geneNames () {
-        Set<String> result = new HashSet<>();
-        for (Gene gene: genes) {
-            result.add(gene.name);
-        }
-        return result;
+        return geneNameMap.keySet();
+    }
+
+    public Set<String> uniProtIDs () {
+        return uniProtIDMap.keySet();
     }
 
     public int numGenes () {
@@ -94,6 +115,14 @@ public class InteractionsDatabase {
 
     private Gene getGene (String geneName) {
         return geneNameMap.get(geneName.toUpperCase());
+    }
+
+    public Boolean isUniProtID (String candidateName) {
+        return uniProtIDMap.containsKey(candidateName);
+    }
+
+    public String convertUniProtIDToGeneName (String uniProtID) {
+        return uniProtIDMap.get(uniProtID).name;
     }
 
     public Set<String> drugNamesForGene (String geneName) {

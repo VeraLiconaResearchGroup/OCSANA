@@ -136,6 +136,10 @@ public class DrugBankScoringAlgorithm
 
         String geneName = network.getDefaultNodeTable().getRow(node.getSUID()).get(geneColumnSelecter.getSelectedValue().getName(), String.class);
 
+        if (drugBankDB.isUniProtID(geneName)) {
+            geneName = drugBankDB.convertUniProtIDToGeneName(geneName);
+        }
+
         Double score = DEFAULT_SCORE;
 
         if (drugBankDB.drugNamesForGene(geneName).isEmpty()) {

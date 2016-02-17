@@ -16,9 +16,11 @@ import simplejson as json
 import logging
 
 def parse_xml(filename):
-    # Construct a dict mapping each gene name (Entrez standard) to a
+    # Construct a dict with two elements:
+    # * "interactions" maps each gene name (Entrez standard) to a
     # dict mapping action types to lists of drug names. For example, we
-    # might have result["ERBB2"]["inhibitor"] == ["Afatinib"].
+    # might have result["interactions"]["ERBB2"]["inhibitor"] == ["Afatinib"].
+    # * "geneNames" maps UniProt IDs to gene names. For example, we might have result["geneNames"][]
     logging.info("Reading XML file")
     try:
         tree = etree.parse(filename)
@@ -29,6 +31,7 @@ def parse_xml(filename):
 
     found_action_types = set()
     found_genes = set()
+    uniprot_to_gene_name_mapping = {}
 
     logging.info("Parsing XML tree")
     root = tree.getroot()
@@ -42,11 +45,11 @@ def parse_xml(filename):
         drugdict = {'name': drugname, 'groups': druggroups}
 
         for target in drug.find(DB + 'targets').findall(DB + 'target'):
-            polypeptide = target.find(DB + 'polypeptide')
-            if polypeptide is not None:
-                geneXML = polypeptide.find(DB + 'gene-name')
-                if geneXML is not None:
+            for polypeptide in target.findall(DB + "polypeptide"):
+                uniprot_id = polypeptide.get("id");
+                for geneXML in polypeptide.findall(DB + "gene-name"):
                     genename = geneXML.text
+                    uniprot_to_gene_name_mapping[uniprot_id] = genename
                     if genename is not None:
                         found_genes.add(genename)
                         actions = target.find(DB + 'actions').getchildren()
@@ -59,14 +62,15 @@ def parse_xml(filename):
                             found_action_types.add(actionname)
                             interactions[genename][actionname].append(drugdict)
 
-    logging.info("Found {0} drugs, {1} genes in DrugBank XML file".format(len(interactions), len(found_genes)))
+    logging.info("Found {0} drugs, {1} genes, {2} UniProt IDs in DrugBank XML file".format(len(interactions), len(found_genes), len(uniprot_to_gene_name_mapping)))
     logging.info("Found interaction types: {0}".format(found_action_types))
-    return interactions
+    result = {"interactions": interactions, "geneNames": uniprot_to_gene_name_mapping}
+    return result
 
-def write_json(interactions, filename):
+def write_json(data, filename):
     logging.info("Writing JSON file")
     with open(filename, 'w') as outfile:
-        json.dump(interactions, outfile)
+        json.dump(data, outfile)
 
 def main():
     # Set up argument processing
@@ -89,10 +93,10 @@ def main():
     logging.basicConfig(level = log_level)
 
     # Parse the XML file
-    interactions = parse_xml(args.drugbank_db_file)
+    data = parse_xml(args.drugbank_db_file)
 
     # Write the result
-    write_json(interactions, args.json_output_file)
+    write_json(data, args.json_output_file)
 
 
 if __name__ == "__main__":

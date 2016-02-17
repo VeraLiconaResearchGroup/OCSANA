@@ -21,8 +21,9 @@ public class InteractionsDatabaseTest {
     @Test
     public void buildDatabaseShouldWork () {
         InteractionsDatabase db = InteractionsDatabase.getDB();
-        assertEquals("Number of genes in database", 3520, db.numGenes());
+        assertEquals("Number of genes in database", 3550, db.numGenes());
         assertTrue("ERBB2 has antagonist Lapatanib", db.drugInteractionGroupsForGene("erbb2").get("antagonist").contains("Lapatinib"));
+        assertEquals("P04626 is ERBB2", "ERBB2", db.convertUniProtIDToGeneName("P04626"));
     }
 
     @Test
