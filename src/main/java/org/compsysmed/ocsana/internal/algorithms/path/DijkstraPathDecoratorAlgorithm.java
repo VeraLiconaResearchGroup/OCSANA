@@ -132,7 +132,10 @@ public class DijkstraPathDecoratorAlgorithm
                 if ((!nodeMinDistances.containsKey(nextNode))
                     || (nodeMinDistances.get(nextNode) > newEdgeDist)) {
                     nodeMinDistances.put(nextNode, newEdgeDist);
-                    nodesToProcess.add(nextNode);
+
+                    if (!restrictPathLength || (newEdgeDist < maxPathLength)) {
+                        nodesToProcess.add(nextNode);
+                    }
                 }
             }
         }
