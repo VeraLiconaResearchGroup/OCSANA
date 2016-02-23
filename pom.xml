@@ -88,6 +88,7 @@
                 <version>${maven.surefire.version}</version>
                 <configuration>
                     <enableAssertions>true</enableAssertions>
+                    <trimStackTrace>false</trimStackTrace>
                 </configuration>
             </plugin>
             <!-- Generates the OSGi metadata based on the osgi.bnd file. -->
