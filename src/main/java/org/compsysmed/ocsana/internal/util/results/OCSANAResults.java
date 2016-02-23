@@ -258,8 +258,6 @@ public class OCSANAResults {
                 Double effectScore = ocsanaAlg.effectOnTargetsScore(elementaryNode, targetNode);
                 Integer setScore = ocsanaAlg.nodeSubPathsToTarget(elementaryNode, targetNode).size();
 
-                System.out.println(String.format("Node %s, target %s: effect %f, SET %d", nodeString(elementaryNode), nodeString(targetNode), effectScore, setScore));
-
                 Double totalScore = effectScore * setScore;
                 elementaryNodeLine.add(totalScore.toString());
             }
