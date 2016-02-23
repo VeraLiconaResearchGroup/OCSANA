@@ -32,7 +32,7 @@ public abstract class AbstractOCSANAAlgorithm {
      **/
     public void cancel () {
         canceled.set(true);
-    };
+    }
 
     /**
      * Indicate whether the algorithm has been canceled by the user

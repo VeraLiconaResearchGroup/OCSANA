@@ -30,7 +30,7 @@ public abstract class AbstractMHSAlgorithm
     extends AbstractOCSANAAlgorithm {
     public static final String CONFIG_GROUP = "CI search algorithm";
 
-    public AbstractMHSAlgorithm () {};
+    public AbstractMHSAlgorithm () {}
 
     /**
      * Compute MHSes of a given collection of sets
