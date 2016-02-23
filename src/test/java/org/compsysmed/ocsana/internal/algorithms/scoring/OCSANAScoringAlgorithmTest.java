@@ -106,5 +106,8 @@ public class OCSANAScoringAlgorithmTest {
         assertEquals("Toy network score: E", 18.0d, scoringAlg.scoreNode(E), 0.0d);
         assertEquals("Toy network score: F", 2.66d, scoringAlg.scoreNode(F), 0.01d);
         assertEquals("Toy network score: C+E", 21.75d, scoringAlg.scoreNodeSet(new HashSet<CyNode>(Arrays.asList(C, E))), 0.01d);
+
+        assertEquals("Toy network subpaths: A to all targets", 2, scoringAlg.nodeSubPathsToTargets(A).size());
+        assertEquals("Toy network subpaths: A to O1", 2, scoringAlg.nodeSubPathsToTarget(A, O1).size());
     }
 }

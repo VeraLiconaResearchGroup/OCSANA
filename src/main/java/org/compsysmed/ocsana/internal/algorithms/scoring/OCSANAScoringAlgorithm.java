@@ -13,6 +13,7 @@ package org.compsysmed.ocsana.internal.algorithms.scoring;
 
 // Java imports
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.function.Predicate;
 
 // Cytoscape imports
@@ -208,8 +209,11 @@ public class OCSANAScoringAlgorithm
                 nodeScoreMap.put(endpoint, nodePrevScore + nodeNewScoreTerm);
 
                 // Update the node path records
-                Collection<List<CyEdge>> nodeSubPaths = subPathsMap.getOrDefault(edgeSource, new ArrayList<>());
-                List<CyEdge> subPath = path.subList(i, path.size() - 1);
+                if (!subPathsMap.containsKey(edgeSource)) {
+                    subPathsMap.put(edgeSource, new ArrayList<>());
+                }
+                Collection<List<CyEdge>> nodeSubPaths = subPathsMap.get(edgeSource);
+                List<CyEdge> subPath = path.subList(i, path.size());
                 nodeSubPaths.add(subPath);
                 subPathsMap.put(edgeSource, nodeSubPaths);
 
@@ -287,6 +291,61 @@ public class OCSANAScoringAlgorithm
         } else {
             return effectsOnOffTargets.get(node).get(target);
         }
+    }
+
+    /**
+     * Retrieve the set of elementary nodes
+     **/
+    public Set<CyNode> elementaryNodes () {
+        return elementaryNodes;
+    }
+
+    /**
+     * Retrieve the subpaths from a node to all targets
+     *
+     * @param node  the node
+     *
+     * @return all subpaths starting from the node and ending at the targets
+     **/
+    public Collection<List<CyEdge>> nodeSubPathsToTargets (CyNode node) {
+        return nodeSubPathsToTargets.getOrDefault(node, new HashSet<>());
+    }
+
+    /**
+     * Retrieve the subpaths from a node to a selected target
+     *
+     * @param node  the node
+     * @param target  the target
+     *
+     * @return all subpaths starting from the node and ending at the target
+     **/
+    public Collection<List<CyEdge>> nodeSubPathsToTarget (CyNode node,
+                                                          CyNode target) {
+        return nodeSubPathsToTargets(node).stream().filter(path -> !path.isEmpty()).filter(path -> path.get(path.size() - 1).getTarget().equals(target)).collect(Collectors.toList());
+    }
+
+    /**
+     * Retrieve the subpaths from a node to all off-targets
+     *
+     * @param node  the node
+     *
+     * @return all subpaths starting from the node and ending at the off-targets
+     **/
+    public Collection<List<CyEdge>> nodeSubPathsToOffTargets (CyNode node) {
+        return nodeSubPathsToOffTargets.getOrDefault(node, new HashSet<>());
+    }
+
+    /**
+     * Retrieve the subpaths from a node to a selected off-target
+     *
+     * @param node  the node
+     * @param offTarget  the off-target
+     *
+     * @return all subpaths starting from the node and ending at the off-target
+     **/
+    public Collection<List<CyEdge>> nodeSubPathsToOffTarget (CyNode node,
+                                                             CyNode offTarget) {
+        return nodeSubPathsToOffTargets(node).stream().filter(path -> path.get(path.size() - 1).getTarget().equals(offTarget)).collect(Collectors.toList());
     }
 
     /**

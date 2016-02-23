@@ -66,6 +66,15 @@ public class OCSANAResults {
 
     // Output generation
     /**
+     * Get a string representation of a node
+     *
+     * @param node  the node
+     **/
+    public String nodeString (CyNode node) {
+        return nodeSetSelecter.getNodeName(node);
+    }
+
+    /**
      * Get a string representation of a set of nodes
      *
      * The current format is "[node1, node2, node3]".
@@ -78,11 +87,11 @@ public class OCSANAResults {
         }
 
         List<String> nodeStrings = new ArrayList<>();
-         for (CyNode node: nodes) {
-            nodeStrings.add(nodeSetSelecter.getNodeName(node));
-         }
+        for (CyNode node: nodes) {
+            nodeStrings.add(nodeString(node));
+        }
 
-         Collections.sort(nodeStrings);
+        Collections.sort(nodeStrings);
 
         return "[" + String.join(", ", nodeStrings) + "]";
     }
@@ -232,6 +241,29 @@ public class OCSANAResults {
             }
 
             reportLines.add(String.format("%s (%s)", nodeSetString(mhs), scoreReport));
+        }
+
+        reportLines.add("");
+
+        reportLines.add("EFFECT_ON_TARGETS × SET score matrix");
+        reportLines.add("Rows: elementary node, columns: target nodes");
+        reportLines.add("");
+
+        reportLines.add("Elementary node / Target node\t" + targetNodes.stream().map(node -> nodeString(node)).collect(Collectors.joining("\t")));
+
+        for (CyNode elementaryNode: ocsanaAlg.elementaryNodes()) {
+            StringJoiner elementaryNodeLine = new StringJoiner("\t");
+            elementaryNodeLine.add(nodeString(elementaryNode));
+            for (CyNode targetNode: targetNodes) {
+                Double effectScore = ocsanaAlg.effectOnTargetsScore(elementaryNode, targetNode);
+                Integer setScore = ocsanaAlg.nodeSubPathsToTarget(elementaryNode, targetNode).size();
+
+                System.out.println(String.format("Node %s, target %s: effect %f, SET %d", nodeString(elementaryNode), nodeString(targetNode), effectScore, setScore));
+
+                Double totalScore = effectScore * setScore;
+                elementaryNodeLine.add(totalScore.toString());
+            }
+            reportLines.add(elementaryNodeLine.toString());
         }
     }
 }
