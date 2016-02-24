@@ -8,7 +8,6 @@ package org.compsysmed.ocsana.internal.util.drugbank;
 
 // Java imports
 import java.util.*;
-import java.io.IOException;
 
 // JUnit imports
 import org.junit.*;

@@ -14,8 +14,6 @@ import static org.junit.Assert.*;
 import org.cytoscape.model.NetworkTestSupport;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
-import org.cytoscape.model.CyEdge;
-
 // Java imports
 import java.util.*;
 

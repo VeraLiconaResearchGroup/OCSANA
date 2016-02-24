@@ -11,9 +11,6 @@
 
 package org.compsysmed.ocsana.internal.tasks.path;
 
-// Java imports
-import java.util.*;
-
 // Cytoscape imports
 import org.cytoscape.work.AbstractTaskFactory;
 import org.cytoscape.work.TaskIterator;

@@ -11,13 +11,9 @@
 
 package org.compsysmed.ocsana.internal.tasks;
 
-// Java imports
-import java.util.*;
-
 // Cytoscape imports
 import org.cytoscape.task.AbstractNetworkTask;
 
-import org.cytoscape.work.Task;
 import org.cytoscape.work.TaskMonitor;
 import org.cytoscape.work.TaskManager;
 import org.cytoscape.work.TaskObserver;
@@ -27,9 +23,6 @@ import org.cytoscape.work.ContainsTunables;
 import org.cytoscape.work.ProvidesTitle;
 
 import org.cytoscape.model.CyNetwork;
-import org.cytoscape.model.CyEdge;
-import org.cytoscape.model.CyNode;
-
 // OCSANA imports
 import org.compsysmed.ocsana.internal.tasks.nodeselection.NodeSetSelecter;
 import org.compsysmed.ocsana.internal.tasks.edgeprocessing.EdgeProcessor;

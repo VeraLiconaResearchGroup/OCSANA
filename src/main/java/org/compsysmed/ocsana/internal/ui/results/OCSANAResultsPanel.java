@@ -11,8 +11,6 @@
 
 package org.compsysmed.ocsana.internal.ui.results;
 
-// Java imports
-import java.util.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 

@@ -11,9 +11,6 @@
 
 package org.compsysmed.ocsana.internal.tasks.scoring;
 
-// Java imports
-import java.util.*;
-
 // Cytoscape imports
 import org.cytoscape.work.AbstractTaskFactory;
 import org.cytoscape.work.TaskIterator;

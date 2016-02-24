@@ -11,8 +11,6 @@
 package org.compsysmed.ocsana.internal.algorithms;
 
 // Java imports
-import java.util.*;
-
 import java.util.concurrent.atomic.AtomicBoolean;
 
 // Cytoscape imports
