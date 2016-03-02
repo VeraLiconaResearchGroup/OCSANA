@@ -17,6 +17,11 @@ import java.util.Properties;
 // Cytoscape imports
 import org.cytoscape.work.TaskManager;
 
+import org.cytoscape.work.swing.PanelTaskManager;
+
+import org.cytoscape.application.CyApplicationManager;
+import org.cytoscape.application.events.SetCurrentNetworkListener;
+
 import org.cytoscape.application.swing.CySwingApplication;
 import org.cytoscape.application.swing.CytoPanelComponent;
 
@@ -27,18 +32,27 @@ import org.cytoscape.task.NetworkTaskFactory;
 
 // OCSANA imports
 import org.compsysmed.ocsana.internal.tasks.OCSANACoordinatorTaskFactory;
+import org.compsysmed.ocsana.internal.ui.control.OCSANAControlPanel;
 import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
 
 public class CyActivator extends AbstractCyActivator {
     @Override
     public void start (BundleContext bc) throws Exception {
-        // Get a TaskManager
+        // Get Cytoscape internal utilities
         TaskManager<?, ?> taskManager = getService(bc, TaskManager.class);
+        CyApplicationManager cyApplicationManager = getService(bc, CyApplicationManager.class);
+        CySwingApplication cySwingApplication = getService(bc, CySwingApplication.class);
+        PanelTaskManager panelTaskManager = getService(bc, PanelTaskManager.class);
+
+        // Control panel registration
+        OCSANAControlPanel controlPanel =
+            new OCSANAControlPanel(cyApplicationManager, cySwingApplication, panelTaskManager);
+        registerService(bc, controlPanel, CytoPanelComponent.class, new Properties());
+        registerService(bc, controlPanel, SetCurrentNetworkListener.class, new Properties());
 
         // Results panel registration
-        CySwingApplication cySwingApplicationService = getService(bc,CySwingApplication.class);
         OCSANAResultsPanel resultsPanel =
-            new OCSANAResultsPanel(cySwingApplicationService);
+            new OCSANAResultsPanel(cySwingApplication);
         registerService(bc, resultsPanel, CytoPanelComponent.class, new Properties());
 
         // Main OCSANA task registration

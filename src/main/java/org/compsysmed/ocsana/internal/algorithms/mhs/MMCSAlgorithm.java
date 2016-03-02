@@ -35,26 +35,26 @@ public class MMCSAlgorithm extends AbstractMHSAlgorithm {
 
     // Tunables for threading
     @Tunable(description = "Specify number of threads",
-             gravity = 410,
+             gravity = 350,
              tooltip="By default, all CPUs will be utilized",
              groups = {AbstractMHSAlgorithm.CONFIG_GROUP + ": " + SHORTNAME})
     public Boolean configureThreads = false;
 
     @Tunable(description = "Number of threads",
-             gravity = 411,
+             gravity = 351,
              dependsOn = "configureThreads=true",
              groups={AbstractMHSAlgorithm.CONFIG_GROUP + ": " + SHORTNAME})
     public BoundedInteger numThreads;
 
     // Tunables for bounded-cardinality search
     @Tunable(description = "Restrict search to small CIs",
-             gravity = 420,
+             gravity = 352,
              tooltip="Unbounded search may take a very long time!",
              groups = {AbstractMHSAlgorithm.CONFIG_GROUP + ": " + SHORTNAME})
     public Boolean useMaxCardinality = true;
 
     @Tunable(description = "Maximum size of CI to find",
-             gravity = 421,
+             gravity = 353,
              dependsOn = "useMaxCardinality=true",
              groups = {AbstractMHSAlgorithm.CONFIG_GROUP + ": " + SHORTNAME})
     public BoundedInteger maxCardinalityBInt;
