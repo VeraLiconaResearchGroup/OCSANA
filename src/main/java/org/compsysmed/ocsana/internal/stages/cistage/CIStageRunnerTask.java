@@ -44,25 +44,31 @@ import org.compsysmed.ocsana.internal.tasks.mhs.MHSAlgorithmTaskFactory;
  **/
 public class CIStageRunnerTask
     extends AbstractNetworkTask
-    implements TaskObserver {
+    implements TaskObserver, ObservableTask {
     private TaskManager<?, ?> taskManager;
     private CIStageContext context;
     private CIStageResults results;
+    private TaskObserver observer;
+
+    private Boolean hasCleanResults = false;
 
     public CIStageRunnerTask (TaskManager<?, ?> taskManager,
+                              TaskObserver observer,
                               CIStageContext context) {
         super(context.getNetwork());
         this.taskManager = taskManager;
+        this.observer = observer;
         this.context = context;
         this.results = new CIStageResults();
     }
 
     @Override
     public void run (TaskMonitor taskMonitor) {
-        // TODO: Handle null members
-
         // Give the task a title
         taskMonitor.setTitle("OCSANA");
+
+        // Flag that the results are not clean
+        hasCleanResults = false;
 
         // Start the first step of the algorithm
         spawnPathsToTargetsTask();
@@ -112,7 +118,18 @@ public class CIStageRunnerTask
     }
 
     private void spawnCleanupTask () {
-        // Any post-process cleanup should happen here
+        // Flag that the results are clean
+        hasCleanResults = true;
+        observer.taskFinished(this);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T getResults (Class<? extends T> type) {
+        if (hasCleanResults) {
+            return (T) results;
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -143,7 +160,8 @@ public class CIStageRunnerTask
             break;
 
         case FIND_MHSES:
-            spawnPresentResultsTask();
+            spawnCleanupTask();
+            //spawnPresentResultsTask();
             break;
 
         case PRESENT_RESULTS:

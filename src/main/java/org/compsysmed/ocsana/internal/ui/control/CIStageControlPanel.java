@@ -24,10 +24,16 @@ import javax.swing.JPanel;
 // Cytoscape imports
 import org.cytoscape.model.CyNetwork;
 
+import org.cytoscape.work.FinishStatus;
+import org.cytoscape.work.ObservableTask;
+import org.cytoscape.work.TaskObserver;
+
 import org.cytoscape.work.swing.PanelTaskManager;
 
 // OCSANA imports
 import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
+import org.compsysmed.ocsana.internal.stages.cistage.CIStageResults;
+import org.compsysmed.ocsana.internal.stages.cistage.CIStageRunnerTask;
 import org.compsysmed.ocsana.internal.stages.cistage.CIStageRunnerTaskFactory;
 
 /**
@@ -35,9 +41,10 @@ import org.compsysmed.ocsana.internal.stages.cistage.CIStageRunnerTaskFactory;
  **/
 public class CIStageControlPanel
     extends JPanel
-    implements ActionListener {
+    implements ActionListener, TaskObserver {
     private PanelTaskManager panelTaskManager;
     private CIStageContext ciStageContext;
+    private CIStageResults ciStageResults;
     private CyNetwork network;
 
     public CIStageControlPanel (CyNetwork network,
@@ -81,13 +88,25 @@ public class CIStageControlPanel
     private void runCITask () {
         panelTaskManager.validateAndApplyTunables(ciStageContext);
         CIStageRunnerTaskFactory runnerTaskFactory
-            = new CIStageRunnerTaskFactory(panelTaskManager, ciStageContext);
+            = new CIStageRunnerTaskFactory(panelTaskManager, this, ciStageContext);
         panelTaskManager.execute(runnerTaskFactory.createTaskIterator());
+    }
+
+    @Override
+    public void taskFinished (ObservableTask task) {
+        ciStageResults = task.getResults(CIStageResults.class);
+    }
+
+    @Override
+    public void allFinished(FinishStatus finishStatus) {
+        // Called after the TaskManager finished up a TaskIterator.
+        // Currently, we don't do anything with this information.
     }
 
     // Helper functions to support listening for component changes
     public void actionPerformed (ActionEvent event) {
         // Synchronize any changes made to the @Tunable UI widgets
+        System.out.println("Something happened!");
         panelTaskManager.validateAndApplyTunables(ciStageContext);
 
         buildPanel();
