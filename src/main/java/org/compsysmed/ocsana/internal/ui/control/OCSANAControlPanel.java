@@ -34,6 +34,8 @@ import org.cytoscape.application.swing.CytoPanel;
 import org.cytoscape.application.swing.CytoPanelComponent;
 import org.cytoscape.application.swing.CytoPanelName;
 
+import org.cytoscape.util.swing.BasicCollapsiblePanel;
+
 // OCSANA imports
 
 /**
@@ -71,8 +73,12 @@ public class OCSANAControlPanel
     private void buildPanel (CyNetwork network) {
         removeAll();
 
+        BasicCollapsiblePanel ciCollapsible = new BasicCollapsiblePanel("CI stage");
+        ciCollapsible.setCollapsed(false);
+        add(ciCollapsible);
+
         ciControlPanel = new CIStageControlPanel(network, panelTaskManager);
-        add(ciControlPanel);
+        ciCollapsible.add(ciControlPanel);
 
         revalidate();
         repaint();

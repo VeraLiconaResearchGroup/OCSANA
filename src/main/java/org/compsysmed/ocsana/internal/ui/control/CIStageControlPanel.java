@@ -71,8 +71,6 @@ public class CIStageControlPanel
                 }
             });
 
-        setSize(getMinimumSize());
-
         revalidate();
         repaint();
     }
