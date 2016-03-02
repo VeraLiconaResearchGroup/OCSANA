@@ -29,16 +29,18 @@ import javax.swing.table.TableRowSorter;
 import org.cytoscape.model.CyNode;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.util.results.OCSANAResults;
+import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
+import org.compsysmed.ocsana.internal.stages.cistage.CIStageResults;
 
 public class CIPanel
     extends JPanel {
     private static final Vector<String> mhsCols =
-        new Vector<>(Arrays.asList(new String[] {"CI", "Size", "OCSANA Score", "Undruggable nodes (DrugBank)"}));
+        new Vector<>(Arrays.asList(new String[] {"CI", "Size", "OCSANA Score"}));
 
-    public CIPanel (OCSANAResults results) {
+    public CIPanel (CIStageContext context,
+                    CIStageResults results) {
         if (results.MHSes != null) {
-            Vector<Vector<Object>> mhsRows = getMHSRows(results);
+            Vector<Vector<Object>> mhsRows = getMHSRows(context, results);
 
             TableModel mhsModel = new DefaultTableModel(mhsRows, mhsCols) {
                     @Override
@@ -62,10 +64,7 @@ public class CIPanel
             // Sort the rows
             RowSorter<TableModel> mhsSorter = new TableRowSorter<TableModel>(mhsModel);
 
-            if (results.drugBankAlg.hasScores()) {
-                // If we have DrugBank scores, sort in increasing order with respect to them
-                mhsSorter.toggleSortOrder(3);
-            } else if (results.ocsanaAlg.hasScores()) {
+            if (context.ocsanaAlg.hasScores()) {
                 // If we have OCSANA scores, sort in decreasing order with respect to them
                 mhsSorter.toggleSortOrder(2);
                 mhsSorter.toggleSortOrder(2);
@@ -90,21 +89,16 @@ public class CIPanel
     /**
      * Get the rows of the CI results table
      **/
-    private static Vector<Vector<Object>> getMHSRows (OCSANAResults results) {
+    private static Vector<Vector<Object>> getMHSRows (CIStageContext context,
+                                                      CIStageResults results) {
         Vector<Vector<Object>> rows = new Vector<>();
         for (Set<CyNode> MHS: results.MHSes) {
             Vector<Object> row = new Vector<>();
-            row.add(results.nodeSetString(MHS));
+            row.add(context.nodeSetString(MHS));
             row.add(MHS.size());
 
-            if (results.ocsanaAlg.hasScores()) {
-                row.add(results.ocsanaAlg.scoreNodeSet(MHS));
-            } else {
-                row.add(null);
-            }
-
-            if (results.drugBankAlg.hasScores()) {
-                row.add(results.drugBankAlg.scoreNodeSet(MHS));
+            if (context.ocsanaAlg.hasScores()) {
+                row.add(context.ocsanaAlg.scoreNodeSet(MHS));
             } else {
                 row.add(null);
             }

@@ -32,6 +32,9 @@ import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
 import org.compsysmed.ocsana.internal.tasks.path.PathFindingAlgorithmTaskFactory;
 import org.compsysmed.ocsana.internal.tasks.scoring.ScoringTaskFactory;
 import org.compsysmed.ocsana.internal.tasks.mhs.MHSAlgorithmTaskFactory;
+import org.compsysmed.ocsana.internal.tasks.results.PresentResultsTaskFactory;
+
+import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
 
 /**
  * Runner task for the CI stage of OCSANA
@@ -49,16 +52,20 @@ public class CIStageRunnerTask
     private CIStageContext context;
     private CIStageResults results;
     private TaskObserver observer;
+    private OCSANAResultsPanel resultsPanel;
 
     private Boolean hasCleanResults = false;
 
     public CIStageRunnerTask (TaskManager<?, ?> taskManager,
                               TaskObserver observer,
-                              CIStageContext context) {
+                              CIStageContext context,
+                              OCSANAResultsPanel resultsPanel) {
         super(context.getNetwork());
         this.taskManager = taskManager;
         this.observer = observer;
         this.context = context;
+        this.resultsPanel = resultsPanel;
+
         this.results = new CIStageResults();
     }
 
@@ -109,12 +116,10 @@ public class CIStageRunnerTask
     }
 
     private void spawnPresentResultsTask () {
-        /*
         PresentResultsTaskFactory presentResultsTaskFactory =
             new PresentResultsTaskFactory(context, results, resultsPanel);
 
         taskManager.execute(presentResultsTaskFactory.createTaskIterator(), this);
-        */
     }
 
     private void spawnCleanupTask () {
@@ -160,8 +165,7 @@ public class CIStageRunnerTask
             break;
 
         case FIND_MHSES:
-            spawnCleanupTask();
-            //spawnPresentResultsTask();
+            spawnPresentResultsTask();
             break;
 
         case PRESENT_RESULTS:

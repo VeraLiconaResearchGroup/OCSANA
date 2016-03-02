@@ -32,7 +32,7 @@ import org.cytoscape.task.NetworkTaskFactory;
 
 // OCSANA imports
 import org.compsysmed.ocsana.internal.ui.control.OCSANAControlPanel;
-//import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
+import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
 
 public class CyActivator extends AbstractCyActivator {
     @Override
@@ -43,17 +43,15 @@ public class CyActivator extends AbstractCyActivator {
         CySwingApplication cySwingApplication = getService(bc, CySwingApplication.class);
         PanelTaskManager panelTaskManager = getService(bc, PanelTaskManager.class);
 
-        // Control panel registration
-        OCSANAControlPanel controlPanel =
-            new OCSANAControlPanel(cyApplicationManager, cySwingApplication, panelTaskManager);
-        registerService(bc, controlPanel, CytoPanelComponent.class, new Properties());
-        registerService(bc, controlPanel, SetCurrentNetworkListener.class, new Properties());
-
         // Results panel registration
-        /*
         OCSANAResultsPanel resultsPanel =
             new OCSANAResultsPanel(cySwingApplication);
         registerService(bc, resultsPanel, CytoPanelComponent.class, new Properties());
-        */
+
+        // Control panel registration
+        OCSANAControlPanel controlPanel =
+            new OCSANAControlPanel(cyApplicationManager, cySwingApplication, resultsPanel, panelTaskManager);
+        registerService(bc, controlPanel, CytoPanelComponent.class, new Properties());
+        registerService(bc, controlPanel, SetCurrentNetworkListener.class, new Properties());
     }
 }

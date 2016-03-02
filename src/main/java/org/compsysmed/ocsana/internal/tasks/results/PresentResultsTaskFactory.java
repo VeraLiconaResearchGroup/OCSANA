@@ -21,22 +21,27 @@ import org.cytoscape.work.TaskIterator;
 // OCSANA imports
 import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
 
-import org.compsysmed.ocsana.internal.util.results.OCSANAResults;
+import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
+import org.compsysmed.ocsana.internal.stages.cistage.CIStageResults;
 
 public class PresentResultsTaskFactory extends AbstractTaskFactory {
-    private OCSANAResults results;
+    private CIStageContext ciContext;
+    private CIStageResults ciResults;
+
     private OCSANAResultsPanel resultsPanel;
 
-    public PresentResultsTaskFactory (OCSANAResults results,
+    public PresentResultsTaskFactory (CIStageContext ciContext,
+                                      CIStageResults ciResults,
                                       OCSANAResultsPanel resultsPanel) {
-        this.results = results;
+        this.ciContext = ciContext;
+        this.ciResults = ciResults;
         this.resultsPanel = resultsPanel;
     }
 
     @Override
     public TaskIterator createTaskIterator () {
         TaskIterator tasks = new TaskIterator();
-        tasks.append(new PresentResultsTask(results, resultsPanel));
+        tasks.append(new PresentResultsTask(ciContext, ciResults, resultsPanel));
         return tasks;
     }
 }

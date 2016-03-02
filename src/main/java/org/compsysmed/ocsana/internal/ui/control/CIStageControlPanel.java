@@ -36,19 +36,25 @@ import org.compsysmed.ocsana.internal.stages.cistage.CIStageResults;
 import org.compsysmed.ocsana.internal.stages.cistage.CIStageRunnerTask;
 import org.compsysmed.ocsana.internal.stages.cistage.CIStageRunnerTaskFactory;
 
+import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
+
 /**
  * Panel to configure and run OCSANA CI stage
  **/
 public class CIStageControlPanel
     extends JPanel
     implements ActionListener, TaskObserver {
+    private OCSANAResultsPanel resultsPanel;
     private PanelTaskManager panelTaskManager;
+
     private CIStageContext ciStageContext;
     private CIStageResults ciStageResults;
     private CyNetwork network;
 
     public CIStageControlPanel (CyNetwork network,
+                                OCSANAResultsPanel resultsPanel,
                                 PanelTaskManager panelTaskManager) {
+        this.resultsPanel = resultsPanel;
         this.panelTaskManager = panelTaskManager;
 
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
@@ -88,7 +94,7 @@ public class CIStageControlPanel
     private void runCITask () {
         panelTaskManager.validateAndApplyTunables(ciStageContext);
         CIStageRunnerTaskFactory runnerTaskFactory
-            = new CIStageRunnerTaskFactory(panelTaskManager, this, ciStageContext);
+            = new CIStageRunnerTaskFactory(panelTaskManager, this, ciStageContext, resultsPanel);
         panelTaskManager.execute(runnerTaskFactory.createTaskIterator());
     }
 

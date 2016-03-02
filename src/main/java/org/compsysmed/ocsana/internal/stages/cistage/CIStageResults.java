@@ -21,6 +21,7 @@ import org.cytoscape.model.CyEdge;
 
 // OCSANA imports
 
+
 public class CIStageResults {
     // Paths data
     public Collection<List<CyEdge>> pathsToTargets;
@@ -39,4 +40,8 @@ public class CIStageResults {
     public Collection<Set<CyNode>> MHSes;
     public Double mhsExecutionSeconds;
     public Boolean mhsFindingCanceled = false;
+
+    public List<String> getReportLines () {
+        return new ArrayList<String>();
+    }
 }

@@ -24,11 +24,13 @@ import javax.swing.JTextArea;
 import org.cytoscape.model.CyEdge;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.util.results.OCSANAResults;
+import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
+import org.compsysmed.ocsana.internal.stages.cistage.CIStageResults;
 
 public class PathsPanel
     extends JPanel {
-    public PathsPanel (OCSANAResults results,
+    public PathsPanel (CIStageContext context,
+                       CIStageResults results,
                        PathType pathType) {
         Collection<List<CyEdge>> paths;
         Double pathFindingTime;
@@ -51,7 +53,7 @@ public class PathsPanel
         if (paths != null) {
             List<String> pathLines = new ArrayList<>();
             for (List<CyEdge> path: paths) {
-                pathLines.add(results.pathString(path));
+                pathLines.add(context.pathString(path));
             }
 
             // Sort alphabetically

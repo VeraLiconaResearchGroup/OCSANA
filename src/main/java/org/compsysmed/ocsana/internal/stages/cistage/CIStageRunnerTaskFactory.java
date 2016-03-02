@@ -24,24 +24,29 @@ import org.cytoscape.work.TaskObserver;
 import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
 import org.compsysmed.ocsana.internal.stages.cistage.CIStageResults;
 
+import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
+
 public class CIStageRunnerTaskFactory extends AbstractTaskFactory {
     private TaskManager<?, ?> taskManager;
     private TaskObserver observer;
     private CIStageContext context;
+    private OCSANAResultsPanel resultsPanel;
 
     public CIStageRunnerTaskFactory (TaskManager<?, ?> taskManager,
                                      TaskObserver observer,
-                                     CIStageContext context) {
+                                     CIStageContext context,
+                                     OCSANAResultsPanel resultsPanel) {
         super();
         this.taskManager = taskManager;
         this.observer = observer;
         this.context = context;
+        this.resultsPanel = resultsPanel;
     }
 
     @Override
     public TaskIterator createTaskIterator () {
         TaskIterator tasks = new TaskIterator();
-        tasks.append(new CIStageRunnerTask(taskManager, observer, context));
+        tasks.append(new CIStageRunnerTask(taskManager, observer, context, resultsPanel));
         return tasks;
     }
 }

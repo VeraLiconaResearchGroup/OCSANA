@@ -37,6 +37,7 @@ import org.cytoscape.application.swing.CytoPanelName;
 import org.cytoscape.util.swing.BasicCollapsiblePanel;
 
 // OCSANA imports
+import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
 
 /**
  * Panel to configure and run OCSANA
@@ -47,13 +48,16 @@ public class OCSANAControlPanel
     private CyApplicationManager cyApplicationManager;
     private PanelTaskManager panelTaskManager;
     private CytoPanel cyControlPanel;
+    private OCSANAResultsPanel resultsPanel;
 
     private CIStageControlPanel ciControlPanel;
 
     public OCSANAControlPanel (CyApplicationManager cyApplicationManager,
                                CySwingApplication cySwingApplication,
+                               OCSANAResultsPanel resultsPanel,
                                PanelTaskManager panelTaskManager) {
         super();
+        this.resultsPanel = resultsPanel;
         this.panelTaskManager = panelTaskManager;
         this.cyControlPanel = cySwingApplication.getCytoPanel(getCytoPanelName());
 
@@ -77,7 +81,7 @@ public class OCSANAControlPanel
         ciCollapsible.setCollapsed(false);
         add(ciCollapsible);
 
-        ciControlPanel = new CIStageControlPanel(network, panelTaskManager);
+        ciControlPanel = new CIStageControlPanel(network, resultsPanel, panelTaskManager);
         ciCollapsible.add(ciControlPanel);
 
         revalidate();
