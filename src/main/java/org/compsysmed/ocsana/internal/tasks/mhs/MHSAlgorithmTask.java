@@ -24,15 +24,19 @@ import org.cytoscape.model.CyEdge;
 import org.compsysmed.ocsana.internal.tasks.AbstractOCSANATask;
 import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
 
-import org.compsysmed.ocsana.internal.util.results.OCSANAResults;
+import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
+import org.compsysmed.ocsana.internal.stages.cistage.CIStageResults;
 
 public class MHSAlgorithmTask extends AbstractOCSANATask {
     private static final OCSANAStep algStep = OCSANAStep.FIND_MHSES;
 
-    private OCSANAResults results;
+    private CIStageContext context;
+    private CIStageResults results;
 
-    public MHSAlgorithmTask (OCSANAResults results) {
-        super(results.network);
+    public MHSAlgorithmTask (CIStageContext context,
+                             CIStageResults results) {
+        super(context.getNetwork());
+        this.context = context;
         this.results = results;
     }
 
@@ -75,10 +79,10 @@ public class MHSAlgorithmTask extends AbstractOCSANATask {
         Double conversionTime = (postConversionTime - preConversionTime) / 1E9;
         taskMonitor.setStatusMessage(String.format("Converted paths in %f s.", conversionTime));
 
-        taskMonitor.setStatusMessage(String.format("Finding minimal combinations of interventions (algorithm: %s).", results.mhsAlg.shortName()));
+        taskMonitor.setStatusMessage(String.format("Finding minimal combinations of interventions (algorithm: %s).", context.mhsAlg.shortName()));
 
         Long preMHSTime = System.nanoTime();
-        results.MHSes = results.mhsAlg.MHSes(nodeSets);
+        results.MHSes = context.mhsAlg.MHSes(nodeSets);
         Long postMHSTime = System.nanoTime();
 
         Double mhsTime = (postMHSTime - preMHSTime) / 1E9;
@@ -98,8 +102,8 @@ public class MHSAlgorithmTask extends AbstractOCSANATask {
      **/
     private void addNodeWithEndpointChecks (CyNode nodeToAdd,
                                             Set<CyNode> nodeSet) {
-        if (results.includeEndpointsInCIs ||
-            (!results.nodeSetSelecter.getSourceNodes().contains(nodeToAdd) && !results.nodeSetSelecter.getTargetNodes().contains(nodeToAdd))) {
+        if (context.includeEndpointsInCIs ||
+            (!context.nodeSetSelecter.getSourceNodes().contains(nodeToAdd) && !context.nodeSetSelecter.getTargetNodes().contains(nodeToAdd))) {
             nodeSet.add(nodeToAdd);
         }
     }
@@ -121,7 +125,7 @@ public class MHSAlgorithmTask extends AbstractOCSANATask {
     @Override
     public void cancel () {
         super.cancel();
-        results.mhsAlg.cancel();
+        context.mhsAlg.cancel();
         results.mhsFindingCanceled = true;
     }
 }

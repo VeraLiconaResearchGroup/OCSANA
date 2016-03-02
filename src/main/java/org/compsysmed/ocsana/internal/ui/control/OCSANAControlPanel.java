@@ -73,6 +73,9 @@ public class OCSANAControlPanel
 
         ciControlPanel = new CIStageControlPanel(network, panelTaskManager);
         add(ciControlPanel);
+
+        revalidate();
+        repaint();
     }
 
     // Helper functions to get information about the panel

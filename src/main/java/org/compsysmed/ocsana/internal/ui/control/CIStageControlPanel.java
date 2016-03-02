@@ -18,6 +18,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JPanel;
 
 // Cytoscape imports
@@ -27,6 +28,7 @@ import org.cytoscape.work.swing.PanelTaskManager;
 
 // OCSANA imports
 import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
+import org.compsysmed.ocsana.internal.stages.cistage.CIStageRunnerTaskFactory;
 
 /**
  * Panel to configure and run OCSANA CI stage
@@ -50,11 +52,24 @@ public class CIStageControlPanel
         buildPanel();
     }
 
-    public void buildPanel () {
+    /**
+     * (Re)construct the panel from its components
+     **/
+    private void buildPanel () {
         removeAll();
 
         JPanel tunablePanel = panelTaskManager.getConfiguration(null, ciStageContext);
         add(tunablePanel);
+
+        JButton runCIStageButton = new JButton("Run CI stage computations");
+        add(runCIStageButton);
+
+        runCIStageButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed (ActionEvent e) {
+                    runCITask();
+                }
+            });
 
         setSize(getMinimumSize());
 
@@ -62,15 +77,20 @@ public class CIStageControlPanel
         repaint();
     }
 
+    /**
+     * Spawn the CI stage task
+     **/
+    private void runCITask () {
+        panelTaskManager.validateAndApplyTunables(ciStageContext);
+        CIStageRunnerTaskFactory runnerTaskFactory
+            = new CIStageRunnerTaskFactory(panelTaskManager, ciStageContext);
+        panelTaskManager.execute(runnerTaskFactory.createTaskIterator());
+    }
+
     // Helper functions to support listening for component changes
     public void actionPerformed (ActionEvent event) {
         // Synchronize any changes made to the @Tunable UI widgets
         panelTaskManager.validateAndApplyTunables(ciStageContext);
-
-        // Copy the context so PanelTaskManager.getConfiguration()
-        // will have a cache miss and rebuild the JPanel.
-        // This is a workaround for a bug.
-        //ciStageContext = new CIStageContext(ciStageContext);
 
         buildPanel();
     }

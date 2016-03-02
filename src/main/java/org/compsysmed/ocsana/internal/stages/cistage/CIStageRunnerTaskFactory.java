@@ -1,7 +1,7 @@
 /**
- * Factory for tasks to run scoring algorithms in OCSANA
+ * Factory for tasks to run CI stages in OCSANA
  *
- * Copyright Vera-Licona Research Group (C) 2015
+ * Copyright Vera-Licona Research Group (C) 2016
  *
  * This software is licensed under the Artistic License 2.0, see the
  * LICENSE file or
@@ -9,7 +9,7 @@
  * details
  **/
 
-package org.compsysmed.ocsana.internal.tasks.scoring;
+package org.compsysmed.ocsana.internal.stages.cistage;
 
 // Java imports
 import java.util.*;
@@ -17,29 +17,27 @@ import java.util.*;
 // Cytoscape imports
 import org.cytoscape.work.AbstractTaskFactory;
 import org.cytoscape.work.TaskIterator;
-
-import org.cytoscape.model.CyNetwork;
+import org.cytoscape.work.TaskManager;
 
 // OCSANA imports
 import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
 import org.compsysmed.ocsana.internal.stages.cistage.CIStageResults;
 
-public class ScoringTaskFactory extends AbstractTaskFactory {
-    private CyNetwork network;
-
+public class CIStageRunnerTaskFactory extends AbstractTaskFactory {
+    private TaskManager<?, ?> taskManager;
     private CIStageContext context;
-    private CIStageResults results;
 
-    public ScoringTaskFactory (CIStageContext context,
-                               CIStageResults results) {
+    public CIStageRunnerTaskFactory (TaskManager<?, ?> taskManager,
+                                     CIStageContext context) {
+        super();
+        this.taskManager = taskManager;
         this.context = context;
-        this.results = results;
     }
 
     @Override
     public TaskIterator createTaskIterator () {
         TaskIterator tasks = new TaskIterator();
-        tasks.append(new ScoringTask(context, results));
+        tasks.append(new CIStageRunnerTask(taskManager, context));
         return tasks;
     }
 }

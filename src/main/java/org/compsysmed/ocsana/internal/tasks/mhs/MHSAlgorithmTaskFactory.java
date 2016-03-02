@@ -19,20 +19,24 @@ import org.cytoscape.work.AbstractTaskFactory;
 import org.cytoscape.work.TaskIterator;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.util.results.OCSANAResults;
+import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
+import org.compsysmed.ocsana.internal.stages.cistage.CIStageResults;
 
 public class MHSAlgorithmTaskFactory extends AbstractTaskFactory {
-    private OCSANAResults results;
+    private CIStageContext context;
+    private CIStageResults results;
 
-    public MHSAlgorithmTaskFactory (OCSANAResults results) {
+    public MHSAlgorithmTaskFactory (CIStageContext context,
+                                    CIStageResults results) {
         super();
+        this.context = context;
         this.results = results;
     }
 
     @Override
     public TaskIterator createTaskIterator () {
         TaskIterator tasks = new TaskIterator();
-        tasks.append(new MHSAlgorithmTask(results));
+        tasks.append(new MHSAlgorithmTask(context, results));
         return tasks;
     }
 }

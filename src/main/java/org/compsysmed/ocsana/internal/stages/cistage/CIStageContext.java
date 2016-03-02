@@ -19,6 +19,8 @@ import java.awt.event.ActionListener;
 
 // Cytoscape imports
 import org.cytoscape.model.CyNetwork;
+import org.cytoscape.model.CyEdge;
+import org.cytoscape.model.CyNode;
 
 import org.cytoscape.work.ContainsTunables;
 import org.cytoscape.work.Tunable;
@@ -51,7 +53,6 @@ import org.compsysmed.ocsana.internal.algorithms.scoring.OCSANAScoringAlgorithm;
  **/
 public class CIStageContext
     implements ListChangeListener {
-
     // User options as Tunables
     // Node and edge selection
     @ContainsTunables
@@ -127,6 +128,80 @@ public class CIStageContext
 
         // OCSANA scoring options
         ocsanaAlg = new OCSANAScoringAlgorithm(network);
+    }
+
+    /**
+     * Return the CyNetwork used by this context
+     **/
+    public CyNetwork getNetwork () {
+        return network;
+    }
+
+    // Output generation
+    /**
+     * Get a string representation of a node
+     *
+     * @param node  the node
+     **/
+    public String nodeString (CyNode node) {
+        return nodeSetSelecter.getNodeName(node);
+    }
+
+    /**
+     * Get a string representation of a set of nodes
+     *
+     * The current format is "[node1, node2, node3]".
+     *
+     * @param nodes  the Collection of nodes
+     **/
+    public String nodeSetString(Collection<CyNode> nodes) {
+        if (nodes == null) {
+            return "";
+        }
+
+        List<String> nodeStrings = new ArrayList<>();
+        for (CyNode node: nodes) {
+            nodeStrings.add(nodeString(node));
+        }
+
+        Collections.sort(nodeStrings);
+
+        return "[" + String.join(", ", nodeStrings) + "]";
+    }
+
+    /**
+     * Get a string representation of a path of (directed) edges
+     *
+     * The current format is "node1 -> node2 -| node3".
+     *
+     * @param path  the path
+     **/
+    public String pathString(List<CyEdge> path) {
+        if (path == null) {
+            return "";
+        }
+
+        StringBuilder result = new StringBuilder();
+
+        // Handle first node
+        try {
+            CyNode firstNode = path.iterator().next().getSource();
+            result.append(nodeSetSelecter.getNodeName(firstNode));
+        } catch (NoSuchElementException e) {
+            return result.toString();
+        }
+
+        // Each other node is a target
+        for (CyEdge edge: path) {
+            if (edgeProcessor.edgeIsInhibition(edge)) {
+                result.append(" -| ");
+            } else {
+                result.append(" -> ");
+            }
+            result.append(nodeSetSelecter.getNodeName(edge.getTarget()));
+        }
+
+        return result.toString();
     }
 
     // Bits and pieces to support listeners

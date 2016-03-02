@@ -31,9 +31,8 @@ import org.osgi.framework.BundleContext;
 import org.cytoscape.task.NetworkTaskFactory;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.tasks.OCSANACoordinatorTaskFactory;
 import org.compsysmed.ocsana.internal.ui.control.OCSANAControlPanel;
-import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
+//import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
 
 public class CyActivator extends AbstractCyActivator {
     @Override
@@ -51,19 +50,10 @@ public class CyActivator extends AbstractCyActivator {
         registerService(bc, controlPanel, SetCurrentNetworkListener.class, new Properties());
 
         // Results panel registration
+        /*
         OCSANAResultsPanel resultsPanel =
             new OCSANAResultsPanel(cySwingApplication);
         registerService(bc, resultsPanel, CytoPanelComponent.class, new Properties());
-
-        // Main OCSANA task registration
-        Properties properties = new Properties();
-
-        properties.setProperty(PREFERRED_MENU, "Apps");
-        properties.setProperty(TITLE, "OCSANA");
-
-        registerService(bc,
-                        new OCSANACoordinatorTaskFactory(taskManager, resultsPanel),
-                        NetworkTaskFactory.class,
-                        properties);
+        */
     }
 }

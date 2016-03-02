@@ -13,6 +13,7 @@ package org.compsysmed.ocsana.internal.tasks.nodeselection;
 
 // Java imports
 import java.util.*;
+import java.util.stream.Collectors;
 
 // Cytoscape imports
 import org.cytoscape.work.Tunable;
@@ -75,7 +76,7 @@ public class NodeSetSelecter {
              params = CONFIG_GROUP_TITLE_PARAM,
              xorKey = CONFIG_GROUP_LIST,
              listenForChange = "NodeNameColumnSelecter")
-    public ListMultipleSelection<NodeWithName> sourceNodeList;
+    public ListMultipleSelection<String> sourceNodeList;
 
     @Tunable(gravity = 151,
              description = STRING_SELECT_DESCRIPTION,
@@ -90,7 +91,7 @@ public class NodeSetSelecter {
              params = CONFIG_GROUP_TITLE_PARAM,
              xorKey = CONFIG_GROUP_LIST,
              listenForChange = "NodeNameColumnSelecter")
-    public ListMultipleSelection<NodeWithName> targetNodeList;
+    public ListMultipleSelection<String> targetNodeList;
 
     @Tunable(gravity = 152,
              description = STRING_SELECT_DESCRIPTION,
@@ -105,7 +106,7 @@ public class NodeSetSelecter {
              params = CONFIG_GROUP_TITLE_PARAM,
              xorKey = CONFIG_GROUP_LIST,
              listenForChange = "NodeNameColumnSelecter")
-    public ListMultipleSelection<NodeWithName> offTargetNodeList;
+    public ListMultipleSelection<String> offTargetNodeList;
 
     @Tunable(gravity = 153,
              description = STRING_SELECT_DESCRIPTION,
@@ -115,7 +116,6 @@ public class NodeSetSelecter {
     public String offTargetNodeString = "";
 
     private CyNetwork network;
-    private List<NodeWithName> nodesWithNames;
     private Map<String, CyNode> nodeNamesMap;
 
     public NodeSetSelecter (CyNetwork network) {
@@ -136,22 +136,21 @@ public class NodeSetSelecter {
 
     private void populateWithNodeNames () {
         List<CyNode> nodes = network.getNodeList();
-        nodesWithNames = new ArrayList<>(nodes.size());
+        List<String> nodeNames = new ArrayList<>(nodes.size());
         nodeNamesMap = new HashMap<>(nodes.size());
 
         for (CyNode node: nodes) {
             String nodeName = getNodeName(node);
-            NodeWithName namedNode = new NodeWithName(node, nodeName);
-            nodesWithNames.add(namedNode);
+            nodeNames.add(nodeName);
             nodeNamesMap.put(nodeName, node);
         }
 
         // Sort the nodes alphabetically for display
-        Collections.sort(nodesWithNames);
+        Collections.sort(nodeNames);
 
-        sourceNodeList = new ListMultipleSelection<>(nodesWithNames);
-        targetNodeList = new ListMultipleSelection<>(nodesWithNames);
-        offTargetNodeList = new ListMultipleSelection<>(nodesWithNames);
+        sourceNodeList = new ListMultipleSelection<>(nodeNames);
+        targetNodeList = new ListMultipleSelection<>(nodeNames);
+        offTargetNodeList = new ListMultipleSelection<>(nodeNames);
     }
 
     public List<CyNode> getSourceNodes () {
@@ -210,51 +209,21 @@ public class NodeSetSelecter {
         return network.getRow(node).get(nodeNameColumn, String.class);
     }
 
-    private List<CyNode> getNodesFromList (List<NodeWithName> nodesWithNames) {
-        List<CyNode> nodes = new ArrayList<>(nodesWithNames.size());
-        for (NodeWithName nodeWithName: nodesWithNames) {
-            nodes.add(nodeWithName.node);
-        }
-        return nodes;
-    }
-
-    private List<CyNode> getNodesFromString (String nodeNames) {
-        List<String> selectedNodeNames = Arrays.asList(nodeNames.trim().split(","));
-        List<CyNode> nodes = new ArrayList<>(selectedNodeNames.size());
-        for (String nodeName: selectedNodeNames) {
-            String trimmedName = nodeName.trim();
-            if (trimmedName.isEmpty()) {
-                continue;
-            }
-
-            CyNode node = nodeNamesMap.get(trimmedName);
-            if (node != null) {
-                nodes.add(node);
+    private List<CyNode> getNodesFromList (List<String> nodeNames) {
+        List<CyNode> nodes = new ArrayList<>(nodeNames.size());
+        for (String nodeName: nodeNames) {
+            if (nodeNamesMap.containsKey(nodeName)) {
+                nodes.add(nodeNamesMap.get(nodeName));
             } else {
-                throw new IllegalArgumentException("No node named " + trimmedName + " could be found.");
+                throw new IllegalArgumentException(String.format("No node named %s", nodeName));
             }
         }
         return nodes;
     }
 
-    private static class NodeWithName implements Comparable<NodeWithName> {
-        public final CyNode node;
-        public final String name;
-
-        public NodeWithName (CyNode node, String name) {
-            this.node = node;
-            this.name = name;
-        }
-
-        @Override
-        public String toString () {
-            return name;
-        }
-
-        @Override
-        public int compareTo (NodeWithName otherNode) {
-            return name.compareTo(otherNode.name);
-        }
+    private List<CyNode> getNodesFromString (String commaSeparatedNodeNames) {
+        // Split input string at commas and trim whitespace and empty entries
+        List<String> selectedNodeNames = Arrays.stream(commaSeparatedNodeNames.trim().split(",")).map(name -> name.trim()).filter(name -> !name.isEmpty()).collect(Collectors.toList());
+        return getNodesFromList(selectedNodeNames);
     }
-
 }

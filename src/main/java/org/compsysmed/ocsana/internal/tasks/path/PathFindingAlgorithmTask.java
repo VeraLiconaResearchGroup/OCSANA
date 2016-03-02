@@ -24,16 +24,20 @@ import org.cytoscape.model.CyEdge;
 import org.compsysmed.ocsana.internal.tasks.AbstractOCSANATask;
 import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
 
-import org.compsysmed.ocsana.internal.util.results.OCSANAResults;
+import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
+import org.compsysmed.ocsana.internal.stages.cistage.CIStageResults;
 
 public class PathFindingAlgorithmTask extends AbstractOCSANATask {
-    private OCSANAResults results;
+    private CIStageContext context;
+    private CIStageResults results;
     private OCSANAStep algStep;
     private Collection<List<CyEdge>> paths;
 
-    public PathFindingAlgorithmTask (OCSANAResults results,
+    public PathFindingAlgorithmTask (CIStageContext context,
+                                     CIStageResults results,
                                      OCSANAStep algStep) {
-        super(results.network);
+        super(context.getNetwork());
+        this.context = context;
         this.results = results;
         this.algStep = algStep;
     }
@@ -41,17 +45,17 @@ public class PathFindingAlgorithmTask extends AbstractOCSANATask {
     @Override
     public void run (TaskMonitor taskMonitor) {
         String targetType;
-        Set<CyNode> sourceNodes = results.nodeSetSelecter.getSourceNodeSet();
+        Set<CyNode> sourceNodes = context.nodeSetSelecter.getSourceNodeSet();
         Set<CyNode> targetsForThisRun;
         switch (algStep) {
         case FIND_PATHS_TO_TARGETS:
             targetType = "target";
-            targetsForThisRun = results.nodeSetSelecter.getTargetNodeSet();
+            targetsForThisRun = context.nodeSetSelecter.getTargetNodeSet();
             break;
 
         case FIND_PATHS_TO_OFF_TARGETS:
             targetType = "off-target";
-            targetsForThisRun = results.nodeSetSelecter.getOffTargetNodeSet();
+            targetsForThisRun = context.nodeSetSelecter.getOffTargetNodeSet();
             break;
 
         default:
@@ -64,10 +68,10 @@ public class PathFindingAlgorithmTask extends AbstractOCSANATask {
 
         taskMonitor.setTitle(String.format("Paths to %ss", targetType));
 
-        taskMonitor.setStatusMessage(String.format("Finding paths from %d source nodes to %d %s nodes (algorithm: %s).", sourceNodes.size(), targetsForThisRun.size(), targetType, results.pathFindingAlg.shortName()));
+        taskMonitor.setStatusMessage(String.format("Finding paths from %d source nodes to %d %s nodes (algorithm: %s).", sourceNodes.size(), targetsForThisRun.size(), targetType, context.pathFindingAlg.shortName()));
 
         Long preTime = System.nanoTime();
-        paths = results.pathFindingAlg.paths(sourceNodes, targetsForThisRun);
+        paths = context.pathFindingAlg.paths(sourceNodes, targetsForThisRun);
         Long postTime = System.nanoTime();
 
         Double runTime = (postTime - preTime) / 1E9;
@@ -90,6 +94,10 @@ public class PathFindingAlgorithmTask extends AbstractOCSANATask {
         taskMonitor.showMessage(TaskMonitor.Level.INFO, String.format("Found %d paths in %fs.", paths.size(), runTime));
     }
 
+    /**
+     * Return the paths found by this task (or null if the task has
+     * not completed)
+     **/
     public Collection<List<CyEdge>> getPaths () {
         return paths;
     }
@@ -107,7 +115,7 @@ public class PathFindingAlgorithmTask extends AbstractOCSANATask {
     @Override
     public void cancel () {
         super.cancel();
-        results.pathFindingAlg.cancel();
+        context.pathFindingAlg.cancel();
         results.pathFindingCanceled = true;
     }
 }

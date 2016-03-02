@@ -21,15 +21,19 @@ import org.cytoscape.work.TaskIterator;
 // OCSANA imports
 import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
 
-import org.compsysmed.ocsana.internal.util.results.OCSANAResults;
+import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
+import org.compsysmed.ocsana.internal.stages.cistage.CIStageResults;
 
 public class PathFindingAlgorithmTaskFactory extends AbstractTaskFactory {
-    private OCSANAResults results;
+    private CIStageContext context;
+    private CIStageResults results;
     private OCSANAStep algStep;
 
-    public PathFindingAlgorithmTaskFactory (OCSANAResults results,
+    public PathFindingAlgorithmTaskFactory (CIStageContext context,
+                                            CIStageResults results,
                                             OCSANAStep algStep) {
         super();
+        this.context = context;
         this.results = results;
         this.algStep = algStep;
     }
@@ -37,7 +41,7 @@ public class PathFindingAlgorithmTaskFactory extends AbstractTaskFactory {
     @Override
     public TaskIterator createTaskIterator () {
         TaskIterator tasks = new TaskIterator();
-        tasks.append(new PathFindingAlgorithmTask(results, algStep));
+        tasks.append(new PathFindingAlgorithmTask(context, results, algStep));
         return tasks;
     }
 }

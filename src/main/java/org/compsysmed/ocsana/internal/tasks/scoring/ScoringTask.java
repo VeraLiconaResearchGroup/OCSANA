@@ -24,15 +24,19 @@ import org.cytoscape.model.CyEdge;
 import org.compsysmed.ocsana.internal.tasks.AbstractOCSANATask;
 import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
 
-import org.compsysmed.ocsana.internal.util.results.OCSANAResults;
+import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
+import org.compsysmed.ocsana.internal.stages.cistage.CIStageResults;
 
 public class ScoringTask extends AbstractOCSANATask {
     private static final OCSANAStep algStep = OCSANAStep.SCORE_PATHS;
 
-    private OCSANAResults results;
+    private CIStageContext context;
+    private CIStageResults results;
 
-    public ScoringTask (OCSANAResults results) {
-        super(results.network);
+    public ScoringTask (CIStageContext context,
+                        CIStageResults results) {
+        super(context.getNetwork());
+        this.context = context;
         this.results = results;
     }
 
@@ -46,31 +50,19 @@ public class ScoringTask extends AbstractOCSANATask {
             throw new IllegalStateException("Paths have not been computed.");
         }
 
-        Predicate<CyEdge> inhibitionEdgeTester = (CyEdge edge) -> results.edgeProcessor.edgeIsInhibition(edge);
+        Predicate<CyEdge> inhibitionEdgeTester = (CyEdge edge) -> context.edgeProcessor.edgeIsInhibition(edge);
 
         taskMonitor.setTitle("OCSANA scoring");
 
         taskMonitor.setStatusMessage("Computing OCSANA scores.");
 
         Long OCSANAPreTime = System.nanoTime();
-        results.ocsanaAlg.computeScores(results.pathsToTargets, results.pathsToOffTargets, inhibitionEdgeTester);
+        context.ocsanaAlg.computeScores(results.pathsToTargets, results.pathsToOffTargets, inhibitionEdgeTester);
         Long OCSANAPostTime = System.nanoTime();
 
         Double OCSANARunTime = (OCSANAPostTime - OCSANAPreTime) / 1E9;
         results.OCSANAScoringExecutionSeconds = OCSANARunTime;
         taskMonitor.setStatusMessage(String.format("Computed OCSANA scores in %fs.", OCSANARunTime));
-
-        if (results.drugBankAlg.computeScores) {
-            taskMonitor.setStatusMessage("Computing DrugBank scores.");
-
-            Long DBPreTime = System.nanoTime();
-            results.drugBankAlg.computeScores();
-            Long DBPostTime = System.nanoTime();
-
-            Double DBRunTime = (DBPostTime - DBPreTime) / 1E9;
-            results.drugBankScoringExecutionSeconds = DBRunTime;
-            taskMonitor.setStatusMessage(String.format("computed DrugBank scores in %fs.", DBRunTime));
-        }
     }
 
     @Override
@@ -86,6 +78,7 @@ public class ScoringTask extends AbstractOCSANATask {
     @Override
     public void cancel () {
         super.cancel();
-        results.ocsanaAlg.cancel();
+        context.ocsanaAlg.cancel();
+        results.OCSANAScoringCanceled = true;
     }
 }
