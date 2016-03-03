@@ -112,7 +112,6 @@ public class CIStageControlPanel
     // Helper functions to support listening for component changes
     public void actionPerformed (ActionEvent event) {
         // Synchronize any changes made to the @Tunable UI widgets
-        System.out.println("Something happened!");
         panelTaskManager.validateAndApplyTunables(ciStageContext);
 
         buildPanel();
