@@ -30,8 +30,8 @@ import org.cytoscape.work.util.ListSingleSelection;
 import org.cytoscape.work.util.ListChangeListener;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.tasks.nodeselection.NodeSetSelecter;
-import org.compsysmed.ocsana.internal.tasks.edgeprocessing.EdgeProcessor;
+import org.compsysmed.ocsana.internal.util.tunables.NodeSetSelecter;
+import org.compsysmed.ocsana.internal.util.tunables.EdgeProcessor;
 
 import org.compsysmed.ocsana.internal.algorithms.path.AbstractPathFindingAlgorithm;
 import org.compsysmed.ocsana.internal.algorithms.path.AllNonSelfIntersectingPathsAlgorithm;

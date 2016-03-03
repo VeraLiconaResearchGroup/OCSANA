@@ -9,7 +9,7 @@
  * details
  **/
 
-package org.compsysmed.ocsana.internal.tasks.nodeselection;
+package org.compsysmed.ocsana.internal.util.tunables;
 
 // Java imports
 import java.util.*;
