@@ -44,12 +44,17 @@ import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
 public class CIStageControlPanel
     extends JPanel
     implements ActionListener, TaskObserver {
+    public static final String START_CI_SIGNAL = "CI task start";
+    public static final String END_CI_SIGNAL = "CI task end";
+
     private OCSANAResultsPanel resultsPanel;
     private PanelTaskManager panelTaskManager;
 
     private CIStageContext ciStageContext;
     private CIStageResults ciStageResults;
     private CyNetwork network;
+
+    private List<ActionListener> listeners;
 
     public CIStageControlPanel (CyNetwork network,
                                 OCSANAResultsPanel resultsPanel,
@@ -62,7 +67,17 @@ public class CIStageControlPanel
         ciStageContext = new CIStageContext(network);
         ciStageContext.addActionListener(this);
 
+        listeners = new ArrayList<>();
+
         buildPanel();
+    }
+
+    public CIStageContext getContext () {
+        return ciStageContext;
+    }
+
+    public CIStageResults getResults () {
+        return ciStageResults;
     }
 
     /**
@@ -93,20 +108,45 @@ public class CIStageControlPanel
      **/
     private void runCITask () {
         panelTaskManager.validateAndApplyTunables(ciStageContext);
+        signalStartOfCITask();
         CIStageRunnerTaskFactory runnerTaskFactory
             = new CIStageRunnerTaskFactory(panelTaskManager, this, ciStageContext, resultsPanel);
         panelTaskManager.execute(runnerTaskFactory.createTaskIterator());
     }
 
+    private void signalStartOfCITask () {
+        sendSignal(START_CI_SIGNAL);
+    }
+
+    private void signalEndOfCITask () {
+        sendSignal(END_CI_SIGNAL);
+    }
+
+    private void sendSignal (String signal) {
+        ActionEvent signalEvent = new ActionEvent(this, ActionEvent.ACTION_PERFORMED, signal);
+            for (ActionListener listener: listeners) {
+                listener.actionPerformed(signalEvent);
+            }
+    }
+
     @Override
     public void taskFinished (ObservableTask task) {
         ciStageResults = task.getResults(CIStageResults.class);
+        signalEndOfCITask();
     }
 
     @Override
     public void allFinished(FinishStatus finishStatus) {
         // Called after the TaskManager finished up a TaskIterator.
         // Currently, we don't do anything with this information.
+    }
+
+    public void addActionListener (ActionListener listener) {
+        listeners.add(listener);
+    }
+
+    public void removeActionListener (ActionListener listener) {
+        listeners.remove(listener);
     }
 
     // Helper functions to support listening for component changes

@@ -18,6 +18,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 // Cytoscape imports
+import org.cytoscape.model.CyColumn;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNode;
@@ -30,7 +31,7 @@ import org.cytoscape.work.util.ListSingleSelection;
 import org.cytoscape.work.util.ListChangeListener;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.util.tunables.NodeSetSelecter;
+import org.compsysmed.ocsana.internal.util.tunables.TripleNodeSetSelecter;
 import org.compsysmed.ocsana.internal.util.tunables.EdgeProcessor;
 
 import org.compsysmed.ocsana.internal.algorithms.path.AbstractPathFindingAlgorithm;
@@ -52,11 +53,12 @@ import org.compsysmed.ocsana.internal.algorithms.scoring.OCSANAScoringAlgorithm;
  * beginning of a run.
  **/
 public class CIStageContext
-    implements ListChangeListener {
+    implements ListChangeListener, ActionListener {
+    public static final String UPDATE_EVENT_COMMAND = "CI update";
     // User options as Tunables
     // Node and edge selection
     @ContainsTunables
-    public NodeSetSelecter nodeSetSelecter;
+    public TripleNodeSetSelecter nodeSetSelecter;
 
     @ContainsTunables
     public EdgeProcessor edgeProcessor;
@@ -92,7 +94,7 @@ public class CIStageContext
 
     // Internal data
     private CyNetwork network;
-    private List<ActionListener> listeners = new ArrayList<>();
+    private Collection<ActionListener> listeners = new HashSet<>();
 
     public CIStageContext (CyNetwork network) {
         this.network = network;
@@ -102,7 +104,9 @@ public class CIStageContext
         }
 
         // Node and edge selection
-        nodeSetSelecter = new NodeSetSelecter(network);
+        nodeSetSelecter = new TripleNodeSetSelecter(network);
+        nodeSetSelecter.addActionListener(this);
+
         edgeProcessor = new EdgeProcessor(network);
 
         // Path search options
@@ -135,6 +139,13 @@ public class CIStageContext
      **/
     public CyNetwork getNetwork () {
         return network;
+    }
+
+    /**
+     * Return the CyColumn used to name the nodes
+     **/
+    public CyColumn getNodeNameColumn () {
+        return nodeSetSelecter.getNodeNameColumn();
     }
 
     // Output generation
@@ -213,11 +224,16 @@ public class CIStageContext
         listeners.remove(listener);
     }
 
-    private void notifyListenersToRepaint () {
-        ActionEvent repaintEvent = new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "CI repaint");
+    private void notifyListenersOfUpdate () {
+        ActionEvent updateEvent = new ActionEvent(this, ActionEvent.ACTION_PERFORMED, UPDATE_EVENT_COMMAND);
         for (ActionListener listener: listeners) {
-            listener.actionPerformed(repaintEvent);
+            listener.actionPerformed(updateEvent);
         }
+    }
+
+    // Helper functions to support listening for component changes
+    public void actionPerformed (ActionEvent event) {
+        notifyListenersOfUpdate();
     }
 
     @Override
@@ -230,12 +246,12 @@ public class CIStageContext
         if (listSelecter.equals(mhsAlgSelecter)) {
             if (!mhsAlg.equals(mhsAlgSelecter.getSelectedValue())) {
                 mhsAlg = mhsAlgSelecter.getSelectedValue();
-                notifyListenersToRepaint();
+                notifyListenersOfUpdate();
             }
         } else if (listSelecter.equals(pathFindingAlgSelecter)) {
             if (!pathFindingAlg.equals(pathFindingAlgSelecter.getSelectedValue())) {
                 pathFindingAlg = pathFindingAlgSelecter.getSelectedValue();
-                notifyListenersToRepaint();
+                notifyListenersOfUpdate();
             }
         } else {
             throw new IllegalStateException("Unknown list selecter");

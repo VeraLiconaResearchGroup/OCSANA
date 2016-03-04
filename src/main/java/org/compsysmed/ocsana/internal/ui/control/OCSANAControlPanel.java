@@ -16,7 +16,11 @@ import java.util.*;
 
 import java.awt.Component;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.Icon;
 
@@ -37,6 +41,9 @@ import org.cytoscape.application.swing.CytoPanelName;
 import org.cytoscape.util.swing.BasicCollapsiblePanel;
 
 // OCSANA imports
+import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
+import org.compsysmed.ocsana.internal.stages.cistage.CIStageResults;
+
 import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
 
 /**
@@ -44,13 +51,18 @@ import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
  **/
 public class OCSANAControlPanel
     extends JPanel
-    implements CytoPanelComponent, SetCurrentNetworkListener {
+    implements CytoPanelComponent, SetCurrentNetworkListener, ActionListener {
     private CyApplicationManager cyApplicationManager;
     private PanelTaskManager panelTaskManager;
     private CytoPanel cyControlPanel;
     private OCSANAResultsPanel resultsPanel;
 
+    private BasicCollapsiblePanel ciCollapsible;
     private CIStageControlPanel ciControlPanel;
+
+    private BasicCollapsiblePanel scoringCollapsible;
+    private ScoringStageControlPanel scoringControlPanel;
+    Boolean scoringPanelLocked = true;
 
     public OCSANAControlPanel (CyApplicationManager cyApplicationManager,
                                CySwingApplication cySwingApplication,
@@ -77,15 +89,50 @@ public class OCSANAControlPanel
     private void buildPanel (CyNetwork network) {
         removeAll();
 
-        BasicCollapsiblePanel ciCollapsible = new BasicCollapsiblePanel("1: Find CIs");
+        ciCollapsible = new BasicCollapsiblePanel("1: Find CIs");
         ciCollapsible.setCollapsed(false);
         add(ciCollapsible);
 
         ciControlPanel = new CIStageControlPanel(network, resultsPanel, panelTaskManager);
+        ciControlPanel.addActionListener(this);
         ciCollapsible.add(ciControlPanel);
+
+        scoringCollapsible = new BasicCollapsiblePanel("2: Score and compare CIs");
+        scoringCollapsible.addCollapseListener(new BasicCollapsiblePanel.CollapseListener(){
+                @Override
+                public void collapsed () {}
+                @Override
+                public void expanded () {
+                    if (scoringPanelLocked) {
+                        scoringCollapsible.setCollapsed(true);
+                    }
+                }
+            });
+        add(scoringCollapsible);
+
+
+        scoringControlPanel = new ScoringStageControlPanel(network, resultsPanel, panelTaskManager);
+        scoringControlPanel.addActionListener(this);
+        scoringCollapsible.add(scoringControlPanel);
 
         revalidate();
         repaint();
+    }
+
+    /**
+     * Put the scoring subpanel in "locked" state so user cannot access it
+     **/
+    private void lockScoringCollapsible () {
+        scoringPanelLocked = true;
+        scoringCollapsible.setCollapsed(true);
+    }
+
+    /**
+     * Put the scoring subpanel in "unlocked" state so user can access it
+     **/
+    private void unlockScoringCollapsible () {
+        scoringPanelLocked = false;
+        scoringCollapsible.setCollapsed(false);
     }
 
     // Helper functions to get information about the panel
@@ -119,5 +166,26 @@ public class OCSANAControlPanel
     @Override
     public Icon getIcon() {
         return null;
+    }
+
+    /**
+     * Respond to an event
+     **/
+    public void actionPerformed (ActionEvent event) {
+        switch (event.getActionCommand()) {
+        case CIStageControlPanel.START_CI_SIGNAL:
+            lockScoringCollapsible();
+            break;
+
+        case CIStageControlPanel.END_CI_SIGNAL:
+            CIStageContext ciContext = ciControlPanel.getContext();
+            CIStageResults ciResults = ciControlPanel.getResults();
+            scoringControlPanel.populatePanel(ciContext, ciResults);
+            unlockScoringCollapsible();
+            break;
+
+        default:
+            throw new IllegalStateException(String.format("Unknown event %s heard by OCSANA control panel", event.paramString()));
+        }
     }
 }
