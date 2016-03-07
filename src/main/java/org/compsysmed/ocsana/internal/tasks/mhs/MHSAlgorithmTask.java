@@ -55,6 +55,9 @@ public class MHSAlgorithmTask extends AbstractOCSANATask {
         taskMonitor.setStatusMessage(String.format("Converting %d paths to node sets.", results.pathsToTargets.size()));
         Long preConversionTime = System.nanoTime();
         List<Set<CyNode>> nodeSets = new ArrayList<>();
+        Set<CyNode> sourceNodes = context.nodeSetSelecter.getSourceNodeSet();
+        Set<CyNode> targetNodes = context.nodeSetSelecter.getTargetNodeSet();
+
         for (List<CyEdge> path: results.pathsToTargets) {
             Set<CyNode> nodes = new HashSet<>();
 
@@ -66,8 +69,15 @@ public class MHSAlgorithmTask extends AbstractOCSANATask {
                 // Since we're using a Set, we don't have to worry
                 // about multiple addition, so we'll just go ahead and
                 // add the source and target every time
-                addNodeWithEndpointChecks(edge.getSource(), nodes);
-                addNodeWithEndpointChecks(edge.getTarget(), nodes);
+                if (context.includeEndpointsInCIs ||
+                    (!sourceNodes.contains(edge.getSource()) && !targetNodes.contains(edge.getSource()))) {
+                    nodes.add(edge.getSource());
+                }
+
+                if (context.includeEndpointsInCIs ||
+                    (!sourceNodes.contains(edge.getTarget()) && !targetNodes.contains(edge.getTarget()))) {
+                    nodes.add(edge.getTarget());
+                }
             }
 
             if (!nodes.isEmpty()) {
@@ -89,23 +99,6 @@ public class MHSAlgorithmTask extends AbstractOCSANATask {
         taskMonitor.showMessage(TaskMonitor.Level.INFO, String.format("Found %d minimal CIs in %f s.", results.MHSes.size(), mhsTime));
 
         results.mhsExecutionSeconds = mhsTime;
-    }
-
-    /**
-     * Add a node to a set if it satisfies the endpoint conditions
-     *
-     * In particular, if the node is a source or target, only add it
-     * if results.includeEndpointsinCIs is true
-     *
-     * @param nodeToAdd  the node to add
-     * @param nodeSet  the set of nodes to (maybe) add to
-     **/
-    private void addNodeWithEndpointChecks (CyNode nodeToAdd,
-                                            Set<CyNode> nodeSet) {
-        if (context.includeEndpointsInCIs ||
-            (!context.nodeSetSelecter.getSourceNodes().contains(nodeToAdd) && !context.nodeSetSelecter.getTargetNodes().contains(nodeToAdd))) {
-            nodeSet.add(nodeToAdd);
-        }
     }
 
     public Collection<Set<CyNode>> getMHSes () {
