@@ -30,7 +30,7 @@ import org.cytoscape.work.TaskObserver;
 // OCSANA imports
 import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
 import org.compsysmed.ocsana.internal.tasks.path.PathFindingAlgorithmTaskFactory;
-import org.compsysmed.ocsana.internal.tasks.scoring.ScoringTaskFactory;
+import org.compsysmed.ocsana.internal.tasks.scoring.OCSANAScoringTaskFactory;
 import org.compsysmed.ocsana.internal.tasks.mhs.MHSAlgorithmTaskFactory;
 import org.compsysmed.ocsana.internal.tasks.results.PresentResultsTaskFactory;
 
@@ -101,9 +101,9 @@ public class CIStageRunnerTask
                             this);
     }
 
-    private void spawnScoringTask () {
-        ScoringTaskFactory scoringTaskFactory =
-            new ScoringTaskFactory(context, results);
+    private void spawnOCSANAScoringTask () {
+        OCSANAScoringTaskFactory scoringTaskFactory =
+            new OCSANAScoringTaskFactory(context, results);
 
         taskManager.execute(scoringTaskFactory.createTaskIterator(), this);
     }
@@ -157,7 +157,7 @@ public class CIStageRunnerTask
             break;
 
         case FIND_PATHS_TO_OFF_TARGETS:
-            spawnScoringTask();
+            spawnOCSANAScoringTask();
             break;
 
         case SCORE_PATHS:

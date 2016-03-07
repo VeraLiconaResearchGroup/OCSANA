@@ -1,5 +1,5 @@
 /**
- * Factory for tasks to run scoring algorithms in OCSANA
+ * Factory for tasks to run OCSANA path-scoring algorithm
  *
  * Copyright Vera-Licona Research Group (C) 2015
  *
@@ -24,14 +24,14 @@ import org.cytoscape.model.CyNetwork;
 import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
 import org.compsysmed.ocsana.internal.stages.cistage.CIStageResults;
 
-public class ScoringTaskFactory extends AbstractTaskFactory {
+public class OCSANAScoringTaskFactory extends AbstractTaskFactory {
     private CyNetwork network;
 
     private CIStageContext context;
     private CIStageResults results;
 
-    public ScoringTaskFactory (CIStageContext context,
-                               CIStageResults results) {
+    public OCSANAScoringTaskFactory (CIStageContext context,
+                                     CIStageResults results) {
         this.context = context;
         this.results = results;
     }
@@ -39,7 +39,7 @@ public class ScoringTaskFactory extends AbstractTaskFactory {
     @Override
     public TaskIterator createTaskIterator () {
         TaskIterator tasks = new TaskIterator();
-        tasks.append(new ScoringTask(context, results));
+        tasks.append(new OCSANAScoringTask(context, results));
         return tasks;
     }
 }

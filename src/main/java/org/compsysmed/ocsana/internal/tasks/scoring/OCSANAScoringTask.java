@@ -1,5 +1,5 @@
 /**
- * Task to run scoring algorithm in OCSANA
+ * Task to run OCSANA path-scoring algorithm
  *
  * Copyright Vera-Licona Research Group (C) 2015
  *
@@ -27,14 +27,14 @@ import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
 import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
 import org.compsysmed.ocsana.internal.stages.cistage.CIStageResults;
 
-public class ScoringTask extends AbstractOCSANATask {
+public class OCSANAScoringTask extends AbstractOCSANATask {
     private static final OCSANAStep algStep = OCSANAStep.SCORE_PATHS;
 
     private CIStageContext context;
     private CIStageResults results;
 
-    public ScoringTask (CIStageContext context,
-                        CIStageResults results) {
+    public OCSANAScoringTask (CIStageContext context,
+                              CIStageResults results) {
         super(context.getNetwork());
         this.context = context;
         this.results = results;
