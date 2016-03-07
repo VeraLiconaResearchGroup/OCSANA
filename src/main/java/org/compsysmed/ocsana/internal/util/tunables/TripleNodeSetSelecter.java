@@ -49,7 +49,7 @@ public class TripleNodeSetSelecter
     private static final String CONFIG_GROUP_LIST = "List";
     private static final String CONFIG_GROUP_STRING = "String";
 
-    @Tunable(description = "Column containing node names",
+    @Tunable(description = "Node name column",
              tooltip = "<html><b>Warning</b>: changing this may be slow if your network has a lot of vertices!</html>",
              gravity = 120)
     public ListSingleSelection<CyColumn> nodeNameColumnSelecter;

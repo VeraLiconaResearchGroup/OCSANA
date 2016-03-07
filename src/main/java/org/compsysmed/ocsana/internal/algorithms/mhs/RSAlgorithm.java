@@ -34,7 +34,7 @@ public class RSAlgorithm extends AbstractMHSAlgorithm {
     public static final String SHORTNAME = "RS";
 
     // Tunables for threading
-    @Tunable(description = "Specify number of threads",
+    @Tunable(description = "Bound thread count",
              gravity = 350,
              tooltip="By default, all CPUs will be utilized",
              groups = {AbstractMHSAlgorithm.CONFIG_GROUP + ": " + SHORTNAME})
@@ -47,13 +47,13 @@ public class RSAlgorithm extends AbstractMHSAlgorithm {
     public BoundedInteger numThreads;
 
     // Tunables for bounded-cardinality search
-    @Tunable(description = "Restrict search to small CIs",
+    @Tunable(description = "Bound CI size",
              gravity = 352,
              tooltip="Unbounded search may take a very long time!",
              groups = {AbstractMHSAlgorithm.CONFIG_GROUP + ": " + SHORTNAME})
     public Boolean useMaxCardinality = true;
 
-    @Tunable(description = "Maximum size of CI to find",
+    @Tunable(description = "Maximum CI size",
              gravity = 353,
              dependsOn = "useMaxCardinality=true",
              groups = {AbstractMHSAlgorithm.CONFIG_GROUP + ": " + SHORTNAME})

@@ -40,7 +40,7 @@ public class AllNonSelfIntersectingPathsAlgorithm
     @ContainsTunables
     public DijkstraPathDecoratorAlgorithm dijkstra;
 
-    @Tunable(description="Discard node-redundant paths",
+    @Tunable(description="Discard redundant paths",
              groups = {AbstractPathFindingAlgorithm.CONFIG_GROUP},
              gravity=220,
              tooltip="If selected, scan for and discard paths which are nodewise supersets of other paths. This saves (possibly substantial) memory but adds computation time.")

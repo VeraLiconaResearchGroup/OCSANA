@@ -38,13 +38,13 @@ public class EdgeProcessor {
     private static final String CONFIG_GROUP = "Process edges";
 
     // User configuration
-    @Tunable(description = "Process edge activation and inhibition",
+    @Tunable(description = "Process edge signs",
              tooltip = "If enabled, consider whether each edge represents an activation or an inhibition, using information from an edge attribute in the table",
              gravity = 190,
              groups = {CONFIG_GROUP})
     public Boolean processEdgeSigns = false;
 
-    @Tunable(description = "Column storing edge interactions",
+    @Tunable(description = "Edge sign column",
              gravity = 191,
              groups = {CONFIG_GROUP},
              dependsOn = "processEdgeSigns=true")
@@ -59,7 +59,7 @@ public class EdgeProcessor {
 
     private ListSingleSelection<CyColumn> edgeSignColumnSelecter;
 
-    @Tunable(description = "Column value representing inhibition",
+    @Tunable(description = "Values representing inhibition",
              tooltip = "All other values will be interpreted as activation",
              gravity = 192,
              groups = {CONFIG_GROUP},

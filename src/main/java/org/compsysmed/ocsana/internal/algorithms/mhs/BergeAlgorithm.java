@@ -31,13 +31,13 @@ public class BergeAlgorithm extends AbstractMHSAlgorithm {
     public static final String SHORTNAME = "Berge";
 
     // Tunables for bounded-cardinality search
-    @Tunable(description = "Restrict search to small CIs",
+    @Tunable(description = "Bound CI size",
              gravity = 350,
              tooltip="Unbounded search may take a very long time!",
              groups = {AbstractMHSAlgorithm.CONFIG_GROUP + ": " + SHORTNAME})
     public Boolean useMaxCardinality = true;
 
-    @Tunable(description = "Maximum size of CI to find",
+    @Tunable(description = "Maximum CI size",
              gravity = 351,
              dependsOn = "useMaxCardinality=true",
              groups = {AbstractMHSAlgorithm.CONFIG_GROUP + ": " + SHORTNAME})

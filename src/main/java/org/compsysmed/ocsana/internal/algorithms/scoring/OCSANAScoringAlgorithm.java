@@ -37,21 +37,20 @@ import org.compsysmed.ocsana.internal.algorithms.AbstractOCSANAAlgorithm;
 
 public class OCSANAScoringAlgorithm
     extends AbstractOCSANAAlgorithm {
-    public static final String CONFIG_GROUP = "Scoring algorithm";
     public static final String NAME = "OCSANA scoring";
     public static final String SHORTNAME = "OCSANA";
 
     // User configuration
-    @Tunable(description = "Store OCSANA score in a table column",
+    @Tunable(description = "Create score column",
              gravity = 335,
-             groups = {CONFIG_GROUP, NAME})
+             groups = {NAME})
              public Boolean storeScores = false;
 
-    @Tunable(description = "Name of column to store OCSANA scores",
+    @Tunable(description = "Name of column",
              gravity = 336,
              dependsOn = "storeScores=true",
              tooltip = "This column will be overwritten!",
-             groups = {CONFIG_GROUP, NAME})
+             groups = {NAME})
              public String storeScoresColumn = "ocsanaScore";
 
     // Internal data
