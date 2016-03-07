@@ -59,42 +59,79 @@ public class ListTripleNodeSetSelecter
         offTargetNodes = new ListMultipleSelection<>(nodeNames);
     }
 
+    public ListTripleNodeSetSelecter (CyNetwork network,
+                                        Collection<CyNode> nodes,
+                                        CyColumn nodeNameColumn,
+                                        Collection<CyNode> selectedSourceNodes,
+                                        Collection<CyNode> selectedTargetNodes,
+                                        Collection<CyNode> selectedOffTargetNodes) {
+        this(network, nodes, nodeNameColumn);
+
+        setSelectedSourceNodes(selectedSourceNodes);
+        setSelectedTargetNodes(selectedTargetNodes);
+        setSelectedOffTargetNodes(selectedOffTargetNodes);
+    }
+
+    public ListTripleNodeSetSelecter (AbstractTripleNodeSetSelecter other) {
+        this(other.network, other.nodes, other.nodeNameColumn, other.getSelectedSourceNodes(), other.getSelectedTargetNodes(), other.getSelectedOffTargetNodes());
+    }
+
     @Override
-    public List<CyNode> getSelectedSourceNodes () {
+    public Collection<CyNode> getSelectedSourceNodes () {
         return getSelectedNodes(sourceNodes);
     }
 
     @Override
-    public List<String> getSelectedSourceNodeNames () {
+    public Collection<String> getSelectedSourceNodeNames () {
         return getSelectedNodeNames(sourceNodes);
     }
 
     @Override
-    public List<CyNode> getSelectedTargetNodes () {
+    protected void setSelectedSourceNodes (Collection<CyNode> selectedSourceNodes) {
+        setSelectedNodes(sourceNodes, selectedSourceNodes);
+    }
+
+    @Override
+    public Collection<CyNode> getSelectedTargetNodes () {
         return getSelectedNodes(targetNodes);
     }
 
     @Override
-    public List<String> getSelectedTargetNodeNames () {
+    public Collection<String> getSelectedTargetNodeNames () {
         return getSelectedNodeNames(targetNodes);
     }
 
     @Override
-    public List<CyNode> getSelectedOffTargetNodes () {
+    protected void setSelectedTargetNodes (Collection<CyNode> selectedTargetNodes) {
+        setSelectedNodes(targetNodes, selectedTargetNodes);
+   }
+
+    @Override
+    public Collection<CyNode> getSelectedOffTargetNodes () {
         return getSelectedNodes(offTargetNodes);
     }
 
     @Override
-    public List<String> getSelectedOffTargetNodeNames () {
+    public Collection<String> getSelectedOffTargetNodeNames () {
         return getSelectedNodeNames(offTargetNodes);
     }
 
-    private List<CyNode> getSelectedNodes (ListMultipleSelection<String> nodes) {
-        return nodes.getSelectedValues().stream().map(name -> getNode(name)).collect(Collectors.toList());
+    @Override
+    protected void setSelectedOffTargetNodes (Collection<CyNode> selectedOffTargetNodes) {
+        setSelectedNodes(offTargetNodes, selectedOffTargetNodes);
     }
 
-    private List<String> getSelectedNodeNames (ListMultipleSelection<String> nodes) {
+    private Collection<CyNode> getSelectedNodes (ListMultipleSelection<String> nodes) {
+        return nodes.getSelectedValues().stream().map(name -> getNode(name)).collect(Collectors.toSet());
+    }
+
+    private Collection<String> getSelectedNodeNames (ListMultipleSelection<String> nodes) {
         return nodes.getSelectedValues();
     }
 
+    private void setSelectedNodes (ListMultipleSelection<String> selecter,
+                                   Collection<CyNode> nodes) {
+        List<String> selectedNodeNames = nodes.stream().map(node -> getNodeName(node)).collect(Collectors.toList());
+        selecter.setSelectedValues(selectedNodeNames);
+    }
 }

@@ -29,17 +29,17 @@ public class StringTripleNodeSetSelecter
     @Tunable(description="Source nodes",
              tooltip="Enter as a comma-separated list",
              gravity=141)
-    public String sourceNodeList = "";
+    public String sourceNodes = "";
 
     @Tunable(description="Target nodes",
              tooltip="Enter as a comma-separated list",
              gravity=142)
-    public String targetNodeList = "";
+    public String targetNodes = "";
 
     @Tunable(description="Off-target nodes",
              tooltip="Enter as a comma-separated list",
              gravity=143)
-    public String offTargetNodeList = "";
+    public String offTargetNodes = "";
 
     public StringTripleNodeSetSelecter (CyNetwork network,
                                         Collection<CyNode> nodes,
@@ -47,41 +47,77 @@ public class StringTripleNodeSetSelecter
         super(network, nodes, nodeNameColumn);
     }
 
-    @Override
-    public List<CyNode> getSelectedSourceNodes () {
-        return getSelectedNodes(sourceNodeList);
+    public StringTripleNodeSetSelecter (CyNetwork network,
+                                        Collection<CyNode> nodes,
+                                        CyColumn nodeNameColumn,
+                                        Collection<CyNode> selectedSourceNodes,
+                                        Collection<CyNode> selectedTargetNodes,
+                                        Collection<CyNode> selectedOffTargetNodes) {
+        this(network, nodes, nodeNameColumn);
+
+        setSelectedSourceNodes(selectedSourceNodes);
+        setSelectedTargetNodes(selectedTargetNodes);
+        setSelectedOffTargetNodes(selectedOffTargetNodes);
+    }
+
+    public StringTripleNodeSetSelecter (AbstractTripleNodeSetSelecter other) {
+        this(other.network, other.nodes, other.nodeNameColumn, other.getSelectedSourceNodes(), other.getSelectedTargetNodes(), other.getSelectedOffTargetNodes());
     }
 
     @Override
-    public List<String> getSelectedSourceNodeNames () {
-        return getSelectedNodeNames(sourceNodeList);
+    public Collection<CyNode> getSelectedSourceNodes () {
+        return getSelectedNodes(sourceNodes);
     }
 
     @Override
-    public List<CyNode> getSelectedTargetNodes () {
-        return getSelectedNodes(targetNodeList);
+    public Collection<String> getSelectedSourceNodeNames () {
+        return getSelectedNodeNames(sourceNodes);
     }
 
     @Override
-    public List<String> getSelectedTargetNodeNames () {
-        return getSelectedNodeNames(targetNodeList);
+    protected void setSelectedSourceNodes (Collection<CyNode> selectedSourceNodes) {
+        sourceNodes = selectedNodeString(selectedSourceNodes);
     }
 
     @Override
-    public List<CyNode> getSelectedOffTargetNodes () {
-        return getSelectedNodes(offTargetNodeList);
+    public Collection<CyNode> getSelectedTargetNodes () {
+        return getSelectedNodes(targetNodes);
     }
 
     @Override
-    public List<String> getSelectedOffTargetNodeNames () {
-        return getSelectedNodeNames(offTargetNodeList);
+    public Collection<String> getSelectedTargetNodeNames () {
+        return getSelectedNodeNames(targetNodes);
     }
 
-    public List<CyNode> getSelectedNodes (String nodeList) {
-        return getSelectedNodeNames(nodeList).stream().map(nodeName -> getNode(nodeName)).filter(node -> node != null).collect(Collectors.toList());
+    @Override
+    protected void setSelectedTargetNodes (Collection<CyNode> selectedTargetNodes) {
+        targetNodes = selectedNodeString(selectedTargetNodes);
     }
 
-    public List<String> getSelectedNodeNames (String nodeList) {
-        return Arrays.asList(nodeList.trim().split(",")).stream().map(nodeName -> nodeName.trim()).filter(nodeName -> !nodeName.isEmpty()).collect(Collectors.toList());
+    @Override
+    public Collection<CyNode> getSelectedOffTargetNodes () {
+        return getSelectedNodes(offTargetNodes);
+    }
+
+    @Override
+    public Collection<String> getSelectedOffTargetNodeNames () {
+        return getSelectedNodeNames(offTargetNodes);
+    }
+
+    @Override
+    protected void setSelectedOffTargetNodes (Collection<CyNode> selectedOffTargetNodes) {
+        offTargetNodes = selectedNodeString(selectedOffTargetNodes);
+    }
+
+    private Collection<CyNode> getSelectedNodes (String nodeList) {
+        return getSelectedNodeNames(nodeList).stream().map(nodeName -> getNode(nodeName)).filter(node -> node != null).collect(Collectors.toSet());
+    }
+
+    private Collection<String> getSelectedNodeNames (String nodeList) {
+        return Arrays.asList(nodeList.trim().split(",")).stream().map(nodeName -> nodeName.trim()).filter(nodeName -> !nodeName.isEmpty()).collect(Collectors.toSet());
+    }
+
+    private String selectedNodeString (Collection<CyNode> nodes) {
+        return nodes.stream().map(node -> getNodeName(node)).collect(Collectors.joining(", "));
     }
 }

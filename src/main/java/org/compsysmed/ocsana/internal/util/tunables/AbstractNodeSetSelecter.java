@@ -21,8 +21,8 @@ import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyTable;
 
 public class AbstractNodeSetSelecter {
-    private CyNetwork network;
-    private CyColumn nodeNameColumn;
+    protected CyNetwork network;
+    protected CyColumn nodeNameColumn;
 
     protected Collection<CyNode> nodes;
     protected Map<String, CyNode> nodeNamesMap;

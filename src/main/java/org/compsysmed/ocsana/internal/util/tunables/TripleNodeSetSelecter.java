@@ -104,11 +104,19 @@ public class TripleNodeSetSelecter
 
         switch (mode) {
         case CONFIG_GROUP_LIST:
-            tripleNodeSetSelecter = new ListTripleNodeSetSelecter(network, nodes, nodeNameColumn);
+            if (tripleNodeSetSelecter == null) {
+                tripleNodeSetSelecter = new ListTripleNodeSetSelecter(network, nodes, nodeNameColumn);
+            } else {
+                tripleNodeSetSelecter = new ListTripleNodeSetSelecter(tripleNodeSetSelecter);
+            }
             break;
 
         case CONFIG_GROUP_STRING:
-            tripleNodeSetSelecter = new StringTripleNodeSetSelecter(network, nodes, nodeNameColumn);
+            if (tripleNodeSetSelecter == null) {
+                tripleNodeSetSelecter = new StringTripleNodeSetSelecter(network, nodes, nodeNameColumn);
+            } else {
+                tripleNodeSetSelecter = new StringTripleNodeSetSelecter(tripleNodeSetSelecter);
+            }
             break;
 
         default:
@@ -122,7 +130,7 @@ public class TripleNodeSetSelecter
         return currentNodeNameColumn;
     }
 
-    public List<CyNode> getSourceNodes () {
+    public Collection<CyNode> getSourceNodes () {
         return tripleNodeSetSelecter.getSelectedSourceNodes();
     }
 
@@ -130,7 +138,7 @@ public class TripleNodeSetSelecter
         return new HashSet<>(getSourceNodes());
     }
 
-    public List<CyNode> getTargetNodes () {
+    public Collection<CyNode> getTargetNodes () {
         return tripleNodeSetSelecter.getSelectedTargetNodes();
     }
 
@@ -138,7 +146,7 @@ public class TripleNodeSetSelecter
         return new HashSet<>(getTargetNodes());
     }
 
-    public List<CyNode> getOffTargetNodes () {
+    public Collection<CyNode> getOffTargetNodes () {
         return tripleNodeSetSelecter.getSelectedOffTargetNodes();
     }
 

@@ -58,7 +58,7 @@ public class ScoringStageContext {
         this.ciContext = ciContext;
         this.ciResults = ciResults;
 
-        List<CyNode> targets = ciContext.nodeSetSelecter.getTargetNodes();
+        Collection<CyNode> targets = ciContext.nodeSetSelecter.getTargetNodes();
         CyColumn nodeNameColumn = ciContext.getNodeNameColumn();
         targetsSelecter = new ListTargetsToActivateSelecter(network, targets, nodeNameColumn);
     }

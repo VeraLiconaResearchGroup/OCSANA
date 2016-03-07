@@ -28,12 +28,32 @@ abstract public class AbstractTripleNodeSetSelecter
         super(network, nodes, nodeNameColumn);
     }
 
-    abstract public List<CyNode> getSelectedSourceNodes ();
-    abstract public List<String> getSelectedSourceNodeNames ();
+    public AbstractTripleNodeSetSelecter (CyNetwork network,
+                                          Collection<CyNode> nodes,
+                                          CyColumn nodeNameColumn,
+                                          Collection<CyNode> selectedSourceNodes,
+                                          Collection<CyNode> selectedTargetNodes,
+                                          Collection<CyNode> selectedOffTargetNodes) {
+        this(network, nodes, nodeNameColumn);
 
-    abstract public List<CyNode> getSelectedTargetNodes ();
-    abstract public List<String> getSelectedTargetNodeNames ();
+        setSelectedSourceNodes(selectedSourceNodes);
+        setSelectedTargetNodes(selectedTargetNodes);
+        setSelectedOffTargetNodes(selectedOffTargetNodes);
+    }
 
-    abstract public List<CyNode> getSelectedOffTargetNodes ();
-    abstract public List<String> getSelectedOffTargetNodeNames ();
+    public AbstractTripleNodeSetSelecter (AbstractTripleNodeSetSelecter other) {
+        this(other.network, other.nodes, other.nodeNameColumn, other.getSelectedSourceNodes(), other.getSelectedTargetNodes(), other.getSelectedOffTargetNodes());
+    }
+
+    abstract public Collection<CyNode> getSelectedSourceNodes ();
+    abstract public Collection<String> getSelectedSourceNodeNames ();
+    abstract protected void setSelectedSourceNodes (Collection<CyNode> selectedSourceNodes);
+
+    abstract public Collection<CyNode> getSelectedTargetNodes ();
+    abstract public Collection<String> getSelectedTargetNodeNames ();
+    abstract protected void setSelectedTargetNodes (Collection<CyNode> selectedTargetNodes);
+
+    abstract public Collection<CyNode> getSelectedOffTargetNodes ();
+    abstract public Collection<String> getSelectedOffTargetNodeNames ();
+    abstract protected void setSelectedOffTargetNodes (Collection<CyNode> selectedOffTargetNodes);
 }

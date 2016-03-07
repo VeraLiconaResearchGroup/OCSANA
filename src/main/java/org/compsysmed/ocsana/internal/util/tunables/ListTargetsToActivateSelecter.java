@@ -47,8 +47,8 @@ public class ListTargetsToActivateSelecter
         targetsToActivateSelecter = new ListMultipleSelection<>(targetNames);
     }
 
-    public List<CyNode> getTargetsToActivate () {
-        return targetsToActivateSelecter.getSelectedValues().stream().map(name -> getNode(name)).collect(Collectors.toList());
+    public Collection<CyNode> getTargetsToActivate () {
+        return targetsToActivateSelecter.getSelectedValues().stream().map(name -> getNode(name)).collect(Collectors.toSet());
     }
 
 }
