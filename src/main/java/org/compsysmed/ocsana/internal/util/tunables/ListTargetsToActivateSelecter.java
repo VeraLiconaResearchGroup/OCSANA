@@ -45,6 +45,7 @@ public class ListTargetsToActivateSelecter
         Collections.sort(targetNames);
 
         targetsToActivateSelecter = new ListMultipleSelection<>(targetNames);
+        targetsToActivateSelecter.setSelectedValues(targetsToActivateSelecter.getPossibleValues());
     }
 
     public Collection<CyNode> getTargetsToActivate () {
