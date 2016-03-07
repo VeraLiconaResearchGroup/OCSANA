@@ -25,8 +25,6 @@ import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
 import org.compsysmed.ocsana.internal.stages.cistage.CIStageResults;
 
 public class OCSANAScoringTaskFactory extends AbstractTaskFactory {
-    private CyNetwork network;
-
     private CIStageContext context;
     private CIStageResults results;
 

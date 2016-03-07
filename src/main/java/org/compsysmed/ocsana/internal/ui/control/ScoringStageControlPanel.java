@@ -23,6 +23,7 @@ import javax.swing.JPanel;
 
 // Cytoscape imports
 import org.cytoscape.model.CyNetwork;
+import org.cytoscape.model.CyNode;
 
 import org.cytoscape.work.FinishStatus;
 import org.cytoscape.work.ObservableTask;
@@ -35,6 +36,8 @@ import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
 import org.compsysmed.ocsana.internal.stages.cistage.CIStageResults;
 
 import org.compsysmed.ocsana.internal.stages.scorestage.ScoringStageContext;
+
+import org.compsysmed.ocsana.internal.tasks.scoring.CIScoringTaskFactory;
 
 import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
 
@@ -52,6 +55,9 @@ public class ScoringStageControlPanel
     private ScoringStageContext scoringContext;
 
     private CyNetwork network;
+
+    private CIStageContext ciContext;
+    private CIStageResults ciResults;
 
     private JPanel tunablePanel;
 
@@ -88,6 +94,9 @@ public class ScoringStageControlPanel
      **/
     public void populatePanel (CIStageContext ciContext,
                                CIStageResults ciResults) {
+        this.ciContext = ciContext;
+        this.ciResults = ciResults;
+
         tunablePanel.removeAll();
 
         scoringContext = new ScoringStageContext(network, ciContext, ciResults);
@@ -105,7 +114,14 @@ public class ScoringStageControlPanel
      * Spawn the scoring stage task
      **/
     private void runScoringTask () {
-        System.out.println(scoringContext.targetsToActivate());
+        panelTaskManager.validateAndApplyTunables(scoringContext);
+
+        Optional<Set<CyNode>> testCI = ciResults.MHSes.stream().findFirst();
+        if (testCI.isPresent()) {
+            CIScoringTaskFactory scorerTaskFactory
+                = new CIScoringTaskFactory(ciContext, testCI.get(), scoringContext.targetsToActivate());
+            panelTaskManager.execute(scorerTaskFactory.createTaskIterator());
+        }
     }
 
     @Override

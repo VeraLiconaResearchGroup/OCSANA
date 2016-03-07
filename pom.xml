@@ -17,6 +17,7 @@
         <maven.bundle.version>3.0.1</maven.bundle.version>
         <ekstazi.version>4.6.1</ekstazi.version>
         <json.version>20151123</json.version>
+        <la4j.version>0.6.0</la4j.version>
     </properties>
 
     <modelVersion>4.0.0</modelVersion>
@@ -228,6 +229,11 @@
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>${json.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.la4j</groupId>
+            <artifactId>la4j</artifactId>
+            <version>${la4j.version}</version>
         </dependency>
 
         <dependency>
