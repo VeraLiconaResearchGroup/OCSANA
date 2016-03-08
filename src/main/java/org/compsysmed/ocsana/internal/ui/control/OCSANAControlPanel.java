@@ -184,6 +184,10 @@ public class OCSANAControlPanel
             unlockScoringCollapsible();
             break;
 
+        case ScoringStageControlPanel.END_SIGN_ASSIGNMENT_SIGNAL:
+            // Currently, do nothing
+            break;
+
         default:
             throw new IllegalStateException(String.format("Unknown event %s heard by OCSANA control panel", event.paramString()));
         }

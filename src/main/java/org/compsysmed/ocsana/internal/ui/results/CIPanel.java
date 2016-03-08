@@ -37,7 +37,7 @@ import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
 public class CIPanel
     extends JPanel {
     private static final Vector<String> mhsCols =
-        new Vector<>(Arrays.asList(new String[] {"CI", "Size", "OCSANA Score"}));
+        new Vector<>(Arrays.asList(new String[] {"CI", "Size", "Successful targets"}));
 
     public CIPanel (CIStageContext ciContext,
                     CIStageResults ciResults) {
@@ -66,8 +66,8 @@ public class CIPanel
             // Sort the rows
             RowSorter<TableModel> mhsSorter = new TableRowSorter<TableModel>(mhsModel);
 
-            if (ciContext.ocsanaAlg.hasScores()) {
-                // If we have OCSANA scores, sort in decreasing order with respect to them
+            if (mhsRows.get(0) != null && mhsRows.get(0).get(2) != null) {
+                // If we have target counts, sort in decreasing order with respect to them
                 mhsSorter.toggleSortOrder(2);
                 mhsSorter.toggleSortOrder(2);
             } else {
@@ -108,7 +108,7 @@ public class CIPanel
         Vector<Object> row = new Vector<>();
         row.add(ciContext.nodeSetString(ci.getNodes()));
         row.add(ci.size());
-        row.add(ci.getClassicalOCSANAScore());
+        row.add(ci.maximumNumberOfCorrectEffects());
         return row;
     }
 }

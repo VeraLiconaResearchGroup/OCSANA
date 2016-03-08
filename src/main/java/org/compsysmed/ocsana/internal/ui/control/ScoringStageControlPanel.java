@@ -50,6 +50,8 @@ import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
 public class ScoringStageControlPanel
     extends JPanel
     implements ActionListener, TaskObserver {
+    public static final String END_SIGN_ASSIGNMENT_SIGNAL = "Sign assignment task end";
+
     private OCSANAResultsPanel resultsPanel;
     private PanelTaskManager panelTaskManager;
 
@@ -124,7 +126,20 @@ public class ScoringStageControlPanel
             signAssignmentTasks.append(scorerTaskFactory.createTaskIterator());
         }
 
-        panelTaskManager.execute(signAssignmentTasks, this);
+        if (signAssignmentTasks.hasNext()) {
+            panelTaskManager.execute(signAssignmentTasks, this);
+        }
+    }
+
+    private void signalEndOfSignAssignmentTask () {
+        sendSignal(END_SIGN_ASSIGNMENT_SIGNAL);
+    }
+
+    private void sendSignal (String signal) {
+        ActionEvent signalEvent = new ActionEvent(this, ActionEvent.ACTION_PERFORMED, signal);
+        for (ActionListener listener: listeners) {
+            listener.actionPerformed(signalEvent);
+        }
     }
 
     @Override
@@ -136,7 +151,8 @@ public class ScoringStageControlPanel
     @Override
     public void allFinished(FinishStatus finishStatus) {
         // Called after the TaskManager finished up a TaskIterator.
-        // Currently, we don't do anything with this information.
+        signalEndOfSignAssignmentTask();
+        resultsPanel.updateResults(ciContext, ciResults);
     }
 
     // Helper functions to support listening for component changes
