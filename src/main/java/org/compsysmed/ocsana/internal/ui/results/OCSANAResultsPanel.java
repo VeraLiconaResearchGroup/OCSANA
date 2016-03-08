@@ -177,7 +177,7 @@ public class OCSANAResultsPanel
         resultsPanel.add(resultsTabbedPane, BorderLayout.CENTER);
         resultsPanel.setBorder(null);
 
-        if (ciResults.MHSes != null) {
+        if (ciResults.CIs != null) {
             CIPanel ciPanel = new CIPanel(ciContext, ciResults);
             resultsTabbedPane.addTab("Optimal CIs", ciPanel);
         }

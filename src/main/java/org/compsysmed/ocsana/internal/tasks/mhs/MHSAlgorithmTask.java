@@ -13,6 +13,7 @@ package org.compsysmed.ocsana.internal.tasks.mhs;
 
 // Java imports
 import java.util.*;
+import java.util.stream.Collectors;
 
 // Cytoscape imports
 import org.cytoscape.work.TaskMonitor;
@@ -26,6 +27,8 @@ import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
 
 import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
 import org.compsysmed.ocsana.internal.stages.cistage.CIStageResults;
+
+import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
 
 public class MHSAlgorithmTask extends AbstractOCSANATask {
     private static final OCSANAStep algStep = OCSANAStep.FIND_MHSES;
@@ -92,17 +95,14 @@ public class MHSAlgorithmTask extends AbstractOCSANATask {
         taskMonitor.setStatusMessage(String.format("Finding minimal combinations of interventions (algorithm: %s).", context.mhsAlg.shortName()));
 
         Long preMHSTime = System.nanoTime();
-        results.MHSes = context.mhsAlg.MHSes(nodeSets);
+        Collection<Set<CyNode>> MHSes = context.mhsAlg.MHSes(nodeSets);
+        results.CIs = MHSes.stream().map(mhs -> new CombinationOfInterventions(mhs, targetNodes)).collect(Collectors.toList());
         Long postMHSTime = System.nanoTime();
 
         Double mhsTime = (postMHSTime - preMHSTime) / 1E9;
-        taskMonitor.showMessage(TaskMonitor.Level.INFO, String.format("Found %d minimal CIs in %f s.", results.MHSes.size(), mhsTime));
+        taskMonitor.showMessage(TaskMonitor.Level.INFO, String.format("Found %d minimal CIs in %f s.", results.CIs.size(), mhsTime));
 
         results.mhsExecutionSeconds = mhsTime;
-    }
-
-    public Collection<Set<CyNode>> getMHSes () {
-        return results.MHSes;
     }
 
     @Override
@@ -111,7 +111,7 @@ public class MHSAlgorithmTask extends AbstractOCSANATask {
         if (type.isAssignableFrom(OCSANAStep.class)) {
             return (T) algStep;
         } else {
-            return (T) getMHSes();
+            return (T) results.CIs;
         }
     }
 

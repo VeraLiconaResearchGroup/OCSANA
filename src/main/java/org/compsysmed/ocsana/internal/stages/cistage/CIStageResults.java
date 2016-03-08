@@ -20,7 +20,7 @@ import org.cytoscape.model.CyNode;
 import org.cytoscape.model.CyEdge;
 
 // OCSANA imports
-
+import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
 
 public class CIStageResults {
     // Paths data
@@ -37,7 +37,7 @@ public class CIStageResults {
     public Boolean OCSANAScoringCanceled = false;
 
     // MHS data
-    public Collection<Set<CyNode>> MHSes;
+    public Collection<CombinationOfInterventions> CIs;
     public Double mhsExecutionSeconds;
     public Boolean mhsFindingCanceled = false;
 

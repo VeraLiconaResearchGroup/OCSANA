@@ -41,6 +41,8 @@ import org.compsysmed.ocsana.internal.tasks.scoring.CIScoringTaskFactory;
 
 import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
 
+import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
+
 /**
  * Panel to configure and run OCSANA scoring stage
  **/
@@ -116,9 +118,9 @@ public class ScoringStageControlPanel
     private void runScoringTask () {
         panelTaskManager.validateAndApplyTunables(scoringContext);
 
-        for (Set<CyNode> MHS: ciResults.MHSes) {
+        for (CombinationOfInterventions CI: ciResults.CIs) {
             CIScoringTaskFactory scorerTaskFactory
-                = new CIScoringTaskFactory(ciContext, MHS, scoringContext.targetsToActivate());
+                = new CIScoringTaskFactory(ciContext, CI, scoringContext.targetsToActivate());
             panelTaskManager.execute(scorerTaskFactory.createTaskIterator());
         }
     }

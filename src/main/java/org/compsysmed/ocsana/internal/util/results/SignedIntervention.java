@@ -17,12 +17,14 @@ import java.util.*;
 // Cytoscape imports
 import org.cytoscape.model.CyNode;
 
+// OCSANA imports
+
 /**
  * Class representing a signed intervention of a CI and its effects on
  * certain targets
  **/
 public class SignedIntervention {
-    private final Set<CyNode> interventionNodes;
+    private final CombinationOfInterventions ci;
     private final Set<CyNode> interventionNodesToActivate;
     private final Set<CyNode> interventionNodesToInhibit;
 
@@ -32,35 +34,35 @@ public class SignedIntervention {
     /**
      * Constructor
      *
-     * @param interventionNodes  the nodes in the CI
+     * @param ci  the CI
      * @param interventionNodesToActivate the nodes which are
-     * activated in this CI (must be a subset of interventionNodes)
+     * activated in this CI (must be a subset of the nodes in the CI)
      * @param effectsOnTargets sends each target node to its total
      * EFFECT_ON_TARGET score from this signed CI, with the convention
      * that a positive score means the user's desired intervention was
      * achieved and a negative score means the opposite was achieved
      **/
-    public SignedIntervention (Set<CyNode> interventionNodes,
+    public SignedIntervention (CombinationOfInterventions ci,
                                Set<CyNode> interventionNodesToActivate,
                                Map<CyNode, Double> effectsOnTargets) {
-        if (!interventionNodes.containsAll(interventionNodesToActivate)) {
+        if (!ci.getNodes().containsAll(interventionNodesToActivate)) {
             throw new IllegalArgumentException("Nodes to activate must be a subset of CI nodes");
         }
 
-        this.interventionNodes = interventionNodes;
+        this.ci = ci;
         this.interventionNodesToActivate = interventionNodesToActivate;
         this.effectsOnTargets = effectsOnTargets;
 
         this.targetNodes = effectsOnTargets.keySet();
-        this.interventionNodesToInhibit = new HashSet<>(interventionNodes);
+        this.interventionNodesToInhibit = new HashSet<>(ci.getNodes());
         this.interventionNodesToInhibit.removeAll(interventionNodesToActivate);
     }
 
     /**
-     * Return all nodes involved in the intervention
+     * Return the underlying CI
      **/
-    public Set<CyNode> getInterventionNodes () {
-        return interventionNodes;
+    public CombinationOfInterventions getCI () {
+        return ci;
     }
 
     /**

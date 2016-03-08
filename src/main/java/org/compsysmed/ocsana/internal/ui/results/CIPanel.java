@@ -32,15 +32,17 @@ import org.cytoscape.model.CyNode;
 import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
 import org.compsysmed.ocsana.internal.stages.cistage.CIStageResults;
 
+import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
+
 public class CIPanel
     extends JPanel {
     private static final Vector<String> mhsCols =
         new Vector<>(Arrays.asList(new String[] {"CI", "Size", "OCSANA Score"}));
 
-    public CIPanel (CIStageContext context,
-                    CIStageResults results) {
-        if (results.MHSes != null) {
-            Vector<Vector<Object>> mhsRows = getMHSRows(context, results);
+    public CIPanel (CIStageContext ciContext,
+                    CIStageResults ciResults) {
+        if (ciResults.CIs != null) {
+            Vector<Vector<Object>> mhsRows = getMHSRows(ciContext, ciResults.CIs);
 
             TableModel mhsModel = new DefaultTableModel(mhsRows, mhsCols) {
                     @Override
@@ -64,7 +66,7 @@ public class CIPanel
             // Sort the rows
             RowSorter<TableModel> mhsSorter = new TableRowSorter<TableModel>(mhsModel);
 
-            if (context.ocsanaAlg.hasScores()) {
+            if (ciContext.ocsanaAlg.hasScores()) {
                 // If we have OCSANA scores, sort in decreasing order with respect to them
                 mhsSorter.toggleSortOrder(2);
                 mhsSorter.toggleSortOrder(2);
@@ -80,7 +82,7 @@ public class CIPanel
             JScrollPane mhsScrollPane = new JScrollPane(mhsTable);
 
             setLayout(new BorderLayout());
-            String mhsText = String.format("<html>Found %d optimal CIs in %f s.</html>", results.MHSes.size(), results.mhsExecutionSeconds);
+            String mhsText = String.format("<html>Found %d optimal CIs in %f s.</html>", ciResults.CIs.size(), ciResults.mhsExecutionSeconds);
             add(new JLabel(mhsText), BorderLayout.PAGE_START);
             add(mhsScrollPane, BorderLayout.CENTER);
         }
@@ -89,22 +91,24 @@ public class CIPanel
     /**
      * Get the rows of the CI results table
      **/
-    private static Vector<Vector<Object>> getMHSRows (CIStageContext context,
-                                                      CIStageResults results) {
+    private static Vector<Vector<Object>> getMHSRows (CIStageContext ciContext,
+                                                      Collection<CombinationOfInterventions> CIs) {
         Vector<Vector<Object>> rows = new Vector<>();
-        for (Set<CyNode> MHS: results.MHSes) {
-            Vector<Object> row = new Vector<>();
-            row.add(context.nodeSetString(MHS));
-            row.add(MHS.size());
-
-            if (context.ocsanaAlg.hasScores()) {
-                row.add(context.ocsanaAlg.scoreNodeSet(MHS));
-            } else {
-                row.add(null);
-            }
-
-            rows.add(row);
+        for (CombinationOfInterventions ci: CIs) {
+            rows.add(getMHSRow(ciContext, ci));
         }
         return rows;
+    }
+
+    /**
+     * Build a row for a CombinationOfInterventions
+     **/
+    private static Vector<Object> getMHSRow (CIStageContext ciContext,
+                                             CombinationOfInterventions ci) {
+        Vector<Object> row = new Vector<>();
+        row.add(ciContext.nodeSetString(ci.getNodes()));
+        row.add(ci.size());
+        row.add(ci.getClassicalOCSANAScore());
+        return row;
     }
 }

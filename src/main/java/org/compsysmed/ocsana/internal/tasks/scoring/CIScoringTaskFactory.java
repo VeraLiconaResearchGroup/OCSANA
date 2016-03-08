@@ -23,24 +23,26 @@ import org.cytoscape.model.CyNode;
 // OCSANA imports
 import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
 
+import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
+
 public class CIScoringTaskFactory
     extends AbstractTaskFactory {
     private CIStageContext ciContext;
-    private Set<CyNode> CI;
+    private CombinationOfInterventions ci;
     private Set<CyNode> targetsToActivate;
 
     public CIScoringTaskFactory (CIStageContext ciContext,
-                                 Set<CyNode> CI,
+                                 CombinationOfInterventions ci,
                                  Set<CyNode> targetsToActivate) {
         this.ciContext = ciContext;
-        this.CI = CI;
+        this.ci = ci;
         this.targetsToActivate = targetsToActivate;
     }
 
     @Override
     public TaskIterator createTaskIterator () {
         TaskIterator tasks = new TaskIterator();
-        tasks.append(new CIScoringTask(ciContext, CI, targetsToActivate));
+        tasks.append(new CIScoringTask(ciContext, ci, targetsToActivate));
         return tasks;
     }
 }

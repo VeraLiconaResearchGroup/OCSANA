@@ -29,26 +29,29 @@ import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
 import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
 import org.compsysmed.ocsana.internal.stages.cistage.CIStageResults;
 
+import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
 import org.compsysmed.ocsana.internal.util.results.SignedIntervention;
+
 
 public class CIScoringTask
     extends AbstractOCSANATask {
     private static final OCSANAStep algStep = OCSANAStep.SCORE_PATHS;
 
     private CIStageContext ciContext;
-    private Set<CyNode> CI;
+    private CombinationOfInterventions ci;
+    private Set<CyNode> CINodesToActivate;
+
     private Set<CyNode> targetsToActivate;
 
-    private Set<CyNode> CINodesToActivate;
 
     private Collection<SignedIntervention> signedInterventions;
 
     public CIScoringTask (CIStageContext ciContext,
-                          Set<CyNode> CI,
+                          CombinationOfInterventions ci,
                           Set<CyNode> targetsToActivate) {
         super(ciContext.getNetwork());
         this.ciContext = ciContext;
-        this.CI = CI;
+        this.ci = ci;
         this.targetsToActivate = targetsToActivate;
 
         assert(ciContext.nodeSetSelecter.getTargetNodes().containsAll(targetsToActivate));
@@ -64,7 +67,7 @@ public class CIScoringTask
             return effectValue;
         };
 
-        CISignTestingAlgorithm testAlg = new CISignTestingAlgorithm(CI, ciContext.nodeSetSelecter.getTargetNodeSet(), signedEffectOnTargets);
+        CISignTestingAlgorithm testAlg = new CISignTestingAlgorithm(ci, ciContext.nodeSetSelecter.getTargetNodeSet(), signedEffectOnTargets);
         signedInterventions = testAlg.bestInterventions();
         SignedIntervention exampleIntervention = signedInterventions.stream().findFirst().get();
         System.out.println(String.format("Found %d best interventions; example: %s", signedInterventions.size(), exampleIntervention));

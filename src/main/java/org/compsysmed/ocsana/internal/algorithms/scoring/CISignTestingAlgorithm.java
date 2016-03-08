@@ -27,6 +27,8 @@ import org.cytoscape.model.CyNode;
 
 // OCSANA imports
 import org.compsysmed.ocsana.internal.algorithms.AbstractOCSANAAlgorithm;
+
+import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
 import org.compsysmed.ocsana.internal.util.results.SignedIntervention;
 
 /**
@@ -43,23 +45,23 @@ public class CISignTestingAlgorithm
     public static final String NAME = "CI sign testing";
     public static final String SHORTNAME = "CI-sign";
 
-    private Set<CyNode> sources;
+    private CombinationOfInterventions ci;
     private Set<CyNode> targets;
     private BiFunction<CyNode, CyNode, Double> effectOnTarget;
 
     /**
      * Constructor
      *
-     * @param sources  the source nodes
+     * @param ci  the CI
      * @param targets  the target nodes
      * @param effectOnTarget  function which computes for input
      * (source, target) the EFFECT_ON_TARGETS score of source on
      * target
      **/
-    public CISignTestingAlgorithm (Set<CyNode> sources,
+    public CISignTestingAlgorithm (CombinationOfInterventions ci,
                                    Set<CyNode> targets,
                                    BiFunction<CyNode, CyNode, Double> effectOnTarget) {
-        this.sources = sources;
+        this.ci = ci;
         this.targets = targets;
         this.effectOnTarget = effectOnTarget;
     }
@@ -70,7 +72,7 @@ public class CISignTestingAlgorithm
      **/
     public Collection<SignedIntervention> bestInterventions () {
         // Use lists of the source and target nodes to ensure consistent ordering
-        List<CyNode> sourceList = new ArrayList<>(sources);
+        List<CyNode> sourceList = new ArrayList<>(ci.getNodes());
         List<CyNode> targetList = new ArrayList<>(targets);
 
         // For each source, build a Vector storing its effects on the targets
@@ -133,7 +135,7 @@ public class CISignTestingAlgorithm
                 targetEffects.put(targetList.get(i), effect.get(i));
             }
 
-            SignedIntervention intervention = new SignedIntervention(sources, activatedSources, targetEffects);
+            SignedIntervention intervention = new SignedIntervention(ci, activatedSources, targetEffects);
             interventions.add(intervention);
         }
 
