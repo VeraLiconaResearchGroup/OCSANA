@@ -116,10 +116,9 @@ public class ScoringStageControlPanel
     private void runScoringTask () {
         panelTaskManager.validateAndApplyTunables(scoringContext);
 
-        Optional<Set<CyNode>> testCI = ciResults.MHSes.stream().findFirst();
-        if (testCI.isPresent()) {
+        for (Set<CyNode> MHS: ciResults.MHSes) {
             CIScoringTaskFactory scorerTaskFactory
-                = new CIScoringTaskFactory(ciContext, testCI.get(), scoringContext.targetsToActivate());
+                = new CIScoringTaskFactory(ciContext, MHS, scoringContext.targetsToActivate());
             panelTaskManager.execute(scorerTaskFactory.createTaskIterator());
         }
     }

@@ -27,7 +27,17 @@ import org.cytoscape.model.CyNode;
 
 // OCSANA imports
 import org.compsysmed.ocsana.internal.algorithms.AbstractOCSANAAlgorithm;
+import org.compsysmed.ocsana.internal.util.results.SignedIntervention;
 
+/**
+ * Algorithm to find best sign assignment for a set of sources to
+ * activate a set of targets.
+ *
+ * NOTE: The current implementation is an exhaustive search through
+ * all possible sign assignments of the CI, so the running time is
+ * exponential in the size of the CI. Be careful if running this with
+ * more than ~14 terms in a CI.
+ **/
 public class CISignTestingAlgorithm
     extends AbstractOCSANAAlgorithm {
     public static final String NAME = "CI sign testing";
@@ -38,8 +48,7 @@ public class CISignTestingAlgorithm
     private BiFunction<CyNode, CyNode, Double> effectOnTarget;
 
     /**
-     * Algorithm to find best sign assignment for a set of sources to
-     * activate a set of targets
+     * Constructor
      *
      * @param sources  the source nodes
      * @param targets  the target nodes
@@ -129,74 +138,6 @@ public class CISignTestingAlgorithm
         }
 
         return interventions;
-    }
-
-    /**
-     * Class representing a signed intervention of a particular CI
-     **/
-    public static class SignedIntervention {
-        private final Set<CyNode> interventionNodes;
-        private final Set<CyNode> interventionNodesToActivate;
-        private final Set<CyNode> interventionNodesToInhibit;
-
-        private final Set<CyNode> targetNodes;
-        private final Map<CyNode, Double> effectsOnTargets;
-
-        public SignedIntervention (Set<CyNode> interventionNodes,
-                                   Set<CyNode> interventionNodesToActivate,
-                                   Map<CyNode, Double> effectsOnTargets) {
-            assert(interventionNodes.containsAll(interventionNodesToActivate));
-
-            this.interventionNodes = interventionNodes;
-            this.interventionNodesToActivate = interventionNodesToActivate;
-            this.effectsOnTargets = effectsOnTargets;
-
-            this.targetNodes = effectsOnTargets.keySet();
-            this.interventionNodesToInhibit = new HashSet<>(interventionNodes);
-            this.interventionNodesToInhibit.removeAll(interventionNodesToActivate);
-        }
-
-        /**
-         * Return the nodes involved in the intervention
-         **/
-        public Set<CyNode> getInterventionNodes () {
-            return interventionNodes;
-        }
-
-        /**
-         * Return the nodes to be activated in the intervention
-         **/
-        public Set<CyNode> getInterventionNodesToActivate () {
-            return interventionNodesToActivate;
-        }
-
-        /**
-         * Return the nodes to be inhibited in the intervention
-         **/
-        public Set<CyNode> getInterventionNodesToInhibit () {
-            return interventionNodesToInhibit;
-        }
-
-        /**
-         * Return the number of targets which are effected correctly
-         * by this intervention
-         **/
-        public Long numberOfCorrectEffects () {
-            return effectsOnTargets.values().stream().filter(val -> val > 0).count();
-        }
-
-        /**
-         * Return the signed EFFECT_ON_TARGET score on a given target
-         * node (Positive indicates that the desired effect was
-         * achieved, negative indicates its opposite)
-         **/
-        public Double effectOnTarget (CyNode target) {
-            return effectsOnTargets.get(target);
-        }
-
-        public String toString () {
-            return String.format("Activating nodes %s and inhibiting nodes %s drives %d nodes correctly with effect %s", interventionNodesToActivate, interventionNodesToInhibit, numberOfCorrectEffects(), effectsOnTargets);
-        }
     }
 
     /**

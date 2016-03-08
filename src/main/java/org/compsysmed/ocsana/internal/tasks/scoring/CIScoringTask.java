@@ -22,13 +22,14 @@ import org.cytoscape.model.CyNode;
 
 // OCSANA imports
 import org.compsysmed.ocsana.internal.algorithms.scoring.CISignTestingAlgorithm;
-import org.compsysmed.ocsana.internal.algorithms.scoring.CISignTestingAlgorithm.SignedIntervention;
 
 import org.compsysmed.ocsana.internal.tasks.AbstractOCSANATask;
 import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
 
 import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
 import org.compsysmed.ocsana.internal.stages.cistage.CIStageResults;
+
+import org.compsysmed.ocsana.internal.util.results.SignedIntervention;
 
 public class CIScoringTask
     extends AbstractOCSANATask {
