@@ -25,15 +25,15 @@ import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
 
 import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
 
-public class CIScoringTaskFactory
+public class CISignAssignmentTaskFactory
     extends AbstractTaskFactory {
     private CIStageContext ciContext;
     private CombinationOfInterventions ci;
     private Set<CyNode> targetsToActivate;
 
-    public CIScoringTaskFactory (CIStageContext ciContext,
-                                 CombinationOfInterventions ci,
-                                 Set<CyNode> targetsToActivate) {
+    public CISignAssignmentTaskFactory (CIStageContext ciContext,
+                                        CombinationOfInterventions ci,
+                                        Set<CyNode> targetsToActivate) {
         this.ciContext = ciContext;
         this.ci = ci;
         this.targetsToActivate = targetsToActivate;
@@ -42,7 +42,7 @@ public class CIScoringTaskFactory
     @Override
     public TaskIterator createTaskIterator () {
         TaskIterator tasks = new TaskIterator();
-        tasks.append(new CIScoringTask(ciContext, ci, targetsToActivate));
+        tasks.append(new CISignAssignmentTask(ciContext, ci, targetsToActivate));
         return tasks;
     }
 }

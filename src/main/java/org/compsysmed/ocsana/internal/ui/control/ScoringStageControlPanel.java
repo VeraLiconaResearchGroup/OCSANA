@@ -37,7 +37,7 @@ import org.compsysmed.ocsana.internal.stages.cistage.CIStageResults;
 
 import org.compsysmed.ocsana.internal.stages.scorestage.ScoringStageContext;
 
-import org.compsysmed.ocsana.internal.tasks.scoring.CIScoringTaskFactory;
+import org.compsysmed.ocsana.internal.tasks.scoring.CISignAssignmentTaskFactory;
 
 import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
 
@@ -119,8 +119,8 @@ public class ScoringStageControlPanel
         panelTaskManager.validateAndApplyTunables(scoringContext);
 
         for (CombinationOfInterventions CI: ciResults.CIs) {
-            CIScoringTaskFactory scorerTaskFactory
-                = new CIScoringTaskFactory(ciContext, CI, scoringContext.targetsToActivate());
+            CISignAssignmentTaskFactory scorerTaskFactory
+                = new CISignAssignmentTaskFactory(ciContext, CI, scoringContext.targetsToActivate());
             panelTaskManager.execute(scorerTaskFactory.createTaskIterator());
         }
     }

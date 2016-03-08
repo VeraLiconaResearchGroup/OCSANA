@@ -33,7 +33,7 @@ import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
 import org.compsysmed.ocsana.internal.util.results.SignedIntervention;
 
 
-public class CIScoringTask
+public class CISignAssignmentTask
     extends AbstractOCSANATask {
     private static final OCSANAStep algStep = OCSANAStep.SCORE_PATHS;
 
@@ -46,9 +46,9 @@ public class CIScoringTask
 
     private Collection<SignedIntervention> signedInterventions;
 
-    public CIScoringTask (CIStageContext ciContext,
-                          CombinationOfInterventions ci,
-                          Set<CyNode> targetsToActivate) {
+    public CISignAssignmentTask (CIStageContext ciContext,
+                                 CombinationOfInterventions ci,
+                                 Set<CyNode> targetsToActivate) {
         super(ciContext.getNetwork());
         this.ciContext = ciContext;
         this.ci = ci;
