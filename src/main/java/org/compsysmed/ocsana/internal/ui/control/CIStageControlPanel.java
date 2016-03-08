@@ -111,7 +111,7 @@ public class CIStageControlPanel
         signalStartOfCITask();
         CIStageRunnerTaskFactory runnerTaskFactory
             = new CIStageRunnerTaskFactory(panelTaskManager, this, ciStageContext, resultsPanel);
-        panelTaskManager.execute(runnerTaskFactory.createTaskIterator());
+        panelTaskManager.execute(runnerTaskFactory.createTaskIterator(), this);
     }
 
     private void signalStartOfCITask () {

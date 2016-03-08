@@ -50,11 +50,14 @@ public class CISignAssignmentTask
                                  CombinationOfInterventions ci,
                                  Set<CyNode> targetsToActivate) {
         super(ciContext.getNetwork());
+
+        if (!ciContext.nodeSetSelecter.getTargetNodes().containsAll(targetsToActivate)) {
+            throw new IllegalArgumentException("Specified target nodes are not targets");
+        }
+
         this.ciContext = ciContext;
         this.ci = ci;
         this.targetsToActivate = targetsToActivate;
-
-        assert(ciContext.nodeSetSelecter.getTargetNodes().containsAll(targetsToActivate));
     }
 
     @Override
@@ -67,10 +70,9 @@ public class CISignAssignmentTask
             return effectValue;
         };
 
-        CISignTestingAlgorithm testAlg = new CISignTestingAlgorithm(ci, ciContext.nodeSetSelecter.getTargetNodeSet(), signedEffectOnTargets);
-        signedInterventions = testAlg.bestInterventions();
-        SignedIntervention exampleIntervention = signedInterventions.stream().findFirst().get();
-        System.out.println(String.format("Found %d best interventions; example: %s", signedInterventions.size(), exampleIntervention));
+        CISignTestingAlgorithm signingAlg = new CISignTestingAlgorithm(ci, ciContext.nodeSetSelecter.getTargetNodeSet(), signedEffectOnTargets);
+        signedInterventions = signingAlg.bestInterventions();
+        ci.setOptimalSignings(signedInterventions);
     }
 
     @Override

@@ -27,6 +27,7 @@ import org.cytoscape.model.CyNode;
 
 import org.cytoscape.work.FinishStatus;
 import org.cytoscape.work.ObservableTask;
+import org.cytoscape.work.TaskIterator;
 import org.cytoscape.work.TaskObserver;
 
 import org.cytoscape.work.swing.PanelTaskManager;
@@ -83,7 +84,7 @@ public class ScoringStageControlPanel
         runScoringStageButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed (ActionEvent e) {
-                    runScoringTask();
+                    runScoringTasks();
                 }
             });
 
@@ -103,9 +104,6 @@ public class ScoringStageControlPanel
 
         scoringContext = new ScoringStageContext(network, ciContext, ciResults);
         JPanel setupPanel = panelTaskManager.getConfiguration(null, scoringContext);
-        if (setupPanel == null) {
-            throw new IllegalStateException("WTF");
-        }
         tunablePanel.add(setupPanel);
 
         tunablePanel.revalidate();
@@ -115,18 +113,24 @@ public class ScoringStageControlPanel
     /**
      * Spawn the scoring stage task
      **/
-    private void runScoringTask () {
+    private void runScoringTasks () {
         panelTaskManager.validateAndApplyTunables(scoringContext);
+
+        TaskIterator signAssignmentTasks = new TaskIterator();
 
         for (CombinationOfInterventions CI: ciResults.CIs) {
             CISignAssignmentTaskFactory scorerTaskFactory
                 = new CISignAssignmentTaskFactory(ciContext, CI, scoringContext.targetsToActivate());
-            panelTaskManager.execute(scorerTaskFactory.createTaskIterator());
+            signAssignmentTasks.append(scorerTaskFactory.createTaskIterator());
         }
+
+        panelTaskManager.execute(signAssignmentTasks, this);
     }
 
     @Override
     public void taskFinished (ObservableTask task) {
+        // Called after the TaskManager finishes each of its Tasks.
+        // Currently, we don't do anything with this information.
     }
 
     @Override
