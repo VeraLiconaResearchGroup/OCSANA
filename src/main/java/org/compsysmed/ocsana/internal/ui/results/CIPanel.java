@@ -21,7 +21,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.RowSorter;
 
-import javax.swing.table.DefaultTableModel;
+import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
@@ -36,48 +36,10 @@ import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
 
 public class CIPanel
     extends JPanel {
-    private static final Vector<String> mhsCols =
-        new Vector<>(Arrays.asList(new String[] {"CI", "Size", "Successful targets"}));
-
     public CIPanel (CIStageContext ciContext,
                     CIStageResults ciResults) {
         if (ciResults.CIs != null) {
-            Vector<Vector<Object>> mhsRows = getMHSRows(ciContext, ciResults.CIs);
-
-            TableModel mhsModel = new DefaultTableModel(mhsRows, mhsCols) {
-                    @Override
-                    public Class<?> getColumnClass(int column) {
-                        try {
-                            return getValueAt(0, column).getClass();
-                        } catch (ArrayIndexOutOfBoundsException|NullPointerException exception) {
-                            return Object.class;
-                        }
-                    }
-
-                    // Disable cell editing
-                    @Override
-                    public boolean isCellEditable(int row, int column) {
-                        return false;
-                    }
-                };
-
-            JTable mhsTable = new JTable(mhsModel);
-
-            // Sort the rows
-            RowSorter<TableModel> mhsSorter = new TableRowSorter<TableModel>(mhsModel);
-
-            if (mhsRows.get(0) != null && mhsRows.get(0).get(2) != null) {
-                // If we have target counts, sort in decreasing order with respect to them
-                mhsSorter.toggleSortOrder(2);
-                mhsSorter.toggleSortOrder(2);
-            } else {
-                // Otherwise, sort in increasing order of CI size
-                mhsSorter.toggleSortOrder(1);
-            }
-
-            mhsTable.setRowSorter(mhsSorter);
-
-            mhsTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+            MHSTable mhsTable = new MHSTable(ciContext, ciResults);
 
             JScrollPane mhsScrollPane = new JScrollPane(mhsTable);
 
@@ -88,27 +50,87 @@ public class CIPanel
         }
     }
 
-    /**
-     * Get the rows of the CI results table
-     **/
-    private static Vector<Vector<Object>> getMHSRows (CIStageContext ciContext,
-                                                      Collection<CombinationOfInterventions> CIs) {
-        Vector<Vector<Object>> rows = new Vector<>();
-        for (CombinationOfInterventions ci: CIs) {
-            rows.add(getMHSRow(ciContext, ci));
+    private class MHSTable extends JTable {
+        public MHSTable (CIStageContext ciContext,
+                         CIStageResults ciResults) {
+            MHSTableModel mhsModel = new MHSTableModel(ciContext, ciResults.CIs);
+            setModel(mhsModel);
+
+            // Sort the rows
+            RowSorter<TableModel> mhsSorter = new TableRowSorter<TableModel>(mhsModel);
+
+            // If the CIs have intervention data, sort on that
+            if (ciResults.CIs.stream().findFirst().get().maximumNumberOfCorrectEffects() != null) {
+                mhsSorter.toggleSortOrder(2);
+                mhsSorter.toggleSortOrder(2);
+            } else {
+                // Otherwise, sort on CI size
+                mhsSorter.toggleSortOrder(1);
+            }
+
+            setRowSorter(mhsSorter);
+
+            setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         }
-        return rows;
     }
 
-    /**
-     * Build a row for a CombinationOfInterventions
-     **/
-    private static Vector<Object> getMHSRow (CIStageContext ciContext,
-                                             CombinationOfInterventions ci) {
-        Vector<Object> row = new Vector<>();
-        row.add(ciContext.nodeSetString(ci.getNodes()));
-        row.add(ci.size());
-        row.add(ci.maximumNumberOfCorrectEffects());
-        return row;
+    private class MHSTableModel extends AbstractTableModel {
+        private CIStageContext ciContext;
+        private List<CombinationOfInterventions> ciList;
+
+        public MHSTableModel (CIStageContext ciContext,
+                              Collection<CombinationOfInterventions> CIs) {
+            this.ciContext = ciContext;
+            this.ciList = new ArrayList<>(CIs);
+        }
+        String[] colNames = {"CI", "Size", "Successful targets"};
+
+        @Override
+        public String getColumnName (int col) {
+            return colNames[col];
+        }
+
+        @Override
+        public int getRowCount () {
+            return ciList.size();
+        }
+
+        @Override
+        public int getColumnCount () {
+            return 3;
+        }
+
+        @Override
+        public Object getValueAt (int row, int col) {
+            CombinationOfInterventions ci = ciList.get(row);
+            switch (col) {
+            case 0:
+                return ciContext.nodeSetString(ci.getNodes());
+
+            case 1:
+                return ci.size();
+
+            case 2:
+                return ci.maximumNumberOfCorrectEffects();
+
+            default:
+                throw new IllegalArgumentException(String.format("Table does not have %d columns", col));
+            }
+        }
+
+        @Override
+        public Class<?> getColumnClass(int column) {
+            try {
+                return getValueAt(0, column).getClass();
+            } catch (IndexOutOfBoundsException|NullPointerException exception) {
+                return Object.class;
+            }
+        }
+
+        // Disable cell editing
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            return false;
+        }
     }
 }
