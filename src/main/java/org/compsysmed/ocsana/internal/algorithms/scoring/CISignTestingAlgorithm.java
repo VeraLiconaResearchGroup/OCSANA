@@ -69,8 +69,24 @@ public class CISignTestingAlgorithm
     /**
      * Find all sets of sources to activate that maximize the number
      * of targets that are activated
+     * <p>
+     * {@code paretoOptimalOnly} defaults to true
+     *
+     * @see #bestInterventions(Boolean)
      **/
     public Collection<SignedIntervention> bestInterventions () {
+        return bestInterventions(true);
+    }
+
+    /**
+     * Find all sets of sources to activate that maximize the number
+     * of targets that are activated
+     *
+     * @param paretoOptimalOnly if true, filter out sign assignments
+     * which are sub-optimal by total effect score (NOTE: this may be
+     * expensive if the original set is large)
+     **/
+    public Collection<SignedIntervention> bestInterventions (Boolean paretoOptimalOnly) {
         // Use lists of the source and target nodes to ensure consistent ordering
         List<CyNode> sourceList = new ArrayList<>(ci.getNodes());
         List<CyNode> targetList = new ArrayList<>(targets);
@@ -97,13 +113,17 @@ public class CISignTestingAlgorithm
         }
 
         int mostPositiveTermsSoFar = 0;
-        Map<BitSet, Vector> bestSignsSoFar = new HashMap<>();
+        Collection<BitSetWithEffect> bestSignsSoFar = new ArrayList<>();
 
         mostPositiveTermsSoFar = numberOfPositiveTerms(interventionEffect);
-        bestSignsSoFar.put((BitSet) signs.clone(), interventionEffect);
+        bestSignsSoFar.add(new BitSetWithEffect(signs, interventionEffect));
 
         Integer numberOfPossibleAssignments = 1 << sourceList.size(); // Java doesn't have an exponent operator? It's 2016!
         for (int i = 1; i < numberOfPossibleAssignments; i++) {
+            if (isCanceled()) {
+                break;
+            }
+
             // We use a simple Gray code to scan the possible assignments
             int bitToFlip = Integer.numberOfTrailingZeros(i);
             signs.flip(bitToFlip);
@@ -114,22 +134,57 @@ public class CISignTestingAlgorithm
             }
 
             if (numberOfPositiveTerms(interventionEffect) > mostPositiveTermsSoFar){
-                bestSignsSoFar = new HashMap<>();
+                bestSignsSoFar = new ArrayList<>();
 
                 mostPositiveTermsSoFar = numberOfPositiveTerms(interventionEffect);
-                bestSignsSoFar.put((BitSet) signs.clone(), interventionEffect);
+                bestSignsSoFar.add(new BitSetWithEffect(signs, interventionEffect));
 
             } else if (numberOfPositiveTerms(interventionEffect) == mostPositiveTermsSoFar) {
-                bestSignsSoFar.put((BitSet) signs.clone(), interventionEffect);
+                bestSignsSoFar.add(new BitSetWithEffect(signs, interventionEffect));
             }
         }
 
+        // Filter the list if requested
+        if (paretoOptimalOnly) {
+            // This algorithm requires quadratically checks of the
+            // assignments, but I don't think that can be improved…
+            Collection<BitSetWithEffect> trimmedOptimalAssignments = new HashSet<>();
+
+        candidateTestingLoop:
+            for (BitSetWithEffect newCandidate: bestSignsSoFar) {
+                Collection<BitSetWithEffect> assignmentsInferiorToCandidate = new HashSet<>();
+                for (BitSetWithEffect oldAssignment: trimmedOptimalAssignments) {
+                    switch (compareVectors(newCandidate.effect, oldAssignment.effect)) {
+                    case LESS_THAN:
+                    case EQUAL:
+                        assert assignmentsInferiorToCandidate.isEmpty();
+                        continue candidateTestingLoop;
+
+                    case GREATER_THAN:
+                        assignmentsInferiorToCandidate.add(oldAssignment);
+                        break;
+
+                    case INCOMPARABLE:
+                        break;
+                    }
+                }
+
+                trimmedOptimalAssignments.removeAll(assignmentsInferiorToCandidate);
+
+                trimmedOptimalAssignments.add(newCandidate);
+            }
+
+            bestSignsSoFar = trimmedOptimalAssignments;
+        }
+
+        // Convert the resulting bitsets into sets of source nodes and
+        // construct the corresponding SignedInterventions
         Collection<SignedIntervention> interventions = new ArrayList<>();
-        for (Map.Entry<BitSet, Vector> result: bestSignsSoFar.entrySet()) {
-            BitSet resultSigns = result.getKey();
+        for (BitSetWithEffect result: bestSignsSoFar) {
+            BitSet resultSigns = result.bitset;
             Set<CyNode> activatedSources = activatedSources(sourceList, resultSigns);
 
-            Vector effect = result.getValue();
+            Vector effect = result.effect;
             Map<CyNode, Double> targetEffects = new HashMap<>();
             for (int i = 0; i < targetList.size(); i++) {
                 targetEffects.put(targetList.get(i), effect.get(i));
@@ -140,6 +195,61 @@ public class CISignTestingAlgorithm
         }
 
         return interventions;
+    }
+
+    private class BitSetWithEffect {
+        public BitSet bitset;
+        public Vector effect;
+
+        public BitSetWithEffect (BitSet bitset,
+                                 Vector effect) {
+            this.bitset = (BitSet) bitset.clone();
+            this.effect = effect;
+        }
+
+        public String toString () {
+            return effect.toString();
+        }
+    }
+
+    private enum PosetRelation {
+        LESS_THAN, GREATER_THAN, EQUAL, INCOMPARABLE
+    }
+
+    private static PosetRelation compareVectors (Vector left, Vector right) {
+        if (left == null || right == null) {
+            throw new IllegalArgumentException("Cannot compare a null vector.");
+        }
+
+        if (left.length() != right.length()) {
+            throw new IllegalArgumentException("Cannot compare vectors of different lengths.");
+        }
+
+        PosetRelation relation = PosetRelation.EQUAL;
+
+        for (int i = 0; i < left.length(); i++) {
+            Double leftTerm = left.get(i);
+            Double rightTerm = right.get(i);
+
+            // Do nothing if they're equal
+            if (leftTerm < rightTerm) {
+                if (relation == PosetRelation.GREATER_THAN) {
+                    relation = PosetRelation.INCOMPARABLE;
+                    break;
+                }
+
+                relation = PosetRelation.LESS_THAN;
+            } else if (leftTerm > rightTerm) {
+                if (relation == PosetRelation.LESS_THAN) {
+                    relation = PosetRelation.INCOMPARABLE;
+                    break;
+                }
+
+                relation = PosetRelation.GREATER_THAN;
+            }
+        }
+
+        return relation;
     }
 
     /**
