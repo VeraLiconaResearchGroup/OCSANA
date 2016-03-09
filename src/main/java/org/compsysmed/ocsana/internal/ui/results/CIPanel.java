@@ -13,7 +13,13 @@ package org.compsysmed.ocsana.internal.ui.results;
 
 // Java imports
 import java.util.*;
+
 import java.awt.BorderLayout;
+import java.awt.Point;
+
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -74,11 +80,22 @@ public class CIPanel
 
             setRowSorter(mhsSorter);
 
+            MouseListener mouseListener = new MouseAdapter() {
+                    public void mousePressed(MouseEvent me) {
+                        Point p = me.getPoint();
+                        int row = rowAtPoint(p);
+                        if (me.getClickCount() == 2 && row != -1) {
+                            handleUserDoubleClick(row);
+                        }
+                    }};
+
+            addMouseListener(mouseListener);
+
             setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         }
 
-        public CombinationOfInterventions getCI (Integer row) {
-            return CIs.get(row);
+        public void handleUserDoubleClick (Integer row) {
+            System.out.println(String.format("User double-clicked row %d with CI %s", row, CIs.get(row).interventionNodesString()));
         }
     }
 
