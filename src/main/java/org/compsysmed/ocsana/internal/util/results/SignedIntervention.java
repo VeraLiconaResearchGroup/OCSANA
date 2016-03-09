@@ -96,7 +96,20 @@ public class SignedIntervention {
         return effectsOnTargets.get(target);
     }
 
+    /**
+     * Return a cumulative effect score for this signed intervention
+     *
+     * NOTE: this score can be compared with the scores of other sign
+     * assignments of the same CI; positive scores indicate overall
+     * achievement of the intervention goal, and higher scores
+     * indicate a stronger effect. However, these scores <b>cannot</b>
+     * be compared between different CIs.
+     **/
+    public Double cumulativeEffectOnTargets () {
+        return targetNodes.stream().mapToDouble(this::effectOnTarget).sum();
+    }
+
     public String toString () {
-        return String.format("Activating nodes %s and inhibiting nodes %s drives %d nodes correctly with effect %s", interventionNodesToActivate, interventionNodesToInhibit, numberOfCorrectEffects(), effectsOnTargets);
+        return String.format("Activating nodes %s and inhibiting nodes %s drives %d nodes correctly with effect %s", ci.nodeSetString(interventionNodesToActivate), ci.nodeSetString(interventionNodesToInhibit), numberOfCorrectEffects(), effectsOnTargets);
     }
 }

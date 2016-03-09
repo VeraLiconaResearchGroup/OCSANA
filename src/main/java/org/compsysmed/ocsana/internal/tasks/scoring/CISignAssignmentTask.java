@@ -73,6 +73,7 @@ public class CISignAssignmentTask
         CISignTestingAlgorithm signingAlg = new CISignTestingAlgorithm(ci, ciContext.nodeSetSelecter.getTargetNodeSet(), signedEffectOnTargets);
         signedInterventions = signingAlg.bestInterventions();
         ci.setOptimalSignings(signedInterventions);
+        ci.setTargetsToActivate(targetsToActivate);
     }
 
     @Override

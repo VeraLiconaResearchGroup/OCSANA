@@ -21,7 +21,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
+import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -42,25 +44,33 @@ import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
 
 public class CIPanel
     extends JPanel {
+    private JFrame cytoscapeFrame;
+    private CIStageContext ciContext;
+    private CIStageResults ciResults;
+
     public CIPanel (CIStageContext ciContext,
-                    CIStageResults ciResults) {
+                    CIStageResults ciResults,
+                    JFrame cytoscapeFrame) {
+        this.ciContext = ciContext;
+        this.ciResults = ciResults;
+        this.cytoscapeFrame = cytoscapeFrame;
+
         if (ciResults.CIs != null) {
-            MHSTable mhsTable = new MHSTable(ciContext, ciResults);
+            MHSTable mhsTable = new MHSTable();
 
             JScrollPane mhsScrollPane = new JScrollPane(mhsTable);
 
             setLayout(new BorderLayout());
-            String mhsText = String.format("<html>Found %d optimal CIs in %f s.</html>", ciResults.CIs.size(), ciResults.mhsExecutionSeconds);
+            String mhsText = String.format("<html>Found %d optimal CIs in %f s.<br />Double-click a CI for a detailed intervention report.</html>", ciResults.CIs.size(), ciResults.mhsExecutionSeconds);
             add(new JLabel(mhsText), BorderLayout.PAGE_START);
             add(mhsScrollPane, BorderLayout.CENTER);
         }
     }
 
-    private static class MHSTable extends JTable {
+    private class MHSTable extends JTable {
         List<CombinationOfInterventions> CIs;
 
-        public MHSTable (CIStageContext ciContext,
-                         CIStageResults ciResults) {
+        public MHSTable () {
             this.CIs = new ArrayList<>(ciResults.CIs);
 
             MHSTableModel mhsModel = new MHSTableModel(ciContext, CIs);
@@ -95,7 +105,10 @@ public class CIPanel
         }
 
         public void handleUserDoubleClick (Integer row) {
-            System.out.println(String.format("User double-clicked row %d with CI %s", row, CIs.get(row).interventionNodesString()));
+            CombinationOfInterventions ci = CIs.get(row);
+            if (ci.getOptimalSignings() != null) {
+                CIDialog ciDialog = new CIDialog(cytoscapeFrame, CIs.get(row));
+            }
         }
     }
 

@@ -26,6 +26,8 @@ import org.cytoscape.model.CyNode;
 public class CombinationOfInterventions {
     private final Set<CyNode> ciNodes;
     private final Set<CyNode> targetNodes;
+    private Set<CyNode> targetNodesToActivate;
+
     private final Function<CyNode, String> nodeName;
 
     private Double classicalOCSANAScore;
@@ -94,6 +96,24 @@ public class CombinationOfInterventions {
         }
 
         this.optimalSignings = optimalSignings;
+    }
+
+    /**
+     * Get the optimal sign assignments of this CI
+     **/
+    public Collection<SignedIntervention> getOptimalSignings () {
+        return optimalSignings;
+    }
+
+    /**
+     * Set the targets which are to be activated by this CI
+     **/
+    public void setTargetsToActivate (Set<CyNode> targetNodesToActivate) {
+        if (!targetNodes.containsAll(targetNodesToActivate)) {
+            throw new IllegalArgumentException("Cannot activate nodes which are not targets.");
+        }
+
+        this.targetNodesToActivate = targetNodesToActivate;
     }
 
     /**
