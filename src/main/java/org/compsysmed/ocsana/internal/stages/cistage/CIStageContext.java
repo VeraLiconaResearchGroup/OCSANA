@@ -159,28 +159,6 @@ public class CIStageContext
     }
 
     /**
-     * Get a string representation of a set of nodes
-     *
-     * The current format is "[node1, node2, node3]".
-     *
-     * @param nodes  the Collection of nodes
-     **/
-    public String nodeSetString(Collection<CyNode> nodes) {
-        if (nodes == null) {
-            return "";
-        }
-
-        List<String> nodeStrings = new ArrayList<>();
-        for (CyNode node: nodes) {
-            nodeStrings.add(nodeString(node));
-        }
-
-        Collections.sort(nodeStrings);
-
-        return "[" + String.join(", ", nodeStrings) + "]";
-    }
-
-    /**
      * Get a string representation of a path of (directed) edges
      *
      * The current format is "node1 -> node2 -| node3".

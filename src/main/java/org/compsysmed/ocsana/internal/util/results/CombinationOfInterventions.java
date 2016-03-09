@@ -13,6 +13,8 @@ package org.compsysmed.ocsana.internal.util.results;
 
 // Java imports
 import java.util.*;
+import java.util.function.*;
+import java.util.stream.Collectors;
 
 // Cytoscape imports
 import org.cytoscape.model.CyNode;
@@ -24,6 +26,7 @@ import org.cytoscape.model.CyNode;
 public class CombinationOfInterventions {
     private final Set<CyNode> ciNodes;
     private final Set<CyNode> targetNodes;
+    private final Function<CyNode, String> nodeName;
 
     private Double classicalOCSANAScore;
 
@@ -34,11 +37,15 @@ public class CombinationOfInterventions {
      *
      * @param ciNodes  the nodes in this CI
      * @param targetNodes  the target nodes that this CI dominates
+     * @param nodeName function returning the name of a given node (if
+     * null, use Cytoscape's automatic name, which is based on SUID)
      **/
     public CombinationOfInterventions (Set<CyNode> ciNodes,
-                                       Set<CyNode> targetNodes) {
+                                       Set<CyNode> targetNodes,
+                                       Function<CyNode, String> nodeName) {
         this.ciNodes = ciNodes;
         this.targetNodes = targetNodes;
+        this.nodeName = nodeName;
     }
 
     /**
@@ -46,6 +53,13 @@ public class CombinationOfInterventions {
      **/
     public Set<CyNode> getNodes () {
         return ciNodes;
+    }
+
+    /**
+     * Get the targets of this CI
+     **/
+    public Set<CyNode> getTargets () {
+        return targetNodes;
     }
 
     /**
@@ -96,4 +110,36 @@ public class CombinationOfInterventions {
             return optimalSignings.stream().findFirst().get().numberOfCorrectEffects();
         }
     }
+
+    /**
+     * Get a string representation of the nodes of this CI.
+     *
+     * @see #nodeSetString
+     **/
+    public String interventionNodesString () {
+        return nodeSetString(getNodes());
+    }
+
+    /**
+     * Return the name of a node
+     **/
+    public String nodeName (CyNode node) {
+        if (nodeName != null) {
+            return nodeName(node);
+        } else {
+            return node.toString();
+        }
+    }
+
+    /**
+     * Get a string representation of a collection of nodes
+     *
+     * The current format is "[node1, node2, node3]".
+     *
+     * @param nodes  the Collection of nodes
+     **/
+    public String nodeSetString(Collection<CyNode> nodes) {
+        return nodes.stream().map(nodeName).collect(Collectors.joining(", ", "[", "]"));
+    }
+
 }

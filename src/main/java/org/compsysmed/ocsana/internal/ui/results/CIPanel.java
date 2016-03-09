@@ -50,10 +50,14 @@ public class CIPanel
         }
     }
 
-    private class MHSTable extends JTable {
+    private static class MHSTable extends JTable {
+        List<CombinationOfInterventions> CIs;
+
         public MHSTable (CIStageContext ciContext,
                          CIStageResults ciResults) {
-            MHSTableModel mhsModel = new MHSTableModel(ciContext, ciResults.CIs);
+            this.CIs = new ArrayList<>(ciResults.CIs);
+
+            MHSTableModel mhsModel = new MHSTableModel(ciContext, CIs);
             setModel(mhsModel);
 
             // Sort the rows
@@ -72,16 +76,20 @@ public class CIPanel
 
             setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         }
+
+        public CombinationOfInterventions getCI (Integer row) {
+            return CIs.get(row);
+        }
     }
 
-    private class MHSTableModel extends AbstractTableModel {
+    private static class MHSTableModel extends AbstractTableModel {
         private CIStageContext ciContext;
-        private List<CombinationOfInterventions> ciList;
+        private List<CombinationOfInterventions> CIs;
 
         public MHSTableModel (CIStageContext ciContext,
-                              Collection<CombinationOfInterventions> CIs) {
+                              List<CombinationOfInterventions> CIs) {
             this.ciContext = ciContext;
-            this.ciList = new ArrayList<>(CIs);
+            this.CIs = CIs;
         }
         String[] colNames = {"CI", "Size", "Successful targets"};
 
@@ -92,7 +100,7 @@ public class CIPanel
 
         @Override
         public int getRowCount () {
-            return ciList.size();
+            return CIs.size();
         }
 
         @Override
@@ -102,10 +110,10 @@ public class CIPanel
 
         @Override
         public Object getValueAt (int row, int col) {
-            CombinationOfInterventions ci = ciList.get(row);
+            CombinationOfInterventions ci = CIs.get(row);
             switch (col) {
             case 0:
-                return ciContext.nodeSetString(ci.getNodes());
+                return ci.interventionNodesString();
 
             case 1:
                 return ci.size();
