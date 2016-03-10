@@ -83,6 +83,7 @@ public class OCSANAControlPanel
     @Override
     public void handleEvent (SetCurrentNetworkEvent e) {
         CyNetwork network = e.getNetwork();
+        resultsPanel.reset();
         buildPanel(network);
     }
 

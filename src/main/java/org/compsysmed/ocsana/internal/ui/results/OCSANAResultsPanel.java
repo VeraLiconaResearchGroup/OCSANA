@@ -62,6 +62,15 @@ public class OCSANAResultsPanel
     }
 
     /**
+     * Reset the panel to a blank state
+     **/
+    public void reset () {
+        removeAll();
+        revalidate();
+        repaint();
+    }
+
+    /**
      * Update the panel with the specified CI-stage results
      *
      * @param results  the results to display
