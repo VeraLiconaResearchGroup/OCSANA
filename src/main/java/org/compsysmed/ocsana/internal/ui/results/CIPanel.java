@@ -107,7 +107,7 @@ public class CIPanel
         public void handleUserDoubleClick (Integer row) {
             CombinationOfInterventions ci = CIs.get(row);
             if (ci.getOptimalSignings() != null) {
-                CIDialog ciDialog = new CIDialog(cytoscapeFrame, CIs.get(row));
+                InterventionDetailsDialog detailsDialog = new InterventionDetailsDialog(cytoscapeFrame, CIs.get(row));
             }
         }
     }

@@ -36,7 +36,7 @@ import org.compsysmed.ocsana.internal.util.results.SignedIntervention;
 /**
  * Dialog presenting details of a given CombinationOfInterventions
  **/
-public class CIDialog
+public class InterventionDetailsDialog
     extends JDialog {
     private CombinationOfInterventions ci;
 
@@ -49,7 +49,7 @@ public class CIDialog
      * positioning)
      * @param ci  the CombinationOfInterventions
     **/
-    public CIDialog (JFrame parentFrame,
+    public InterventionDetailsDialog (JFrame parentFrame,
                      CombinationOfInterventions ci) {
         super(parentFrame, "Intervention details report");
         this.ci = ci;
