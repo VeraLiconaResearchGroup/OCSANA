@@ -30,6 +30,8 @@ import javax.swing.JScrollPane;
 // Cytoscape imports
 
 // OCSANA improts
+import org.compsysmed.ocsana.internal.ui.OCSANADialog;
+
 import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
 import org.compsysmed.ocsana.internal.util.results.SignedIntervention;
 
@@ -37,7 +39,7 @@ import org.compsysmed.ocsana.internal.util.results.SignedIntervention;
  * Dialog presenting details of a given CombinationOfInterventions
  **/
 public class InterventionDetailsDialog
-    extends JDialog {
+    extends OCSANADialog {
     private CombinationOfInterventions ci;
 
     /**
@@ -50,7 +52,7 @@ public class InterventionDetailsDialog
      * @param ci  the CombinationOfInterventions
     **/
     public InterventionDetailsDialog (JFrame parentFrame,
-                     CombinationOfInterventions ci) {
+                                      CombinationOfInterventions ci) {
         super(parentFrame, "Intervention details report");
         this.ci = ci;
 
@@ -64,10 +66,7 @@ public class InterventionDetailsDialog
             displayPanel.showIntervention(ci.getOptimalSignings().stream().findFirst().get());
         }
 
-        setLocationRelativeTo(parentFrame);
-
         pack();
-        setVisible(true);
     }
 
     private static class InterventionSelectionPanel
