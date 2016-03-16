@@ -146,8 +146,9 @@ public class CISignTestingAlgorithm
 
         // Filter the list if requested
         if (paretoOptimalOnly) {
-            // This algorithm requires quadratically checks of the
-            // assignments, but I don't think that can be improved…
+            // This algorithm requires quadratically many checks of
+            // the assignments, but I don't think that can be
+            // improved…
             Collection<BitSetWithEffect> trimmedOptimalAssignments = new HashSet<>();
 
         candidateTestingLoop:
