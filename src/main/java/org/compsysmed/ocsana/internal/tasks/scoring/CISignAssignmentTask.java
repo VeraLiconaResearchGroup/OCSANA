@@ -21,13 +21,13 @@ import org.cytoscape.work.TaskMonitor;
 import org.cytoscape.model.CyNode;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.algorithms.scoring.CISignTestingAlgorithm;
-
 import org.compsysmed.ocsana.internal.tasks.AbstractOCSANATask;
 import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
 
 import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
 import org.compsysmed.ocsana.internal.stages.cistage.CIStageResults;
+
+import org.compsysmed.ocsana.internal.stages.scorestage.ScoringStageContext;
 
 import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
 import org.compsysmed.ocsana.internal.util.results.SignedIntervention;
@@ -38,42 +38,29 @@ public class CISignAssignmentTask
     private static final OCSANAStep algStep = OCSANAStep.SCORE_PATHS;
 
     private CIStageContext ciContext;
+    private ScoringStageContext scoringContext;
+
     private CombinationOfInterventions ci;
     private Set<CyNode> CINodesToActivate;
-
-    private Set<CyNode> targetsToActivate;
-
 
     private Collection<SignedIntervention> signedInterventions;
 
     public CISignAssignmentTask (CIStageContext ciContext,
-                                 CombinationOfInterventions ci,
-                                 Set<CyNode> targetsToActivate) {
+                                 ScoringStageContext scoringContext,
+                                 CombinationOfInterventions ci) {
         super(ciContext.getNetwork());
 
-        if (!ciContext.nodeSetSelecter.getTargetNodes().containsAll(targetsToActivate)) {
-            throw new IllegalArgumentException("Specified target nodes are not targets");
-        }
-
         this.ciContext = ciContext;
+        this.scoringContext = scoringContext;
+
         this.ci = ci;
-        this.targetsToActivate = targetsToActivate;
     }
 
     @Override
     public void run (TaskMonitor taskMonitor) {
-        BiFunction<CyNode, CyNode, Double> signedEffectOnTargets = (source, target) -> {
-            Double effectValue = ciContext.ocsanaAlg.effectOnTargetsScore(source, target);
-            if (!targetsToActivate.contains(target)) {
-                effectValue = -effectValue;
-            }
-            return effectValue;
-        };
-
-        CISignTestingAlgorithm signingAlg = new CISignTestingAlgorithm(ci, ciContext.nodeSetSelecter.getTargetNodeSet(), signedEffectOnTargets);
-        signedInterventions = signingAlg.bestInterventions();
+        signedInterventions = scoringContext.ciSignAlgorithm.bestInterventions(ci, scoringContext.targetsToActivate());
         ci.setOptimalSignings(signedInterventions);
-        ci.setTargetsToActivate(targetsToActivate);
+        ci.setTargetsToActivate(scoringContext.targetsToActivate());
     }
 
     @Override

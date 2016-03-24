@@ -26,70 +26,78 @@ import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNode;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.algorithms.AbstractOCSANAAlgorithm;
-
 import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
 import org.compsysmed.ocsana.internal.util.results.SignedIntervention;
 
 /**
  * Algorithm to find best sign assignment for a set of sources to
- * activate a set of targets.
- *
+ * activate a set of targets by maximizing (over all possible sign
+ * assignments) the number of nodes which are given the correct sign
+ * of OCSANA EFFECT_ON_TARGETS score.
+ * <p>
  * NOTE: The current implementation is an exhaustive search through
  * all possible sign assignments of the CI, so the running time is
  * exponential in the size of the CI. Be careful if running this with
  * more than ~14 terms in a CI.
  **/
-public class CISignTestingAlgorithm
-    extends AbstractOCSANAAlgorithm {
+public class ExhaustiveSearchCISignAssignmentAlgorithm
+    extends AbstractCISignAssignmentAlgorithm {
     public static final String NAME = "CI sign testing";
     public static final String SHORTNAME = "CI-sign";
 
-    private CombinationOfInterventions ci;
-    private Set<CyNode> targets;
     private BiFunction<CyNode, CyNode, Double> effectOnTarget;
+    private Boolean paretoOptimalOnly;
 
     /**
      * Constructor
      *
-     * @param ci  the CI
-     * @param targets  the target nodes
-     * @param effectOnTarget  function which computes for input
-     * (source, target) the EFFECT_ON_TARGETS score of source on
-     * target
-     **/
-    public CISignTestingAlgorithm (CombinationOfInterventions ci,
-                                   Set<CyNode> targets,
-                                   BiFunction<CyNode, CyNode, Double> effectOnTarget) {
-        this.ci = ci;
-        this.targets = targets;
-        this.effectOnTarget = effectOnTarget;
-    }
-
-    /**
-     * Find all sets of sources to activate that maximize the number
-     * of targets that are activated
-     * <p>
-     * {@code paretoOptimalOnly} defaults to true
-     *
-     * @see #bestInterventions(Boolean)
-     **/
-    public Collection<SignedIntervention> bestInterventions () {
-        return bestInterventions(true);
-    }
-
-    /**
-     * Find all sets of sources to activate that maximize the number
-     * of targets that are activated
-     *
+     * @param effectOnTarget function which computes for a pair of
+     * CyNodes (source, target) the EFFECT_ON_TARGETS score of source
+     * on target
      * @param paretoOptimalOnly if true, filter out sign assignments
      * which are sub-optimal by total effect score (NOTE: this may be
      * expensive if the original set is large)
      **/
-    public Collection<SignedIntervention> bestInterventions (Boolean paretoOptimalOnly) {
+    public ExhaustiveSearchCISignAssignmentAlgorithm (BiFunction<CyNode, CyNode, Double> effectOnTarget,
+                                                      Boolean paretoOptimalOnly) {
+        this.effectOnTarget = effectOnTarget;
+        this.paretoOptimalOnly = paretoOptimalOnly;
+    }
+
+    /**
+     * Constructor
+     * <p>
+     * Sets {@code paretoOptimalOnly} true
+     *
+     * @see #ExhaustiveSearchCISignAssignmentAlgorithm(BiFunction, Boolean)
+     *
+     * @param effectOnTarget function which computes for a pair of
+     * CyNodes (source, target) the EFFECT_ON_TARGETS score of source
+     * on target
+     **/
+    public ExhaustiveSearchCISignAssignmentAlgorithm (BiFunction<CyNode, CyNode, Double> effectOnTarget) {
+        this(effectOnTarget, true);
+    }
+
+    /**
+     * Find all sets of sources to activate that maximize the number
+     * of targets that are activated
+     **/
+    @Override
+    public Collection<SignedIntervention> bestInterventions (CombinationOfInterventions ci,
+                                                             Collection<CyNode> targetsToActivate) {
         // Use lists of the source and target nodes to ensure consistent ordering
         List<CyNode> sourceList = new ArrayList<>(ci.getNodes());
-        List<CyNode> targetList = new ArrayList<>(targets);
+        List<CyNode> targetList = new ArrayList<>(ci.getTargets());
+
+        // Generate a signed EFFECT_ON_TARGETS function
+        BiFunction<CyNode, CyNode, Double> signedEffectOnTarget = (source, target) -> {
+            if (targetsToActivate.contains(target)) {
+                return effectOnTarget.apply(source, target);
+            } else {
+                return -effectOnTarget.apply(source, target);
+            }
+        };
 
         // For each source, build a Vector storing its effects on the targets
         List<Vector> effectVectors = new ArrayList<>(sourceList.size());
@@ -97,7 +105,7 @@ public class CISignTestingAlgorithm
             Vector effectVector = new BasicVector(targetList.size());
             for (int i = 0; i < targetList.size(); i++) {
                 CyNode target = targetList.get(i);
-                effectVector.set(i, effectOnTarget.apply(source, target));
+                effectVector.set(i, signedEffectOnTarget.apply(source, target));
             }
             effectVectors.add(effectVector);
         }

@@ -122,7 +122,7 @@ public class ScoringStageControlPanel
 
         for (CombinationOfInterventions CI: ciResults.CIs) {
             CISignAssignmentTaskFactory scorerTaskFactory
-                = new CISignAssignmentTaskFactory(ciContext, CI, scoringContext.targetsToActivate());
+                = new CISignAssignmentTaskFactory(ciContext, scoringContext, CI);
             signAssignmentTasks.append(scorerTaskFactory.createTaskIterator());
         }
 

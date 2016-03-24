@@ -18,31 +18,30 @@ import java.util.*;
 import org.cytoscape.work.AbstractTaskFactory;
 import org.cytoscape.work.TaskIterator;
 
-import org.cytoscape.model.CyNode;
-
 // OCSANA imports
 import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
+import org.compsysmed.ocsana.internal.stages.scorestage.ScoringStageContext;
 
 import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
 
 public class CISignAssignmentTaskFactory
     extends AbstractTaskFactory {
     private CIStageContext ciContext;
+    private ScoringStageContext scoringContext;
     private CombinationOfInterventions ci;
-    private Set<CyNode> targetsToActivate;
 
     public CISignAssignmentTaskFactory (CIStageContext ciContext,
-                                        CombinationOfInterventions ci,
-                                        Set<CyNode> targetsToActivate) {
+                                        ScoringStageContext scoringContext,
+                                        CombinationOfInterventions ci) {
         this.ciContext = ciContext;
+        this.scoringContext = scoringContext;
         this.ci = ci;
-        this.targetsToActivate = targetsToActivate;
     }
 
     @Override
     public TaskIterator createTaskIterator () {
         TaskIterator tasks = new TaskIterator();
-        tasks.append(new CISignAssignmentTask(ciContext, ci, targetsToActivate));
+        tasks.append(new CISignAssignmentTask(ciContext, scoringContext, ci));
         return tasks;
     }
 }

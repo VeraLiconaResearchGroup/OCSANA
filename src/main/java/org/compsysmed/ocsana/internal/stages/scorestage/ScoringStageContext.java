@@ -13,6 +13,7 @@ package org.compsysmed.ocsana.internal.stages.scorestage;
 
 // Java imports
 import java.util.*;
+import java.util.function.*;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -29,6 +30,9 @@ import org.cytoscape.work.Tunable;
 import org.cytoscape.work.util.ListMultipleSelection;
 
 // OCSANA imports
+import org.compsysmed.ocsana.internal.algorithms.scoring.AbstractCISignAssignmentAlgorithm;
+import org.compsysmed.ocsana.internal.algorithms.scoring.ExhaustiveSearchCISignAssignmentAlgorithm;
+
 import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
 import org.compsysmed.ocsana.internal.stages.cistage.CIStageResults;
 
@@ -51,6 +55,8 @@ public class ScoringStageContext {
     private CIStageContext ciContext;
     private CIStageResults ciResults;
 
+    public AbstractCISignAssignmentAlgorithm ciSignAlgorithm;
+
     public ScoringStageContext (CyNetwork network,
                                 CIStageContext ciContext,
                                 CIStageResults ciResults) {
@@ -61,6 +67,9 @@ public class ScoringStageContext {
         Collection<CyNode> targets = ciContext.nodeSetSelecter.getTargetNodes();
         CyColumn nodeNameColumn = ciContext.getNodeNameColumn();
         targetsSelecter = new ListTargetsToActivateSelecter(network, targets, nodeNameColumn);
+
+        BiFunction<CyNode, CyNode, Double> effectOnTargets = (source, target) -> ciContext.ocsanaAlg.effectOnTargetsScore(source, target);
+        ciSignAlgorithm = new ExhaustiveSearchCISignAssignmentAlgorithm(effectOnTargets);
     }
 
     public Set<CyNode> targetsToActivate () {
