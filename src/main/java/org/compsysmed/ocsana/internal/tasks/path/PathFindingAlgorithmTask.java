@@ -45,17 +45,17 @@ public class PathFindingAlgorithmTask extends AbstractOCSANATask {
     @Override
     public void run (TaskMonitor taskMonitor) {
         String targetType;
-        Set<CyNode> sourceNodes = context.nodeSetSelecter.getSourceNodeSet();
+        Set<CyNode> sourceNodes = context.sourceNodes;
         Set<CyNode> targetsForThisRun;
         switch (algStep) {
         case FIND_PATHS_TO_TARGETS:
             targetType = "target";
-            targetsForThisRun = context.nodeSetSelecter.getTargetNodeSet();
+            targetsForThisRun = context.targetNodes;
             break;
 
         case FIND_PATHS_TO_OFF_TARGETS:
             targetType = "off-target";
-            targetsForThisRun = context.nodeSetSelecter.getOffTargetNodeSet();
+            targetsForThisRun = context.offTargetNodes;
             break;
 
         default:

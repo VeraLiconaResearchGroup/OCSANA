@@ -46,14 +46,14 @@ import org.compsysmed.ocsana.internal.util.tunables.ListTargetsToActivateSelecte
  * ScoringStageController which handles scoring tasks.
  **/
 public class ScoringStageContext {
-    // User options as Tunables
-    @ContainsTunables
-    public ListTargetsToActivateSelecter targetsSelecter;
+    public Set<CyNode> targetsToDeactivate;
+    public Set<CyNode> targetsToActivate;
 
     // Internal data
     private CyNetwork network;
     private CIStageContext ciContext;
     private CIStageResults ciResults;
+    private Collection<CyNode> targets;
 
     public AbstractCISignAssignmentAlgorithm ciSignAlgorithm;
 
@@ -64,21 +64,16 @@ public class ScoringStageContext {
         this.ciContext = ciContext;
         this.ciResults = ciResults;
 
-        Collection<CyNode> targets = ciContext.nodeSetSelecter.getTargetNodes();
-        CyColumn nodeNameColumn = ciContext.getNodeNameColumn();
-        targetsSelecter = new ListTargetsToActivateSelecter(network, targets, nodeNameColumn);
+        targets = ciContext.targetNodes;
+        targetsToActivate = new HashSet<>(targets);
+        updateTargetsToDeactivate();
 
         BiFunction<CyNode, CyNode, Double> effectOnTargets = (source, target) -> ciContext.ocsanaAlg.effectOnTargetsScore(source, target);
         ciSignAlgorithm = new ExhaustiveSearchCISignAssignmentAlgorithm(effectOnTargets);
     }
 
-    public Set<CyNode> targetsToActivate () {
-        return new HashSet<>(targetsSelecter.getTargetsToActivate());
-    }
-
-    public Set<CyNode> targetsToDeActivate () {
-        Set<CyNode> result = targetsToActivate();
-        result.removeAll(targetsToActivate());
-        return result;
+    private void updateTargetsToDeactivate () {
+        targetsToDeactivate = new HashSet<>(targets);
+        targetsToDeactivate.removeAll(targetsToActivate);
     }
 }

@@ -58,8 +58,8 @@ public class MHSAlgorithmTask extends AbstractOCSANATask {
         taskMonitor.setStatusMessage(String.format("Converting %d paths to node sets.", ciResults.pathsToTargets.size()));
         Long preConversionTime = System.nanoTime();
         List<Set<CyNode>> nodeSets = new ArrayList<>();
-        Set<CyNode> sourceNodes = ciContext.nodeSetSelecter.getSourceNodeSet();
-        Set<CyNode> targetNodes = ciContext.nodeSetSelecter.getTargetNodeSet();
+        Set<CyNode> sourceNodes = ciContext.sourceNodes;
+        Set<CyNode> targetNodes = ciContext.targetNodes;
 
         for (List<CyEdge> path: ciResults.pathsToTargets) {
             Set<CyNode> nodes = new HashSet<>();
@@ -97,7 +97,7 @@ public class MHSAlgorithmTask extends AbstractOCSANATask {
         Long preMHSTime = System.nanoTime();
         Collection<Set<CyNode>> MHSes = ciContext.mhsAlg.MHSes(nodeSets);
 
-        ciResults.CIs = MHSes.stream().map(mhs -> new CombinationOfInterventions(mhs, targetNodes, node -> ciContext.nodeString(node))).collect(Collectors.toList());
+        ciResults.CIs = MHSes.stream().map(mhs -> new CombinationOfInterventions(mhs, targetNodes, node -> ciContext.nodeNameHandler.getNodeName(node))).collect(Collectors.toList());
         Long postMHSTime = System.nanoTime();
 
         Double mhsTime = (postMHSTime - preMHSTime) / 1E9;

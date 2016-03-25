@@ -58,9 +58,9 @@ public class CISignAssignmentTask
 
     @Override
     public void run (TaskMonitor taskMonitor) {
-        signedInterventions = scoringContext.ciSignAlgorithm.bestInterventions(ci, scoringContext.targetsToActivate());
+        signedInterventions = scoringContext.ciSignAlgorithm.bestInterventions(ci, scoringContext.targetsToActivate);
         ci.setOptimalSignings(signedInterventions);
-        ci.setTargetsToActivate(scoringContext.targetsToActivate());
+        ci.setTargetsToActivate(scoringContext.targetsToActivate);
     }
 
     @Override
