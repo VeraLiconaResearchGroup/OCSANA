@@ -73,7 +73,7 @@ public class OCSANAControlPanel
         this.panelTaskManager = panelTaskManager;
         this.cyControlPanel = cySwingApplication.getCytoPanel(getCytoPanelName());
 
-        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         buildPanel(cyApplicationManager.getCurrentNetwork());
     }
 

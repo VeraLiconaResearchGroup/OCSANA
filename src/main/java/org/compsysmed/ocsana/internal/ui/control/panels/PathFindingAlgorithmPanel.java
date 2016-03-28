@@ -61,13 +61,12 @@ public class PathFindingAlgorithmPanel
         this.ciStageContext = ciStageContext;
         this.taskManager = taskManager;
 
-        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         add(makeHeader("Configure path-finding"));
 
         // Algorithm selecter
         algSelectionPanel = new JPanel();
-        algSelectionPanel.setLayout(new BoxLayout(algSelectionPanel, BoxLayout.LINE_AXIS));
         add(algSelectionPanel);
 
         algSelectionPanel.add(new JLabel("Algorithm:"));

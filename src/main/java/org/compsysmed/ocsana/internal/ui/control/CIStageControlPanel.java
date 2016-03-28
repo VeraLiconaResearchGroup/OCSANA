@@ -81,7 +81,7 @@ public class CIStageControlPanel
         this.resultsPanel = resultsPanel;
         this.taskManager = taskManager;
 
-        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         ciStageContext = new CIStageContext(network);
 
@@ -140,7 +140,7 @@ public class CIStageControlPanel
      **/
     private JPanel getContextPanel () {
         JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
         networkConfigPanel = new CINetworkConfigurationPanel(ciStageContext, taskManager);
         panel.add(networkConfigPanel);

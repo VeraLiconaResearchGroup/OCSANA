@@ -66,7 +66,6 @@ public class ListNodeSetSelecter
      * Build the JPanel after the constructors populate the data
      **/
     private void draw () {
-        setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
         JLabel title = new JLabel(label);
         add(title);
 

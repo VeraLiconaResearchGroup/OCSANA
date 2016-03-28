@@ -81,10 +81,10 @@ public class ScoringStageControlPanel
 
         listeners = new ArrayList<>();
 
-        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         optionsPanel = new JPanel();
-        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
+        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
         add(optionsPanel);
 
         JButton runScoringStageButton = new JButton("Run scoring stage computations");

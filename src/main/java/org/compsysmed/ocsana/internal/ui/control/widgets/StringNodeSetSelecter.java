@@ -59,7 +59,6 @@ public class StringNodeSetSelecter
      * Build the JPanel after the constructors populate the data
      **/
     private void draw () {
-        setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
         JLabel title = new JLabel(label);
         add(title);
 
@@ -76,7 +75,7 @@ public class StringNodeSetSelecter
     @Override
     public void setSelectedNodes (Set<CyNode> selectedNodes) {
         if (nodeSetStringField == null) {
-            nodeSetStringField = new JTextField();
+            nodeSetStringField = new JTextField(20);
         }
 
         String nodeSetString = selectedNodes.stream().map(node -> nodeNameHandler.getNodeName(node)).collect(Collectors.joining(", "));

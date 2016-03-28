@@ -57,7 +57,7 @@ public class ScoringNetworkConfigurationPanel
         this.scoringStageContext = scoringStageContext;
         this.taskManager = taskManager;
 
-        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         add(makeHeader("Configure network processing"));
 

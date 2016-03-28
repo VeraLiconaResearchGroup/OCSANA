@@ -17,7 +17,6 @@ import java.util.*;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-
 abstract public class AbstractOCSANASubPanel
     extends JPanel {
     /**

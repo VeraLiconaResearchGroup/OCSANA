@@ -70,13 +70,13 @@ public class CINetworkConfigurationPanel
         this.ciStageContext = ciStageContext;
         this.taskManager = taskManager;
 
-        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         // Selection mode selection widgets
-        add(makeHeader("Configure network processing"));
+        JLabel header = makeHeader("Configure network processing");
+        add(header);
 
         modePanel = new JPanel();
-        modePanel.setLayout(new BoxLayout(modePanel, BoxLayout.LINE_AXIS));
         add(modePanel);
 
         modePanel.add(new JLabel("Selection mode"));
@@ -87,7 +87,6 @@ public class CINetworkConfigurationPanel
         modePanel.add(nodeSelectionModeSelecter);
 
         columnPanel = new JPanel();
-        columnPanel.setLayout(new BoxLayout(columnPanel, BoxLayout.LINE_AXIS));
         add(columnPanel);
 
         columnPanel.add(new JLabel("Node name column"));
@@ -98,7 +97,8 @@ public class CINetworkConfigurationPanel
 
         // Node set selection widgets
         nodeSetsPanel = new JPanel();
-        nodeSetsPanel.setLayout(new BoxLayout(nodeSetsPanel, BoxLayout.PAGE_AXIS));
+        nodeSetsPanel.setLayout(new BoxLayout(nodeSetsPanel, BoxLayout.Y_AXIS));
+
         add(nodeSetsPanel);
 
         populateSetsPanelWithListSelecters(nodeSetsPanel);
