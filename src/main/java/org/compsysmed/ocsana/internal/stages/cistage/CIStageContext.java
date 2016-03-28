@@ -56,10 +56,8 @@ public class CIStageContext {
 
     public EdgeProcessor edgeProcessor;
 
-    @ContainsTunables
     public AbstractPathFindingAlgorithm pathFindingAlg;
 
-    @ContainsTunables
     public AbstractMHSAlgorithm mhsAlg;
     public Boolean includeEndpointsInCIs = false;
 

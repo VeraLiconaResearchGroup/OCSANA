@@ -1,7 +1,7 @@
 /**
- * Panel containing node set selecters for CI stage
+ * Panel containing network configuration for CI stage
  *
- * Copyright Vera-Licona Research Group (C) 2015
+ * Copyright Vera-Licona Research Group (C) 2016
  *
  * This software is licensed under the Artistic License 2.0, see the
  * LICENSE file or
@@ -26,18 +26,21 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.cytoscape.work.swing.PanelTaskManager;
+
 // OCSANA imports
 import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
 
 import org.compsysmed.ocsana.internal.ui.control.widgets.*;
 
 /**
- * Subpanel for user selection of node sets (sources, targets, and off-targets)
+ * Subpanel for user configuration of network parameters in CI stage
  **/
-public class CINodeSetsPanel
+public class CINetworkConfigurationPanel
     extends AbstractOCSANASubPanel
     implements ActionListener {
     private CIStageContext ciStageContext;
+    private PanelTaskManager taskManager;
 
     // UI elements
     private static final String listMode = "List";
@@ -59,14 +62,18 @@ public class CINodeSetsPanel
      * Constructor
      *
      * @param ciStageContext  the context for the CI stage
+     * @param taskManager  a PanelTaskManager to provide @Tunable panels
      **/
-    public CINodeSetsPanel (CIStageContext ciStageContext) {
+    public CINetworkConfigurationPanel (CIStageContext ciStageContext,
+                                        PanelTaskManager taskManager) {
         // Initial setup
         this.ciStageContext = ciStageContext;
+        this.taskManager = taskManager;
+
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
         // Selection mode selection widgets
-        add(makeHeader("Select node sets"));
+        add(makeHeader("Configure network processing"));
 
         modePanel = new JPanel();
         modePanel.setLayout(new BoxLayout(modePanel, BoxLayout.LINE_AXIS));
@@ -95,6 +102,9 @@ public class CINodeSetsPanel
         add(nodeSetsPanel);
 
         populateSetsPanelWithListSelecters(nodeSetsPanel);
+
+        // Edge processor
+        add(taskManager.getConfiguration(null, ciStageContext.edgeProcessor));
     }
 
     @Override

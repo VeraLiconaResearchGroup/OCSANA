@@ -19,8 +19,6 @@ import java.awt.event.ActionListener;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -29,8 +27,9 @@ import org.cytoscape.model.CyNetwork;
 
 import org.cytoscape.work.FinishStatus;
 import org.cytoscape.work.ObservableTask;
-import org.cytoscape.work.TaskManager;
 import org.cytoscape.work.TaskObserver;
+
+import org.cytoscape.work.swing.PanelTaskManager;
 
 // OCSANA imports
 import org.compsysmed.ocsana.internal.algorithms.mhs.*;
@@ -53,7 +52,7 @@ public class CIStageControlPanel
     public static final String END_CI_SIGNAL = "CI task end";
 
     private OCSANAResultsPanel resultsPanel;
-    private TaskManager taskManager;
+    private PanelTaskManager taskManager;
 
     private CIStageContext ciStageContext;
     private CIStageResults ciStageResults;
@@ -64,9 +63,9 @@ public class CIStageControlPanel
     // UI elements
     private Collection<AbstractOCSANASubPanel> subpanels;
 
-    private CINodeSetsPanel ciNodeSetsPanel;
-    private JComboBox mhsAlgorithm;
-    private JCheckBox includeEndpointsInCIs;
+    private CINetworkConfigurationPanel networkConfigPanel;
+    private PathFindingAlgorithmPanel pathFindingAlgorithmPanel;
+    private MHSAlgorithmPanel mhsAlgorithmPanel;
 
     /**
      * Constructor.
@@ -77,7 +76,7 @@ public class CIStageControlPanel
      **/
     public CIStageControlPanel (CyNetwork network,
                                 OCSANAResultsPanel resultsPanel,
-                                TaskManager taskManager) {
+                                PanelTaskManager taskManager) {
         this.network = network;
         this.resultsPanel = resultsPanel;
         this.taskManager = taskManager;
@@ -143,22 +142,17 @@ public class CIStageControlPanel
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 
-        ciNodeSetsPanel = new CINodeSetsPanel(ciStageContext);
-        panel.add(ciNodeSetsPanel);
-        subpanels.add(ciNodeSetsPanel);
+        networkConfigPanel = new CINetworkConfigurationPanel(ciStageContext, taskManager);
+        panel.add(networkConfigPanel);
+        subpanels.add(networkConfigPanel);
 
-        panel.add(new JLabel("MHS algorithm"));
+        pathFindingAlgorithmPanel = new PathFindingAlgorithmPanel(ciStageContext, taskManager);
+        panel.add(pathFindingAlgorithmPanel);
+        subpanels.add(pathFindingAlgorithmPanel);
 
-        List<AbstractMHSAlgorithm> mhsAlgorithms = new ArrayList<>();
-        mhsAlgorithms.add(new MMCSAlgorithm());
-        mhsAlgorithms.add(new RSAlgorithm());
-        mhsAlgorithms.add(new BergeAlgorithm());
-
-        mhsAlgorithm = new JComboBox(mhsAlgorithms.toArray());
-        panel.add(mhsAlgorithm);
-
-        includeEndpointsInCIs = new JCheckBox("Allow sources and targets in CIs", ciStageContext.includeEndpointsInCIs);
-        panel.add(includeEndpointsInCIs);
+        mhsAlgorithmPanel = new MHSAlgorithmPanel(ciStageContext, taskManager);
+        panel.add(mhsAlgorithmPanel);
+        subpanels.add(mhsAlgorithmPanel);
 
         return panel;
     }
@@ -170,9 +164,6 @@ public class CIStageControlPanel
         for (AbstractOCSANASubPanel subpanel: subpanels) {
             subpanel.updateContext();
         }
-
-        ciStageContext.mhsAlg = (AbstractMHSAlgorithm) mhsAlgorithm.getSelectedItem();
-        ciStageContext.includeEndpointsInCIs = includeEndpointsInCIs.isSelected();
     }
 
     /**
@@ -183,12 +174,9 @@ public class CIStageControlPanel
 
         signalStartOfCITask();
 
-        System.out.println(String.format("Beep! include: %s", ciStageContext.includeEndpointsInCIs));
-        System.out.println(String.format("Selected %d source nodes, %d target nodes, and %d off-target nodes", ciStageContext.sourceNodes.size(), ciStageContext.targetNodes.size(), ciStageContext.offTargetNodes.size()));
-
         CIStageRunnerTaskFactory runnerTaskFactory
             = new CIStageRunnerTaskFactory(taskManager, this, ciStageContext, resultsPanel);
-        //taskManager.execute(runnerTaskFactory.createTaskIterator(), this);
+        taskManager.execute(runnerTaskFactory.createTaskIterator(), this);
     }
 
     private void signalStartOfCITask () {

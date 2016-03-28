@@ -1,7 +1,7 @@
 /**
  * Abstract base class for OCSANA control subpanels
  *
- * Copyright Vera-Licona Research Group (C) 2015
+ * Copyright Vera-Licona Research Group (C) 2016
  *
  * This software is licensed under the Artistic License 2.0, see the
  * LICENSE file or
