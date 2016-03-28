@@ -42,6 +42,8 @@ import org.compsysmed.ocsana.internal.tasks.scoring.CISignAssignmentTaskFactory;
 
 import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
 
+import org.compsysmed.ocsana.internal.ui.control.panels.*;
+
 import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
 
 /**
@@ -53,7 +55,7 @@ public class ScoringStageControlPanel
     public static final String END_SIGN_ASSIGNMENT_SIGNAL = "Sign assignment task end";
 
     private OCSANAResultsPanel resultsPanel;
-    private PanelTaskManager panelTaskManager;
+    private PanelTaskManager taskManager;
 
     private List<ActionListener> listeners;
 
@@ -64,21 +66,26 @@ public class ScoringStageControlPanel
     private CIStageContext ciContext;
     private CIStageResults ciResults;
 
-    private JPanel tunablePanel;
+    private Collection<AbstractOCSANASubPanel> subpanels;
+    private JPanel optionsPanel;
+    private ScoringNetworkConfigurationPanel networkConfigPanel;
 
     public ScoringStageControlPanel (CyNetwork network,
                                      OCSANAResultsPanel resultsPanel,
-                                     PanelTaskManager panelTaskManager) {
+                                     PanelTaskManager taskManager) {
         this.network = network;
         this.resultsPanel = resultsPanel;
-        this.panelTaskManager = panelTaskManager;
+        this.taskManager = taskManager;
+
+        subpanels = new ArrayList<>();
 
         listeners = new ArrayList<>();
 
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
-        tunablePanel = new JPanel();
-        add(tunablePanel);
+        optionsPanel = new JPanel();
+        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
+        add(optionsPanel);
 
         JButton runScoringStageButton = new JButton("Run scoring stage computations");
         add(runScoringStageButton);
@@ -102,21 +109,33 @@ public class ScoringStageControlPanel
         this.ciContext = ciContext;
         this.ciResults = ciResults;
 
-        tunablePanel.removeAll();
+        optionsPanel.removeAll();
+        subpanels.clear();
 
         scoringContext = new ScoringStageContext(network, ciContext, ciResults);
-        JPanel setupPanel = panelTaskManager.getConfiguration(null, scoringContext);
-        tunablePanel.add(setupPanel);
 
-        tunablePanel.revalidate();
-        tunablePanel.repaint();
+        networkConfigPanel = new ScoringNetworkConfigurationPanel(ciContext, scoringContext, taskManager);
+        optionsPanel.add(networkConfigPanel);
+        subpanels.add(networkConfigPanel);
+
+        optionsPanel.revalidate();
+        optionsPanel.repaint();
+    }
+
+    /**
+     * Update the ScoringStageContext with the settings in the UI
+     **/
+    private void updateContext () {
+        for (AbstractOCSANASubPanel subpanel: subpanels) {
+            subpanel.updateContext();
+        }
     }
 
     /**
      * Spawn the scoring stage task
      **/
     private void runScoringTasks () {
-        panelTaskManager.validateAndApplyTunables(scoringContext);
+        updateContext();
 
         TaskIterator signAssignmentTasks = new TaskIterator();
 
@@ -127,7 +146,7 @@ public class ScoringStageControlPanel
         }
 
         if (signAssignmentTasks.hasNext()) {
-            panelTaskManager.execute(signAssignmentTasks, this);
+            taskManager.execute(signAssignmentTasks, this);
         }
     }
 

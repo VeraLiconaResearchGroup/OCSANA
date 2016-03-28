@@ -54,8 +54,6 @@ public class NodeNameHandler {
             String nodeName = getNodeName(node);
             nodeNamesMap.put(nodeName, node);
         }
-
-        System.out.println(String.format("Populated node name handler with %d nodes with names from column %s (example: %s)", nodeNamesMap.size(), nodeNameColumn.getName(), nodeNamesMap.keySet().stream().findFirst().get()));
     }
 
     /**

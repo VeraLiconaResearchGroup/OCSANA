@@ -72,6 +72,11 @@ public class ScoringStageContext {
         ciSignAlgorithm = new ExhaustiveSearchCISignAssignmentAlgorithm(effectOnTargets);
     }
 
+    public void setTargetsToActivate (Set<CyNode> targetsToActivate) {
+        this.targetsToActivate = targetsToActivate;
+        updateTargetsToDeactivate();
+    }
+
     private void updateTargetsToDeactivate () {
         targetsToDeactivate = new HashSet<>(targets);
         targetsToDeactivate.removeAll(targetsToActivate);
