@@ -59,7 +59,7 @@ public class InterventionDetailsDialog
         InterventionDisplayPanel displayPanel = new InterventionDisplayPanel();
         add(displayPanel, BorderLayout.CENTER);
 
-        if (ci.getOptimalSignings().size() > 1) {
+        if (ci.getOptimalSignings().size() >= 1) {
             InterventionSelectionPanel selectionPanel = new InterventionSelectionPanel(ci, displayPanel);
             add(selectionPanel, BorderLayout.LINE_END);
         } else {
@@ -111,6 +111,9 @@ public class InterventionDetailsDialog
 
             JLabel testLabel = new JLabel(intervention.getCI().interventionNodesString());
             add(testLabel);
+
+            JLabel activationLabel = new JLabel("Activated nodes: " + intervention.getCI().nodeSetString(intervention.getInterventionNodesToActivate()));
+            add(activationLabel);
 
             revalidate();
             repaint();
