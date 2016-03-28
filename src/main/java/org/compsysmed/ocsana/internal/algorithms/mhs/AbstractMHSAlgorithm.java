@@ -15,8 +15,6 @@ import java.util.*;
 
 // Cytoscape imports
 import org.cytoscape.model.CyNode;
-import org.cytoscape.model.CyNetwork;
-
 // OCSANA imports
 import org.compsysmed.ocsana.internal.algorithms.AbstractOCSANAAlgorithm;
 

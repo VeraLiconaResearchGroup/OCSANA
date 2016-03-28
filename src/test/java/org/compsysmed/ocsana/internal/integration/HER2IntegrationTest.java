@@ -23,8 +23,6 @@ import org.cytoscape.model.CyEdge;
 import org.compsysmed.ocsana.internal.algorithms.path.AbstractPathFindingAlgorithm;
 import org.compsysmed.ocsana.internal.algorithms.path.AllNonSelfIntersectingPathsAlgorithm;
 
-import org.compsysmed.ocsana.internal.algorithms.scoring.OCSANAScoringAlgorithm;
-
 import org.compsysmed.ocsana.internal.algorithms.mhs.AbstractMHSAlgorithm;
 import org.compsysmed.ocsana.internal.algorithms.mhs.MMCSAlgorithm;
 

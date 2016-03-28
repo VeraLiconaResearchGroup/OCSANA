@@ -4,7 +4,7 @@
  * Copyright Vera-Licona Research Group (C) 2015
  **/
 
-package org.compsysmed.ocsana.internal.algorithms.paths;
+package org.compsysmed.ocsana.internal.algorithms.path;
 
 // JUnit imports
 import org.junit.*;

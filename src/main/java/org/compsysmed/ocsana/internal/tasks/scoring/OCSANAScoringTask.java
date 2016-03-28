@@ -11,8 +11,6 @@
 
 package org.compsysmed.ocsana.internal.tasks.scoring;
 
-// Java imports
-import java.util.*;
 import java.util.function.Predicate;
 
 // Cytoscape imports

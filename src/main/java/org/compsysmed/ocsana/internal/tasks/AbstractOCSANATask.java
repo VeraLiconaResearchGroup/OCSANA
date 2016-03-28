@@ -12,7 +12,6 @@
 package org.compsysmed.ocsana.internal.tasks;
 
 // Java imports
-import java.util.*;
 
 // Cytoscape imports
 import org.cytoscape.model.CyNetwork;
@@ -20,9 +19,6 @@ import org.cytoscape.model.CyNetwork;
 import org.cytoscape.task.AbstractNetworkTask;
 
 import org.cytoscape.work.ObservableTask;
-
-// OCSANA imports
-import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
 
 /**
  * Abstract base class for OCSANA tasks.

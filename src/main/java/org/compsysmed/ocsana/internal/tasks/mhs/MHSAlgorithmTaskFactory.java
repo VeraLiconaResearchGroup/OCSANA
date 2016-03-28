@@ -12,7 +12,6 @@
 package org.compsysmed.ocsana.internal.tasks.mhs;
 
 // Java imports
-import java.util.*;
 
 // Cytoscape imports
 import org.cytoscape.work.AbstractTaskFactory;
