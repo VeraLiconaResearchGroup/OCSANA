@@ -86,7 +86,7 @@ public class InterventionDetailsDialog
             signedInterventionSelecter.addActionListener(new ActionListener(){
                     @Override
                     public void actionPerformed (ActionEvent event) {
-                        JComboBox source = (JComboBox) event.getSource();
+                        JComboBox<SignedIntervention> source = (JComboBox<SignedIntervention>) event.getSource();
                         SignedIntervention intervention = (SignedIntervention) source.getSelectedItem();
                         displayIntervention(intervention);
                     }

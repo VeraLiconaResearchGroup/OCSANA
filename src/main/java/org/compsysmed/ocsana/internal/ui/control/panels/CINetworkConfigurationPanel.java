@@ -47,10 +47,10 @@ public class CINetworkConfigurationPanel
     private static final String stringMode = "String";
 
     private JPanel modePanel;
-    private JComboBox nodeSelectionModeSelecter;
+    private JComboBox<String> nodeSelectionModeSelecter;
 
     private JPanel columnPanel;
-    private JComboBox nodeNameColumnSelecter;
+    private JComboBox<CyColumn> nodeNameColumnSelecter;
 
     private JPanel nodeSetsPanel;
 
@@ -82,7 +82,7 @@ public class CINetworkConfigurationPanel
         modePanel.add(new JLabel("Selection mode"));
 
         String[] modes = {listMode, stringMode};
-        nodeSelectionModeSelecter = new JComboBox(modes);
+        nodeSelectionModeSelecter = new JComboBox<>(modes);
         nodeSelectionModeSelecter.addActionListener(this);
         modePanel.add(nodeSelectionModeSelecter);
 
@@ -91,7 +91,7 @@ public class CINetworkConfigurationPanel
 
         columnPanel.add(new JLabel("Node name column"));
         CyColumn[] nodeNameColumns = ciStageContext.getNetwork().getDefaultNodeTable().getColumns().stream().toArray(CyColumn[]::new);
-        nodeNameColumnSelecter = new JComboBox(nodeNameColumns);
+        nodeNameColumnSelecter = new JComboBox<>(nodeNameColumns);
         nodeNameColumnSelecter.addActionListener(this);
         columnPanel.add(nodeNameColumnSelecter);
 

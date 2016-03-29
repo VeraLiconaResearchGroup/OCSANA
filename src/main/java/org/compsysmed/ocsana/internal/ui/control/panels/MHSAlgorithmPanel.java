@@ -46,7 +46,7 @@ public class MHSAlgorithmPanel
 
     // UI elements
     private JPanel algSelectionPanel;
-    private JComboBox algorithmSelecter;
+    private JComboBox<AbstractMHSAlgorithm> algorithmSelecter;
     private JCheckBox includeEndpointsInCIs;
 
     private JPanel tunablePanel;
@@ -78,7 +78,7 @@ public class MHSAlgorithmPanel
         algorithms.add(new RSAlgorithm());
         algorithms.add(new BergeAlgorithm());
 
-        algorithmSelecter = new JComboBox(algorithms.toArray());
+        algorithmSelecter = new JComboBox<>(algorithms.toArray(new AbstractMHSAlgorithm[algorithms.size()]));
         algSelectionPanel.add(algorithmSelecter);
         algorithmSelecter.addActionListener(this);
 

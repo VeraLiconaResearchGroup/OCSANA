@@ -45,7 +45,7 @@ public class PathFindingAlgorithmPanel
 
     // UI elements
     private JPanel algSelectionPanel;
-    private JComboBox algorithmSelecter;
+    private JComboBox<AbstractPathFindingAlgorithm> algorithmSelecter;
 
     private JPanel tunablePanel;
 
@@ -75,7 +75,7 @@ public class PathFindingAlgorithmPanel
         algorithms.add(new AllNonSelfIntersectingPathsAlgorithm(ciStageContext.getNetwork()));
         algorithms.add(new ShortestPathsAlgorithm(ciStageContext.getNetwork()));
 
-        algorithmSelecter = new JComboBox(algorithms.toArray());
+        algorithmSelecter = new JComboBox<>(algorithms.toArray(new AbstractPathFindingAlgorithm[algorithms.size()]));
         algSelectionPanel.add(algorithmSelecter);
         algorithmSelecter.addActionListener(this);
 
