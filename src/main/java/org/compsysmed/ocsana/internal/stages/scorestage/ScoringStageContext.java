@@ -36,8 +36,6 @@ import org.compsysmed.ocsana.internal.algorithms.scoring.ExhaustiveSearchCISignA
 import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
 import org.compsysmed.ocsana.internal.stages.cistage.CIStageResults;
 
-import org.compsysmed.ocsana.internal.util.tunables.ListTargetsToActivateSelecter;
-
 /**
  * Context for the scoring stage of OCSANA
  *
