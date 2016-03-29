@@ -19,6 +19,7 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -30,16 +31,12 @@ import org.cytoscape.util.swing.LookAndFeelUtil;
 /**
  * Wrapper class for OCSANA dialog boxes
  * <p>
- *
  * This class provides a lightweight convenience wrapper which ensures
  * a unified look-and-feel for OCSANA dialogs. This includes a
  * standardized BorderLayout and a "Close" button with hotkey support.
  **/
 public class OCSANADialog
     extends JDialog {
-    protected JButton closeButton;
-    protected JPanel buttonPanel;
-
     /**
      * Constructor
      * <p>
@@ -56,31 +53,27 @@ public class OCSANADialog
 
         setLocationRelativeTo(parentFrame);
 
-        rebuild();
+        setVisible(true);
     }
 
-    private void rebuild () {
-        closeButton = new JButton(new AbstractAction("Close") {
+    /**
+     * Construct a panel containing standard buttons, including a
+     * "close" button which is set as the default for ESC keypresses
+     **/
+    protected JPanel getButtonPanel () {
+        JButton closeButton = new JButton(new AbstractAction("Close") {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     dispose();
                 }
             });
 
-        buttonPanel = new JPanel();
-        buttonPanel.add(closeButton, BorderLayout.LINE_END);
-
-        add(buttonPanel, BorderLayout.PAGE_END);
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(closeButton);
 
         LookAndFeelUtil.setDefaultOkCancelKeyStrokes(getRootPane(), closeButton.getAction(), closeButton.getAction());
         getRootPane().setDefaultButton(closeButton);
 
-        setVisible(true);
-    }
-
-    @Override
-    public void removeAll () {
-        super.removeAll();
-        rebuild();
+        return buttonPanel;
     }
 }

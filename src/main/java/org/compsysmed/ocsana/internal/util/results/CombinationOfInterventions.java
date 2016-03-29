@@ -28,7 +28,7 @@ public class CombinationOfInterventions {
     private final Set<CyNode> targetNodes;
     private Set<CyNode> targetNodesToActivate;
 
-    private final Function<CyNode, String> nodeName;
+    private final Function<CyNode, String> nodeNameFunction;
 
     private Double classicalOCSANAScore;
 
@@ -39,15 +39,16 @@ public class CombinationOfInterventions {
      *
      * @param ciNodes  the nodes in this CI
      * @param targetNodes  the target nodes that this CI dominates
-     * @param nodeName function returning the name of a given node (if
-     * null, use Cytoscape's automatic name, which is based on SUID)
+     * @param nodeNameFunction  function returning the name of a given
+     * node (if null, use Cytoscape's automatic name, which is based
+     * on SUID)
      **/
     public CombinationOfInterventions (Set<CyNode> ciNodes,
                                        Set<CyNode> targetNodes,
-                                       Function<CyNode, String> nodeName) {
+                                       Function<CyNode, String> nodeNameFunction) {
         this.ciNodes = ciNodes;
         this.targetNodes = targetNodes;
-        this.nodeName = nodeName;
+        this.nodeNameFunction = nodeNameFunction;
     }
 
     /**
@@ -144,8 +145,8 @@ public class CombinationOfInterventions {
      * Return the name of a node
      **/
     public String nodeName (CyNode node) {
-        if (nodeName != null) {
-            return nodeName(node);
+        if (nodeNameFunction != null) {
+            return nodeNameFunction.apply(node);
         } else {
             return node.toString();
         }
@@ -159,7 +160,7 @@ public class CombinationOfInterventions {
      * @param nodes  the Collection of nodes
      **/
     public String nodeSetString(Collection<CyNode> nodes) {
-        return nodes.stream().map(nodeName).collect(Collectors.joining(", ", "[", "]"));
+        return nodes.stream().map(node -> nodeName(node)).collect(Collectors.joining(", ", "[", "]"));
     }
 
 }

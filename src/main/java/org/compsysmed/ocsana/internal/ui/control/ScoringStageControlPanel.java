@@ -66,7 +66,7 @@ public class ScoringStageControlPanel
     private CIStageContext ciContext;
     private CIStageResults ciResults;
 
-    private Collection<AbstractOCSANASubPanel> subpanels;
+    private Collection<AbstractControlSubPanel> subpanels;
     private JPanel optionsPanel;
     private ScoringNetworkConfigurationPanel networkConfigPanel;
 
@@ -126,7 +126,7 @@ public class ScoringStageControlPanel
      * Update the ScoringStageContext with the settings in the UI
      **/
     private void updateContext () {
-        for (AbstractOCSANASubPanel subpanel: subpanels) {
+        for (AbstractControlSubPanel subpanel: subpanels) {
             subpanel.updateContext();
         }
     }

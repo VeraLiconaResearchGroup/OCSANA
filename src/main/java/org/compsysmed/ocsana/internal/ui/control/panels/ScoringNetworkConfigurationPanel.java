@@ -35,7 +35,7 @@ import org.compsysmed.ocsana.internal.ui.control.widgets.*;
  * Subpanel for user configuration of network parameters in scoring stage
  **/
 public class ScoringNetworkConfigurationPanel
-    extends AbstractOCSANASubPanel {
+    extends AbstractControlSubPanel {
     private CIStageContext ciStageContext;
     private ScoringStageContext scoringStageContext;
     private PanelTaskManager taskManager;

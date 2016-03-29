@@ -61,7 +61,7 @@ public class CIStageControlPanel
     private List<ActionListener> listeners;
 
     // UI elements
-    private Collection<AbstractOCSANASubPanel> subpanels;
+    private Collection<AbstractControlSubPanel> subpanels;
 
     private CINetworkConfigurationPanel networkConfigPanel;
     private PathFindingAlgorithmPanel pathFindingAlgorithmPanel;
@@ -161,7 +161,7 @@ public class CIStageControlPanel
      * Update the CIStageContext members with the settings in the UI
      **/
     private void updateContext () {
-        for (AbstractOCSANASubPanel subpanel: subpanels) {
+        for (AbstractControlSubPanel subpanel: subpanels) {
             subpanel.updateContext();
         }
     }

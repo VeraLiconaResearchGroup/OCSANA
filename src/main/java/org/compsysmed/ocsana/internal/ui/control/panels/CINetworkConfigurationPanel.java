@@ -37,7 +37,7 @@ import org.compsysmed.ocsana.internal.ui.control.widgets.*;
  * Subpanel for user configuration of network parameters in CI stage
  **/
 public class CINetworkConfigurationPanel
-    extends AbstractOCSANASubPanel
+    extends AbstractControlSubPanel
     implements ActionListener {
     private CIStageContext ciStageContext;
     private PanelTaskManager taskManager;

@@ -39,7 +39,7 @@ import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
  * Subpanel for user configuration of MHS algorithm
  **/
 public class MHSAlgorithmPanel
-    extends AbstractOCSANASubPanel
+    extends AbstractControlSubPanel
     implements ActionListener {
     private CIStageContext ciStageContext;
     private PanelTaskManager taskManager;

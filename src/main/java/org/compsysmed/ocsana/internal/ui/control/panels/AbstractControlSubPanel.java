@@ -17,7 +17,7 @@ import java.util.*;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-abstract public class AbstractOCSANASubPanel
+abstract public class AbstractControlSubPanel
     extends JPanel {
     /**
      * Update the CIStageContext members with the settings in this subpanel

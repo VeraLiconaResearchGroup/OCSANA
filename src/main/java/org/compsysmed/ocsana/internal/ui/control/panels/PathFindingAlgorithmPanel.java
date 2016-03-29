@@ -38,7 +38,7 @@ import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
  * Subpanel for user configuration of path-finding algorithm
  **/
 public class PathFindingAlgorithmPanel
-    extends AbstractOCSANASubPanel
+    extends AbstractControlSubPanel
     implements ActionListener {
     private CIStageContext ciStageContext;
     private PanelTaskManager taskManager;
