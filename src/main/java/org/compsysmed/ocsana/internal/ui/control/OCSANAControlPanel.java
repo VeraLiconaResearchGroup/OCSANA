@@ -176,6 +176,7 @@ public class OCSANAControlPanel
     /**
      * Respond to an event
      **/
+    @Override
     public void actionPerformed (ActionEvent event) {
         switch (event.getActionCommand()) {
         case CIStageControlPanel.START_CI_SIGNAL:

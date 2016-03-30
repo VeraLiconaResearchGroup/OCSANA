@@ -1,0 +1,28 @@
+{% macro nodelist(nodes) %}
+    {% if nodes is empty %}
+    <b>None</b>
+    {% else %}
+    (Click node name for drugability report)
+    <ul>
+        {% for node in nodes %}
+        {# We attach a hyperlink whose URL encodes information about the node #}
+        <li><a href="http://ocsana.internal/node?suid={{node.getSUID()}}">{{node.name()}}</a></li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+{% endmacro %}
+
+<html>
+    <h3>Intervention nodes to activate:</h3>
+    {{ nodelist(nodesToActivate)}}
+
+    <h3>Intervention nodes to inhibit:</h3>
+    {{ nodelist(nodesToInhibit) }}
+
+    <h3>Effects on targets:</h3>
+    <ul>
+        {% for target in targets %}
+        <li>{{target.name()}}: {{target.score()}}</li>
+        {% endfor %}
+    </ul>
+</html>

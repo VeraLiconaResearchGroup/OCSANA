@@ -18,6 +18,8 @@ import java.util.*;
 import org.cytoscape.model.CyNode;
 
 // OCSANA imports
+import org.compsysmed.ocsana.internal.util.results.ScoredTargetNode;
+import org.compsysmed.ocsana.internal.util.results.SignedInterventionNode;
 
 /**
  * Class representing a signed intervention of a CI and its effects on
@@ -27,9 +29,11 @@ public class SignedIntervention {
     private final CombinationOfInterventions ci;
     private final Set<CyNode> interventionNodesToActivate;
     private final Set<CyNode> interventionNodesToInhibit;
+    private final Set<SignedInterventionNode> signedInterventionNodes;
 
     private final Set<CyNode> targetNodes;
     private final Map<CyNode, Double> effectsOnTargets;
+    private final Set<ScoredTargetNode> scoredTargetNodes;
 
     /**
      * Constructor
@@ -53,9 +57,26 @@ public class SignedIntervention {
         this.interventionNodesToActivate = interventionNodesToActivate;
         this.effectsOnTargets = effectsOnTargets;
 
-        this.targetNodes = effectsOnTargets.keySet();
         this.interventionNodesToInhibit = new HashSet<>(ci.getNodes());
         this.interventionNodesToInhibit.removeAll(interventionNodesToActivate);
+
+        signedInterventionNodes = new HashSet<>();
+        for (CyNode node: interventionNodesToActivate) {
+            SignedInterventionNode signedNode = new SignedInterventionNode(node, SignedInterventionNode.InterventionSign.POSITIVE, ci.nodeName(node));
+            signedInterventionNodes.add(signedNode);
+        }
+
+        for (CyNode node: interventionNodesToInhibit) {
+            SignedInterventionNode signedNode = new SignedInterventionNode(node, SignedInterventionNode.InterventionSign.NEGATIVE, ci.nodeName(node));
+            signedInterventionNodes.add(signedNode);
+        }
+
+        this.targetNodes = effectsOnTargets.keySet();
+        scoredTargetNodes = new HashSet<>();
+        for (CyNode target: targetNodes) {
+            ScoredTargetNode scoredTarget = new ScoredTargetNode(target, effectOnTarget(target), ci.nodeName(target));
+            scoredTargetNodes.add(scoredTarget);
+        }
     }
 
     /**
@@ -73,6 +94,13 @@ public class SignedIntervention {
     }
 
     /**
+     * Return the scored target nodes of this intervention
+     **/
+    public Set<ScoredTargetNode> getScoredTargetNodes () {
+        return scoredTargetNodes;
+    }
+
+    /**
      * Return the nodes which are activated in this intervention
      **/
     public Set<CyNode> getInterventionNodesToActivate () {
@@ -84,6 +112,13 @@ public class SignedIntervention {
      **/
     public Set<CyNode> getInterventionNodesToInhibit () {
         return interventionNodesToInhibit;
+    }
+
+    /**
+     * Return the signed nodes of the intervention
+     **/
+    public Set<SignedInterventionNode> getSignedInterventionNodes () {
+        return signedInterventionNodes;
     }
 
     /**

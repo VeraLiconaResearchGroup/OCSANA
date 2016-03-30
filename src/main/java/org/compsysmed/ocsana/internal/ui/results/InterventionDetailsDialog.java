@@ -20,14 +20,15 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 // Cytoscape imports
+import org.cytoscape.model.CyNetwork;
+import org.cytoscape.model.CyNode;
 
 // OCSANA improts
 import org.compsysmed.ocsana.internal.ui.OCSANADialog;
 
 import org.compsysmed.ocsana.internal.ui.results.panels.*;
 
-import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
-import org.compsysmed.ocsana.internal.util.results.SignedIntervention;
+import org.compsysmed.ocsana.internal.util.results.*;
 
 /**
  * Dialog presenting details of a given CombinationOfInterventions
@@ -35,6 +36,12 @@ import org.compsysmed.ocsana.internal.util.results.SignedIntervention;
 public class InterventionDetailsDialog
     extends OCSANADialog {
     private CombinationOfInterventions ci;
+    private CyNetwork network;
+
+    // UI elements
+    private JPanel contentPanel;
+    private SignedInterventionReportPanel signedInterventionPanel;
+    private DrugabilityReportPanel drugabilityPanel;
 
     /**
      * Constructor
@@ -46,29 +53,42 @@ public class InterventionDetailsDialog
      * @param ci  the CombinationOfInterventions
     **/
     public InterventionDetailsDialog (JFrame parentFrame,
+                                      CyNetwork network,
                                       CombinationOfInterventions ci) {
         super(parentFrame, "Intervention details report");
+        this.network = network;
         this.ci = ci;
 
         // Set up page skeleton
         setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 
-        JPanel contentPanel = new JPanel();
-        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.X_AXIS));
+        contentPanel = new JPanel();
         add(contentPanel);
         add(getButtonPanel());
 
-        // Add subpanels
-        if (ci.getOptimalSignings() == null) {
-            InterventionDisplayPanel ciPanel = new InterventionDisplayPanel(ci);
-            contentPanel.add(ciPanel);
-        } else {
+        signedInterventionPanel = new SignedInterventionReportPanel(this);
+        contentPanel.add(signedInterventionPanel);
+
+        if (ci.getOptimalSignings() != null && !ci.getOptimalSignings().isEmpty()) {
             SignedIntervention signedIntervention = ci.getOptimalSignings().stream().findFirst().get();
-            SignedInterventionDisplayPanel signedInterventionPanel = new SignedInterventionDisplayPanel(signedIntervention);
-            contentPanel.add(signedInterventionPanel);
+            signedInterventionPanel.updateIntervention(signedIntervention);
         }
 
         // Format for presentation
+        pack();
+    }
+
+    /**
+     * Respond to a node click event in the signed intervention dialog
+     * panel
+     **/
+    public void processNodeClick (SignedInterventionNode signedNode) {
+        if (drugabilityPanel == null) {
+            drugabilityPanel = new DrugabilityReportPanel();
+            contentPanel.add(drugabilityPanel);
+        }
+
+        drugabilityPanel.setNode(signedNode);
         pack();
     }
 }

@@ -106,7 +106,7 @@ public class CIPanel
 
         public void handleUserDoubleClick (Integer row) {
             CombinationOfInterventions ci = CIs.get(row);
-            InterventionDetailsDialog detailsDialog = new InterventionDetailsDialog(cytoscapeFrame, CIs.get(row));
+            InterventionDetailsDialog detailsDialog = new InterventionDetailsDialog(cytoscapeFrame, ciContext.getNetwork(), CIs.get(row));
         }
     }
 
