@@ -59,10 +59,10 @@ public class InterventionDetailsDialog
         add(getButtonPanel());
 
         // Add subpanels
-        InterventionDisplayPanel ciPanel = new InterventionDisplayPanel(ci);
-        contentPanel.add(ciPanel);
-
-        if (ci.getOptimalSignings() != null) {
+        if (ci.getOptimalSignings() == null) {
+            InterventionDisplayPanel ciPanel = new InterventionDisplayPanel(ci);
+            contentPanel.add(ciPanel);
+        } else {
             SignedIntervention signedIntervention = ci.getOptimalSignings().stream().findFirst().get();
             SignedInterventionDisplayPanel signedInterventionPanel = new SignedInterventionDisplayPanel(signedIntervention);
             contentPanel.add(signedInterventionPanel);

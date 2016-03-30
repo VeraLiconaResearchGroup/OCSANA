@@ -66,6 +66,13 @@ public class SignedIntervention {
     }
 
     /**
+     * Return the target nodes of this intervention
+     **/
+    public Set<CyNode> getTargetNodes () {
+        return targetNodes;
+    }
+
+    /**
      * Return the nodes which are activated in this intervention
      **/
     public Set<CyNode> getInterventionNodesToActivate () {
