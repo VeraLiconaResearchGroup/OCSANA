@@ -31,6 +31,7 @@ import org.compsysmed.ocsana.internal.util.science.*;
 public class DrugBankInteractionsDatabase {
     private static final String DRUGBANK_PATH = "/drugbank/drugbank.json";
     private static DrugBankInteractionsDatabase internalDB;
+
     private Map<String, Drug> drugsByID = new HashMap<>();
     private Map<String, Protein> proteinsByID = new HashMap<>();
     private Map<Drug, Collection<DrugProteinInteraction>> drugActions = new HashMap<>();
@@ -47,9 +48,9 @@ public class DrugBankInteractionsDatabase {
 
         // Process drug records
         JSONObject drugsJSON = drugBankJSON.getJSONObject("drugs");
-        Iterator drugKeys = drugsJSON.keys();
+        Iterator<String> drugKeys = drugsJSON.keys();
         while (drugKeys.hasNext()) {
-            String drugBankPrimaryID = (String) drugKeys.next();
+            String drugBankPrimaryID = drugKeys.next();
             JSONObject drugInformationJSON = drugsJSON.getJSONObject(drugBankPrimaryID);
 
             String drugName = drugInformationJSON.getString("name");
@@ -72,9 +73,9 @@ public class DrugBankInteractionsDatabase {
 
         // Process protein records
         JSONObject proteinsJSON = drugBankJSON.getJSONObject("proteins");
-        Iterator proteinKeys = proteinsJSON.keys();
+        Iterator<String> proteinKeys = proteinsJSON.keys();
         while (proteinKeys.hasNext()) {
-            String uniProtID = (String) proteinKeys.next();
+            String uniProtID = proteinKeys.next();
             JSONObject proteinInformationJSON = proteinsJSON.getJSONObject(uniProtID);
 
             String proteinName = proteinInformationJSON.getString("name");
