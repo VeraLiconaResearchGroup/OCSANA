@@ -83,7 +83,7 @@ public class DrugabilityReportPanel
         add(textPane);
 
         // Compile template
-        PebbleEngine engine = new PebbleEngine.Builder().strictVariables(true).build();
+        PebbleEngine engine = new PebbleEngine.Builder().build();
         try {
             compiledTemplate = engine.getTemplate("/home/andrew/documents/work/research/ocsana/OCSANA/src/main/resources/templates/DrugabilityReport.html");
         } catch (PebbleException e) {

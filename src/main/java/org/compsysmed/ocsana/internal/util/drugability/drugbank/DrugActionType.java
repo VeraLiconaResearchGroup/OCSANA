@@ -40,7 +40,7 @@ public enum DrugActionType {
     INCORPORATION_INTO_AND_DESTABILIZATION ("incorporation into and destabilization", InteractionSign.NEGATIVE),
     INDUCER ("inducer", InteractionSign.POSITIVE),
     INHIBITOR ("inhibitor", InteractionSign.NEGATIVE),
-    COMPETITIVE_INHIBITOR ("inhibitor (competitive)", InteractionSign.NEGATIVE),
+    COMPETITIVE_INHIBITOR ("inhibitor, competitive", InteractionSign.NEGATIVE),
     INHIBITORY_ALLOSTERIC_MODULATOR ("inhibitory allosteric modulator", InteractionSign.NEGATIVE),
     INTERCALATION ("intercalation", InteractionSign.NEGATIVE),
     INVERSE_AGONIST ("inverse agonist", InteractionSign.NEGATIVE),
@@ -50,6 +50,7 @@ public enum DrugActionType {
     NEGATIVE_MODULATOR ("negative modulator", InteractionSign.NEGATIVE),
     NEUTRALIZER ("neutralizer", InteractionSign.NEGATIVE),
     OTHER ("other", InteractionSign.UNSIGNED),
+    OTHER_UNKNOWN ("other/unknown", InteractionSign.UNSIGNED),
     PARTIAL_AGONIST ("partial agonist", InteractionSign.POSITIVE),
     PARTIAL_ANTAGONIST ("partial antagonist", InteractionSign.UNSIGNED),
     POSITIVE_ALLOSTERIC_MODULATOR ("positive allosteric modulator", InteractionSign.POSITIVE),
@@ -70,7 +71,7 @@ public enum DrugActionType {
     }
 
     public static DrugActionType getByDescription (String description) {
-        return lookupByDescription.get(description.toLowerCase());
+        return lookupByDescription.getOrDefault(description.toLowerCase(), null);
     }
 
     private String description;

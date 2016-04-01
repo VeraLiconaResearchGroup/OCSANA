@@ -29,9 +29,20 @@ public class DrugProteinInteraction {
     public DrugProteinInteraction (Drug drug,
                                    Protein protein,
                                    String action) {
+        if (drug == null) {
+            throw new IllegalArgumentException("Drug cannot be null");
+        }
         this.drug = drug;
+
+        if (protein == null) {
+            throw new IllegalArgumentException("Protein cannot be null");
+        }
         this.protein = protein;
+
         this.action = DrugActionType.getByDescription(action);
+        if (this.action == null) {
+            throw new IllegalArgumentException(String.format("Could not find action type for %s", action));
+        }
     }
 
     public Drug getDrug () {

@@ -17,7 +17,7 @@
         Known drug interactions (effect: {{sign}})
         <ul>
             {% for interaction in bundle.getAllInteractionsOfSign(sign) %}
-            <li><a href="{{interaction.getDrug().getDrugBankURL()}}">{{interaction.getDrug().getName()}}</a></li>
+            <li><a href="{{interaction.getDrug().getDrugBankURL()}}">{{interaction.getDrug().getName()}}</a> ({{interaction.getDrugActionType().getDescription()}})</li>
             {% endfor %}
         </ul>
         ({{bundle.getAllInteractionsNotOfSign(sign).size()}} other interactions are known. See <a href="{{interaction.getProtein().getDrugBankBioDBURL()}}">DrugBank BioDB page</a> for details.)

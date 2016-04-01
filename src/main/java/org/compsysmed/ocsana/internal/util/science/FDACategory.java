@@ -37,7 +37,7 @@ public enum FDACategory {
      * Return the FDACategory with a specified description
      **/
     public static FDACategory getByDescription (String description) {
-        return lookupByDescription.get(description.toLowerCase());
+        return lookupByDescription.getOrDefault(description.toLowerCase(), null);
     }
 
     private final String description;
