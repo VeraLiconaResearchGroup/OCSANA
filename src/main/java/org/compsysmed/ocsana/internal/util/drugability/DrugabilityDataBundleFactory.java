@@ -31,6 +31,9 @@ public class DrugabilityDataBundleFactory {
         drugBankDB = DrugBankInteractionsDatabase.getDB();
     }
 
+    /**
+     * Retrieve the singleton bundle factory, constructing it if necessary
+     **/
     public static synchronized DrugabilityDataBundleFactory getFactory () {
         if (factory == null) {
             factory = new DrugabilityDataBundleFactory();
@@ -44,11 +47,16 @@ public class DrugabilityDataBundleFactory {
      * UniProt ID.
      *
      * @param uniProtID  the UniProt ID of the protein.
+     * @return a bundle of all the drugability data available for the
+     * protein, if found, or null if not
      **/
     public DrugabilityDataBundle getBundleByUniProtID (String uniProtID) {
         Protein protein = drugBankDB.getProteinByID(uniProtID);
-        Collection<DrugProteinInteraction> interactions = drugBankDB.getInteractions(protein);
+        if (protein == null) {
+            return null;
+        }
 
+        Collection<DrugProteinInteraction> interactions = drugBankDB.getInteractions(protein);
         DrugabilityDataBundle bundle = new DrugabilityDataBundle(protein, interactions);
         return bundle;
     }

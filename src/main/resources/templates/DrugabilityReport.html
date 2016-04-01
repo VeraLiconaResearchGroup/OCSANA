@@ -1,3 +1,15 @@
 <html>
-    <h3>Drugability report for node {{node.name}}</h3>
+    <h3>Drugability report</h3>
+    <p>
+        Protein: <a href="{{bundle.getProtein().getUniProtURL()}}">{{bundle.getProtein().getName()}}</a>
+    </p>
+    <p>
+        {{sign}} known drug interactions:
+        <ul>
+            {% for interaction in bundle.getAllInteractionsOfSign(sign) %}
+            <li><a href="{{interaction.getDrug().getDrugBankURL()}}">{{interaction.getDrug().getName()}}</a></li>
+            {% endfor %}
+        </ul>
+        ({{bundle.getAllInteractionsNotOfSign(sign).size()}} other interactions are known. See UniProt page for details.)
+    </p>
 </html>

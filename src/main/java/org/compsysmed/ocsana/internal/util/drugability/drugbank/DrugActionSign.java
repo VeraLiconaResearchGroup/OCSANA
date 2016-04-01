@@ -12,7 +12,24 @@
 package org.compsysmed.ocsana.internal.util.drugability.drugbank;
 
 public enum DrugActionSign {
-    POSITIVE,
-    NEGATIVE,
-    UNSIGNED
+    POSITIVE ("positive", '+'),
+    NEGATIVE ("negative", '-'),
+    UNSIGNED ("unsigned", '±');
+
+    private final String description;
+    private final Character symbol;
+
+    private DrugActionSign (String description,
+                            Character symbol) {
+        this.description = description;
+        this.symbol = symbol;
+    }
+
+    public String getDescription () {
+        return description;
+    }
+
+    public Character getSymbol () {
+        return symbol;
+    }
 }

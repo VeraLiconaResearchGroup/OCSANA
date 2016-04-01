@@ -13,8 +13,13 @@ package org.compsysmed.ocsana.internal.ui.results.panels;
 
 // Java imports
 import java.io.*;
+
 import java.util.*;
 import java.util.stream.Collectors;
+
+import java.awt.Desktop;
+import java.net.URISyntaxException;
+import java.io.IOException;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -37,6 +42,8 @@ import org.cytoscape.model.CyNode;
 // OCSANA imports
 import org.compsysmed.ocsana.internal.util.results.*;
 
+import org.compsysmed.ocsana.internal.util.drugability.*;
+
 /**
  * Panel presenting drugability details for a particular node intervention
  * <p>
@@ -49,6 +56,8 @@ public class DrugabilityReportPanel
     private JTextPane textPane;
     private PebbleTemplate compiledTemplate;
 
+    private DrugabilityDataBundleFactory drugabilityDataBundleFactory;
+
     /**
      * Constructor
      **/
@@ -56,9 +65,24 @@ public class DrugabilityReportPanel
         // Set up dialog
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
+        drugabilityDataBundleFactory = DrugabilityDataBundleFactory.getFactory();
+
         textPane = new JTextPane();
         textPane.setContentType("text/html");
         textPane.setEditable(false);
+        textPane.addHyperlinkListener(new HyperlinkListener() {
+                public void hyperlinkUpdate(HyperlinkEvent e) {
+                    if(e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                        if(Desktop.isDesktopSupported()) {
+                            try {
+                                Desktop.getDesktop().browse(e.getURL().toURI());
+                            } catch (URISyntaxException|IOException ex) {
+                                throw new IllegalStateException(String.format("Handling HyperlinkEvent %s resulted in an error: %s", e, ex));
+                            }
+                        }
+                    }
+                }
+            });
         add(textPane);
 
         // Compile template
@@ -79,7 +103,11 @@ public class DrugabilityReportPanel
         // Set up data
         Map<String, Object> data = new HashMap<>();
 
-        data.put("node", node);
+        String uniProtID = node.getName();
+        DrugabilityDataBundle bundle = drugabilityDataBundleFactory.getBundleByUniProtID(uniProtID);
+
+        data.put("bundle", bundle);
+        data.put("sign", node.getSign());
 
         Writer writer = new StringWriter();
         try {
