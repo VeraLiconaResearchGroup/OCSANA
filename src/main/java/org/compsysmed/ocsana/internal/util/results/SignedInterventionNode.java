@@ -17,9 +17,9 @@ package org.compsysmed.ocsana.internal.util.results;
 import org.cytoscape.model.CyNode;
 
 public class SignedInterventionNode {
-    public final CyNode node;
-    public final InterventionSign sign;
-    public final String name;
+    private final CyNode node;
+    private final InterventionSign sign;
+    private final String name;
 
     public SignedInterventionNode (CyNode node,
                                    InterventionSign sign,
@@ -27,6 +27,18 @@ public class SignedInterventionNode {
         this.node = node;
         this.sign = sign;
         this.name = name;
+    }
+
+    public CyNode getNode () {
+        return node;
+    }
+
+    public InterventionSign getSign () {
+        return sign;
+    }
+
+    public String getName () {
+        return name;
     }
 
     public Long getSUID () {

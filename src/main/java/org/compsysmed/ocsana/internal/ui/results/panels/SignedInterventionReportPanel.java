@@ -87,7 +87,7 @@ public class SignedInterventionReportPanel
         List<SignedInterventionNode> nodesToInhibit = new ArrayList<>();
 
         for (SignedInterventionNode node: signedIntervention.getSignedInterventionNodes()) {
-            switch (node.sign) {
+            switch (node.getSign()) {
             case POSITIVE:
                 nodesToActivate.add(node);
                 break;
@@ -97,7 +97,7 @@ public class SignedInterventionReportPanel
                 break;
 
             default:
-                throw new IllegalStateException("Unknwno intervention sign " + node.sign);
+                throw new IllegalStateException("Unknown intervention sign " + node.getSign());
             }
 
             nodeBySUID.put(node.getSUID(), node);
