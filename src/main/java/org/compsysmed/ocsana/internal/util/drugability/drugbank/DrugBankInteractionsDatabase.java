@@ -170,7 +170,7 @@ public class DrugBankInteractionsDatabase {
      * @param drug  the drug
      **/
     public Collection<DrugProteinInteraction> getInteractions (Drug drug) {
-        return drugActions.get(drug);
+        return drugActions.getOrDefault(drug, new HashSet<>());
     }
 
     /**
@@ -179,6 +179,6 @@ public class DrugBankInteractionsDatabase {
      * @param protein  the protein
      **/
     public Collection<DrugProteinInteraction> getInteractions (Protein protein) {
-        return proteinActions.get(protein);
+        return proteinActions.getOrDefault(protein, new HashSet<>());
     }
 }
