@@ -30,6 +30,10 @@ import org.compsysmed.ocsana.internal.ui.results.panels.*;
 
 import org.compsysmed.ocsana.internal.util.results.*;
 
+import org.compsysmed.ocsana.internal.util.drugability.*;
+
+import org.compsysmed.ocsana.internal.util.science.*;
+
 /**
  * Dialog presenting details of a given CombinationOfInterventions
  **/
@@ -37,6 +41,7 @@ public class InterventionDetailsDialog
     extends OCSANADialog {
     private CombinationOfInterventions ci;
     private CyNetwork network;
+    private DrugabilityDataBundleFactory drugabilityDataBundleFactory;
 
     // UI elements
     private JPanel contentPanel;
@@ -58,6 +63,9 @@ public class InterventionDetailsDialog
         super(parentFrame, "Intervention details report");
         this.network = network;
         this.ci = ci;
+
+        drugabilityDataBundleFactory = DrugabilityDataBundleFactory.getFactory();
+
 
         // Set up page skeleton
         setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
@@ -88,7 +96,8 @@ public class InterventionDetailsDialog
             contentPanel.add(drugabilityPanel);
         }
 
-        drugabilityPanel.setNode(signedNode);
+        DrugabilityDataBundle bundle = drugabilityDataBundleFactory.getBundleByUniProtID(signedNode.getName());
+        drugabilityPanel.showReport(bundle, signedNode.getSign());
         pack();
     }
 }

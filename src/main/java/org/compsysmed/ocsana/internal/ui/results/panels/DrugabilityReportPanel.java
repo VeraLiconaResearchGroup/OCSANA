@@ -43,6 +43,7 @@ import org.cytoscape.model.CyNode;
 import org.compsysmed.ocsana.internal.util.results.*;
 
 import org.compsysmed.ocsana.internal.util.drugability.*;
+import org.compsysmed.ocsana.internal.util.science.*;
 
 /**
  * Panel presenting drugability details for a particular node intervention
@@ -56,16 +57,12 @@ public class DrugabilityReportPanel
     private JTextPane textPane;
     private PebbleTemplate compiledTemplate;
 
-    private DrugabilityDataBundleFactory drugabilityDataBundleFactory;
-
     /**
      * Constructor
      **/
     public DrugabilityReportPanel () {
         // Set up dialog
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-
-        drugabilityDataBundleFactory = DrugabilityDataBundleFactory.getFactory();
 
         textPane = new JTextPane();
         textPane.setContentType("text/html");
@@ -88,26 +85,26 @@ public class DrugabilityReportPanel
         // Compile template
         PebbleEngine engine = new PebbleEngine.Builder().strictVariables(true).build();
         try {
-            compiledTemplate = engine.getTemplate("templates/DrugabilityReport.html");
+            compiledTemplate = engine.getTemplate("/home/andrew/documents/work/research/ocsana/OCSANA/src/main/resources/templates/DrugabilityReport.html");
         } catch (PebbleException e) {
             throw new IllegalStateException("Could not load drugability report template. Please report the following error to the plugin author: " + e.getMessage());
         }
     }
 
     /**
-     * Display the report for a particular node
+     * Display the report for a particular protein with a particular
+     * intervention sign
      *
-     * @param node  the node
+     * @param bundle  the DrugabilityDataBundle for the protein
+     * @param sign  the sign
      **/
-    public void setNode (SignedInterventionNode node) {
+    public void showReport (DrugabilityDataBundle bundle,
+                            InteractionSign sign) {
         // Set up data
         Map<String, Object> data = new HashMap<>();
 
-        String uniProtID = node.getName();
-        DrugabilityDataBundle bundle = drugabilityDataBundleFactory.getBundleByUniProtID(uniProtID);
-
         data.put("bundle", bundle);
-        data.put("sign", node.getSign());
+        data.put("sign", sign);
 
         Writer writer = new StringWriter();
         try {
