@@ -84,6 +84,7 @@ public class InterventionDetailsDialog
 
         // Format for presentation
         pack();
+        setLocationRelativeTo(getOwner());
     }
 
     /**
@@ -98,6 +99,8 @@ public class InterventionDetailsDialog
 
         DrugabilityDataBundle bundle = drugabilityDataBundleFactory.getBundleByUniProtID(signedNode.getName());
         drugabilityPanel.showReport(bundle, signedNode.getSign());
+
         pack();
+        setLocationRelativeTo(getOwner());
     }
 }
