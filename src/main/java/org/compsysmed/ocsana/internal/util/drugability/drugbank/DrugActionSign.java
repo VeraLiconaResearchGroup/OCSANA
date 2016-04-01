@@ -9,7 +9,7 @@
  * details
  **/
 
-package org.compsysmed.ocsana.internal.util.drugbank;
+package org.compsysmed.ocsana.internal.util.drugability.drugbank;
 
 public enum DrugActionSign {
     POSITIVE,

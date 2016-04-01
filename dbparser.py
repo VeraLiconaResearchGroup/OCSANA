@@ -15,66 +15,109 @@ from collections import defaultdict
 import simplejson as json
 import logging
 
+# Helper class to handle JSON encoding with sets
+class SetEncoder(json.JSONEncoder):
+    def default(self, obj):
+       if isinstance(obj, set) or isinstance(obj, frozenset):
+          return sorted(list(obj))
+       return json.JSONEncoder.default(self, obj)
+
 def parse_xml(filename):
-    # Construct a dict with two elements:
-    # * "interactions" maps each gene name (Entrez standard) to a
-    # dict mapping action types to lists of drug names. For example, we
-    # might have result["interactions"]["ERBB2"]["inhibitor"] == ["Afatinib"].
-    # * "geneNames" maps UniProt IDs to gene names. For example, we might have result["geneNames"][]
-    logging.info("Reading XML file")
+    # Return two dicts, 'proteins' and 'drugs'
+    #
+    # 'proteins' is keyed with UniProt IDs and contains name, HUGO
+    # gene IDs, HUGO gene names, function descriptions, and
+    # information about the drugs that target that protein.
+    #
+    # 'drugs' is keyed with DrugBank IDs and contains
+    logging.info(u"Reading XML file")
     try:
         tree = etree.parse(filename)
     except IOError:
         raise ValueError("Could not read DB file {0}".format(filename))
 
-    DB = "{http://www.drugbank.ca}"
-
-    found_action_types = set()
-    found_genes = set()
-    uniprot_to_gene_name_mapping = {}
-
-    logging.info("Parsing XML tree")
+    logging.info(u"Parsing XML tree")
     root = tree.getroot()
 
-    interactions = defaultdict(lambda: defaultdict(list))
+    ns = {'dbns': root.nsmap[None]}
 
-    for drug in root.findall(DB + 'drug'):
-        drugname = drug.find(DB + 'name').text
-        druggroups = [group.text for group in drug.find(DB + 'groups').findall(DB + 'group')]
+    proteins = {}
+    drugs = {}
 
-        drugdict = {'name': drugname, 'groups': druggroups}
+    for drug in root.findall('dbns:drug', namespaces=ns):
+        drug_name = drug.findtext('dbns:name', namespaces=ns).strip()
+        logging.debug(u"Drug: {}".format(drug_name))
 
-        for target in drug.find(DB + 'targets').findall(DB + 'target'):
-            for polypeptide in target.findall(DB + "polypeptide"):
-                uniprot_id = polypeptide.get("id");
-                for geneXML in polypeptide.findall(DB + "gene-name"):
-                    genename = geneXML.text
-                    uniprot_to_gene_name_mapping[uniprot_id] = genename
-                    if genename is not None:
-                        found_genes.add(genename)
-                        actions = target.find(DB + 'actions').getchildren()
+        dbid = drug.findtext('dbns:drugbank-id[@primary="true"]', namespaces=ns).strip()
+        all_dbids = set(entry.text.strip() for entry in drug.findall('dbns:drugbank-id', namespaces=ns))
+        drug_groups = set(group.text.strip().upper() for group in drug.findall('dbns:groups/dbns:group', namespaces=ns))
 
-                        if len(actions) == 0:
-                            interactions[genename]["UNKNOWN"].append(drugdict)
+        drugs[dbid] = {"name": drug_name, "dbids": all_dbids, "groups": drug_groups, "targets": []}
 
-                        for action in actions:
-                            actionname = action.text.lower()
-                            found_action_types.add(actionname)
-                            interactions[genename][actionname].append(drugdict)
+        for target in drug.find('dbns:targets', namespaces=ns).findall('dbns:target', namespaces=ns):
+            target_name = target.findtext('dbns:name', namespaces=ns).strip()
+            logging.debug(u"Target: {}".format(target_name))
+            polypeptides = target.findall("dbns:polypeptide", namespaces=ns)
+            is_complex = len(polypeptides) > 1
 
-    logging.info("Found {0} drugs, {1} genes, {2} UniProt IDs in DrugBank XML file".format(len(interactions), len(found_genes), len(uniprot_to_gene_name_mapping)))
-    logging.info("Found interaction types: {0}".format(found_action_types))
-    result = {"interactions": interactions, "geneNames": uniprot_to_gene_name_mapping}
-    return result
+            for polypeptide in polypeptides:
+                uniprot_id =  polypeptide.findtext('dbns:external-identifiers/dbns:external-identifier[dbns:resource="UniProtKB"]/dbns:identifier', namespaces=ns)
+                if uniprot_id:
+                    uniprot_id = uniprot_id.strip()
+                else:
+                    uniprot_id = polypeptide.get("id").strip()
+                if uniprot_id not in proteins:
+                    proteins[uniprot_id] = {}
 
-def write_json(data, filename):
-    logging.info("Writing JSON file")
-    with open(filename, 'w') as outfile:
-        json.dump(data, outfile)
+                logging.debug(u"Polypeptide ID: {}".format(uniprot_id))
+
+                protein_name = polypeptide.findtext('dbns:name', namespaces=ns)
+                if protein_name:
+                    protein_name = protein_name.strip()
+                    proteins[uniprot_id]["name"] = protein_name
+
+                hugo_id = polypeptide.findtext('dbns:external-identifiers/dbns:external-identifier[dbns:resource="Hugo Gene Nomenclature Committee (HGNC)"]/dbns:identifier', namespaces=ns)
+                if hugo_id:
+                    hugo_id = hugo_id.strip()
+                    if "hugo_ids" not in proteins[uniprot_id]:
+                        proteins[uniprot_id]["hugo_ids"] = set()
+                        proteins[uniprot_id]["hugo_ids"].add(hugo_id)
+
+                gene_names = map(lambda geneXML: geneXML.text.strip(), filter(lambda geneXML: geneXML.text is not None, polypeptide.findall("dbns:gene-name", namespaces=ns)))
+                if "gene_names" not in proteins[uniprot_id]:
+                    proteins[uniprot_id]["gene_names"] = set()
+                proteins[uniprot_id]["gene_names"].update(gene_names)
+
+                general_function = polypeptide.findtext("dbns:general-function", namespaces=ns)
+                if general_function:
+                    proteins[uniprot_id]["general_function"] = general_function
+
+                specific_function = polypeptide.findtext("dbns:specific-function", namespaces=ns)
+                if specific_function:
+                    proteins[uniprot_id]["specific_function"] = specific_function
+
+                if is_complex:
+                    if "in_complexes" not in proteins[uniprot_id]:
+                        proteins[uniprot_id]["in_complexes"] = set()
+                    proteins[uniprot_id]["in_complexes"].add(target_name)
+                    logging.info(u"Protein {} is in complex {}".format(uniprot_id, target_name))
+
+                if "drug_actions" not in proteins[uniprot_id]:
+                    proteins[uniprot_id]["drug_actions"] = []
+                actions = target.findall('dbns:actions/dbns:action', namespaces=ns)
+                for action in actions:
+                    action_name = action.text.strip().upper()
+                    logging.debug(u"Action: {}".format(action_name))
+                    action_desc = {"target": uniprot_id, "drug": dbid, "action": action_name}
+                    proteins[uniprot_id]["drug_actions"].append(action_desc)
+                    drugs[dbid]["targets"].append(action_desc)
+
+    logging.info(u"Found {0} drugs, {1} proteins in DrugBank XML file".format(len(drugs), len(proteins)))
+    return proteins, drugs
 
 def main():
     # Set up argument processing
-    parser = argparse.ArgumentParser(description="MHS algorithm benchmark runner")
+    parser = argparse.ArgumentParser(description="DrugBank data parser")
 
     parser.add_argument("drugbank_db_file", help="XML file of DrugBank data (download from www.drugbank.ca)")
     parser.add_argument("json_output_file", help="JSON file to write with interaction data")
@@ -92,11 +135,15 @@ def main():
 
     logging.basicConfig(level = log_level)
 
-    # Parse the XML file
-    data = parse_xml(args.drugbank_db_file)
+    # Parse the XML file and combine the results into one dict for
+    # JSON serialization
+    proteins, drugs = parse_xml(args.drugbank_db_file)
+    data = {"proteins": proteins, "drugs": drugs}
 
     # Write the result
-    write_json(data, args.json_output_file)
+    logging.info(u"Writing JSON file")
+    with open(args.json_output_file, 'w') as outfile:
+        json.dump(data, outfile, cls=SetEncoder)
 
 
 if __name__ == "__main__":
