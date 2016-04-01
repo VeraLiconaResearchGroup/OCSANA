@@ -83,9 +83,9 @@ public class DrugabilityReportPanel
         add(textPane);
 
         // Compile template
-        PebbleEngine engine = new PebbleEngine.Builder().build();
+        PebbleEngine engine = new PebbleEngine.Builder().strictVariables(true).build();
         try {
-            compiledTemplate = engine.getTemplate("/home/andrew/documents/work/research/ocsana/OCSANA/src/main/resources/templates/DrugabilityReport.html");
+            compiledTemplate = engine.getTemplate("templates/DrugabilityReport.html");
         } catch (PebbleException e) {
             throw new IllegalStateException("Could not load drugability report template. Please report the following error to the plugin author: " + e.getMessage());
         }
@@ -95,14 +95,17 @@ public class DrugabilityReportPanel
      * Display the report for a particular protein with a particular
      * intervention sign
      *
+     * @param name  the name of the node
      * @param bundle  the DrugabilityDataBundle for the protein
      * @param sign  the sign
      **/
-    public void showReport (DrugabilityDataBundle bundle,
+    public void showReport (String name,
+                            DrugabilityDataBundle bundle,
                             InteractionSign sign) {
         // Set up data
         Map<String, Object> data = new HashMap<>();
 
+        data.put("name", name);
         data.put("bundle", bundle);
         data.put("sign", sign);
 

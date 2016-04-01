@@ -98,7 +98,7 @@ public class InterventionDetailsDialog
         }
 
         DrugabilityDataBundle bundle = drugabilityDataBundleFactory.getBundleByUniProtID(signedNode.getName());
-        drugabilityPanel.showReport(bundle, signedNode.getSign());
+        drugabilityPanel.showReport(signedNode.getName(), bundle, signedNode.getSign());
 
         pack();
         setLocationRelativeTo(getOwner());
