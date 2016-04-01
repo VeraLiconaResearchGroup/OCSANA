@@ -4,12 +4,12 @@
         Protein: <a href="{{bundle.getProtein().getUniProtURL()}}">{{bundle.getProtein().getName()}}</a>
     </p>
     <p>
-        {{sign}} known drug interactions:
+        Known drug interactions (effect: {{sign}})
         <ul>
             {% for interaction in bundle.getAllInteractionsOfSign(sign) %}
             <li><a href="{{interaction.getDrug().getDrugBankURL()}}">{{interaction.getDrug().getName()}}</a></li>
             {% endfor %}
         </ul>
-        ({{bundle.getAllInteractionsNotOfSign(sign).size()}} other interactions are known. See UniProt page for details.)
+        ({{bundle.getAllInteractionsNotOfSign(sign).size()}} other interactions are known. See <a href="{{interaction.getProtein().getDrugBankBioDBURL()}}">DrugBank BioDB page</a> for details.)
     </p>
 </html>

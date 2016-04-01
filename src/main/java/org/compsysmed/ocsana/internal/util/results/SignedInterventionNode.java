@@ -16,16 +16,30 @@ package org.compsysmed.ocsana.internal.util.results;
 // Cytoscape imports
 import org.cytoscape.model.CyNode;
 
+// OCSANA imports
+import org.compsysmed.ocsana.internal.util.science.InteractionSign;
+
 public class SignedInterventionNode {
     private final CyNode node;
-    private final InterventionSign sign;
+    private final InteractionSign sign;
     private final String name;
 
     public SignedInterventionNode (CyNode node,
-                                   InterventionSign sign,
+                                   InteractionSign sign,
                                    String name) {
+        if (node == null) {
+            throw new IllegalArgumentException("Node cannot be null");
+        }
         this.node = node;
+
+        if (sign == null) {
+            throw new IllegalArgumentException("Sign cannot be null");
+        }
         this.sign = sign;
+
+        if (name == null) {
+            throw new IllegalArgumentException("Name cannot be null");
+        }
         this.name = name;
     }
 
@@ -33,7 +47,7 @@ public class SignedInterventionNode {
         return node;
     }
 
-    public InterventionSign getSign () {
+    public InteractionSign getSign () {
         return sign;
     }
 
@@ -43,9 +57,5 @@ public class SignedInterventionNode {
 
     public Long getSUID () {
         return node.getSUID();
-    }
-
-    public static enum InterventionSign {
-        POSITIVE, NEGATIVE
     }
 }

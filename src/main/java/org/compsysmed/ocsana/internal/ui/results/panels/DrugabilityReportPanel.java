@@ -86,7 +86,7 @@ public class DrugabilityReportPanel
         add(textPane);
 
         // Compile template
-        PebbleEngine engine = new PebbleEngine.Builder().build();
+        PebbleEngine engine = new PebbleEngine.Builder().strictVariables(true).build();
         try {
             compiledTemplate = engine.getTemplate("templates/DrugabilityReport.html");
         } catch (PebbleException e) {

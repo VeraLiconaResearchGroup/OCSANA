@@ -1,7 +1,7 @@
 /**
- * Enum of signs of drug actions
+ * Enum of signs of interactions
  *
- * Copyright Vera-Licona Research Group (C) 2015
+ * Copyright Vera-Licona Research Group (C) 2016
  *
  * This software is licensed under the Artistic License 2.0, see the
  * LICENSE file or
@@ -9,9 +9,9 @@
  * details
  **/
 
-package org.compsysmed.ocsana.internal.util.drugability.drugbank;
+package org.compsysmed.ocsana.internal.util.science;
 
-public enum DrugActionSign {
+public enum InteractionSign {
     POSITIVE ("positive", '+'),
     NEGATIVE ("negative", '-'),
     UNSIGNED ("unsigned", '±');
@@ -19,8 +19,8 @@ public enum DrugActionSign {
     private final String description;
     private final Character symbol;
 
-    private DrugActionSign (String description,
-                            Character symbol) {
+    private InteractionSign (String description,
+                             Character symbol) {
         this.description = description;
         this.symbol = symbol;
     }

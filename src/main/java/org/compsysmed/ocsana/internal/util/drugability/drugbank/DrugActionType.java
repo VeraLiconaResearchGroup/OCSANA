@@ -21,45 +21,45 @@ import org.compsysmed.ocsana.internal.util.science.*;
  * Enum of types of drug actions in the DrugBank database
  **/
 public enum DrugActionType {
-    ACETYLATION ("acetylation", DrugActionSign.UNSIGNED),
-    ACTIVATOR ("activator", DrugActionSign.POSITIVE),
-    ADDUCT ("adduct", DrugActionSign.NEGATIVE),
-    AGONIST ("agonist", DrugActionSign.POSITIVE),
-    ALLOSTERIC_MODULATOR ("allosteric modulator", DrugActionSign.UNSIGNED),
-    ANTAGONIST ("antagonist", DrugActionSign.NEGATIVE),
-    ANTIBODY ("antibody", DrugActionSign.NEGATIVE),
-    BLOCKER ("blocker", DrugActionSign.NEGATIVE),
-    BINDER ("binder", DrugActionSign.UNSIGNED),
-    BINDING ("binding", DrugActionSign.UNSIGNED),
-    CHAPERONE ("chaperone", DrugActionSign.UNSIGNED),
-    CHELATOR ("chelator", DrugActionSign.NEGATIVE),
-    CLEAVAGE ("cleavage", DrugActionSign.NEGATIVE),
-    COFACTOR ("cofactor", DrugActionSign.UNSIGNED),
-    CROSS_LINKING ("cross-linking/alkylation", DrugActionSign.NEGATIVE),
-    DESENSITIZE_THE_TARGET ("desensitize the target", DrugActionSign.NEGATIVE),
-    INCORPORATION_INTO_AND_DESTABILIZATION ("incorporation into and destabilization", DrugActionSign.NEGATIVE),
-    INDUCER ("inducer", DrugActionSign.POSITIVE),
-    INHIBITOR ("inhibitor", DrugActionSign.NEGATIVE),
-    COMPETITIVE_INHIBITOR ("inhibitor (competitive)", DrugActionSign.NEGATIVE),
-    INHIBITORY_ALLOSTERIC_MODULATOR ("inhibitory allosteric modulator", DrugActionSign.NEGATIVE),
-    INTERCALATION ("intercalation", DrugActionSign.NEGATIVE),
-    INVERSE_AGONIST ("inverse agonist", DrugActionSign.NEGATIVE),
-    LIGAND ("ligand", DrugActionSign.POSITIVE),
-    MODULATOR ("modulator", DrugActionSign.UNSIGNED),
-    MULTITARGET ("multitarget", DrugActionSign.UNSIGNED),
-    NEGATIVE_MODULATOR ("negative modulator", DrugActionSign.NEGATIVE),
-    NEUTRALIZER ("neutralizer", DrugActionSign.NEGATIVE),
-    OTHER ("other", DrugActionSign.UNSIGNED),
-    PARTIAL_AGONIST ("partial agonist", DrugActionSign.POSITIVE),
-    PARTIAL_ANTAGONIST ("partial antagonist", DrugActionSign.UNSIGNED),
-    POSITIVE_ALLOSTERIC_MODULATOR ("positive allosteric modulator", DrugActionSign.POSITIVE),
-    POSITIVE_MODULATOR ("positive modulator", DrugActionSign.POSITIVE),
-    POTENTIATOR ("potentiator", DrugActionSign.POSITIVE),
-    PRODUCT_OF ("product of", DrugActionSign.UNSIGNED),
-    REDUCER ("reducer", DrugActionSign.NEGATIVE),
-    STIMULATOR ("stimulator", DrugActionSign.POSITIVE),
-    SUPPRESSOR ("suppressor", DrugActionSign.NEGATIVE),
-    UNKNOWN ("unknown", DrugActionSign.UNSIGNED);
+    ACETYLATION ("acetylation", InteractionSign.UNSIGNED),
+    ACTIVATOR ("activator", InteractionSign.POSITIVE),
+    ADDUCT ("adduct", InteractionSign.NEGATIVE),
+    AGONIST ("agonist", InteractionSign.POSITIVE),
+    ALLOSTERIC_MODULATOR ("allosteric modulator", InteractionSign.UNSIGNED),
+    ANTAGONIST ("antagonist", InteractionSign.NEGATIVE),
+    ANTIBODY ("antibody", InteractionSign.NEGATIVE),
+    BLOCKER ("blocker", InteractionSign.NEGATIVE),
+    BINDER ("binder", InteractionSign.UNSIGNED),
+    BINDING ("binding", InteractionSign.UNSIGNED),
+    CHAPERONE ("chaperone", InteractionSign.UNSIGNED),
+    CHELATOR ("chelator", InteractionSign.NEGATIVE),
+    CLEAVAGE ("cleavage", InteractionSign.NEGATIVE),
+    COFACTOR ("cofactor", InteractionSign.UNSIGNED),
+    CROSS_LINKING ("cross-linking/alkylation", InteractionSign.NEGATIVE),
+    DESENSITIZE_THE_TARGET ("desensitize the target", InteractionSign.NEGATIVE),
+    INCORPORATION_INTO_AND_DESTABILIZATION ("incorporation into and destabilization", InteractionSign.NEGATIVE),
+    INDUCER ("inducer", InteractionSign.POSITIVE),
+    INHIBITOR ("inhibitor", InteractionSign.NEGATIVE),
+    COMPETITIVE_INHIBITOR ("inhibitor (competitive)", InteractionSign.NEGATIVE),
+    INHIBITORY_ALLOSTERIC_MODULATOR ("inhibitory allosteric modulator", InteractionSign.NEGATIVE),
+    INTERCALATION ("intercalation", InteractionSign.NEGATIVE),
+    INVERSE_AGONIST ("inverse agonist", InteractionSign.NEGATIVE),
+    LIGAND ("ligand", InteractionSign.POSITIVE),
+    MODULATOR ("modulator", InteractionSign.UNSIGNED),
+    MULTITARGET ("multitarget", InteractionSign.UNSIGNED),
+    NEGATIVE_MODULATOR ("negative modulator", InteractionSign.NEGATIVE),
+    NEUTRALIZER ("neutralizer", InteractionSign.NEGATIVE),
+    OTHER ("other", InteractionSign.UNSIGNED),
+    PARTIAL_AGONIST ("partial agonist", InteractionSign.POSITIVE),
+    PARTIAL_ANTAGONIST ("partial antagonist", InteractionSign.UNSIGNED),
+    POSITIVE_ALLOSTERIC_MODULATOR ("positive allosteric modulator", InteractionSign.POSITIVE),
+    POSITIVE_MODULATOR ("positive modulator", InteractionSign.POSITIVE),
+    POTENTIATOR ("potentiator", InteractionSign.POSITIVE),
+    PRODUCT_OF ("product of", InteractionSign.UNSIGNED),
+    REDUCER ("reducer", InteractionSign.NEGATIVE),
+    STIMULATOR ("stimulator", InteractionSign.POSITIVE),
+    SUPPRESSOR ("suppressor", InteractionSign.NEGATIVE),
+    UNKNOWN ("unknown", InteractionSign.UNSIGNED);
 
     private static final Map<String, DrugActionType> lookupByDescription = new HashMap<>();
 
@@ -74,10 +74,10 @@ public enum DrugActionType {
     }
 
     private String description;
-    private DrugActionSign sign;
+    private InteractionSign sign;
 
     private DrugActionType (String description,
-                            DrugActionSign sign) {
+                            InteractionSign sign) {
         this.description = description;
         this.sign = sign;
     }
@@ -92,7 +92,7 @@ public enum DrugActionType {
     /**
      * Get the sign associated to this action type
      **/
-    public DrugActionSign getSign () {
+    public InteractionSign getSign () {
         return sign;
     }
 

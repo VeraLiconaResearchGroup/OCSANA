@@ -59,16 +59,20 @@ public class DrugabilityDataBundle {
 
     /**
      * Get all the positive known drug-protein interactions
+     * <p>
+     * (NOTE: convenience wrapper for {@link #getAllInteractionsOfSign})
      **/
     public Collection<DrugProteinInteraction> getAllPositiveInteractions () {
-        return getAllInteractionsOfSign(DrugActionSign.POSITIVE);
+        return getAllInteractionsOfSign(InteractionSign.POSITIVE);
     }
 
     /**
      * Get all the negative known drug-protein interactions
+     * <p>
+     * (NOTE: convenience wrapper for {@link #getAllInteractionsOfSign})
      **/
     public Collection<DrugProteinInteraction> getAllNegativeInteractions () {
-        return getAllInteractionsOfSign(DrugActionSign.NEGATIVE);
+        return getAllInteractionsOfSign(InteractionSign.NEGATIVE);
     }
 
     /**
@@ -76,7 +80,7 @@ public class DrugabilityDataBundle {
      *
      * @param sign  the sign
      **/
-    public Collection<DrugProteinInteraction> getAllInteractionsOfSign (DrugActionSign sign) {
+    public Collection<DrugProteinInteraction> getAllInteractionsOfSign (InteractionSign sign) {
         return interactions.stream().filter(interaction -> interaction.getDrugActionType().getSign() == sign).collect(Collectors.toSet());
     }
 
@@ -86,7 +90,7 @@ public class DrugabilityDataBundle {
      *
      * @param sign  the sign
      **/
-    public Collection<DrugProteinInteraction> getAllInteractionsNotOfSign (DrugActionSign sign) {
+    public Collection<DrugProteinInteraction> getAllInteractionsNotOfSign (InteractionSign sign) {
         return interactions.stream().filter(interaction -> interaction.getDrugActionType().getSign() != sign).collect(Collectors.toSet());
     }
 }

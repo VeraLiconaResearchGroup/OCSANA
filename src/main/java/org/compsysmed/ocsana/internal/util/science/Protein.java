@@ -22,6 +22,7 @@ import java.net.MalformedURLException;
  **/
 public class Protein {
     private static final String UNIPROT_URL_BASE = "http://www.uniprot.org/uniprot/";
+    private static final String DRUGBANK_BIODB_URL_BASE = "http://www.drugbank.ca/biodb/polypeptides/";
 
     private final String uniProtID;
     private final String name;
@@ -118,7 +119,7 @@ public class Protein {
     }
 
     /**
-     * Return the URL for the online database entry of this protein
+     * Return the URL for the online UniProt entry of this protein
      **/
     public URL getUniProtURL () {
         String uniProtURL = UNIPROT_URL_BASE + uniProtID;
@@ -126,6 +127,18 @@ public class Protein {
             return new URL(uniProtURL);
         } catch (MalformedURLException e) {
             throw new IllegalStateException(String.format("Protein URL %s is malformed", uniProtURL));
+        }
+    }
+
+    /**
+     * Return the URL for the online DrugBank entry of this protein
+     **/
+    public URL getDrugBankBioDBURL () {
+        String drugBankURL = DRUGBANK_BIODB_URL_BASE + uniProtID;
+        try {
+            return new URL(drugBankURL);
+        } catch (MalformedURLException e) {
+            throw new IllegalStateException(String.format("Protein URL %s is malformed", drugBankURL));
         }
     }
 }

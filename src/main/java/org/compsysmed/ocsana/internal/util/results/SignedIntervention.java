@@ -21,6 +21,8 @@ import org.cytoscape.model.CyNode;
 import org.compsysmed.ocsana.internal.util.results.ScoredTargetNode;
 import org.compsysmed.ocsana.internal.util.results.SignedInterventionNode;
 
+import org.compsysmed.ocsana.internal.util.science.InteractionSign;
+
 /**
  * Class representing a signed intervention of a CI and its effects on
  * certain targets
@@ -62,12 +64,12 @@ public class SignedIntervention {
 
         signedInterventionNodes = new HashSet<>();
         for (CyNode node: interventionNodesToActivate) {
-            SignedInterventionNode signedNode = new SignedInterventionNode(node, SignedInterventionNode.InterventionSign.POSITIVE, ci.nodeName(node));
+            SignedInterventionNode signedNode = new SignedInterventionNode(node, InteractionSign.POSITIVE, ci.nodeName(node));
             signedInterventionNodes.add(signedNode);
         }
 
         for (CyNode node: interventionNodesToInhibit) {
-            SignedInterventionNode signedNode = new SignedInterventionNode(node, SignedInterventionNode.InterventionSign.NEGATIVE, ci.nodeName(node));
+            SignedInterventionNode signedNode = new SignedInterventionNode(node, InteractionSign.NEGATIVE, ci.nodeName(node));
             signedInterventionNodes.add(signedNode);
         }
 
