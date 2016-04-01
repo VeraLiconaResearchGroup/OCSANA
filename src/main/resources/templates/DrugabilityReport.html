@@ -1,8 +1,18 @@
 <html>
     <h3>Drugability report</h3>
+    {%if bundle is null %}
+    <p>
+        Protein name could not be found.
+    </p>
+    {% else %}
     <p>
         Protein: <a href="{{bundle.getProtein().getUniProtURL()}}">{{bundle.getProtein().getName()}}</a>
     </p>
+    {% if bundle.getAllInteractions() is empty %}
+    <p>
+        No known drug interactions.
+    </p>
+    {% else %}
     <p>
         Known drug interactions (effect: {{sign}})
         <ul>
@@ -12,4 +22,6 @@
         </ul>
         ({{bundle.getAllInteractionsNotOfSign(sign).size()}} other interactions are known. See <a href="{{interaction.getProtein().getDrugBankBioDBURL()}}">DrugBank BioDB page</a> for details.)
     </p>
+    {% endif %}
+    {% endif %}
 </html>
