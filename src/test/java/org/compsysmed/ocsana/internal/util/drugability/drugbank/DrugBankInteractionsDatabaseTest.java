@@ -28,7 +28,6 @@ public class DrugBankInteractionsDatabaseTest {
     public void buildDatabaseShouldWork () {
         DrugBankInteractionsDatabase db = DrugBankInteractionsDatabase.getDB();
         assertEquals("Number of drugs in database", 8203, db.getAllDrugs().size());
-        assertEquals("Number of proteins in database", 4081, db.getAllProteins().size());
     }
 
     @Test
@@ -37,13 +36,5 @@ public class DrugBankInteractionsDatabaseTest {
         Drug barbital = db.getDrugByID("DB01483");
         assertEquals("Name of drug", "Barbital", barbital.getName());
         assertEquals("Number of FDA categories", 1, barbital.getFDACategories().size());
-    }
-
-    @Test
-    public void retrieveProteinShouldWork () {
-        DrugBankInteractionsDatabase db = DrugBankInteractionsDatabase.getDB();
-        Protein erbb2 = db.getProteinByID("P04626");
-        assertEquals("Name of protein", "Receptor tyrosine-protein kinase erbB-2", erbb2.getName());
-        assertEquals("UniProt ID", "P04626", erbb2.getUniProtID());
     }
 }

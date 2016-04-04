@@ -1,5 +1,5 @@
 /**
- * Helper class for drug-gene interactions database
+ * Drug-gene interactions database (from DrugBank)
  *
  * Copyright Vera-Licona Research Group (C) 2016
  *
@@ -24,16 +24,17 @@ import org.json.JSONTokener;
 
 // OCSANA imports
 import org.compsysmed.ocsana.internal.util.science.*;
+import org.compsysmed.ocsana.internal.util.science.uniprot.ProteinDatabase;
 
 /**
  * Singleton class representing the DrugBank database
  **/
 public class DrugBankInteractionsDatabase {
-    private static final String DRUGBANK_PATH = "/drugbank/drugbank.json";
+    private static final String DRUGBANK_PATH = "/drugbank/drugs.json";
     private static DrugBankInteractionsDatabase internalDB;
+    private static ProteinDatabase proteinDB = ProteinDatabase.getDB();
 
     private Map<String, Drug> drugsByID = new HashMap<>();
-    private Map<String, Protein> proteinsByID = new HashMap<>();
     private Map<Drug, Collection<DrugProteinInteraction>> drugActions = new HashMap<>();
     private Map<Protein, Collection<DrugProteinInteraction>> proteinActions = new HashMap<>();
 
@@ -47,11 +48,10 @@ public class DrugBankInteractionsDatabase {
         }
 
         // Process drug records
-        JSONObject drugsJSON = drugBankJSON.getJSONObject("drugs");
-        Iterator<String> drugKeys = drugsJSON.keys();
+        Iterator<String> drugKeys = drugBankJSON.keys();
         while (drugKeys.hasNext()) {
             String drugBankPrimaryID = drugKeys.next();
-            JSONObject drugInformationJSON = drugsJSON.getJSONObject(drugBankPrimaryID);
+            JSONObject drugInformationJSON = drugBankJSON.getJSONObject(drugBankPrimaryID);
 
             String drugName = drugInformationJSON.getString("name");
 
@@ -69,40 +69,22 @@ public class DrugBankInteractionsDatabase {
 
             Drug drug = new Drug(drugName, drugBankPrimaryID, drugBankIDs, categories);
             drugsByID.put(drugBankPrimaryID, drug);
-        }
 
-        // Process protein records
-        JSONObject proteinsJSON = drugBankJSON.getJSONObject("proteins");
-        Iterator<String> proteinKeys = proteinsJSON.keys();
-        while (proteinKeys.hasNext()) {
-            String uniProtID = proteinKeys.next();
-            JSONObject proteinInformationJSON = proteinsJSON.getJSONObject(uniProtID);
-
-            String proteinName = proteinInformationJSON.getString("name");
-
-            Set<String> geneNames = new HashSet<>();
-            JSONArray geneNameJSON = proteinInformationJSON.getJSONArray("gene_names");
-            for (int i = 0; i < geneNameJSON.length(); i++) {
-                geneNames.add(geneNameJSON.getString(i));
-            }
-
-            String generalFunction = proteinInformationJSON.optString("general_function");
-            String specificFunction = proteinInformationJSON.optString("specific_function");
-
-            Protein protein = new Protein(uniProtID, proteinName, geneNames, generalFunction, specificFunction);
-            proteinsByID.put(uniProtID, protein);
-
-            // Build all interaction objects
-            JSONArray interactionsJSON = proteinInformationJSON.getJSONArray("drug_actions");
+            JSONArray interactionsJSON = drugInformationJSON.getJSONArray("targets");
             for (int i = 0; i < interactionsJSON.length(); i++) {
                 JSONObject interactionJSON = interactionsJSON.getJSONObject(i);
                 String actionDescription = interactionJSON.getString("action");
                 String drugID = interactionJSON.getString("drug");
                 String proteinID = interactionJSON.getString("target");
 
-                assert (proteinID.equals(uniProtID));
+                assert (drugID.equals(drugBankPrimaryID));
 
-                Drug drug = drugsByID.get(drugID);
+                Protein protein = proteinDB.getProteinByID(proteinID);
+                if (protein == null) {
+                    // Not a human protein, so we move on.
+                    continue;
+                }
+
                 DrugProteinInteraction interaction = new DrugProteinInteraction(drug, protein, actionDescription);
 
                 if (!drugActions.containsKey(drug)) {
@@ -145,23 +127,6 @@ public class DrugBankInteractionsDatabase {
      **/
     public Drug getDrugByID (String drugBankID) {
         return drugsByID.getOrDefault(drugBankID, null);
-    }
-
-    /**
-     * Return all the proteins in the database
-     **/
-    public Collection<Protein> getAllProteins () {
-        return proteinsByID.values();
-    }
-
-    /**
-     * Get the protein with a particular UniProt ID
-     *
-     * @param uniProtID  the ID
-     * @return the protein, if found, or null if not
-     **/
-    public Protein getProteinByID (String uniProtID) {
-        return proteinsByID.getOrDefault(uniProtID, null);
     }
 
     /**

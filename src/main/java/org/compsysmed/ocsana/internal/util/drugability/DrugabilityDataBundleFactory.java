@@ -16,8 +16,10 @@ import java.util.*;
 
 // OCSANA imports
 import org.compsysmed.ocsana.internal.util.drugability.drugbank.*;
+import org.compsysmed.ocsana.internal.util.drugability.drugfeature.*;
 
 import org.compsysmed.ocsana.internal.util.science.*;
+import org.compsysmed.ocsana.internal.util.science.uniprot.ProteinDatabase;
 
 /**
  * Singleton factory class to build DrugabilityDataBundles
@@ -25,10 +27,14 @@ import org.compsysmed.ocsana.internal.util.science.*;
 public class DrugabilityDataBundleFactory {
     private static DrugabilityDataBundleFactory factory;
 
+    private final ProteinDatabase proteinDB;
     private final DrugBankInteractionsDatabase drugBankDB;
+    private final DrugFEATUREScoresDatabase drugFeatureDB;
 
     private DrugabilityDataBundleFactory () {
+        proteinDB = ProteinDatabase.getDB();
         drugBankDB = DrugBankInteractionsDatabase.getDB();
+        drugFeatureDB = DrugFEATUREScoresDatabase.getDB();
     }
 
     /**
@@ -51,13 +57,14 @@ public class DrugabilityDataBundleFactory {
      * protein, if found, or null if not
      **/
     public DrugabilityDataBundle getBundleByUniProtID (String uniProtID) {
-        Protein protein = drugBankDB.getProteinByID(uniProtID);
+        Protein protein = proteinDB.getProteinByID(uniProtID);
         if (protein == null) {
             return null;
         }
 
         Collection<DrugProteinInteraction> interactions = drugBankDB.getInteractions(protein);
-        DrugabilityDataBundle bundle = new DrugabilityDataBundle(protein, interactions);
+        Collection<DrugFEATURELigand> ligands = drugFeatureDB.getLigands(protein);
+        DrugabilityDataBundle bundle = new DrugabilityDataBundle(protein, interactions, ligands);
         return bundle;
     }
 }

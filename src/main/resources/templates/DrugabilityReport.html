@@ -7,6 +7,12 @@
     {% else %}
     <p>
         Protein: <a href="{{bundle.getProtein().getUniProtURL()}}">{{bundle.getProtein().getName()}}</a>
+        <br />
+        {% if bundle.getProtein().getFunctionDescription() is not null %}
+        Function: {{bundle.getProtein().getFunctionDescription()}}
+        {% else %}
+        No function specified in UniProt.
+        {% endif %}
     </p>
     {% if bundle.getAllInteractions() is empty %}
     <p>
@@ -23,5 +29,30 @@
         ({{bundle.getAllInteractionsNotOfSign(sign).size()}} other interactions are known. See <a href="{{interaction.getProtein().getDrugBankBioDBURL()}}">DrugBank BioDB page</a> for details.)
     </p>
     {% endif %}
+    <p>
+        {% if bundle.hasDrugableLigand() %}
+        DrugFEATURE predicted drugable ligands:
+        <table>
+            <tr>
+                <td>PDB ID</td>
+                <td>Chain</td>
+                <td>Index</td>
+                <td>Ligand</td>
+                <td>Score</td>
+            </tr>
+            {% for ligand in bundle.getDrugableLigands() %}
+            <tr>
+                <td><a href="{{ligand.getPDBURL()}}">{{ligand.getPDBID()}}</a></td>
+                <td>{{ligand.getChain()}}</td>
+                <td>{{ligand.getIndex()}}</td>
+                <td>{{ligand.getLigandName()}}</td>
+                <td>{{ligand.getScore()}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+        No drugable ligands predicted by DrugFEATURE.
+        {% endif %}
+    </p>
     {% endif %}
 </html>

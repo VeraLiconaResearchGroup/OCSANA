@@ -25,33 +25,36 @@ public class Protein {
     private static final String DRUGBANK_BIODB_URL_BASE = "http://www.drugbank.ca/biodb/polypeptides/";
 
     private final String uniProtID;
+    private final Collection<String> allUniProtIDs;
     private final String name;
-    private final Set<String> geneNames;
-    private final String generalFunction;
-    private final String specificFunction;
+    private final Collection<String> geneNames;
+    private final String functionDescription;
 
     /**
      * Constructor
      *
-     * @param uniProtID  the UniProt ID of the protein
+     * @param uniProtID  the primary UniProt ID of the protein
+     * @param allUniProtIDs  the collection of UniProt IDs of the protein
      * @param name  the human-readable name of the protein
      * @param geneNames  the ENSEMBL IDs of the genes associated to the protein
-     * @param generalFunction  string description of the general
-     * function of the protein (can be null, in which case an empty string is
-     * stored)
-     * @param specificFunction  string description of the specific
-     * function of the protein (can be null, in which case an empty string is
+     * @param functionDescription  string description of the function
+     * of the protein (can be null, in which case an empty string is
      * stored)
      **/
     public Protein (String uniProtID,
+                    Collection<String> allUniProtIDs,
                     String name,
-                    Set<String> geneNames,
-                    String generalFunction,
-                    String specificFunction) {
+                    Collection<String> geneNames,
+                    String functionDescription) {
         if (uniProtID == null) {
             throw new IllegalArgumentException("Protein UniProt ID cannot be null");
         }
         this.uniProtID = uniProtID;
+
+        if (allUniProtIDs == null) {
+            throw new IllegalArgumentException("Protein UniProt ID collection cannot be null");
+        }
+        this.allUniProtIDs = allUniProtIDs;
 
         if (name == null) {
             throw new IllegalArgumentException("Protein name cannot be null");
@@ -63,15 +66,10 @@ public class Protein {
         }
         this.geneNames = geneNames;
 
-        if (generalFunction == null) {
-            generalFunction = "";
+        if (functionDescription == null) {
+            functionDescription = "";
         }
-        this.generalFunction = generalFunction;
-
-        if (specificFunction == null) {
-            specificFunction = "";
-        }
-        this.specificFunction = specificFunction;
+        this.functionDescription = functionDescription;
     }
 
     /**
@@ -91,24 +89,16 @@ public class Protein {
     /**
      * Get the gene names associated to this protein
      **/
-    public Set<String> getGeneNames () {
+    public Collection<String> getGeneNames () {
         return geneNames;
     }
 
     /**
-     * Get a description of the general function of this protein (may
-     * be empty)
+     * Get a description of the function of this protein (may be
+     * empty)
      **/
-    public String getGeneralFunction () {
-        return generalFunction;
-    }
-
-    /**
-     * Get a description of the specific function of this protein (may
-     * be empty)
-     **/
-    public String getSpecificFunction () {
-        return specificFunction;
+    public String getFunctionDescription () {
+        return functionDescription;
     }
 
     /**

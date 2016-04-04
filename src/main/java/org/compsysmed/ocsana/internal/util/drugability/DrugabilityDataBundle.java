@@ -18,20 +18,25 @@ import java.util.stream.Collectors;
 // OCSANA imports
 import org.compsysmed.ocsana.internal.util.drugability.drugbank.*;
 
+import org.compsysmed.ocsana.internal.util.drugability.drugfeature.DrugFEATURELigand;
+
 import org.compsysmed.ocsana.internal.util.science.*;
 
 public class DrugabilityDataBundle {
     private final Protein protein;
     private final Collection<DrugProteinInteraction> interactions;
+    private final Collection<DrugFEATURELigand> ligands;
 
     /**
      * Constructor
      *
      * @param protein  the protein this bundle represents
      * @param interactions  the known drug-protein interactions for this protein
+     * @param ligands  the scored ligands of this protein in the PDB
      **/
     public DrugabilityDataBundle (Protein protein,
-                                  Collection<DrugProteinInteraction> interactions) {
+                                  Collection<DrugProteinInteraction> interactions,
+                                  Collection<DrugFEATURELigand> ligands) {
         if (protein == null) {
             throw new IllegalArgumentException("Protein cannot be null.");
         }
@@ -41,6 +46,11 @@ public class DrugabilityDataBundle {
             throw new IllegalArgumentException("Interactions set cannot be null.");
         }
         this.interactions = interactions;
+
+        if (ligands == null) {
+            throw new IllegalArgumentException("Ligands collection cannot be null.");
+        }
+        this.ligands = ligands;
     }
 
     /**
@@ -92,5 +102,26 @@ public class DrugabilityDataBundle {
      **/
     public Collection<DrugProteinInteraction> getAllInteractionsNotOfSign (InteractionSign sign) {
         return interactions.stream().filter(interaction -> interaction.getDrugActionType().getSign() != sign).collect(Collectors.toSet());
+    }
+
+    /**
+     * Return the ligands
+     **/
+    public Collection<DrugFEATURELigand> getAllLigands () {
+        return ligands;
+    }
+
+    /**
+     * Return drugable ligands
+     **/
+    public Collection<DrugFEATURELigand> getDrugableLigands () {
+        return getAllLigands().stream().filter(ligand -> ligand.isDrugable()).collect(Collectors.toList());
+    }
+
+    /**
+     * Test whether any ligand is drugable
+     **/
+    public Boolean hasDrugableLigand () {
+        return getAllLigands().stream().anyMatch(ligand -> ligand.isDrugable());
     }
 }
