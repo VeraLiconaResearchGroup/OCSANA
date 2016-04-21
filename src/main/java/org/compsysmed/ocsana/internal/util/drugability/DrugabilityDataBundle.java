@@ -16,6 +16,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 // OCSANA imports
+import org.compsysmed.ocsana.internal.util.drugability.drprodis.DrProdisDrugabilityPrediction;
+
 import org.compsysmed.ocsana.internal.util.drugability.drugbank.*;
 
 import org.compsysmed.ocsana.internal.util.drugability.drugfeature.DrugFEATURELigand;
@@ -24,6 +26,7 @@ import org.compsysmed.ocsana.internal.util.science.*;
 
 public class DrugabilityDataBundle {
     private final Protein protein;
+    private final DrProdisDrugabilityPrediction drProdisPrediction;
     private final Collection<DrugProteinInteraction> interactions;
     private final Collection<DrugFEATURELigand> ligands;
 
@@ -31,10 +34,13 @@ public class DrugabilityDataBundle {
      * Constructor
      *
      * @param protein  the protein this bundle represents
+     * @param drProdisPrediction  the DR.PRODIS prediction for this
+     * protein (can be null)
      * @param interactions  the known drug-protein interactions for this protein
      * @param ligands  the scored ligands of this protein in the PDB
      **/
     public DrugabilityDataBundle (Protein protein,
+                                  DrProdisDrugabilityPrediction drProdisPrediction,
                                   Collection<DrugProteinInteraction> interactions,
                                   Collection<DrugFEATURELigand> ligands) {
         if (protein == null) {
@@ -42,11 +48,18 @@ public class DrugabilityDataBundle {
         }
         this.protein = protein;
 
+        if (drProdisPrediction != null && drProdisPrediction.getProtein() != protein) {
+            throw new IllegalArgumentException("DR.PRODIS prediction must be for specified protein");
+        }
+        this.drProdisPrediction = drProdisPrediction;
+
+        // TODO: check whether interactions are for correct protein
         if (interactions == null) {
             throw new IllegalArgumentException("Interactions set cannot be null.");
         }
         this.interactions = interactions;
 
+        // TODO: check whether ligands are for correct protein
         if (ligands == null) {
             throw new IllegalArgumentException("Ligands collection cannot be null.");
         }
@@ -58,6 +71,15 @@ public class DrugabilityDataBundle {
      **/
     public Protein getProtein () {
         return protein;
+    }
+
+    /**
+     * Return the DR.PRODIS prediction for the protein
+     *
+     * NOTE: may be null
+     **/
+    public DrProdisDrugabilityPrediction getDrProdisPrediction () {
+        return drProdisPrediction;
     }
 
     /**

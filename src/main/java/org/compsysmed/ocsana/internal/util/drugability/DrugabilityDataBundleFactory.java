@@ -15,6 +15,7 @@ package org.compsysmed.ocsana.internal.util.drugability;
 import java.util.*;
 
 // OCSANA imports
+import org.compsysmed.ocsana.internal.util.drugability.drprodis.*;
 import org.compsysmed.ocsana.internal.util.drugability.drugbank.*;
 import org.compsysmed.ocsana.internal.util.drugability.drugfeature.*;
 
@@ -28,11 +29,13 @@ public class DrugabilityDataBundleFactory {
     private static DrugabilityDataBundleFactory factory;
 
     private final ProteinDatabase proteinDB;
+    private final DrProdisDrugabilityDatabase drProdisDB;
     private final DrugBankInteractionsDatabase drugBankDB;
     private final DrugFEATUREScoresDatabase drugFeatureDB;
 
     private DrugabilityDataBundleFactory () {
         proteinDB = ProteinDatabase.getDB();
+        drProdisDB = DrProdisDrugabilityDatabase.getDB();
         drugBankDB = DrugBankInteractionsDatabase.getDB();
         drugFeatureDB = DrugFEATUREScoresDatabase.getDB();
     }
@@ -62,9 +65,10 @@ public class DrugabilityDataBundleFactory {
             return null;
         }
 
+        DrProdisDrugabilityPrediction drProdisPrediction = drProdisDB.getPrediction(protein);
         Collection<DrugProteinInteraction> interactions = drugBankDB.getInteractions(protein);
         Collection<DrugFEATURELigand> ligands = drugFeatureDB.getLigands(protein);
-        DrugabilityDataBundle bundle = new DrugabilityDataBundle(protein, interactions, ligands);
+        DrugabilityDataBundle bundle = new DrugabilityDataBundle(protein, drProdisPrediction, interactions, ligands);
         return bundle;
     }
 }

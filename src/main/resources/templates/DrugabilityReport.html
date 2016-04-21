@@ -14,6 +14,7 @@
         No function specified in UniProt.
         {% endif %}
     </p>
+    <h4>Known drug interactions</h4>
     {% if bundle.getAllInteractions() is empty %}
     <p>
         No known drug interactions.
@@ -29,6 +30,7 @@
         ({{bundle.getAllInteractionsNotOfSign(sign).size()}} other interactions are known. See <a href="{{interaction.getProtein().getDrugBankBioDBURL()}}">DrugBank BioDB page</a> for details.)
     </p>
     {% endif %}
+    <h4>Drugability predictions</h4>
     <p>
         {% if bundle.hasDrugableLigand() %}
         DrugFEATURE predicted drugable ligands:
@@ -54,5 +56,14 @@
         No drugable ligands predicted by DrugFEATURE.
         {% endif %}
     </p>
+    <p>
+        {% if bundle.getDrProdisPrediction() is not null %}
+        DR.PRODIS predicts that {{bundle.getDrProdisPrediction().getCountOfBindingDrugs()}} drugs bind strongly.
+        For more details, see the DR.PRODIS <a href="{{bundle.getDrProdisPrediction().getDrProdisURL()}}">details page</a>.
+        (Note that all access to the DR.PRODIS web service is subject to restrictions on commercial use.
+        See the <a href="http://cssb.biology.gatech.edu/repurpose">home page</a> for details.)
+        {% else %}
+        No DR.PRODIS prediction was found.
+        {% endif %}
     {% endif %}
 </html>
