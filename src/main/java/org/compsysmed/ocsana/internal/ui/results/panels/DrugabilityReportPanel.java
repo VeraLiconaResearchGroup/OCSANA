@@ -25,6 +25,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.BoxLayout;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
 
@@ -75,6 +76,11 @@ public class DrugabilityReportPanel
                                 Desktop.getDesktop().browse(e.getURL().toURI());
                             } catch (URISyntaxException|IOException ex) {
                                 throw new IllegalStateException(String.format("Handling HyperlinkEvent %s resulted in an error: %s", e, ex));
+                            } catch (UnsupportedOperationException ex) {
+                                // This platform doesn't support
+                                // launching the browser. Oh well.
+                                String errorMessage = String.format("<html>This platform does not support launching a browser from Java.<br />The URL you clicked was <a href='%1$s'>%1$s</a></html>.", e.getURL().toString());
+                                JOptionPane.showMessageDialog(null, errorMessage, "Browser not supported", JOptionPane.ERROR_MESSAGE);
                             }
                         }
                     }
