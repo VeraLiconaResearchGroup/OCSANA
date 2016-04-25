@@ -32,7 +32,8 @@ public class ProteinDatabase {
     private static final String UNIPROT_PATH = "/uniprot/proteins.json";
     private static ProteinDatabase internalDB;
 
-    private Map<String, Protein> proteinsByID = new HashMap<>();
+    private Map<String, Protein> proteinByUniProtID = new HashMap<>();
+    private Map<String, String> primaryIDBySecondaryID = new HashMap<>();
 
     private ProteinDatabase () {
         JSONObject proteinsJSON;
@@ -52,20 +53,24 @@ public class ProteinDatabase {
             Collection<String> uniProtIDs = new HashSet<>();
             JSONArray uniProtIDsJSON = proteinData.getJSONArray("upids");
             for (int i = 0; i < uniProtIDsJSON.length(); i++) {
-                uniProtIDs.add(uniProtIDsJSON.getString(i));
+                String secondaryID = uniProtIDsJSON.getString(i);
+                uniProtIDs.add(secondaryID);
+                primaryIDBySecondaryID.put(secondaryID, uniProtID);
             }
 
             Collection<String> geneNames = new HashSet<>();
             JSONArray geneNamesJSON = proteinData.getJSONArray("geneNames");
             for (int i = 0; i < geneNamesJSON.length(); i++) {
-                geneNames.add(geneNamesJSON.getString(i));
+                String geneName = geneNamesJSON.getString(i);
+                geneNames.add(geneName);
+                primaryIDBySecondaryID.put(geneName, uniProtID);
             }
 
             String name = proteinData.getString("name");
             String function = proteinData.getString("function");
 
             Protein protein = new Protein(uniProtID, uniProtIDs, name, geneNames, function);
-            proteinsByID.put(uniProtID, protein);
+            proteinByUniProtID.put(uniProtID, protein);
         }
     }
 
@@ -85,16 +90,32 @@ public class ProteinDatabase {
      * Return all proteins in the database
      **/
     public Collection<Protein> getAllProteins () {
-        return proteinsByID.values();
+        return proteinByUniProtID.values();
     }
 
     /**
-     * Get the protein with a particular UniProt ID
+     * Get the protein with a particular UniProt or Ensembl ID
      *
-     * @param uniProtID  the ID
+     * @param proteinID  the ID
      * @return the protein, if found, or null if not
      **/
-    public Protein getProteinByID (String uniProtID) {
-        return proteinsByID.getOrDefault(uniProtID, null);
+    public Protein getProteinByID (String proteinID) {
+        String cleanedID = proteinID.trim().toUpperCase();
+
+        if (primaryIDBySecondaryID.containsKey(cleanedID)) {
+            String primaryID = primaryIDBySecondaryID.get(cleanedID);
+            Protein protein = proteinByUniProtID.get(primaryID);
+
+            assert (protein.getGeneNames().contains(primaryID) || protein.getAllUniProtIDs().contains(primaryID));
+
+            return protein;
+        }
+
+        if (proteinByUniProtID.containsKey(cleanedID)) {
+            Protein protein = proteinByUniProtID.get(cleanedID);
+            return protein;
+        }
+
+        return null;
     }
 }

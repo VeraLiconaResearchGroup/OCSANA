@@ -56,6 +56,10 @@ public class Protein {
         }
         this.allUniProtIDs = allUniProtIDs;
 
+        if (!this.allUniProtIDs.contains(uniProtID)) {
+            this.allUniProtIDs.add(uniProtID);
+        }
+
         if (name == null) {
             throw new IllegalArgumentException("Protein name cannot be null");
         }
@@ -91,6 +95,13 @@ public class Protein {
      **/
     public Collection<String> getGeneNames () {
         return geneNames;
+    }
+
+    /**
+     * Get all the UniProt IDs associated with this protein
+     **/
+    public Collection<String> getAllUniProtIDs () {
+        return allUniProtIDs;
     }
 
     /**

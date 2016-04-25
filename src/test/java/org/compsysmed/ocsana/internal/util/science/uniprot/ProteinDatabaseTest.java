@@ -29,12 +29,32 @@ public class ProteinDatabaseTest {
     }
 
     @Test
-    public void getProteinShouldWork () {
+    public void getProteinByPrimaryUniProtIDShouldWork () {
         ProteinDatabase proteinDB = ProteinDatabase.getDB();
-        Protein protein = proteinDB.getProteinByID("P48169");
+        Protein protein = proteinDB.getProteinByID("P30613");
 
-        assertEquals("UniProt ID", "P48169", protein.getUniProtID());
-        assertEquals("Protein name", "Gamma-aminobutyric acid receptor subunit alpha-4", protein.getName());
-        assertEquals("Number of genes", 1, protein.getGeneNames().size());
+        assertEquals("UniProt ID", "P30613", protein.getUniProtID());
+        assertEquals("Protein name", "Pyruvate kinase PKLR", protein.getName());
+        assertEquals("Number of genes", 3, protein.getGeneNames().size());
+    }
+
+    @Test
+    public void getProteinBySeconaryUniProtIDShouldWork () {
+        ProteinDatabase proteinDB = ProteinDatabase.getDB();
+        Protein protein = proteinDB.getProteinByID("O75758");
+
+        assertEquals("UniProt ID", "P30613", protein.getUniProtID());
+        assertEquals("Protein name", "Pyruvate kinase PKLR", protein.getName());
+        assertEquals("Number of genes", 3, protein.getGeneNames().size());
+    }
+
+    @Test
+    public void getProteinByEnsemblIDShouldWork () {
+        ProteinDatabase proteinDB = ProteinDatabase.getDB();
+        Protein protein = proteinDB.getProteinByID("PK1");
+
+        assertEquals("UniProt ID", "P30613", protein.getUniProtID());
+        assertEquals("Protein name", "Pyruvate kinase PKLR", protein.getName());
+        assertEquals("Number of genes", 3, protein.getGeneNames().size());
     }
 }
