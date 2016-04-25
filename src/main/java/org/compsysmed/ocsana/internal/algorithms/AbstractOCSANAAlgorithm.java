@@ -35,7 +35,7 @@ public abstract class AbstractOCSANAAlgorithm {
     /**
      * Indicate whether the algorithm has been canceled by the user
      **/
-    public boolean isCanceled() {
+    public Boolean isCanceled() {
         return canceled.get();
     }
 
