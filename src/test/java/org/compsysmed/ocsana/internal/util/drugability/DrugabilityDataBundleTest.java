@@ -27,7 +27,7 @@ public class DrugabilityDataBundleTest {
     @Test
     public void getProteinShouldWork () {
         DrugabilityDataBundleFactory factory = DrugabilityDataBundleFactory.getFactory();
-        DrugabilityDataBundle bundle = factory.getBundleByUniProtID("P48169");
+        DrugabilityDataBundle bundle = factory.getBundle("P48169");
         Protein protein = bundle.getProtein();
 
         assertEquals("UniProt ID", "P48169", protein.getUniProtID());
@@ -38,7 +38,7 @@ public class DrugabilityDataBundleTest {
     @Test
     public void getInteractionsShouldWork () {
         DrugabilityDataBundleFactory factory = DrugabilityDataBundleFactory.getFactory();
-        DrugabilityDataBundle bundle = factory.getBundleByUniProtID("P48169");
+        DrugabilityDataBundle bundle = factory.getBundle("P48169");
         Protein protein = bundle.getProtein();
 
         assertEquals("Number of known interactions", 63, bundle.getAllInteractions().size());

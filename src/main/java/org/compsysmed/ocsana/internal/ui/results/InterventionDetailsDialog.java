@@ -97,7 +97,7 @@ public class InterventionDetailsDialog
             contentPanel.add(drugabilityPanel);
         }
 
-        DrugabilityDataBundle bundle = drugabilityDataBundleFactory.getBundleByUniProtID(signedNode.getName());
+        DrugabilityDataBundle bundle = drugabilityDataBundleFactory.getBundle(signedNode);
         drugabilityPanel.showReport(signedNode.getName(), bundle, signedNode.getSign());
 
         pack();
