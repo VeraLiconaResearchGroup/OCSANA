@@ -31,10 +31,10 @@ import org.compsysmed.ocsana.internal.util.science.uniprot.ProteinDatabase;
  **/
 public class DrProdisDrugabilityDatabase {
     private static final String DRPRODIS_PATH = "/drprodis/drprodis.stripped.json";
-    private static DrProdisDrugabilityDatabase internalDB;
-    private static ProteinDatabase proteinDB = ProteinDatabase.getDB();
+    private static final DrProdisDrugabilityDatabase internalDB = new DrProdisDrugabilityDatabase();
 
-    private Map<String, DrProdisDrugabilityPrediction> predictions = new HashMap<>();
+    private final ProteinDatabase proteinDB = ProteinDatabase.getDB();
+    private final Map<String, DrProdisDrugabilityPrediction> predictions = new HashMap<>();
 
     private DrProdisDrugabilityDatabase () {
         JSONObject drProdisJSON;
@@ -71,14 +71,9 @@ public class DrProdisDrugabilityDatabase {
     }
 
     /**
-     * Retrieve the singleton database instance, constructing it from
-     * disk if necessary
+     * Retrieve the singleton database instance
      **/
-    public static synchronized DrProdisDrugabilityDatabase getDB () {
-        if (internalDB == null) {
-            internalDB = new DrProdisDrugabilityDatabase();
-        }
-
+    public static DrProdisDrugabilityDatabase getDB () {
         return internalDB;
     }
 

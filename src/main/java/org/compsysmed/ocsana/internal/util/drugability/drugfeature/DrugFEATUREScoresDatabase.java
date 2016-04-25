@@ -31,9 +31,9 @@ import org.compsysmed.ocsana.internal.util.science.uniprot.ProteinDatabase;
  **/
 public class DrugFEATUREScoresDatabase {
     private static final String DRUGFEATURE_PATH = "/drugfeature/scores.json";
-    private static DrugFEATUREScoresDatabase internalDB;
-    private static ProteinDatabase proteinDB = ProteinDatabase.getDB();
+    private static final DrugFEATUREScoresDatabase internalDB = new DrugFEATUREScoresDatabase();
 
+    private final ProteinDatabase proteinDB = ProteinDatabase.getDB();
     private Map<String, Collection<DrugFEATURELigand>> ligandsOfProtein = new HashMap<>();
 
     private DrugFEATUREScoresDatabase () {
@@ -75,14 +75,9 @@ public class DrugFEATUREScoresDatabase {
     }
 
     /**
-     * Retrieve the singleton database instance, constructing it from
-     * disk if necessary
+     * Retrieve the singleton database instance
      **/
-    public static synchronized DrugFEATUREScoresDatabase getDB () {
-        if (internalDB == null) {
-            internalDB = new DrugFEATUREScoresDatabase();
-        }
-
+    public static DrugFEATUREScoresDatabase getDB () {
         return internalDB;
     }
 

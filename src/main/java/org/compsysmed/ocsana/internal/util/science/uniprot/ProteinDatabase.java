@@ -30,10 +30,10 @@ import org.compsysmed.ocsana.internal.util.science.*;
  **/
 public class ProteinDatabase {
     private static final String UNIPROT_PATH = "/uniprot/proteins.json";
-    private static ProteinDatabase internalDB;
+    private static final ProteinDatabase internalDB = new ProteinDatabase();
 
-    private Map<String, Protein> proteinByUniProtID = new HashMap<>();
-    private Map<String, String> primaryIDBySecondaryID = new HashMap<>();
+    private final Map<String, Protein> proteinByUniProtID = new HashMap<>();
+    private final Map<String, String> primaryIDBySecondaryID = new HashMap<>();
 
     private ProteinDatabase () {
         JSONObject proteinsJSON;
@@ -75,14 +75,9 @@ public class ProteinDatabase {
     }
 
     /**
-     * Retrieve the singleton database instance, constructing it from
-     * disk if necessary
+     * Retrieve the singleton database instance
      **/
-    public static synchronized ProteinDatabase getDB () {
-        if (internalDB == null) {
-            internalDB = new ProteinDatabase();
-        }
-
+    public static ProteinDatabase getDB () {
         return internalDB;
     }
 

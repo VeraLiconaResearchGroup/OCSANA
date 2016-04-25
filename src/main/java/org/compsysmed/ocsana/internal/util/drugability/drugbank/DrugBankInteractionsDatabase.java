@@ -31,12 +31,12 @@ import org.compsysmed.ocsana.internal.util.science.uniprot.ProteinDatabase;
  **/
 public class DrugBankInteractionsDatabase {
     private static final String DRUGBANK_PATH = "/drugbank/drugs.json";
-    private static DrugBankInteractionsDatabase internalDB;
-    private static ProteinDatabase proteinDB = ProteinDatabase.getDB();
+    private static final DrugBankInteractionsDatabase internalDB = new DrugBankInteractionsDatabase();
 
-    private Map<String, Drug> drugsByID = new HashMap<>();
-    private Map<Drug, Collection<DrugProteinInteraction>> drugActions = new HashMap<>();
-    private Map<Protein, Collection<DrugProteinInteraction>> proteinActions = new HashMap<>();
+    private final ProteinDatabase proteinDB = ProteinDatabase.getDB();
+    private final Map<String, Drug> drugsByID = new HashMap<>();
+    private final Map<Drug, Collection<DrugProteinInteraction>> drugActions = new HashMap<>();
+    private final Map<Protein, Collection<DrugProteinInteraction>> proteinActions = new HashMap<>();
 
     private DrugBankInteractionsDatabase () {
         JSONObject drugBankJSON;
@@ -101,14 +101,9 @@ public class DrugBankInteractionsDatabase {
     }
 
     /**
-     * Retrieve the singleton database instance, constructing it from
-     * disk if necessary
+     * Retrieve the singleton database instance
      **/
-    public static synchronized DrugBankInteractionsDatabase getDB () {
-        if (internalDB == null) {
-            internalDB = new DrugBankInteractionsDatabase();
-        }
-
+    public static DrugBankInteractionsDatabase getDB () {
         return internalDB;
     }
 

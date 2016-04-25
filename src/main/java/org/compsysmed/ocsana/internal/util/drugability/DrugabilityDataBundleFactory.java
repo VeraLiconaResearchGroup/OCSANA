@@ -26,28 +26,21 @@ import org.compsysmed.ocsana.internal.util.science.uniprot.ProteinDatabase;
  * Singleton factory class to build DrugabilityDataBundles
  **/
 public class DrugabilityDataBundleFactory {
-    private static DrugabilityDataBundleFactory factory;
+    private static final DrugabilityDataBundleFactory factory = new DrugabilityDataBundleFactory();
 
-    private final ProteinDatabase proteinDB;
-    private final DrProdisDrugabilityDatabase drProdisDB;
-    private final DrugBankInteractionsDatabase drugBankDB;
-    private final DrugFEATUREScoresDatabase drugFeatureDB;
+    private final ProteinDatabase proteinDB = ProteinDatabase.getDB();
+    private final DrProdisDrugabilityDatabase drProdisDB = DrProdisDrugabilityDatabase.getDB();
+    private final DrugBankInteractionsDatabase drugBankDB = DrugBankInteractionsDatabase.getDB();
+    private final DrugFEATUREScoresDatabase drugFeatureDB = DrugFEATUREScoresDatabase.getDB();
 
     private DrugabilityDataBundleFactory () {
-        proteinDB = ProteinDatabase.getDB();
-        drProdisDB = DrProdisDrugabilityDatabase.getDB();
-        drugBankDB = DrugBankInteractionsDatabase.getDB();
-        drugFeatureDB = DrugFEATUREScoresDatabase.getDB();
+        // Nothing to do…
     }
 
     /**
-     * Retrieve the singleton bundle factory, constructing it if necessary
+     * Retrieve the singleton bundle factory
      **/
-    public static synchronized DrugabilityDataBundleFactory getFactory () {
-        if (factory == null) {
-            factory = new DrugabilityDataBundleFactory();
-        }
-
+    public static DrugabilityDataBundleFactory getFactory () {
         return factory;
     }
 
