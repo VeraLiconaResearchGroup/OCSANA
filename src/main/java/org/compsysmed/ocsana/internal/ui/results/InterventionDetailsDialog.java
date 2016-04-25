@@ -40,6 +40,7 @@ import org.compsysmed.ocsana.internal.util.science.*;
 public class InterventionDetailsDialog
     extends OCSANADialog {
     private CombinationOfInterventions ci;
+    private Collection<SignedIntervention> signedInterventions;
     private CyNetwork network;
     private DrugabilityDataBundleFactory drugabilityDataBundleFactory;
 
@@ -56,10 +57,12 @@ public class InterventionDetailsDialog
      * @param parentFrame the parent JFrame of this dialog (used for
      * positioning)
      * @param ci  the CombinationOfInterventions
+     * @param signedInterventions  the optimal SignedInterventions of ci
     **/
     public InterventionDetailsDialog (JFrame parentFrame,
                                       CyNetwork network,
-                                      CombinationOfInterventions ci) {
+                                      CombinationOfInterventions ci,
+                                      Collection<SignedIntervention> signedInterventions) {
         super(parentFrame, "Intervention details report");
         this.network = network;
         this.ci = ci;
@@ -77,8 +80,9 @@ public class InterventionDetailsDialog
         signedInterventionPanel = new SignedInterventionReportPanel(this);
         contentPanel.add(signedInterventionPanel);
 
-        if (ci.getOptimalSignings() != null && !ci.getOptimalSignings().isEmpty()) {
-            SignedIntervention signedIntervention = ci.getOptimalSignings().stream().findFirst().get();
+        if (signedInterventions != null && !signedInterventions.isEmpty()) {
+            // TODO: Allow user to select SignedIntervention to display
+            SignedIntervention signedIntervention = signedInterventions.stream().findFirst().get();
             signedInterventionPanel.updateIntervention(signedIntervention);
         }
 

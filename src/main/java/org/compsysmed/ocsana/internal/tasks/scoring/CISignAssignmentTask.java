@@ -25,7 +25,6 @@ import org.compsysmed.ocsana.internal.tasks.AbstractOCSANATask;
 import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
 
 import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
-import org.compsysmed.ocsana.internal.stages.cistage.CIStageResults;
 
 import org.compsysmed.ocsana.internal.stages.scorestage.ScoringStageContext;
 
@@ -37,11 +36,10 @@ public class CISignAssignmentTask
     extends AbstractOCSANATask {
     private static final OCSANAStep algStep = OCSANAStep.SCORE_PATHS;
 
-    private CIStageContext ciContext;
-    private ScoringStageContext scoringContext;
+    private final CIStageContext ciContext;
+    private final ScoringStageContext scoringContext;
 
-    private CombinationOfInterventions ci;
-    private Set<CyNode> CINodesToActivate;
+    private final CombinationOfInterventions ci;
 
     private Collection<SignedIntervention> signedInterventions;
 
@@ -59,8 +57,7 @@ public class CISignAssignmentTask
     @Override
     public void run (TaskMonitor taskMonitor) {
         signedInterventions = scoringContext.ciSignAlgorithm.bestInterventions(ci, scoringContext.targetsToActivate);
-        ci.setOptimalSignings(signedInterventions);
-        ci.setTargetsToActivate(scoringContext.targetsToActivate);
+        scoringContext.optimalInterventionSignings.put(ci, signedInterventions);
     }
 
     @Override

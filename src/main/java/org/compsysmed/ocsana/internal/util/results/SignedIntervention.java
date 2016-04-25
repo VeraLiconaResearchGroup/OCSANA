@@ -27,8 +27,8 @@ import org.compsysmed.ocsana.internal.util.science.InteractionSign;
  * Class representing a signed intervention of a CI and its effects on
  * certain targets
  **/
-public class SignedIntervention {
-    private final CombinationOfInterventions ci;
+public class SignedIntervention
+    extends CombinationOfInterventions {
     private final Set<CyNode> interventionNodesToActivate;
     private final Set<CyNode> interventionNodesToInhibit;
     private final Set<SignedInterventionNode> signedInterventionNodes;
@@ -51,41 +51,35 @@ public class SignedIntervention {
     public SignedIntervention (CombinationOfInterventions ci,
                                Set<CyNode> interventionNodesToActivate,
                                Map<CyNode, Double> effectsOnTargets) {
-        if (!ci.getNodes().containsAll(interventionNodesToActivate)) {
+        super(ci);
+
+        if (!getNodes().containsAll(interventionNodesToActivate)) {
             throw new IllegalArgumentException("Nodes to activate must be a subset of CI nodes");
         }
 
-        this.ci = ci;
         this.interventionNodesToActivate = interventionNodesToActivate;
         this.effectsOnTargets = effectsOnTargets;
 
-        this.interventionNodesToInhibit = new HashSet<>(ci.getNodes());
+        this.interventionNodesToInhibit = new HashSet<>(getNodes());
         this.interventionNodesToInhibit.removeAll(interventionNodesToActivate);
 
         signedInterventionNodes = new HashSet<>();
         for (CyNode node: interventionNodesToActivate) {
-            SignedInterventionNode signedNode = new SignedInterventionNode(node, InteractionSign.POSITIVE, ci.nodeName(node));
+            SignedInterventionNode signedNode = new SignedInterventionNode(node, InteractionSign.POSITIVE, nodeName(node));
             signedInterventionNodes.add(signedNode);
         }
 
         for (CyNode node: interventionNodesToInhibit) {
-            SignedInterventionNode signedNode = new SignedInterventionNode(node, InteractionSign.NEGATIVE, ci.nodeName(node));
+            SignedInterventionNode signedNode = new SignedInterventionNode(node, InteractionSign.NEGATIVE, nodeName(node));
             signedInterventionNodes.add(signedNode);
         }
 
         this.targetNodes = effectsOnTargets.keySet();
         scoredTargetNodes = new HashSet<>();
         for (CyNode target: targetNodes) {
-            ScoredTargetNode scoredTarget = new ScoredTargetNode(target, effectOnTarget(target), ci.nodeName(target));
+            ScoredTargetNode scoredTarget = new ScoredTargetNode(target, effectOnTarget(target), nodeName(target));
             scoredTargetNodes.add(scoredTarget);
         }
-    }
-
-    /**
-     * Return the underlying CI
-     **/
-    public CombinationOfInterventions getCI () {
-        return ci;
     }
 
     /**
@@ -105,14 +99,14 @@ public class SignedIntervention {
     /**
      * Return the nodes which are activated in this intervention
      **/
-    public Set<CyNode> getInterventionNodesToActivate () {
+    public Set<CyNode> getNodesToActivate () {
         return interventionNodesToActivate;
     }
 
     /**
      * Return the nodes which are inhibited in this intervention
      **/
-    public Set<CyNode> getInterventionNodesToInhibit () {
+    public Set<CyNode> getNodesToInhibit () {
         return interventionNodesToInhibit;
     }
 
@@ -154,6 +148,6 @@ public class SignedIntervention {
     }
 
     public String toString () {
-        return String.format("Activating nodes %s and inhibiting nodes %s drives %d nodes correctly with effect %s", ci.nodeSetString(interventionNodesToActivate), ci.nodeSetString(interventionNodesToInhibit), numberOfCorrectEffects(), effectsOnTargets);
+        return String.format("Activating nodes %s and inhibiting nodes %s drives %d nodes correctly with effect %s", nodeSetString(interventionNodesToActivate), nodeSetString(interventionNodesToInhibit), numberOfCorrectEffects(), effectsOnTargets);
     }
 }

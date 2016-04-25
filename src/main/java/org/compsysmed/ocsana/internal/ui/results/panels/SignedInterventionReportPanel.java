@@ -106,7 +106,7 @@ public class SignedInterventionReportPanel
         data.put("nodesToActivate", nodesToActivate);
         data.put("nodesToInhibit", nodesToInhibit);
 
-        List<ScoredTargetNode> targets = signedIntervention.getTargetNodes().stream().map(target -> new ScoredTargetNode(target, signedIntervention.effectOnTarget(target), signedIntervention.getCI().nodeName(target))).collect(Collectors.toList());
+        List<ScoredTargetNode> targets = signedIntervention.getTargetNodes().stream().map(target -> new ScoredTargetNode(target, signedIntervention.effectOnTarget(target), signedIntervention.nodeName(target))).collect(Collectors.toList());
         data.put("targets", targets);
 
         // Build template

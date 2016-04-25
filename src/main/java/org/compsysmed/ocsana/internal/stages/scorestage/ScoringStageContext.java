@@ -36,6 +36,9 @@ import org.compsysmed.ocsana.internal.algorithms.scoring.ExhaustiveSearchCISignA
 import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
 import org.compsysmed.ocsana.internal.stages.cistage.CIStageResults;
 
+import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
+import org.compsysmed.ocsana.internal.util.results.SignedIntervention;
+
 /**
  * Context for the scoring stage of OCSANA
  *
@@ -54,6 +57,7 @@ public class ScoringStageContext {
     private Collection<CyNode> targets;
 
     public AbstractCISignAssignmentAlgorithm ciSignAlgorithm;
+    public Map<CombinationOfInterventions, Collection<SignedIntervention>> optimalInterventionSignings;
 
     public ScoringStageContext (CyNetwork network,
                                 CIStageContext ciContext,
@@ -68,6 +72,7 @@ public class ScoringStageContext {
 
         BiFunction<CyNode, CyNode, Double> effectOnTargets = (source, target) -> ciContext.ocsanaAlg.effectOnTargetsScore(source, target);
         ciSignAlgorithm = new ExhaustiveSearchCISignAssignmentAlgorithm(effectOnTargets);
+        optimalInterventionSignings = new HashMap<>();
     }
 
     public void setTargetsToActivate (Set<CyNode> targetsToActivate) {

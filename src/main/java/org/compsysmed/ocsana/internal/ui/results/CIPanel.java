@@ -76,18 +76,9 @@ public class CIPanel
             MHSTableModel mhsModel = new MHSTableModel(ciContext, CIs);
             setModel(mhsModel);
 
-            // Sort the rows
+            // Sort the rows on CI size
             RowSorter<TableModel> mhsSorter = new TableRowSorter<TableModel>(mhsModel);
-
-            // If the CIs have intervention data, sort on that
-            if (ciResults.CIs.stream().findFirst().get().maximumNumberOfCorrectEffects() != null) {
-                mhsSorter.toggleSortOrder(2);
-                mhsSorter.toggleSortOrder(2);
-            } else {
-                // Otherwise, sort on CI size
-                mhsSorter.toggleSortOrder(1);
-            }
-
+            mhsSorter.toggleSortOrder(1);
             setRowSorter(mhsSorter);
 
             MouseListener mouseListener = new MouseAdapter() {
@@ -106,7 +97,7 @@ public class CIPanel
 
         public void handleUserDoubleClick (Integer row) {
             CombinationOfInterventions ci = CIs.get(row);
-            InterventionDetailsDialog detailsDialog = new InterventionDetailsDialog(cytoscapeFrame, ciContext.getNetwork(), CIs.get(row));
+            //InterventionDetailsDialog detailsDialog = new InterventionDetailsDialog(cytoscapeFrame, ciContext.getNetwork(), CIs.get(row));
         }
     }
 
@@ -119,7 +110,7 @@ public class CIPanel
             this.ciContext = ciContext;
             this.CIs = CIs;
         }
-        String[] colNames = {"CI", "Size", "Successful targets"};
+        String[] colNames = {"CI", "Size"};
 
         @Override
         public String getColumnName (int col) {
@@ -133,7 +124,7 @@ public class CIPanel
 
         @Override
         public int getColumnCount () {
-            return 3;
+            return 2;
         }
 
         @Override
@@ -145,9 +136,6 @@ public class CIPanel
 
             case 1:
                 return ci.size();
-
-            case 2:
-                return ci.maximumNumberOfCorrectEffects();
 
             default:
                 throw new IllegalArgumentException(String.format("Table does not have %d columns", col));
