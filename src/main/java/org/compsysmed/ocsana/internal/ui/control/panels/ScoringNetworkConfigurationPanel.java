@@ -26,8 +26,8 @@ import javax.swing.BoxLayout;
 import org.cytoscape.work.swing.PanelTaskManager;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
-import org.compsysmed.ocsana.internal.stages.scorestage.ScoringStageContext;
+import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
+import org.compsysmed.ocsana.internal.stages.prioritization.PrioritizationContext;
 
 import org.compsysmed.ocsana.internal.ui.control.widgets.*;
 
@@ -36,8 +36,8 @@ import org.compsysmed.ocsana.internal.ui.control.widgets.*;
  **/
 public class ScoringNetworkConfigurationPanel
     extends AbstractControlSubPanel {
-    private CIStageContext ciStageContext;
-    private ScoringStageContext scoringStageContext;
+    private GenerationContext ciStageContext;
+    private PrioritizationContext scoringStageContext;
     private PanelTaskManager taskManager;
 
     // UI elements
@@ -49,8 +49,8 @@ public class ScoringNetworkConfigurationPanel
      * @param ciStageContext  the context for the CI stage
      * @param taskManager  a PanelTaskManager to provide @Tunable panels
      **/
-    public ScoringNetworkConfigurationPanel (CIStageContext ciStageContext,
-                                             ScoringStageContext scoringStageContext,
+    public ScoringNetworkConfigurationPanel (GenerationContext ciStageContext,
+                                             PrioritizationContext scoringStageContext,
                                              PanelTaskManager taskManager) {
         // Initial setup
         this.ciStageContext = ciStageContext;

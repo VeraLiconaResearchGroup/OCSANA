@@ -18,15 +18,15 @@ import org.cytoscape.work.AbstractTaskFactory;
 import org.cytoscape.work.TaskIterator;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
-import org.compsysmed.ocsana.internal.stages.cistage.CIStageResults;
+import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
+import org.compsysmed.ocsana.internal.stages.generation.GenerationResults;
 
 public class MHSAlgorithmTaskFactory extends AbstractTaskFactory {
-    private CIStageContext context;
-    private CIStageResults results;
+    private GenerationContext context;
+    private GenerationResults results;
 
-    public MHSAlgorithmTaskFactory (CIStageContext context,
-                                    CIStageResults results) {
+    public MHSAlgorithmTaskFactory (GenerationContext context,
+                                    GenerationResults results) {
         super();
         this.context = context;
         this.results = results;

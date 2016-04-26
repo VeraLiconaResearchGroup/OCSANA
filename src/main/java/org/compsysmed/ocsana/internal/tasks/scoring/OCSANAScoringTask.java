@@ -22,17 +22,17 @@ import org.cytoscape.model.CyEdge;
 import org.compsysmed.ocsana.internal.tasks.AbstractOCSANATask;
 import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
 
-import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
-import org.compsysmed.ocsana.internal.stages.cistage.CIStageResults;
+import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
+import org.compsysmed.ocsana.internal.stages.generation.GenerationResults;
 
 public class OCSANAScoringTask extends AbstractOCSANATask {
     private static final OCSANAStep algStep = OCSANAStep.SCORE_PATHS;
 
-    private CIStageContext context;
-    private CIStageResults results;
+    private GenerationContext context;
+    private GenerationResults results;
 
-    public OCSANAScoringTask (CIStageContext context,
-                              CIStageResults results) {
+    public OCSANAScoringTask (GenerationContext context,
+                              GenerationResults results) {
         super(context.getNetwork());
         this.context = context;
         this.results = results;

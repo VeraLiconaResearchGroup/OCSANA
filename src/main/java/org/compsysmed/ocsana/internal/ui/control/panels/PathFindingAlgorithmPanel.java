@@ -32,7 +32,7 @@ import org.cytoscape.work.swing.PanelTaskManager;
 // OCSANA imports
 import org.compsysmed.ocsana.internal.algorithms.path.*;
 
-import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
+import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
 
 /**
  * Subpanel for user configuration of path-finding algorithm
@@ -40,7 +40,7 @@ import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
 public class PathFindingAlgorithmPanel
     extends AbstractControlSubPanel
     implements ActionListener {
-    private CIStageContext ciStageContext;
+    private GenerationContext ciStageContext;
     private PanelTaskManager taskManager;
 
     // UI elements
@@ -55,7 +55,7 @@ public class PathFindingAlgorithmPanel
      * @param ciStageContext  the context for the CI stage
      * @param taskManager  a PanelTaskManager to provide @Tunable panels
      **/
-    public PathFindingAlgorithmPanel (CIStageContext ciStageContext,
+    public PathFindingAlgorithmPanel (GenerationContext ciStageContext,
                                       PanelTaskManager taskManager) {
         // Initial setup
         this.ciStageContext = ciStageContext;

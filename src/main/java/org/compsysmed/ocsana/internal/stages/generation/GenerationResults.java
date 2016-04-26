@@ -9,7 +9,7 @@
  * details
  **/
 
-package org.compsysmed.ocsana.internal.stages.cistage;
+package org.compsysmed.ocsana.internal.stages.generation;
 
 // Java imports
 import java.util.*;
@@ -22,7 +22,7 @@ import org.cytoscape.model.CyEdge;
 // OCSANA imports
 import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
 
-public class CIStageResults {
+public class GenerationResults {
     // Paths data
     public Collection<List<CyEdge>> pathsToTargets;
     public Collection<List<CyEdge>> pathsToOffTargets;

@@ -33,10 +33,10 @@ import org.cytoscape.work.TaskObserver;
 import org.cytoscape.work.swing.PanelTaskManager;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
-import org.compsysmed.ocsana.internal.stages.cistage.CIStageResults;
+import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
+import org.compsysmed.ocsana.internal.stages.generation.GenerationResults;
 
-import org.compsysmed.ocsana.internal.stages.scorestage.ScoringStageContext;
+import org.compsysmed.ocsana.internal.stages.prioritization.PrioritizationContext;
 
 import org.compsysmed.ocsana.internal.tasks.scoring.CISignAssignmentTaskFactory;
 
@@ -49,7 +49,7 @@ import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
 /**
  * Panel to configure and run OCSANA scoring stage
  **/
-public class ScoringStageControlPanel
+public class PrioritizationStageControlPanel
     extends JPanel
     implements ActionListener, TaskObserver {
     public static final String END_SIGN_ASSIGNMENT_SIGNAL = "Sign assignment task end";
@@ -59,18 +59,18 @@ public class ScoringStageControlPanel
 
     private List<ActionListener> listeners;
 
-    private ScoringStageContext scoringContext;
+    private PrioritizationContext scoringContext;
 
     private CyNetwork network;
 
-    private CIStageContext ciContext;
-    private CIStageResults ciResults;
+    private GenerationContext ciContext;
+    private GenerationResults ciResults;
 
     private Collection<AbstractControlSubPanel> subpanels;
     private JPanel optionsPanel;
     private ScoringNetworkConfigurationPanel networkConfigPanel;
 
-    public ScoringStageControlPanel (CyNetwork network,
+    public PrioritizationStageControlPanel (CyNetwork network,
                                      OCSANAResultsPanel resultsPanel,
                                      PanelTaskManager taskManager) {
         this.network = network;
@@ -104,15 +104,15 @@ public class ScoringStageControlPanel
     /**
      * Populate the panel with data from previous stage
      **/
-    public void populatePanel (CIStageContext ciContext,
-                               CIStageResults ciResults) {
+    public void populatePanel (GenerationContext ciContext,
+                               GenerationResults ciResults) {
         this.ciContext = ciContext;
         this.ciResults = ciResults;
 
         optionsPanel.removeAll();
         subpanels.clear();
 
-        scoringContext = new ScoringStageContext(network, ciContext, ciResults);
+        scoringContext = new PrioritizationContext(network, ciContext, ciResults);
 
         networkConfigPanel = new ScoringNetworkConfigurationPanel(ciContext, scoringContext, taskManager);
         optionsPanel.add(networkConfigPanel);

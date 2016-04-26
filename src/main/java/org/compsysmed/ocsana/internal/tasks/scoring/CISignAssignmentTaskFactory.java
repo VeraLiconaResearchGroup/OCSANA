@@ -19,19 +19,19 @@ import org.cytoscape.work.AbstractTaskFactory;
 import org.cytoscape.work.TaskIterator;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
-import org.compsysmed.ocsana.internal.stages.scorestage.ScoringStageContext;
+import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
+import org.compsysmed.ocsana.internal.stages.prioritization.PrioritizationContext;
 
 import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
 
 public class CISignAssignmentTaskFactory
     extends AbstractTaskFactory {
-    private CIStageContext ciContext;
-    private ScoringStageContext scoringContext;
+    private GenerationContext ciContext;
+    private PrioritizationContext scoringContext;
     private CombinationOfInterventions ci;
 
-    public CISignAssignmentTaskFactory (CIStageContext ciContext,
-                                        ScoringStageContext scoringContext,
+    public CISignAssignmentTaskFactory (GenerationContext ciContext,
+                                        PrioritizationContext scoringContext,
                                         CombinationOfInterventions ci) {
         this.ciContext = ciContext;
         this.scoringContext = scoringContext;

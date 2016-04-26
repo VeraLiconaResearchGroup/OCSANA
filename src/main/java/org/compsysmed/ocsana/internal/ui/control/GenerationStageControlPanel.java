@@ -34,10 +34,10 @@ import org.cytoscape.work.swing.PanelTaskManager;
 // OCSANA imports
 import org.compsysmed.ocsana.internal.algorithms.mhs.*;
 
-import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
-import org.compsysmed.ocsana.internal.stages.cistage.CIStageResults;
-import org.compsysmed.ocsana.internal.stages.cistage.CIStageRunnerTask;
-import org.compsysmed.ocsana.internal.stages.cistage.CIStageRunnerTaskFactory;
+import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
+import org.compsysmed.ocsana.internal.stages.generation.GenerationResults;
+import org.compsysmed.ocsana.internal.stages.generation.GenerationStageRunnerTask;
+import org.compsysmed.ocsana.internal.stages.generation.GenerationStageRunnerTaskFactory;
 
 import org.compsysmed.ocsana.internal.ui.control.panels.*;
 import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
@@ -45,7 +45,7 @@ import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
 /**
  * Panel to configure and run OCSANA CI stage
  **/
-public class CIStageControlPanel
+public class GenerationStageControlPanel
     extends JPanel
     implements ActionListener, TaskObserver {
     public static final String START_CI_SIGNAL = "CI task start";
@@ -54,8 +54,8 @@ public class CIStageControlPanel
     private OCSANAResultsPanel resultsPanel;
     private PanelTaskManager taskManager;
 
-    private CIStageContext ciStageContext;
-    private CIStageResults ciStageResults;
+    private GenerationContext ciStageContext;
+    private GenerationResults ciStageResults;
     private CyNetwork network;
 
     private List<ActionListener> listeners;
@@ -74,7 +74,7 @@ public class CIStageControlPanel
      * @param resultsPanel   panel to update with results
      * @param taskManager  a TaskManager to handle the CI calculation tasks
      **/
-    public CIStageControlPanel (CyNetwork network,
+    public GenerationStageControlPanel (CyNetwork network,
                                 OCSANAResultsPanel resultsPanel,
                                 PanelTaskManager taskManager) {
         this.network = network;
@@ -83,7 +83,7 @@ public class CIStageControlPanel
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        ciStageContext = new CIStageContext(network);
+        ciStageContext = new GenerationContext(network);
 
         subpanels = new ArrayList<>();
 
@@ -98,7 +98,7 @@ public class CIStageControlPanel
      *
      * @return the context
      **/
-    public CIStageContext getContext () {
+    public GenerationContext getContext () {
         updateContext();
         return ciStageContext;
     }
@@ -108,7 +108,7 @@ public class CIStageControlPanel
      *
      * @return the results (null if stage has not been run)
      **/
-    public CIStageResults getResults () {
+    public GenerationResults getResults () {
         return ciStageResults;
     }
 
@@ -174,8 +174,8 @@ public class CIStageControlPanel
 
         signalStartOfCITask();
 
-        CIStageRunnerTaskFactory runnerTaskFactory
-            = new CIStageRunnerTaskFactory(taskManager, this, ciStageContext, resultsPanel);
+        GenerationStageRunnerTaskFactory runnerTaskFactory
+            = new GenerationStageRunnerTaskFactory(taskManager, this, ciStageContext, resultsPanel);
         taskManager.execute(runnerTaskFactory.createTaskIterator(), this);
     }
 
@@ -196,7 +196,7 @@ public class CIStageControlPanel
 
     @Override
     public void taskFinished (ObservableTask task) {
-        ciStageResults = task.getResults(CIStageResults.class);
+        ciStageResults = task.getResults(GenerationResults.class);
         signalEndOfCITask();
     }
 

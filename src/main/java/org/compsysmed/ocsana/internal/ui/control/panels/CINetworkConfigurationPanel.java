@@ -29,7 +29,7 @@ import javax.swing.JPanel;
 import org.cytoscape.work.swing.PanelTaskManager;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
+import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
 
 import org.compsysmed.ocsana.internal.ui.control.widgets.*;
 
@@ -39,7 +39,7 @@ import org.compsysmed.ocsana.internal.ui.control.widgets.*;
 public class CINetworkConfigurationPanel
     extends AbstractControlSubPanel
     implements ActionListener {
-    private CIStageContext ciStageContext;
+    private GenerationContext ciStageContext;
     private PanelTaskManager taskManager;
 
     // UI elements
@@ -64,7 +64,7 @@ public class CINetworkConfigurationPanel
      * @param ciStageContext  the context for the CI stage
      * @param taskManager  a PanelTaskManager to provide @Tunable panels
      **/
-    public CINetworkConfigurationPanel (CIStageContext ciStageContext,
+    public CINetworkConfigurationPanel (GenerationContext ciStageContext,
                                         PanelTaskManager taskManager) {
         // Initial setup
         this.ciStageContext = ciStageContext;

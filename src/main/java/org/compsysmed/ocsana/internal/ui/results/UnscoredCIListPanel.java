@@ -37,19 +37,19 @@ import javax.swing.table.TableRowSorter;
 import org.cytoscape.model.CyNode;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
-import org.compsysmed.ocsana.internal.stages.cistage.CIStageResults;
+import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
+import org.compsysmed.ocsana.internal.stages.generation.GenerationResults;
 
 import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
 
 public class UnscoredCIListPanel
     extends JPanel {
     private JFrame cytoscapeFrame;
-    private CIStageContext ciContext;
-    private CIStageResults ciResults;
+    private GenerationContext ciContext;
+    private GenerationResults ciResults;
 
-    public UnscoredCIListPanel (CIStageContext ciContext,
-                                CIStageResults ciResults,
+    public UnscoredCIListPanel (GenerationContext ciContext,
+                                GenerationResults ciResults,
                                 JFrame cytoscapeFrame) {
         this.ciContext = ciContext;
         this.ciResults = ciResults;
@@ -102,10 +102,10 @@ public class UnscoredCIListPanel
     }
 
     private static class MHSTableModel extends AbstractTableModel {
-        private CIStageContext ciContext;
+        private GenerationContext ciContext;
         private List<CombinationOfInterventions> CIs;
 
-        public MHSTableModel (CIStageContext ciContext,
+        public MHSTableModel (GenerationContext ciContext,
                               List<CombinationOfInterventions> CIs) {
             this.ciContext = ciContext;
             this.CIs = CIs;

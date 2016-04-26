@@ -41,8 +41,8 @@ import org.cytoscape.application.swing.CytoPanelName;
 import org.cytoscape.util.swing.BasicCollapsiblePanel;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
-import org.compsysmed.ocsana.internal.stages.cistage.CIStageResults;
+import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
+import org.compsysmed.ocsana.internal.stages.generation.GenerationResults;
 
 import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
 
@@ -58,10 +58,10 @@ public class OCSANAControlPanel
     private OCSANAResultsPanel resultsPanel;
 
     private BasicCollapsiblePanel ciCollapsible;
-    private CIStageControlPanel ciControlPanel;
+    private GenerationStageControlPanel ciControlPanel;
 
     private BasicCollapsiblePanel scoringCollapsible;
-    private ScoringStageControlPanel scoringControlPanel;
+    private PrioritizationStageControlPanel scoringControlPanel;
     Boolean scoringPanelLocked = true;
 
     public OCSANAControlPanel (CyApplicationManager cyApplicationManager,
@@ -98,7 +98,7 @@ public class OCSANAControlPanel
         ciCollapsible.setCollapsed(false);
         add(ciCollapsible);
 
-        ciControlPanel = new CIStageControlPanel(network, resultsPanel, panelTaskManager);
+        ciControlPanel = new GenerationStageControlPanel(network, resultsPanel, panelTaskManager);
         ciControlPanel.addActionListener(this);
         ciCollapsible.add(ciControlPanel);
 
@@ -116,7 +116,7 @@ public class OCSANAControlPanel
         add(scoringCollapsible);
 
 
-        scoringControlPanel = new ScoringStageControlPanel(network, resultsPanel, panelTaskManager);
+        scoringControlPanel = new PrioritizationStageControlPanel(network, resultsPanel, panelTaskManager);
         scoringControlPanel.addActionListener(this);
         scoringCollapsible.add(scoringControlPanel);
 
@@ -179,18 +179,18 @@ public class OCSANAControlPanel
     @Override
     public void actionPerformed (ActionEvent event) {
         switch (event.getActionCommand()) {
-        case CIStageControlPanel.START_CI_SIGNAL:
+        case GenerationStageControlPanel.START_CI_SIGNAL:
             lockScoringCollapsible();
             break;
 
-        case CIStageControlPanel.END_CI_SIGNAL:
-            CIStageContext ciContext = ciControlPanel.getContext();
-            CIStageResults ciResults = ciControlPanel.getResults();
+        case GenerationStageControlPanel.END_CI_SIGNAL:
+            GenerationContext ciContext = ciControlPanel.getContext();
+            GenerationResults ciResults = ciControlPanel.getResults();
             scoringControlPanel.populatePanel(ciContext, ciResults);
             unlockScoringCollapsible();
             break;
 
-        case ScoringStageControlPanel.END_SIGN_ASSIGNMENT_SIGNAL:
+        case PrioritizationStageControlPanel.END_SIGN_ASSIGNMENT_SIGNAL:
             // Currently, do nothing
             break;
 

@@ -20,17 +20,17 @@ import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
 
 import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
 
-import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
-import org.compsysmed.ocsana.internal.stages.cistage.CIStageResults;
+import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
+import org.compsysmed.ocsana.internal.stages.generation.GenerationResults;
 
 public class PresentResultsTask extends AbstractOCSANATask {
     private static final OCSANAStep algStep = OCSANAStep.PRESENT_RESULTS;
-    private CIStageContext ciContext;
-    private CIStageResults ciResults;
+    private GenerationContext ciContext;
+    private GenerationResults ciResults;
     private OCSANAResultsPanel resultsPanel;
 
-    public PresentResultsTask (CIStageContext ciContext,
-                               CIStageResults ciResults,
+    public PresentResultsTask (GenerationContext ciContext,
+                               GenerationResults ciResults,
                                OCSANAResultsPanel resultsPanel) {
         super(ciContext.getNetwork());
         this.ciContext = ciContext;

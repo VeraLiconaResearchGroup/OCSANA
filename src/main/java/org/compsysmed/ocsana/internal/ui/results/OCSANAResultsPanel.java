@@ -38,10 +38,10 @@ import org.cytoscape.application.swing.CytoPanelName;
 import org.cytoscape.application.swing.CytoPanelState;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
-import org.compsysmed.ocsana.internal.stages.cistage.CIStageResults;
+import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
+import org.compsysmed.ocsana.internal.stages.generation.GenerationResults;
 
-import org.compsysmed.ocsana.internal.stages.scorestage.ScoringStageContext;
+import org.compsysmed.ocsana.internal.stages.prioritization.PrioritizationContext;
 
 /**
  * Panel to display OCSANA results
@@ -52,10 +52,10 @@ public class OCSANAResultsPanel
     private final CySwingApplication cySwingApplication;
     private final CytoPanel cyResultsPanel;
 
-    CIStageContext ciContext;
-    CIStageResults ciResults;
+    GenerationContext ciContext;
+    GenerationResults ciResults;
 
-    ScoringStageContext scoreContext;
+    PrioritizationContext scoreContext;
 
     JPanel resultsPanel;
     JPanel operationsPanel;
@@ -82,8 +82,8 @@ public class OCSANAResultsPanel
      * @param ciContext  the CI stage context
      * @param ciResults  the CI stage results to display
      **/
-    public void updateResults (CIStageContext ciContext,
-                               CIStageResults ciResults) {
+    public void updateResults (GenerationContext ciContext,
+                               GenerationResults ciResults) {
         System.out.println("Boop!");
         this.ciContext = ciContext;
         this.ciResults = ciResults;
@@ -93,7 +93,7 @@ public class OCSANAResultsPanel
         rebuildPanels();
     }
 
-    public void updateResults (ScoringStageContext scoreContext) {
+    public void updateResults (PrioritizationContext scoreContext) {
         System.out.println("Beep!");
         this.scoreContext = scoreContext;
 

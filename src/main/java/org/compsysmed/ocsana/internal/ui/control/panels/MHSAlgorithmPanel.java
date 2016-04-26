@@ -33,7 +33,7 @@ import org.cytoscape.work.swing.PanelTaskManager;
 // OCSANA imports
 import org.compsysmed.ocsana.internal.algorithms.mhs.*;
 
-import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
+import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
 
 /**
  * Subpanel for user configuration of MHS algorithm
@@ -41,7 +41,7 @@ import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
 public class MHSAlgorithmPanel
     extends AbstractControlSubPanel
     implements ActionListener {
-    private CIStageContext ciStageContext;
+    private GenerationContext ciStageContext;
     private PanelTaskManager taskManager;
 
     // UI elements
@@ -57,7 +57,7 @@ public class MHSAlgorithmPanel
      * @param ciStageContext  the context for the CI stage
      * @param taskManager  a PanelTaskManager to provide @Tunable panels
      **/
-    public MHSAlgorithmPanel (CIStageContext ciStageContext,
+    public MHSAlgorithmPanel (GenerationContext ciStageContext,
                               PanelTaskManager taskManager) {
         // Initial setup
         this.ciStageContext = ciStageContext;

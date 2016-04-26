@@ -25,19 +25,19 @@ import org.cytoscape.model.CyEdge;
 import org.compsysmed.ocsana.internal.tasks.AbstractOCSANATask;
 import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
 
-import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
-import org.compsysmed.ocsana.internal.stages.cistage.CIStageResults;
+import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
+import org.compsysmed.ocsana.internal.stages.generation.GenerationResults;
 
 import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
 
 public class MHSAlgorithmTask extends AbstractOCSANATask {
     private static final OCSANAStep algStep = OCSANAStep.FIND_MHSES;
 
-    private CIStageContext ciContext;
-    private CIStageResults ciResults;
+    private GenerationContext ciContext;
+    private GenerationResults ciResults;
 
-    public MHSAlgorithmTask (CIStageContext ciContext,
-                             CIStageResults ciResults) {
+    public MHSAlgorithmTask (GenerationContext ciContext,
+                             GenerationResults ciResults) {
         super(ciContext.getNetwork());
         this.ciContext = ciContext;
         this.ciResults = ciResults;

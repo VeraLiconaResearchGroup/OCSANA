@@ -1,5 +1,5 @@
 /**
- * Runner for the CI stage of OCSANA
+ * Runner for the generation stage of OCSANA
  *
  * Copyright Vera-Licona Research Group (C) 2016
  *
@@ -9,7 +9,7 @@
  * details
  **/
 
-package org.compsysmed.ocsana.internal.stages.cistage;
+package org.compsysmed.ocsana.internal.stages.generation;
 
 // Cytoscape imports
 import org.cytoscape.model.CyNetwork;
@@ -33,7 +33,7 @@ import org.compsysmed.ocsana.internal.tasks.results.PresentResultsTaskFactory;
 import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
 
 /**
- * Runner task for the CI stage of OCSANA
+ * Runner task for the generation stage of OCSANA
  *
  * This task runs the OCSANA algorithm on the inputs specified in a
  * CIStageContext. In particular, it:
@@ -41,28 +41,28 @@ import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
  * 2) Finds MHSes/CIs of those paths; and
  * 3) Scores the influence of the CI nodes on the targets.
  **/
-public class CIStageRunnerTask
+public class GenerationStageRunnerTask
     extends AbstractNetworkTask
     implements TaskObserver, ObservableTask {
     private TaskManager<?, ?> taskManager;
-    private CIStageContext context;
-    private CIStageResults results;
+    private GenerationContext context;
+    private GenerationResults results;
     private TaskObserver observer;
     private OCSANAResultsPanel resultsPanel;
 
     private Boolean hasCleanResults = false;
 
-    public CIStageRunnerTask (TaskManager<?, ?> taskManager,
-                              TaskObserver observer,
-                              CIStageContext context,
-                              OCSANAResultsPanel resultsPanel) {
+    public GenerationStageRunnerTask (TaskManager<?, ?> taskManager,
+                                      TaskObserver observer,
+                                      GenerationContext context,
+                                      OCSANAResultsPanel resultsPanel) {
         super(context.getNetwork());
         this.taskManager = taskManager;
         this.observer = observer;
         this.context = context;
         this.resultsPanel = resultsPanel;
 
-        this.results = new CIStageResults();
+        this.results = new GenerationResults();
     }
 
     @Override
@@ -136,12 +136,12 @@ public class CIStageRunnerTask
     @Override
     public void taskFinished(ObservableTask task) {
         // Make sure the task returned non-null
-         if (task.getResults(Object.class) == null) {
+        if (task.getResults(Object.class) == null) {
             cancel();
             return;
         }
 
-         // Process the results based on the step just completed
+        // Process the results based on the step just completed
         OCSANAStep currentStep = task.getResults(OCSANAStep.class);
 
         switch (currentStep) {

@@ -24,13 +24,13 @@ import javax.swing.JTextArea;
 import org.cytoscape.model.CyEdge;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
-import org.compsysmed.ocsana.internal.stages.cistage.CIStageResults;
+import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
+import org.compsysmed.ocsana.internal.stages.generation.GenerationResults;
 
 public class PathsPanel
     extends JPanel {
-    public PathsPanel (CIStageContext context,
-                       CIStageResults results,
+    public PathsPanel (GenerationContext context,
+                       GenerationResults results,
                        PathType pathType) {
         Collection<List<CyEdge>> paths;
         Double pathFindingTime;

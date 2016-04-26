@@ -9,7 +9,7 @@
  * details
  **/
 
-package org.compsysmed.ocsana.internal.stages.cistage;
+package org.compsysmed.ocsana.internal.stages.generation;
 
 // Java imports
 import java.util.*;
@@ -21,20 +21,20 @@ import org.cytoscape.work.TaskManager;
 import org.cytoscape.work.TaskObserver;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
-import org.compsysmed.ocsana.internal.stages.cistage.CIStageResults;
+import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
+import org.compsysmed.ocsana.internal.stages.generation.GenerationResults;
 
 import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
 
-public class CIStageRunnerTaskFactory extends AbstractTaskFactory {
+public class GenerationStageRunnerTaskFactory extends AbstractTaskFactory {
     private TaskManager<?, ?> taskManager;
     private TaskObserver observer;
-    private CIStageContext context;
+    private GenerationContext context;
     private OCSANAResultsPanel resultsPanel;
 
-    public CIStageRunnerTaskFactory (TaskManager<?, ?> taskManager,
+    public GenerationStageRunnerTaskFactory (TaskManager<?, ?> taskManager,
                                      TaskObserver observer,
-                                     CIStageContext context,
+                                     GenerationContext context,
                                      OCSANAResultsPanel resultsPanel) {
         super();
         this.taskManager = taskManager;
@@ -46,7 +46,7 @@ public class CIStageRunnerTaskFactory extends AbstractTaskFactory {
     @Override
     public TaskIterator createTaskIterator () {
         TaskIterator tasks = new TaskIterator();
-        tasks.append(new CIStageRunnerTask(taskManager, observer, context, resultsPanel));
+        tasks.append(new GenerationStageRunnerTask(taskManager, observer, context, resultsPanel));
         return tasks;
     }
 }

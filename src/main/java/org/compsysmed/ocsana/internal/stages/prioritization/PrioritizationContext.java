@@ -9,7 +9,7 @@
  * details
  **/
 
-package org.compsysmed.ocsana.internal.stages.scorestage;
+package org.compsysmed.ocsana.internal.stages.prioritization;
 
 // Java imports
 import java.util.*;
@@ -33,8 +33,8 @@ import org.cytoscape.work.util.ListMultipleSelection;
 import org.compsysmed.ocsana.internal.algorithms.scoring.AbstractCISignAssignmentAlgorithm;
 import org.compsysmed.ocsana.internal.algorithms.scoring.ExhaustiveSearchCISignAssignmentAlgorithm;
 
-import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
-import org.compsysmed.ocsana.internal.stages.cistage.CIStageResults;
+import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
+import org.compsysmed.ocsana.internal.stages.generation.GenerationResults;
 
 import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
 import org.compsysmed.ocsana.internal.util.results.SignedIntervention;
@@ -46,22 +46,22 @@ import org.compsysmed.ocsana.internal.util.results.SignedIntervention;
  * stage.  A populated instance will be passed to a
  * ScoringStageController which handles scoring tasks.
  **/
-public class ScoringStageContext {
+public class PrioritizationContext {
     public Set<CyNode> targetsToDeactivate;
     public Set<CyNode> targetsToActivate;
 
     // Internal data
     private CyNetwork network;
-    private CIStageContext ciContext;
-    private CIStageResults ciResults;
+    private GenerationContext ciContext;
+    private GenerationResults ciResults;
     private Collection<CyNode> targets;
 
     public AbstractCISignAssignmentAlgorithm ciSignAlgorithm;
     public Map<CombinationOfInterventions, Collection<SignedIntervention>> optimalInterventionSignings;
 
-    public ScoringStageContext (CyNetwork network,
-                                CIStageContext ciContext,
-                                CIStageResults ciResults) {
+    public PrioritizationContext (CyNetwork network,
+                                GenerationContext ciContext,
+                                GenerationResults ciResults) {
         this.network = network;
         this.ciContext = ciContext;
         this.ciResults = ciResults;

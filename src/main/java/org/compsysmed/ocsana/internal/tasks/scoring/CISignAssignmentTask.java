@@ -24,9 +24,9 @@ import org.cytoscape.model.CyNode;
 import org.compsysmed.ocsana.internal.tasks.AbstractOCSANATask;
 import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
 
-import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
+import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
 
-import org.compsysmed.ocsana.internal.stages.scorestage.ScoringStageContext;
+import org.compsysmed.ocsana.internal.stages.prioritization.PrioritizationContext;
 
 import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
 import org.compsysmed.ocsana.internal.util.results.SignedIntervention;
@@ -36,15 +36,15 @@ public class CISignAssignmentTask
     extends AbstractOCSANATask {
     private static final OCSANAStep algStep = OCSANAStep.SCORE_PATHS;
 
-    private final CIStageContext ciContext;
-    private final ScoringStageContext scoringContext;
+    private final GenerationContext ciContext;
+    private final PrioritizationContext scoringContext;
 
     private final CombinationOfInterventions ci;
 
     private Collection<SignedIntervention> signedInterventions;
 
-    public CISignAssignmentTask (CIStageContext ciContext,
-                                 ScoringStageContext scoringContext,
+    public CISignAssignmentTask (GenerationContext ciContext,
+                                 PrioritizationContext scoringContext,
                                  CombinationOfInterventions ci) {
         super(ciContext.getNetwork());
 

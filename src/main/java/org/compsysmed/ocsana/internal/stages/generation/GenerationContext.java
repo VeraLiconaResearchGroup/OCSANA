@@ -9,7 +9,7 @@
  * details
  **/
 
-package org.compsysmed.ocsana.internal.stages.cistage;
+package org.compsysmed.ocsana.internal.stages.generation;
 
 // Java imports
 import java.util.*;
@@ -47,7 +47,7 @@ import org.compsysmed.ocsana.internal.algorithms.scoring.OCSANAScoringAlgorithm;
  * populated instance will be passed to a CIStageRunner at the
  * beginning of a run.
  **/
-public class CIStageContext {
+public class GenerationContext {
     public NodeNameHandler nodeNameHandler;
 
     public Set<CyNode> sourceNodes;
@@ -67,7 +67,7 @@ public class CIStageContext {
     private CyNetwork network;
     private Collection<ActionListener> listeners = new HashSet<>();
 
-    public CIStageContext (CyNetwork network) {
+    public GenerationContext (CyNetwork network) {
         this.network = network;
 
         if (network == null) {
