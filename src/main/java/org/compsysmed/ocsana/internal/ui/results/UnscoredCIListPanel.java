@@ -42,15 +42,15 @@ import org.compsysmed.ocsana.internal.stages.cistage.CIStageResults;
 
 import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
 
-public class CIPanel
+public class UnscoredCIListPanel
     extends JPanel {
     private JFrame cytoscapeFrame;
     private CIStageContext ciContext;
     private CIStageResults ciResults;
 
-    public CIPanel (CIStageContext ciContext,
-                    CIStageResults ciResults,
-                    JFrame cytoscapeFrame) {
+    public UnscoredCIListPanel (CIStageContext ciContext,
+                                CIStageResults ciResults,
+                                JFrame cytoscapeFrame) {
         this.ciContext = ciContext;
         this.ciResults = ciResults;
         this.cytoscapeFrame = cytoscapeFrame;
@@ -61,7 +61,7 @@ public class CIPanel
             JScrollPane mhsScrollPane = new JScrollPane(mhsTable);
 
             setLayout(new BorderLayout());
-            String mhsText = String.format("<html>Found %d optimal CIs in %f s.<br />Double-click a CI for a detailed intervention report.</html>", ciResults.CIs.size(), ciResults.mhsExecutionSeconds);
+            String mhsText = String.format("Found %d optimal CIs in %f s.", ciResults.CIs.size(), ciResults.mhsExecutionSeconds);
             add(new JLabel(mhsText), BorderLayout.PAGE_START);
             add(mhsScrollPane, BorderLayout.CENTER);
         }

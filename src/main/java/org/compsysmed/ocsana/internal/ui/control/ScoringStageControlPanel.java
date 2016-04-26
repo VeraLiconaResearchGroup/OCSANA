@@ -171,7 +171,7 @@ public class ScoringStageControlPanel
     public void allFinished(FinishStatus finishStatus) {
         // Called after the TaskManager finished up a TaskIterator.
         signalEndOfSignAssignmentTask();
-        resultsPanel.updateResults(ciContext, ciResults);
+        resultsPanel.updateResults(scoringContext);
     }
 
     // Helper functions to support listening for component changes

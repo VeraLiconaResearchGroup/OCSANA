@@ -41,45 +41,83 @@ import org.cytoscape.application.swing.CytoPanelState;
 import org.compsysmed.ocsana.internal.stages.cistage.CIStageContext;
 import org.compsysmed.ocsana.internal.stages.cistage.CIStageResults;
 
+import org.compsysmed.ocsana.internal.stages.scorestage.ScoringStageContext;
+
 /**
  * Panel to display OCSANA results
  **/
 public class OCSANAResultsPanel
     extends JPanel
     implements CytoPanelComponent {
-    private CySwingApplication cySwingApplication;
-    private CytoPanel cyResultsPanel;
+    private final CySwingApplication cySwingApplication;
+    private final CytoPanel cyResultsPanel;
 
     CIStageContext ciContext;
     CIStageResults ciResults;
 
+    ScoringStageContext scoreContext;
+
+    JPanel resultsPanel;
+    JPanel operationsPanel;
+
+    /**
+     * Constructor
+     * <p>
+     * Produces a blank panel. To populate, use the updateResults methods.
+     *
+     * @param cySwingApplication  the CySwingApplication of this
+     * Cytoscape instance
+     **/
     public OCSANAResultsPanel (CySwingApplication cySwingApplication) {
         super();
         this.cySwingApplication = cySwingApplication;
         this.cyResultsPanel = cySwingApplication.getCytoPanel(getCytoPanelName());
-    }
 
-    /**
-     * Reset the panel to a blank state
-     **/
-    public void reset () {
-        removeAll();
-        revalidate();
-        repaint();
+        setLayout(new BorderLayout());
     }
 
     /**
      * Update the panel with the specified CI-stage results
      *
-     * @param results  the results to display
+     * @param ciContext  the CI stage context
+     * @param ciResults  the CI stage results to display
      **/
-    public void updateResults (CIStageContext context,
-                               CIStageResults results) {
-        this.ciContext = context;
-        this.ciResults = results;;
+    public void updateResults (CIStageContext ciContext,
+                               CIStageResults ciResults) {
+        System.out.println("Boop!");
+        this.ciContext = ciContext;
+        this.ciResults = ciResults;
 
+        this.scoreContext = null;
+
+        rebuildPanels();
+    }
+
+    public void updateResults (ScoringStageContext scoreContext) {
+        System.out.println("Beep!");
+        this.scoreContext = scoreContext;
+
+        rebuildPanels();
+    }
+
+    private void rebuildPanels () {
+        resultsPanel = getResultsPanel();
+        operationsPanel = getOperationsPanel();
+        reset();
+    }
+
+
+    /**
+     * Reset the panel to display the
+     **/
+    public void reset () {
         removeAll();
-        buildCIStagePanel();
+
+        add(resultsPanel, BorderLayout.CENTER);
+        add(operationsPanel, BorderLayout.SOUTH);
+
+        setSize(getMinimumSize());
+
         revalidate();
         repaint();
 
@@ -89,27 +127,12 @@ public class OCSANAResultsPanel
     }
 
     /**
-     * Build the panel for CI-stage results using the stored data
-     **/
-    private void buildCIStagePanel () {
-        setLayout(new BorderLayout());
-
-        JPanel resultsPanel = getCIResultsPanel();
-        this.add(resultsPanel, BorderLayout.CENTER);
-
-        JPanel operationsPanel = getCIOperationsPanel();
-        this.add(operationsPanel, BorderLayout.SOUTH);
-
-        setSize(getMinimumSize());
-    }
-
-    /**
-     * Build the operations panel for CI-stage results
+     * Build the operations panel
      *
      * This is the part of the results panel with buttons and other
      * user operations
      **/
-    private JPanel getCIOperationsPanel () {
+    private JPanel getOperationsPanel () {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
 
@@ -118,7 +141,7 @@ public class OCSANAResultsPanel
         showReportButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed (ActionEvent e) {
-                    showCIResultsReport();
+                    showResultsReport();
                 }
             });
 
@@ -157,7 +180,7 @@ public class OCSANAResultsPanel
     /**
      * Show the CI results report in a dialog
      **/
-    private void showCIResultsReport () {
+    private void showResultsReport () {
         JTextArea reportTextArea = new JTextArea(40, 120);
         reportTextArea.setText(String.join("\n", ciResults.getReportLines()));
         reportTextArea.setEditable(false);
@@ -168,12 +191,12 @@ public class OCSANAResultsPanel
     }
 
     /**
-     * Build the CI results panel
+     * Build the results panel
      *
-     * This is the panel that displays the results of the CI stage of
-     * OCSANA operations
+     * This is the panel that displays the results of whatever OCSANA
+     * operations have completed
      **/
-    private JPanel getCIResultsPanel () {
+    private JPanel getResultsPanel () {
         JPanel resultsPanel = new JPanel(new BorderLayout());
 
         if (ciResults == null) {
@@ -185,7 +208,7 @@ public class OCSANAResultsPanel
         resultsPanel.setBorder(null);
 
         if (ciResults.CIs != null) {
-            CIPanel ciPanel = new CIPanel(ciContext, ciResults, cySwingApplication.getJFrame());
+            UnscoredCIListPanel ciPanel = new UnscoredCIListPanel(ciContext, ciResults, cySwingApplication.getJFrame());
             resultsTabbedPane.addTab("Optimal CIs", ciPanel);
         }
 
