@@ -1,5 +1,5 @@
 /**
- * Simple algorithm to score a signed intervention
+ * Simple algorithm to score a signed intervention based on drugability
  *
  * Copyright Vera-Licona Research Group (C) 2016
  *
@@ -9,7 +9,7 @@
  * details
  **/
 
-package org.compsysmed.ocsana.internal.algorithms.scoring;
+package org.compsysmed.ocsana.internal.algorithms.drugability;
 
 // Java imports
 import java.util.*;
@@ -29,7 +29,7 @@ import org.compsysmed.ocsana.internal.util.results.SignedIntervention;
 import org.compsysmed.ocsana.internal.util.results.SignedInterventionNode;
 
 /**
- * Simple algorithm to score a signed intervention
+ * Simple algorithm to score a signed intervention based on drugability
  **/
 public abstract class SimpleSignedInterventionScoringAlgorithm
     extends AbstractSignedInterventionScoringAlgorithm {

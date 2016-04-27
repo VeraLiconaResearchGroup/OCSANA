@@ -10,7 +10,7 @@
  * details
  **/
 
-package org.compsysmed.ocsana.internal.algorithms.scoring;
+package org.compsysmed.ocsana.internal.algorithms.drugability;
 
 // Java imports
 import java.util.*;

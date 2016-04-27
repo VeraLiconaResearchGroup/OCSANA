@@ -30,8 +30,7 @@ import org.cytoscape.work.Tunable;
 import org.cytoscape.work.util.ListMultipleSelection;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.algorithms.scoring.AbstractCISignAssignmentAlgorithm;
-import org.compsysmed.ocsana.internal.algorithms.scoring.ExhaustiveSearchCISignAssignmentAlgorithm;
+import org.compsysmed.ocsana.internal.algorithms.signassignment.AbstractCISignAssignmentAlgorithm;
 
 import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
 import org.compsysmed.ocsana.internal.stages.generation.GenerationResults;

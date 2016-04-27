@@ -9,7 +9,7 @@
  * details
  **/
 
-package org.compsysmed.ocsana.internal.algorithms.scoring;
+package org.compsysmed.ocsana.internal.algorithms.signassignment;
 
 // Java imports
 import java.util.*;
