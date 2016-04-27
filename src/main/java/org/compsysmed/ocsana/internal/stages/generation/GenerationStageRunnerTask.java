@@ -138,9 +138,7 @@ public class GenerationStageRunnerTask
 
     @Override
     public void taskFinished(ObservableTask task) {
-        // Make sure the task returned non-null
-        if (task.getResults(Object.class) == null) {
-            cancel();
+        if (cancelled) {
             return;
         }
 
@@ -172,13 +170,15 @@ public class GenerationStageRunnerTask
             break;
 
         default:
-            throw new AssertionError("Invalid OCSANA step " + currentStep);
+            throw new IllegalStateException("Unknown OCSANA step " + currentStep);
         }
     }
 
     @Override
     public void allFinished(FinishStatus finishStatus) {
-        // Called after the TaskManager finished up a TaskIterator.
-        // Currently, we don't do anything with this information.
+        if (finishStatus.getType() != FinishStatus.Type.SUCCEEDED) {
+            cancel();
+            spawnCleanupTask();
+        }
     }
 }

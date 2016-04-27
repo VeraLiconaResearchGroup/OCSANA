@@ -163,7 +163,7 @@ public class PrioritizationStageControlPanel
         prioritizationResults = new PrioritizationResults(prioritizationContext);
 
         TaskIterator prioritizationTasks = new TaskIterator();
-        prioritizationTasks.append(new PrioritizationStageRunnerTask(taskManager, this, generationContext, generationResults, prioritizationContext, resultsPanel));
+        prioritizationTasks.append(new PrioritizationStageRunnerTask(taskManager, this, generationContext, generationResults, prioritizationContext, prioritizationResults, resultsPanel));
 
         taskManager.execute(prioritizationTasks, this);
     }

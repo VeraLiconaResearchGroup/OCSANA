@@ -61,4 +61,20 @@ public class PrioritizationResults {
         }
         optimalInterventionSignings.put(ci, optimalSignings);
     }
+
+    /**
+     * Get the optimal signings for all CIs at once
+     **/
+    public Map<CombinationOfInterventions, Collection<SignedIntervention>> getOptimalInterventionSignings () {
+        return optimalInterventionSignings;
+    }
+
+    /**
+     * Get the optimal signings for a specified CombinationOfInterventions
+     *
+     * @param ci  the CI
+     **/
+    public Collection<SignedIntervention> getOptimalInterventionSignings (CombinationOfInterventions ci) {
+        return optimalInterventionSignings.get(ci);
+    }
 }
