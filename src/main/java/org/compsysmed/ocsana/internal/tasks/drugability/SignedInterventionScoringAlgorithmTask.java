@@ -1,5 +1,5 @@
 /**
- * Task to run CI sign assignment algorithm in OCSANA
+ * Task to run SI scoring algorithm in OCSANA
  *
  * Copyright Vera-Licona Research Group (C) 2016
  *
@@ -9,7 +9,7 @@
  * details
  **/
 
-package org.compsysmed.ocsana.internal.tasks.signassignment;
+package org.compsysmed.ocsana.internal.tasks.drugability;
 
 // Java imports
 import java.util.*;
@@ -30,15 +30,15 @@ import org.compsysmed.ocsana.internal.stages.prioritization.PrioritizationResult
 import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
 import org.compsysmed.ocsana.internal.util.results.SignedIntervention;
 
-public class SignAssignmentAlgorithmTask
+public class SignedInterventionScoringAlgorithmTask
     extends AbstractOCSANATask {
-    private static final OCSANAStep algStep = OCSANAStep.ASSIGN_CI_SIGNS;
+    private static final OCSANAStep algStep = OCSANAStep.SCORE_SIGNED_INTERVENTIONS;
 
     private final PrioritizationContext prioritizationContext;
     private final PrioritizationResults prioritizationResults;
 
-    public SignAssignmentAlgorithmTask (PrioritizationContext prioritizationContext,
-                                        PrioritizationResults prioritizationResults) {
+    public SignedInterventionScoringAlgorithmTask (PrioritizationContext prioritizationContext,
+                                                   PrioritizationResults prioritizationResults) {
         super(prioritizationContext.getGenerationContext().getNetwork());
 
         if (prioritizationContext == null) {
@@ -54,23 +54,28 @@ public class SignAssignmentAlgorithmTask
 
     @Override
     public void run (TaskMonitor taskMonitor) {
-        taskMonitor.setTitle("Computing sign assignments for CIs");
+        taskMonitor.setTitle("Scoring signed interventions");
 
         Long preTime = System.nanoTime();
-
         for (CombinationOfInterventions ci: prioritizationContext.getGenerationResults().CIs) {
             if (cancelled) {
                 break;
             }
 
-            Collection<SignedIntervention> optimalSignings = prioritizationContext.getCISignAlgorithm().bestInterventions(ci, prioritizationContext.getTargetsToActivate());
-            prioritizationResults.setOptimalInterventionSignings(ci, optimalSignings);
+            for (SignedIntervention si: prioritizationResults.getOptimalInterventionSignings(ci)) {
+                if (cancelled) {
+                    break;
+                }
+
+                Double siScore = prioritizationContext.getSIScoringAlgorithm().computePriorityScore(si);
+                prioritizationResults.setSignedInterventionScore(si, siScore);
+            }
         }
         Long postTime = System.nanoTime();
 
         Double signingTime = (postTime - preTime) / 1E9;
 
-        taskMonitor.setStatusMessage(String.format("Found optimal sign assignments in %f s.", signingTime));
+        taskMonitor.setStatusMessage(String.format("Scored signed interventions in %f s.", signingTime));
     }
 
     @Override

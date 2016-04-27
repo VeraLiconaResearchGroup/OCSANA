@@ -41,8 +41,6 @@ import org.compsysmed.ocsana.internal.stages.prioritization.PrioritizationContex
 import org.compsysmed.ocsana.internal.stages.prioritization.PrioritizationResults;
 import org.compsysmed.ocsana.internal.stages.prioritization.PrioritizationStageRunnerTask;
 
-import org.compsysmed.ocsana.internal.tasks.scoring.CISignAssignmentTaskFactory;
-
 import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
 
 import org.compsysmed.ocsana.internal.ui.control.panels.*;

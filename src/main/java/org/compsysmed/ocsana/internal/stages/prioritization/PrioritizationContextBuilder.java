@@ -33,6 +33,9 @@ import org.cytoscape.work.util.ListMultipleSelection;
 import org.compsysmed.ocsana.internal.algorithms.signassignment.AbstractCISignAssignmentAlgorithm;
 import org.compsysmed.ocsana.internal.algorithms.signassignment.ExhaustiveSearchCISignAssignmentAlgorithm;
 
+import org.compsysmed.ocsana.internal.algorithms.drugability.AbstractSignedInterventionScoringAlgorithm;
+import org.compsysmed.ocsana.internal.algorithms.drugability.SimpleSignedInterventionScoringAlgorithm;
+
 import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
 import org.compsysmed.ocsana.internal.stages.generation.GenerationResults;
 
@@ -55,6 +58,7 @@ public class PrioritizationContextBuilder {
     private Set<CyNode> targetsToActivate;
 
     private AbstractCISignAssignmentAlgorithm ciSignAlgorithm;
+    private AbstractSignedInterventionScoringAlgorithm siScoringAlgorithm;
 
     /**
      * Constructor
@@ -87,6 +91,8 @@ public class PrioritizationContextBuilder {
 
         BiFunction<CyNode, CyNode, Double> effectOnTargets = (source, target) -> generationContext.getOCSANAAlgorithm().effectOnTargetsScore(source, target);
         ciSignAlgorithm = new ExhaustiveSearchCISignAssignmentAlgorithm(effectOnTargets);
+
+        siScoringAlgorithm = new SimpleSignedInterventionScoringAlgorithm();
     }
 
     /**
@@ -123,9 +129,18 @@ public class PrioritizationContextBuilder {
     }
 
     /**
+     * Set the SI scoring algorithm
+     *
+     * @param siScoringAlgorithm  the algorithm
+     **/
+    public void setSIScoringAlgorithm (AbstractSignedInterventionScoringAlgorithm siScoringAlgorithm) {
+        this.siScoringAlgorithm = siScoringAlgorithm;
+    }
+
+    /**
      * Get the context as configured
      **/
     public PrioritizationContext getContext () {
-        return new PrioritizationContext(network, generationContext, generationResults, targets, targetsToActivate, targetsToDeactivate, ciSignAlgorithm);
+        return new PrioritizationContext(network, generationContext, generationResults, targets, targetsToActivate, targetsToDeactivate, ciSignAlgorithm, siScoringAlgorithm);
     }
 }

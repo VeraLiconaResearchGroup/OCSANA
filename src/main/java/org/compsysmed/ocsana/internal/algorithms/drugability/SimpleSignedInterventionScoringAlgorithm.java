@@ -31,7 +31,7 @@ import org.compsysmed.ocsana.internal.util.results.SignedInterventionNode;
 /**
  * Simple algorithm to score a signed intervention based on drugability
  **/
-public abstract class SimpleSignedInterventionScoringAlgorithm
+public class SimpleSignedInterventionScoringAlgorithm
     extends AbstractSignedInterventionScoringAlgorithm {
     private DrugabilityDataBundleFactory drugabilityDataBundleFactory = DrugabilityDataBundleFactory.getFactory();
 

@@ -32,6 +32,8 @@ import org.cytoscape.work.util.ListMultipleSelection;
 // OCSANA imports
 import org.compsysmed.ocsana.internal.algorithms.signassignment.AbstractCISignAssignmentAlgorithm;
 
+import org.compsysmed.ocsana.internal.algorithms.drugability.AbstractSignedInterventionScoringAlgorithm;
+
 import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
 import org.compsysmed.ocsana.internal.stages.generation.GenerationResults;
 
@@ -58,6 +60,7 @@ public final class PrioritizationContext {
     private final Set<CyNode> targetsToDeactivate;
 
     private final AbstractCISignAssignmentAlgorithm ciSignAlgorithm;
+    private final AbstractSignedInterventionScoringAlgorithm siScoringAlgorithm;
 
     public PrioritizationContext (CyNetwork network,
                                   GenerationContext generationContext,
@@ -65,7 +68,8 @@ public final class PrioritizationContext {
                                   Collection<CyNode> targets,
                                   Set<CyNode> targetsToActivate,
                                   Set<CyNode> targetsToDeactivate,
-                                  AbstractCISignAssignmentAlgorithm ciSignAlgorithm) {
+                                  AbstractCISignAssignmentAlgorithm ciSignAlgorithm,
+                                  AbstractSignedInterventionScoringAlgorithm siScoringAlgorithm) {
         // Sanity checks
         if (!targets.containsAll(targetsToActivate) || !targets.containsAll(targetsToDeactivate)) {
             throw new IllegalArgumentException("Targets to activate and deactivate must be in target set");
@@ -118,6 +122,11 @@ public final class PrioritizationContext {
             throw new IllegalArgumentException("CI sign assignment algorithm cannot be null");
         }
         this.ciSignAlgorithm = ciSignAlgorithm;
+
+        if (siScoringAlgorithm == null) {
+            throw new IllegalArgumentException("Signed intervention scoring algorithm cannot be null");
+        }
+        this.siScoringAlgorithm = siScoringAlgorithm;
     }
 
     public CyNetwork getNetwork () {
@@ -146,5 +155,9 @@ public final class PrioritizationContext {
 
     public AbstractCISignAssignmentAlgorithm getCISignAlgorithm () {
         return ciSignAlgorithm;
+    }
+
+    public AbstractSignedInterventionScoringAlgorithm getSIScoringAlgorithm () {
+        return siScoringAlgorithm;
     }
 }

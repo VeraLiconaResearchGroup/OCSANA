@@ -1,5 +1,5 @@
 /**
- * Factory for tasks to run CI-scoring algorithm
+ * Factory for tasks to run Si scoring algorithms in OCSANA
  *
  * Copyright Vera-Licona Research Group (C) 2016
  *
@@ -9,43 +9,42 @@
  * details
  **/
 
-package org.compsysmed.ocsana.internal.tasks.scoring;
+package org.compsysmed.ocsana.internal.tasks.drugability;
 
 // Java imports
-import java.util.*;
 
 // Cytoscape imports
 import org.cytoscape.work.AbstractTaskFactory;
 import org.cytoscape.work.TaskIterator;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
 import org.compsysmed.ocsana.internal.stages.prioritization.PrioritizationContext;
 import org.compsysmed.ocsana.internal.stages.prioritization.PrioritizationResults;
 
-import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
-
-public class CISignAssignmentTaskFactory
+public class SignedInterventionScoringAlgorithmTaskFactory
     extends AbstractTaskFactory {
-    private final GenerationContext generationContext;
     private final PrioritizationContext prioritizationContext;
     private final PrioritizationResults prioritizationResults;
-    private final CombinationOfInterventions ci;
 
-    public CISignAssignmentTaskFactory (GenerationContext generationContext,
-                                        PrioritizationContext prioritizationContext,
-                                        PrioritizationResults prioritizationResults,
-                                        CombinationOfInterventions ci) {
-        this.generationContext = generationContext;
+    public SignedInterventionScoringAlgorithmTaskFactory (PrioritizationContext prioritizationContext,
+                                                          PrioritizationResults prioritizationResults) {
+        super();
+
+        if (prioritizationContext == null) {
+            throw new IllegalArgumentException("Prioritization context cannot be null");
+        }
         this.prioritizationContext = prioritizationContext;
+
+        if (prioritizationResults == null) {
+            throw new IllegalArgumentException("Prioritization results cannot be null");
+        }
         this.prioritizationResults = prioritizationResults;
-        this.ci = ci;
     }
 
     @Override
     public TaskIterator createTaskIterator () {
         TaskIterator tasks = new TaskIterator();
-        tasks.append(new CISignAssignmentTask(generationContext, prioritizationContext, prioritizationResults, ci));
+        tasks.append(new SignedInterventionScoringAlgorithmTask(prioritizationContext, prioritizationResults));
         return tasks;
     }
 }

@@ -29,6 +29,7 @@ import org.compsysmed.ocsana.internal.stages.generation.GenerationResults;
 
 import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
 
+import org.compsysmed.ocsana.internal.tasks.drugability.SignedInterventionScoringAlgorithmTaskFactory;
 import org.compsysmed.ocsana.internal.tasks.signassignment.SignAssignmentAlgorithmTaskFactory;
 
 import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
@@ -107,6 +108,13 @@ public class PrioritizationStageRunnerTask
         taskManager.execute(ciSignTaskFactory.createTaskIterator(), this);
     }
 
+    private void spawnSignedInterventionScoringTask () {
+        SignedInterventionScoringAlgorithmTaskFactory siScoringTaskFactory =
+            new SignedInterventionScoringAlgorithmTaskFactory(prioritizationContext, prioritizationResults);
+
+        taskManager.execute(siScoringTaskFactory.createTaskIterator(), this);
+    }
+
     private void spawnCleanupTask() {
         observer.taskFinished(this);
     }
@@ -128,6 +136,10 @@ public class PrioritizationStageRunnerTask
 
         switch (currentStep) {
         case ASSIGN_CI_SIGNS:
+            spawnSignedInterventionScoringTask();
+            break;
+
+        case SCORE_SIGNED_INTERVENTIONS:
             spawnCleanupTask();
             break;
 

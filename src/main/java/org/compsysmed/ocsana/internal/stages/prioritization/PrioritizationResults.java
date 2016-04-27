@@ -26,26 +26,14 @@ import org.compsysmed.ocsana.internal.util.results.SignedIntervention;
 public class PrioritizationResults {
     private final PrioritizationContext prioritizationContext;
 
-    private Map<CombinationOfInterventions, Collection<SignedIntervention>> optimalInterventionSignings = new HashMap<>();
+    private final Map<CombinationOfInterventions, Collection<SignedIntervention>> optimalInterventionSignings = new HashMap<>();
+    private final Map<SignedIntervention, Double> signedInterventionScores = new HashMap<>();
 
     public PrioritizationResults (PrioritizationContext prioritizationContext) {
         if (prioritizationContext == null) {
             throw new IllegalArgumentException("Prioritization stage context cannot be null");
         }
         this.prioritizationContext = prioritizationContext;
-    }
-
-    /**
-     * Set the optimal signings for all CIs at once
-     * <p>
-     * NOTE: the input is not validated or sanitized in any way. Use with
-     * caution!
-     *
-     * @param optimalInterventionSignings  map assigning to each CI its
-     * collection of optimal sign assignments
-     **/
-    public void setOptimalInterventionSignings (Map<CombinationOfInterventions, Collection<SignedIntervention>> optimalInterventionSignings) {
-        this.optimalInterventionSignings = optimalInterventionSignings;
     }
 
     /**
@@ -56,6 +44,14 @@ public class PrioritizationResults {
      **/
     public void setOptimalInterventionSignings (CombinationOfInterventions ci,
                                                 Collection<SignedIntervention> optimalSignings) {
+        if (ci == null) {
+            throw new IllegalArgumentException("CI cannot be null");
+        }
+
+        if (optimalSignings == null) {
+            throw new IllegalArgumentException("Optimal signings collection cannot be null");
+        }
+
         if (!optimalSignings.stream().allMatch(si -> si.hasUnderlyingCI(ci))) {
             throw new IllegalArgumentException("Sign assignments do not match given CI");
         }
@@ -63,18 +59,61 @@ public class PrioritizationResults {
     }
 
     /**
-     * Get the optimal signings for all CIs at once
+     * Drop all records of optimal intervention signings
      **/
-    public Map<CombinationOfInterventions, Collection<SignedIntervention>> getOptimalInterventionSignings () {
-        return optimalInterventionSignings;
+    public void resetOptimalInterventionSignings () {
+        optimalInterventionSignings.clear();
     }
 
     /**
      * Get the optimal signings for a specified CombinationOfInterventions
      *
      * @param ci  the CI
+     * @return the optimal SignedIntervention assignments for the CI,
+     * if assigned, or an empty collection if not.
      **/
     public Collection<SignedIntervention> getOptimalInterventionSignings (CombinationOfInterventions ci) {
-        return optimalInterventionSignings.get(ci);
+        if (ci == null) {
+            throw new IllegalArgumentException("CI cannot be null");
+        }
+
+        return optimalInterventionSignings.getOrDefault(ci, Collections.emptyList());
     }
+
+    /**
+     * Set the score for a particular signed intervention
+     *
+     * @param si  the signed intervention
+     * @param score  the score
+     **/
+    public void setSignedInterventionScore (SignedIntervention si,
+                                            Double score) {
+        if (si == null) {
+            throw new IllegalArgumentException("Signed intervention cannot be null");
+        }
+
+        if (score == null) {
+            throw new IllegalArgumentException("Score cannot be null");
+        }
+
+        signedInterventionScores.put(si, score);
+    }
+
+    /**
+     * Drop all records of signed intervention scores
+     **/
+    public void resetSignedInterventionScores () {
+        signedInterventionScores.clear();
+    }
+
+    /**
+     * Get the score for a specified signed intervention
+     *
+     * @param si  the signed intervention
+     * @return the score of the si, if assigned, or null if not
+     **/
+    public Double getSignedInterventionScore (SignedIntervention si) {
+        return signedInterventionScores.getOrDefault(si, null);
+    }
+
 }
