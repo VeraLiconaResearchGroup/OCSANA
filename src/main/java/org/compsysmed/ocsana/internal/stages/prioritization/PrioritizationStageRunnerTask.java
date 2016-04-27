@@ -52,13 +52,34 @@ public class PrioritizationStageRunnerTask
                                           OCSANAResultsPanel resultsPanel) {
         super(generationContext.getNetwork());
 
+        if (taskManager == null) {
+            throw new IllegalArgumentException("Task manager cannot be null");
+        }
         this.taskManager = taskManager;
+
+        if (observer == null) {
+            throw new IllegalArgumentException("Task observer cannot be null");
+        }
         this.observer = observer;
 
+        if (generationContext == null) {
+            throw new IllegalArgumentException("Generation context cannot be null");
+        }
         this.generationContext = generationContext;
+
+        if (generationResults == null) {
+            throw new IllegalArgumentException("Generation results cannot be null");
+        }
         this.generationResults = generationResults;
+
+        if (prioritizationContext == null) {
+            throw new IllegalArgumentException("Prioritization context cannot be null");
+        }
         this.prioritizationContext = prioritizationContext;
 
+        if (resultsPanel == null) {
+            throw new IllegalArgumentException("Results panel cannot be null");
+        }
         this.resultsPanel = resultsPanel;
     }
 
