@@ -81,11 +81,11 @@ public class PrioritizationContextBuilder {
         }
         this.generationResults = generationResults;
 
-        targets = generationContext.targetNodes;
+        targets = generationContext.getTargetNodes();
 
         setTargetsToActivate(new HashSet<>());
 
-        BiFunction<CyNode, CyNode, Double> effectOnTargets = (source, target) -> generationContext.ocsanaAlg.effectOnTargetsScore(source, target);
+        BiFunction<CyNode, CyNode, Double> effectOnTargets = (source, target) -> generationContext.getOCSANAAlgorithm().effectOnTargetsScore(source, target);
         ciSignAlgorithm = new ExhaustiveSearchCISignAssignmentAlgorithm(effectOnTargets);
     }
 

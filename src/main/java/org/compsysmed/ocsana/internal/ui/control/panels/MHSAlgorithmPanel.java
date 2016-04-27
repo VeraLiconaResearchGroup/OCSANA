@@ -33,7 +33,7 @@ import org.cytoscape.work.swing.PanelTaskManager;
 // OCSANA imports
 import org.compsysmed.ocsana.internal.algorithms.mhs.*;
 
-import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
+import org.compsysmed.ocsana.internal.stages.generation.GenerationContextBuilder;
 
 /**
  * Subpanel for user configuration of MHS algorithm
@@ -41,7 +41,7 @@ import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
 public class MHSAlgorithmPanel
     extends AbstractControlSubPanel
     implements ActionListener {
-    private GenerationContext ciStageContext;
+    private GenerationContextBuilder generationContextBuilder;
     private PanelTaskManager taskManager;
 
     // UI elements
@@ -54,13 +54,13 @@ public class MHSAlgorithmPanel
     /**
      * Constructor
      *
-     * @param ciStageContext  the context for the CI stage
+     * @param generationContextBuilder  the context builder for the generation stage
      * @param taskManager  a PanelTaskManager to provide @Tunable panels
      **/
-    public MHSAlgorithmPanel (GenerationContext ciStageContext,
+    public MHSAlgorithmPanel (GenerationContextBuilder generationContextBuilder,
                               PanelTaskManager taskManager) {
         // Initial setup
-        this.ciStageContext = ciStageContext;
+        this.generationContextBuilder = generationContextBuilder;
         this.taskManager = taskManager;
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -83,7 +83,7 @@ public class MHSAlgorithmPanel
         algorithmSelecter.addActionListener(this);
 
         // CI configuration
-        includeEndpointsInCIs = new JCheckBox("Allow sources and targets in CIs", ciStageContext.includeEndpointsInCIs);
+        includeEndpointsInCIs = new JCheckBox("Allow sources and targets in CIs", generationContextBuilder.getIncludeEndpointsInCIs());
         add(includeEndpointsInCIs);
 
         // Algorithm configuration panel
@@ -112,8 +112,8 @@ public class MHSAlgorithmPanel
     }
 
     @Override
-    public void updateContext () {
-        ciStageContext.includeEndpointsInCIs = includeEndpointsInCIs.isSelected();
-        ciStageContext.mhsAlg = getAlgorithm();
+    public void updateContextBuilder () {
+        generationContextBuilder.setIncludeEndpointsInCIs(includeEndpointsInCIs.isSelected());
+        generationContextBuilder.setMHSAlgorithm(getAlgorithm());
     }
 }

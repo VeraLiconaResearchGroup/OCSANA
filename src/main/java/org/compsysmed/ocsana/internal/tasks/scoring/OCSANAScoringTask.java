@@ -28,38 +28,38 @@ import org.compsysmed.ocsana.internal.stages.generation.GenerationResults;
 public class OCSANAScoringTask extends AbstractOCSANATask {
     private static final OCSANAStep algStep = OCSANAStep.SCORE_PATHS;
 
-    private GenerationContext context;
-    private GenerationResults results;
+    private GenerationContext generationContext;
+    private GenerationResults generationResults;
 
-    public OCSANAScoringTask (GenerationContext context,
-                              GenerationResults results) {
-        super(context.getNetwork());
-        this.context = context;
-        this.results = results;
+    public OCSANAScoringTask (GenerationContext generationContext,
+                              GenerationResults generationResults) {
+        super(generationContext.getNetwork());
+        this.generationContext = generationContext;
+        this.generationResults = generationResults;
     }
 
     @Override
     public void run (TaskMonitor taskMonitor) {
-        if (results.pathFindingCanceled) {
+        if (generationResults.pathFindingCanceled) {
             return;
         }
 
-        if (results.pathsToTargets == null || results.pathsToOffTargets == null) {
+        if (generationResults.pathsToTargets == null || generationResults.pathsToOffTargets == null) {
             throw new IllegalStateException("Paths have not been computed.");
         }
 
-        Predicate<CyEdge> inhibitionEdgeTester = (CyEdge edge) -> context.edgeProcessor.edgeIsInhibition(edge);
+        Predicate<CyEdge> inhibitionEdgeTester = (CyEdge edge) -> generationContext.getEdgeProcessor().edgeIsInhibition(edge);
 
         taskMonitor.setTitle("OCSANA scoring");
 
         taskMonitor.setStatusMessage("Computing OCSANA scores.");
 
         Long OCSANAPreTime = System.nanoTime();
-        context.ocsanaAlg.computeScores(results.pathsToTargets, results.pathsToOffTargets, inhibitionEdgeTester);
+        generationContext.getOCSANAAlgorithm().computeScores(generationResults.pathsToTargets, generationResults.pathsToOffTargets, inhibitionEdgeTester);
         Long OCSANAPostTime = System.nanoTime();
 
         Double OCSANARunTime = (OCSANAPostTime - OCSANAPreTime) / 1E9;
-        results.OCSANAScoringExecutionSeconds = OCSANARunTime;
+        generationResults.OCSANAScoringExecutionSeconds = OCSANARunTime;
         taskMonitor.setStatusMessage(String.format("Computed OCSANA scores in %fs.", OCSANARunTime));
     }
 
@@ -76,7 +76,7 @@ public class OCSANAScoringTask extends AbstractOCSANATask {
     @Override
     public void cancel () {
         super.cancel();
-        context.ocsanaAlg.cancel();
-        results.OCSANAScoringCanceled = true;
+        generationContext.getOCSANAAlgorithm().cancel();
+        generationResults.OCSANAScoringCanceled = true;
     }
 }

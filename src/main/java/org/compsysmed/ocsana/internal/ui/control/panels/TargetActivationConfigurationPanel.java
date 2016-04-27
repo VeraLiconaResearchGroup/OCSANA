@@ -36,7 +36,7 @@ import org.compsysmed.ocsana.internal.ui.control.widgets.*;
  **/
 public class TargetActivationConfigurationPanel
     extends AbstractControlSubPanel {
-    private GenerationContext ciStageContext;
+    private GenerationContext generationContext;
     private PrioritizationContextBuilder prioritizationContextBuilder;
     private PanelTaskManager taskManager;
 
@@ -46,14 +46,14 @@ public class TargetActivationConfigurationPanel
     /**
      * Constructor
      *
-     * @param ciStageContext  the context for the CI stage
+     * @param generationContext  the context for the generation stage
      * @param taskManager  a PanelTaskManager to provide @Tunable panels
      **/
-    public TargetActivationConfigurationPanel (GenerationContext ciStageContext,
+    public TargetActivationConfigurationPanel (GenerationContext generationContext,
                                                PrioritizationContextBuilder prioritizationContextBuilder,
                                                PanelTaskManager taskManager) {
         // Initial setup
-        this.ciStageContext = ciStageContext;
+        this.generationContext = generationContext;
         this.prioritizationContextBuilder = prioritizationContextBuilder;
         this.taskManager = taskManager;
 
@@ -62,12 +62,12 @@ public class TargetActivationConfigurationPanel
         add(makeHeader("Configure network processing"));
 
         // Node set selection widgets
-        activatedTargetsSelecter = new ListNodeSetSelecter("Targets to activate", ciStageContext.targetNodes, ciStageContext.nodeNameHandler);
+        activatedTargetsSelecter = new ListNodeSetSelecter("Targets to activate", generationContext.getTargetNodes(), generationContext.getNodeNameHandler());
         add(activatedTargetsSelecter);
     }
 
     @Override
-    public void updateContext () {
+    public void updateContextBuilder () {
         prioritizationContextBuilder.setTargetsToActivate(activatedTargetsSelecter.getSelectedNodes());
     }
 }

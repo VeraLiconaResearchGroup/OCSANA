@@ -28,34 +28,34 @@ import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
 import org.compsysmed.ocsana.internal.stages.generation.GenerationResults;
 
 public class PathFindingAlgorithmTask extends AbstractOCSANATask {
-    private GenerationContext context;
-    private GenerationResults results;
+    private GenerationContext generationContext;
+    private GenerationResults generationResults;
     private OCSANAStep algStep;
     private Collection<List<CyEdge>> paths;
 
-    public PathFindingAlgorithmTask (GenerationContext context,
-                                     GenerationResults results,
+    public PathFindingAlgorithmTask (GenerationContext generationContext,
+                                     GenerationResults generationResults,
                                      OCSANAStep algStep) {
-        super(context.getNetwork());
-        this.context = context;
-        this.results = results;
+        super(generationContext.getNetwork());
+        this.generationContext = generationContext;
+        this.generationResults = generationResults;
         this.algStep = algStep;
     }
 
     @Override
     public void run (TaskMonitor taskMonitor) {
         String targetType;
-        Set<CyNode> sourceNodes = context.sourceNodes;
+        Set<CyNode> sourceNodes = generationContext.getSourceNodes();
         Set<CyNode> targetsForThisRun;
         switch (algStep) {
         case FIND_PATHS_TO_TARGETS:
             targetType = "target";
-            targetsForThisRun = context.targetNodes;
+            targetsForThisRun = generationContext.getTargetNodes();
             break;
 
         case FIND_PATHS_TO_OFF_TARGETS:
             targetType = "off-target";
-            targetsForThisRun = context.offTargetNodes;
+            targetsForThisRun = generationContext.getOffTargetNodes();
             break;
 
         default:
@@ -68,23 +68,23 @@ public class PathFindingAlgorithmTask extends AbstractOCSANATask {
 
         taskMonitor.setTitle(String.format("Paths to %ss", targetType));
 
-        taskMonitor.setStatusMessage(String.format("Finding paths from %d source nodes to %d %s nodes (algorithm: %s).", sourceNodes.size(), targetsForThisRun.size(), targetType, context.pathFindingAlg.shortName()));
+        taskMonitor.setStatusMessage(String.format("Finding paths from %d source nodes to %d %s nodes (algorithm: %s).", sourceNodes.size(), targetsForThisRun.size(), targetType, generationContext.getPathFindingAlgorithm().shortName()));
 
         Long preTime = System.nanoTime();
-        paths = context.pathFindingAlg.paths(sourceNodes, targetsForThisRun);
+        paths = generationContext.getPathFindingAlgorithm().paths(sourceNodes, targetsForThisRun);
         Long postTime = System.nanoTime();
 
         Double runTime = (postTime - preTime) / 1E9;
 
         switch (algStep) {
         case FIND_PATHS_TO_TARGETS:
-            results.pathsToTargets = paths;
-            results.pathsToTargetsExecutionSeconds = runTime;
+            generationResults.pathsToTargets = paths;
+            generationResults.pathsToTargetsExecutionSeconds = runTime;
             break;
 
         case FIND_PATHS_TO_OFF_TARGETS:
-            results.pathsToOffTargets = paths;
-            results.pathsToOffTargetsExecutionSeconds = runTime;
+            generationResults.pathsToOffTargets = paths;
+            generationResults.pathsToOffTargetsExecutionSeconds = runTime;
             break;
 
         default:
@@ -115,7 +115,7 @@ public class PathFindingAlgorithmTask extends AbstractOCSANATask {
     @Override
     public void cancel () {
         super.cancel();
-        context.pathFindingAlg.cancel();
-        results.pathFindingCanceled = true;
+        generationContext.getPathFindingAlgorithm().cancel();
+        generationResults.pathFindingCanceled = true;
     }
 }

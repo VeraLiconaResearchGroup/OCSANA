@@ -14,30 +14,17 @@ package org.compsysmed.ocsana.internal.stages.generation;
 // Java imports
 import java.util.*;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 // Cytoscape imports
-import org.cytoscape.model.CyColumn;
-import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyEdge;
+import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
-
-import org.cytoscape.work.ContainsTunables;
 
 // OCSANA imports
 import org.compsysmed.ocsana.internal.util.tunables.NodeNameHandler;
 import org.compsysmed.ocsana.internal.util.tunables.EdgeProcessor;
 
 import org.compsysmed.ocsana.internal.algorithms.path.AbstractPathFindingAlgorithm;
-import org.compsysmed.ocsana.internal.algorithms.path.AllNonSelfIntersectingPathsAlgorithm;
-import org.compsysmed.ocsana.internal.algorithms.path.ShortestPathsAlgorithm;
-
 import org.compsysmed.ocsana.internal.algorithms.mhs.AbstractMHSAlgorithm;
-import org.compsysmed.ocsana.internal.algorithms.mhs.BergeAlgorithm;
-import org.compsysmed.ocsana.internal.algorithms.mhs.MMCSAlgorithm;
-import org.compsysmed.ocsana.internal.algorithms.mhs.RSAlgorithm;
-
 import org.compsysmed.ocsana.internal.algorithms.scoring.OCSANAScoringAlgorithm;
 
 /**
@@ -46,45 +33,107 @@ import org.compsysmed.ocsana.internal.algorithms.scoring.OCSANAScoringAlgorithm;
  * This class stores the configuration required to run the CI stage. A
  * populated instance will be passed to a CIStageRunner at the
  * beginning of a run.
+ * <p>
+ * This class is immutable by design. Instances should be constructed using
+ * {@link GenerationContextBuilder}.
  **/
-public class GenerationContext {
-    public NodeNameHandler nodeNameHandler;
+public final class GenerationContext {
+    private final CyNetwork network;
 
-    public Set<CyNode> sourceNodes;
-    public Set<CyNode> targetNodes;
-    public Set<CyNode> offTargetNodes;
+    private final Set<CyNode> sourceNodes;
+    private final Set<CyNode> targetNodes;
+    private final Set<CyNode> offTargetNodes;
 
-    public EdgeProcessor edgeProcessor;
+    private final NodeNameHandler nodeNameHandler;
+    private final EdgeProcessor edgeProcessor;
+    private final boolean includeEndpointsInCIs;
 
-    public AbstractPathFindingAlgorithm pathFindingAlg;
+    private final AbstractPathFindingAlgorithm pathFindingAlgorithm;
+    private final AbstractMHSAlgorithm mhsAlgorithm;
+    private final OCSANAScoringAlgorithm ocsanaAlgorithm;
 
-    public AbstractMHSAlgorithm mhsAlg;
-    public Boolean includeEndpointsInCIs = false;
-
-    public OCSANAScoringAlgorithm ocsanaAlg;
-
-    // Internal data
-    private CyNetwork network;
-    private Collection<ActionListener> listeners = new HashSet<>();
-
-    public GenerationContext (CyNetwork network) {
-        this.network = network;
-
-        if (network == null) {
-            return;
+    public GenerationContext (CyNetwork network,
+                              Set<CyNode> sourceNodes,
+                              Set<CyNode> targetNodes,
+                              Set<CyNode> offTargetNodes,
+                              NodeNameHandler nodeNameHandler,
+                              EdgeProcessor edgeProcessor,
+                              boolean includeEndpointsInCIs,
+                              AbstractPathFindingAlgorithm pathFindingAlgorithm,
+                              AbstractMHSAlgorithm mhsAlgorithm,
+                              OCSANAScoringAlgorithm ocsanaAlgorithm) {
+        // Sanity checks
+        if (sourceNodes.stream().anyMatch(node -> !network.containsNode(node))) {
+            throw new IllegalArgumentException("All source nodes must come from underlying network");
         }
 
-        nodeNameHandler = new NodeNameHandler(network);
+        if (targetNodes.stream().anyMatch(node -> !network.containsNode(node))) {
+            throw new IllegalArgumentException("All target nodes must come from underlying network");
+        }
 
-        sourceNodes = new HashSet<>();
-        targetNodes = new HashSet<>();
-        offTargetNodes = new HashSet<>();
+        if (offTargetNodes.stream().anyMatch(node -> !network.containsNode(node))) {
+            throw new IllegalArgumentException("All off-target nodes must come from underlying network");
+        }
 
-        edgeProcessor = new EdgeProcessor(network);
+        if (!Collections.disjoint(sourceNodes, targetNodes)) {
+            throw new IllegalArgumentException("Source and target nodes must be disjoint");
+        }
 
-        pathFindingAlg = new AllNonSelfIntersectingPathsAlgorithm(network);
-        mhsAlg = new MMCSAlgorithm();
-        ocsanaAlg = new OCSANAScoringAlgorithm(network);
+        if (!Collections.disjoint(sourceNodes, offTargetNodes)) {
+            throw new IllegalArgumentException("Source and off-target nodes must be disjoint");
+        }
+
+        if (!Collections.disjoint(targetNodes, offTargetNodes)) {
+            throw new IllegalArgumentException("Target and off-target nodes must be disjoint");
+        }
+
+        // Assignments
+        if (network == null) {
+            throw new IllegalArgumentException("Network cannot be null");
+        }
+        this.network = network;
+
+        if (sourceNodes == null) {
+            throw new IllegalArgumentException("Source node set cannot be null");
+        }
+        this.sourceNodes = sourceNodes;
+
+        if (targetNodes == null) {
+            throw new IllegalArgumentException("Target node set cannot be null");
+        }
+        this.targetNodes = targetNodes;
+
+        if (offTargetNodes == null) {
+            throw new IllegalArgumentException("Off-target node set cannot be null");
+        }
+        this.offTargetNodes = offTargetNodes;
+
+        if (nodeNameHandler == null) {
+            throw new IllegalArgumentException("Node name handler cannot be null");
+        }
+        this.nodeNameHandler = nodeNameHandler;
+
+        if (edgeProcessor == null) {
+            throw new IllegalArgumentException("Edge processor cannot be null");
+        }
+        this.edgeProcessor = edgeProcessor;
+
+        this.includeEndpointsInCIs = includeEndpointsInCIs;
+
+        if (pathFindingAlgorithm == null) {
+            throw new IllegalArgumentException("Path-finding algorithm cannot be null");
+        }
+        this.pathFindingAlgorithm = pathFindingAlgorithm;
+
+        if (mhsAlgorithm == null) {
+            throw new IllegalArgumentException("MHS algorithm cannot be null");
+        }
+        this.mhsAlgorithm = mhsAlgorithm;
+
+        if (ocsanaAlgorithm == null) {
+            throw new IllegalArgumentException("OCSANA scoring algorithm cannot be null");
+        }
+        this.ocsanaAlgorithm = ocsanaAlgorithm;
     }
 
     /**
@@ -92,6 +141,69 @@ public class GenerationContext {
      **/
     public CyNetwork getNetwork () {
         return network;
+    }
+
+    /**
+     * Return the source nodes
+     **/
+    public Set<CyNode> getSourceNodes () {
+        return sourceNodes;
+    }
+
+    /**
+     * Return the target nodes
+     **/
+    public Set<CyNode> getTargetNodes () {
+        return targetNodes;
+    }
+
+    /**
+     * Return the off-target nodes
+     **/
+    public Set<CyNode> getOffTargetNodes () {
+        return offTargetNodes;
+    }
+
+    /**
+     * Return the node name handler
+     **/
+    public NodeNameHandler getNodeNameHandler () {
+        return nodeNameHandler;
+    }
+
+    /**
+     * Return the edge processor
+     **/
+    public EdgeProcessor getEdgeProcessor () {
+        return edgeProcessor;
+    }
+
+    /**
+     * Return whether to include endpoints in CIs
+     **/
+    public boolean getIncludeEndpointsInCIs () {
+        return includeEndpointsInCIs;
+    }
+
+    /**
+     * Return the path-finding algorithm
+     **/
+    public AbstractPathFindingAlgorithm getPathFindingAlgorithm () {
+        return pathFindingAlgorithm;
+    }
+
+    /**
+     * Return the MHS algorithm
+     **/
+    public AbstractMHSAlgorithm getMHSAlgorithm () {
+        return mhsAlgorithm;
+    }
+
+    /**
+     * Return the OCSANA scoring algorithm
+     **/
+    public OCSANAScoringAlgorithm getOCSANAAlgorithm () {
+        return ocsanaAlgorithm;
     }
 
     /**

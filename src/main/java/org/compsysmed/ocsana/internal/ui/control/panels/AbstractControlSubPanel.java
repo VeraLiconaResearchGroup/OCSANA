@@ -20,9 +20,9 @@ import javax.swing.JPanel;
 abstract public class AbstractControlSubPanel
     extends JPanel {
     /**
-     * Update the CIStageContext members with the settings in this subpanel
+     * Update the ContextBuilder with the changes in the UI
      **/
-    abstract public void updateContext ();
+    abstract public void updateContextBuilder ();
 
     /**
      * Generate an appropriately-formatted JLabel for a subpanel header

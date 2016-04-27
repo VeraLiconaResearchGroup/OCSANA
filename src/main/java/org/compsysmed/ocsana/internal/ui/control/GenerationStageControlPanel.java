@@ -35,6 +35,7 @@ import org.cytoscape.work.swing.PanelTaskManager;
 import org.compsysmed.ocsana.internal.algorithms.mhs.*;
 
 import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
+import org.compsysmed.ocsana.internal.stages.generation.GenerationContextBuilder;
 import org.compsysmed.ocsana.internal.stages.generation.GenerationResults;
 import org.compsysmed.ocsana.internal.stages.generation.GenerationStageRunnerTask;
 import org.compsysmed.ocsana.internal.stages.generation.GenerationStageRunnerTaskFactory;
@@ -54,7 +55,7 @@ public class GenerationStageControlPanel
     private OCSANAResultsPanel resultsPanel;
     private PanelTaskManager taskManager;
 
-    private GenerationContext generationContext;
+    private GenerationContextBuilder generationContextBuilder;
     private GenerationResults generationResults;
     private CyNetwork network;
 
@@ -83,7 +84,7 @@ public class GenerationStageControlPanel
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        generationContext = new GenerationContext(network);
+        generationContextBuilder = new GenerationContextBuilder(network);
 
         subpanels = new ArrayList<>();
 
@@ -93,14 +94,14 @@ public class GenerationStageControlPanel
     }
 
     /**
-     * Retrieve the underlying CIStageContext with the latest changes
-     * from the UI
+     * Retrieve the GenerationContext corresponding to the current
+     * settings in the UI
      *
      * @return the context
      **/
     public GenerationContext getContext () {
-        updateContext();
-        return generationContext;
+        updateContextBuilder();
+        return generationContextBuilder.getContext();
     }
 
     /**
@@ -118,7 +119,7 @@ public class GenerationStageControlPanel
     private void buildPanel () {
         removeAll();
 
-        JPanel tunablePanel = getContextPanel();
+        JPanel tunablePanel = getContextBuilderPanel();
         add(tunablePanel);
 
         JButton runCIStageButton = new JButton("Run CI stage computations");
@@ -136,21 +137,21 @@ public class GenerationStageControlPanel
     }
 
     /**
-     * Build a panel with the UI elements for a CIStageContext
+     * Build a panel with the UI elements for a CIStageContextBuilder
      **/
-    private JPanel getContextPanel () {
+    private JPanel getContextBuilderPanel () {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        networkConfigPanel = new CINetworkConfigurationPanel(generationContext, taskManager);
+        networkConfigPanel = new CINetworkConfigurationPanel(generationContextBuilder, taskManager);
         panel.add(networkConfigPanel);
         subpanels.add(networkConfigPanel);
 
-        pathFindingAlgorithmPanel = new PathFindingAlgorithmPanel(generationContext, taskManager);
+        pathFindingAlgorithmPanel = new PathFindingAlgorithmPanel(generationContextBuilder, taskManager);
         panel.add(pathFindingAlgorithmPanel);
         subpanels.add(pathFindingAlgorithmPanel);
 
-        mhsAlgorithmPanel = new MHSAlgorithmPanel(generationContext, taskManager);
+        mhsAlgorithmPanel = new MHSAlgorithmPanel(generationContextBuilder, taskManager);
         panel.add(mhsAlgorithmPanel);
         subpanels.add(mhsAlgorithmPanel);
 
@@ -158,11 +159,11 @@ public class GenerationStageControlPanel
     }
 
     /**
-     * Update the CIStageContext members with the settings in the UI
+     * Update the CIStageContextBuilder members with the settings in the UI
      **/
-    private void updateContext () {
+    private void updateContextBuilder () {
         for (AbstractControlSubPanel subpanel: subpanels) {
-            subpanel.updateContext();
+            subpanel.updateContextBuilder();
         }
     }
 
@@ -170,12 +171,10 @@ public class GenerationStageControlPanel
      * Spawn the CI stage task
      **/
     private void runCITask () {
-        updateContext();
-
         signalStartOfCITask();
 
         GenerationStageRunnerTaskFactory runnerTaskFactory
-            = new GenerationStageRunnerTaskFactory(taskManager, this, generationContext, resultsPanel);
+            = new GenerationStageRunnerTaskFactory(taskManager, this, getContext(), resultsPanel);
         taskManager.execute(runnerTaskFactory.createTaskIterator());
     }
 
@@ -217,7 +216,7 @@ public class GenerationStageControlPanel
     // Helper functions to support listening for component changes
     public void actionPerformed (ActionEvent event) {
         // Synchronize any changes made to the @Tunable UI widgets
-        updateContext();
+        updateContextBuilder();
 
         buildPanel();
     }

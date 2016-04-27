@@ -29,7 +29,7 @@ import javax.swing.JPanel;
 import org.cytoscape.work.swing.PanelTaskManager;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
+import org.compsysmed.ocsana.internal.stages.generation.GenerationContextBuilder;
 
 import org.compsysmed.ocsana.internal.ui.control.widgets.*;
 
@@ -39,7 +39,7 @@ import org.compsysmed.ocsana.internal.ui.control.widgets.*;
 public class CINetworkConfigurationPanel
     extends AbstractControlSubPanel
     implements ActionListener {
-    private GenerationContext ciStageContext;
+    private GenerationContextBuilder generationContextBuilder;
     private PanelTaskManager taskManager;
 
     // UI elements
@@ -61,13 +61,13 @@ public class CINetworkConfigurationPanel
     /**
      * Constructor
      *
-     * @param ciStageContext  the context for the CI stage
+     * @param generationContextBuilder  the context builder for the generation stage
      * @param taskManager  a PanelTaskManager to provide @Tunable panels
      **/
-    public CINetworkConfigurationPanel (GenerationContext ciStageContext,
+    public CINetworkConfigurationPanel (GenerationContextBuilder generationContextBuilder,
                                         PanelTaskManager taskManager) {
         // Initial setup
-        this.ciStageContext = ciStageContext;
+        this.generationContextBuilder = generationContextBuilder;
         this.taskManager = taskManager;
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -90,7 +90,7 @@ public class CINetworkConfigurationPanel
         add(columnPanel);
 
         columnPanel.add(new JLabel("Node name column"));
-        CyColumn[] nodeNameColumns = ciStageContext.getNetwork().getDefaultNodeTable().getColumns().stream().toArray(CyColumn[]::new);
+        CyColumn[] nodeNameColumns = generationContextBuilder.getNetwork().getDefaultNodeTable().getColumns().stream().toArray(CyColumn[]::new);
         nodeNameColumnSelecter = new JComboBox<>(nodeNameColumns);
         nodeNameColumnSelecter.addActionListener(this);
         columnPanel.add(nodeNameColumnSelecter);
@@ -104,13 +104,13 @@ public class CINetworkConfigurationPanel
         populateSetsPanelWithListSelecters(nodeSetsPanel);
 
         // Edge processor
-        add(taskManager.getConfiguration(null, ciStageContext.edgeProcessor));
+        add(taskManager.getConfiguration(null, generationContextBuilder.getEdgeProcessor()));
     }
 
     @Override
     public void actionPerformed (ActionEvent e) {
         CyColumn nodeNameColumn = (CyColumn) nodeNameColumnSelecter.getSelectedItem();
-        ciStageContext.nodeNameHandler.setNodeNameColumn(nodeNameColumn);
+        generationContextBuilder.getNodeNameHandler().setNodeNameColumn(nodeNameColumn);
 
         String mode = (String) nodeSelectionModeSelecter.getSelectedItem();
         switch (mode) {
@@ -132,23 +132,23 @@ public class CINetworkConfigurationPanel
         nodeSetsPanel.removeAll();
 
         if (sourceNodeSelecter == null) {
-            sourceNodeSelecter = new ListNodeSetSelecter("Source nodes", ciStageContext.getNetwork().getNodeList(), ciStageContext.nodeNameHandler);
+            sourceNodeSelecter = new ListNodeSetSelecter("Source nodes", generationContextBuilder.getNetwork().getNodeList(), generationContextBuilder.getNodeNameHandler());
         } else {
-            sourceNodeSelecter = new ListNodeSetSelecter(sourceNodeSelecter, ciStageContext.nodeNameHandler);
+            sourceNodeSelecter = new ListNodeSetSelecter(sourceNodeSelecter, generationContextBuilder.getNodeNameHandler());
         }
         nodeSetsPanel.add(sourceNodeSelecter);
 
         if (targetNodeSelecter == null) {
-            targetNodeSelecter = new ListNodeSetSelecter("Target nodes", ciStageContext.getNetwork().getNodeList(), ciStageContext.nodeNameHandler);
+            targetNodeSelecter = new ListNodeSetSelecter("Target nodes", generationContextBuilder.getNetwork().getNodeList(), generationContextBuilder.getNodeNameHandler());
         } else {
-            targetNodeSelecter = new ListNodeSetSelecter(targetNodeSelecter, ciStageContext.nodeNameHandler);
+            targetNodeSelecter = new ListNodeSetSelecter(targetNodeSelecter, generationContextBuilder.getNodeNameHandler());
         }
         nodeSetsPanel.add(targetNodeSelecter);
 
         if (offTargetNodeSelecter == null) {
-            offTargetNodeSelecter = new ListNodeSetSelecter("Off-target nodes", ciStageContext.getNetwork().getNodeList(), ciStageContext.nodeNameHandler);
+            offTargetNodeSelecter = new ListNodeSetSelecter("Off-target nodes", generationContextBuilder.getNetwork().getNodeList(), generationContextBuilder.getNodeNameHandler());
         } else {
-            offTargetNodeSelecter = new ListNodeSetSelecter(offTargetNodeSelecter, ciStageContext.nodeNameHandler);
+            offTargetNodeSelecter = new ListNodeSetSelecter(offTargetNodeSelecter, generationContextBuilder.getNodeNameHandler());
         }
         nodeSetsPanel.add(offTargetNodeSelecter);
 
@@ -160,23 +160,23 @@ public class CINetworkConfigurationPanel
         nodeSetsPanel.removeAll();
 
         if (sourceNodeSelecter == null) {
-            sourceNodeSelecter = new StringNodeSetSelecter("Source nodes", ciStageContext.getNetwork().getNodeList(), ciStageContext.nodeNameHandler);
+            sourceNodeSelecter = new StringNodeSetSelecter("Source nodes", generationContextBuilder.getNetwork().getNodeList(), generationContextBuilder.getNodeNameHandler());
         } else {
-            sourceNodeSelecter = new StringNodeSetSelecter(sourceNodeSelecter, ciStageContext.nodeNameHandler);
+            sourceNodeSelecter = new StringNodeSetSelecter(sourceNodeSelecter, generationContextBuilder.getNodeNameHandler());
         }
         nodeSetsPanel.add(sourceNodeSelecter);
 
         if (targetNodeSelecter == null) {
-            targetNodeSelecter = new StringNodeSetSelecter("Target nodes", ciStageContext.getNetwork().getNodeList(), ciStageContext.nodeNameHandler);
+            targetNodeSelecter = new StringNodeSetSelecter("Target nodes", generationContextBuilder.getNetwork().getNodeList(), generationContextBuilder.getNodeNameHandler());
         } else {
-            targetNodeSelecter = new StringNodeSetSelecter(targetNodeSelecter, ciStageContext.nodeNameHandler);
+            targetNodeSelecter = new StringNodeSetSelecter(targetNodeSelecter, generationContextBuilder.getNodeNameHandler());
         }
         nodeSetsPanel.add(targetNodeSelecter);
 
         if (offTargetNodeSelecter == null) {
-            offTargetNodeSelecter = new StringNodeSetSelecter("Off-target nodes", ciStageContext.getNetwork().getNodeList(), ciStageContext.nodeNameHandler);
+            offTargetNodeSelecter = new StringNodeSetSelecter("Off-target nodes", generationContextBuilder.getNetwork().getNodeList(), generationContextBuilder.getNodeNameHandler());
         } else {
-            offTargetNodeSelecter = new StringNodeSetSelecter(offTargetNodeSelecter, ciStageContext.nodeNameHandler);
+            offTargetNodeSelecter = new StringNodeSetSelecter(offTargetNodeSelecter, generationContextBuilder.getNodeNameHandler());
         }
         nodeSetsPanel.add(offTargetNodeSelecter);
 
@@ -185,9 +185,9 @@ public class CINetworkConfigurationPanel
     }
 
     @Override
-    public void updateContext () {
-        ciStageContext.sourceNodes = sourceNodeSelecter.getSelectedNodes();
-        ciStageContext.targetNodes = targetNodeSelecter.getSelectedNodes();
-        ciStageContext.offTargetNodes = offTargetNodeSelecter.getSelectedNodes();
+    public void updateContextBuilder () {
+        generationContextBuilder.setSourceNodes(sourceNodeSelecter.getSelectedNodes());
+        generationContextBuilder.setTargetNodes(targetNodeSelecter.getSelectedNodes());
+        generationContextBuilder.setOffTargetNodes(offTargetNodeSelecter.getSelectedNodes());
     }
 }

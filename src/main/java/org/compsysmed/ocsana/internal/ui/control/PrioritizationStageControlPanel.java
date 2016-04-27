@@ -147,9 +147,9 @@ public class PrioritizationStageControlPanel
     /**
      * Update the PrioritizationStageContext with the settings in the UI
      **/
-    private void updateContext () {
+    private void updateContextBuilder () {
         for (AbstractControlSubPanel subpanel: subpanels) {
-            subpanel.updateContext();
+            subpanel.updateContextBuilder();
         }
     }
 
@@ -157,7 +157,7 @@ public class PrioritizationStageControlPanel
      * Spawn the prioritization stage task
      **/
     private void runPrioritizationTasks () {
-        updateContext();
+        updateContextBuilder();
 
         PrioritizationContext prioritizationContext = prioritizationContextBuilder.getContext();
         prioritizationResults = new PrioritizationResults(prioritizationContext);

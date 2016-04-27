@@ -32,7 +32,7 @@ import org.cytoscape.work.swing.PanelTaskManager;
 // OCSANA imports
 import org.compsysmed.ocsana.internal.algorithms.path.*;
 
-import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
+import org.compsysmed.ocsana.internal.stages.generation.GenerationContextBuilder;
 
 /**
  * Subpanel for user configuration of path-finding algorithm
@@ -40,7 +40,7 @@ import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
 public class PathFindingAlgorithmPanel
     extends AbstractControlSubPanel
     implements ActionListener {
-    private GenerationContext ciStageContext;
+    private GenerationContextBuilder generationContextBuilder;
     private PanelTaskManager taskManager;
 
     // UI elements
@@ -52,13 +52,13 @@ public class PathFindingAlgorithmPanel
     /**
      * Constructor
      *
-     * @param ciStageContext  the context for the CI stage
+     * @param generationContextBuilder  the context for the CI stage
      * @param taskManager  a PanelTaskManager to provide @Tunable panels
      **/
-    public PathFindingAlgorithmPanel (GenerationContext ciStageContext,
+    public PathFindingAlgorithmPanel (GenerationContextBuilder generationContextBuilder,
                                       PanelTaskManager taskManager) {
         // Initial setup
-        this.ciStageContext = ciStageContext;
+        this.generationContextBuilder = generationContextBuilder;
         this.taskManager = taskManager;
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -72,8 +72,8 @@ public class PathFindingAlgorithmPanel
         algSelectionPanel.add(new JLabel("Algorithm:"));
 
         List<AbstractPathFindingAlgorithm> algorithms = new ArrayList<>();
-        algorithms.add(new AllNonSelfIntersectingPathsAlgorithm(ciStageContext.getNetwork()));
-        algorithms.add(new ShortestPathsAlgorithm(ciStageContext.getNetwork()));
+        algorithms.add(new AllNonSelfIntersectingPathsAlgorithm(generationContextBuilder.getNetwork()));
+        algorithms.add(new ShortestPathsAlgorithm(generationContextBuilder.getNetwork()));
 
         algorithmSelecter = new JComboBox<>(algorithms.toArray(new AbstractPathFindingAlgorithm[algorithms.size()]));
         algSelectionPanel.add(algorithmSelecter);
@@ -105,7 +105,7 @@ public class PathFindingAlgorithmPanel
     }
 
     @Override
-    public void updateContext () {
-        ciStageContext.pathFindingAlg = getAlgorithm();
+    public void updateContextBuilder () {
+        generationContextBuilder.setPathFindingAlgorithm(getAlgorithm());
     }
 }

@@ -58,8 +58,8 @@ public class MHSAlgorithmTask extends AbstractOCSANATask {
         taskMonitor.setStatusMessage(String.format("Converting %d paths to node sets.", generationResults.pathsToTargets.size()));
         Long preConversionTime = System.nanoTime();
         List<Set<CyNode>> nodeSets = new ArrayList<>();
-        Set<CyNode> sourceNodes = generationContext.sourceNodes;
-        Set<CyNode> targetNodes = generationContext.targetNodes;
+        Set<CyNode> sourceNodes = generationContext.getSourceNodes();
+        Set<CyNode> targetNodes = generationContext.getTargetNodes();
 
         for (List<CyEdge> path: generationResults.pathsToTargets) {
             Set<CyNode> nodes = new HashSet<>();
@@ -72,12 +72,12 @@ public class MHSAlgorithmTask extends AbstractOCSANATask {
                 // Since we're using a Set, we don't have to worry
                 // about multiple addition, so we'll just go ahead and
                 // add the source and target every time
-                if (generationContext.includeEndpointsInCIs ||
+                if (generationContext.getIncludeEndpointsInCIs() ||
                     (!sourceNodes.contains(edge.getSource()) && !targetNodes.contains(edge.getSource()))) {
                     nodes.add(edge.getSource());
                 }
 
-                if (generationContext.includeEndpointsInCIs ||
+                if (generationContext.getIncludeEndpointsInCIs() ||
                     (!sourceNodes.contains(edge.getTarget()) && !targetNodes.contains(edge.getTarget()))) {
                     nodes.add(edge.getTarget());
                 }
@@ -92,12 +92,12 @@ public class MHSAlgorithmTask extends AbstractOCSANATask {
         Double conversionTime = (postConversionTime - preConversionTime) / 1E9;
         taskMonitor.setStatusMessage(String.format("Converted paths in %f s.", conversionTime));
 
-        taskMonitor.setStatusMessage(String.format("Finding minimal combinations of interventions (algorithm: %s).", generationContext.mhsAlg.shortName()));
+        taskMonitor.setStatusMessage(String.format("Finding minimal combinations of interventions (algorithm: %s).", generationContext.getMHSAlgorithm().shortName()));
 
         Long preMHSTime = System.nanoTime();
-        Collection<Set<CyNode>> MHSes = generationContext.mhsAlg.MHSes(nodeSets);
+        Collection<Set<CyNode>> MHSes = generationContext.getMHSAlgorithm().MHSes(nodeSets);
 
-        generationResults.CIs = MHSes.stream().map(mhs -> new CombinationOfInterventions(mhs, targetNodes, node -> generationContext.nodeNameHandler.getNodeName(node))).collect(Collectors.toList());
+        generationResults.CIs = MHSes.stream().map(mhs -> new CombinationOfInterventions(mhs, targetNodes, node -> generationContext.getNodeNameHandler().getNodeName(node))).collect(Collectors.toList());
         Long postMHSTime = System.nanoTime();
 
         Double mhsTime = (postMHSTime - preMHSTime) / 1E9;
@@ -119,7 +119,7 @@ public class MHSAlgorithmTask extends AbstractOCSANATask {
     @Override
     public void cancel () {
         super.cancel();
-        generationContext.mhsAlg.cancel();
+        generationContext.getMHSAlgorithm().cancel();
         generationResults.mhsFindingCanceled = true;
     }
 }
