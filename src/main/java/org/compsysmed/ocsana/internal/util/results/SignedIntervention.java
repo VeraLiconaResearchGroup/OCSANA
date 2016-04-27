@@ -83,6 +83,20 @@ public class SignedIntervention
     }
 
     /**
+     * Return true if the given CI is the underlying CI of this
+     * SignedIntervention
+     * <p>
+     * NOTE: this only checks set-theoretic equality of the underlying
+     * intervention and target nodes. It does <em>not</em> check object equality.
+     **/
+    public Boolean hasUnderlyingCI (CombinationOfInterventions ci) {
+        return (this.getNodes().equals(ci.getNodes()) &&
+                this.getTargets().equals(ci.getTargets())
+            );
+
+    }
+
+    /**
      * Return the target nodes of this intervention
      **/
     public Set<CyNode> getTargetNodes () {

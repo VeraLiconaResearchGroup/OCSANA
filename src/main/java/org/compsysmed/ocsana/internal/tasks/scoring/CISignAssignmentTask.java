@@ -27,6 +27,7 @@ import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
 import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
 
 import org.compsysmed.ocsana.internal.stages.prioritization.PrioritizationContext;
+import org.compsysmed.ocsana.internal.stages.prioritization.PrioritizationResults;
 
 import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
 import org.compsysmed.ocsana.internal.util.results.SignedIntervention;
@@ -36,28 +37,45 @@ public class CISignAssignmentTask
     extends AbstractOCSANATask {
     private static final OCSANAStep algStep = OCSANAStep.SCORE_PATHS;
 
-    private final GenerationContext ciContext;
-    private final PrioritizationContext scoringContext;
+    private final GenerationContext generationContext;
+    private final PrioritizationContext prioritizationContext;
+    private final PrioritizationResults prioritizationResults;
 
     private final CombinationOfInterventions ci;
 
     private Collection<SignedIntervention> signedInterventions;
 
-    public CISignAssignmentTask (GenerationContext ciContext,
-                                 PrioritizationContext scoringContext,
+    public CISignAssignmentTask (GenerationContext generationContext,
+                                 PrioritizationContext prioritizationContext,
+                                 PrioritizationResults prioritizationResults,
                                  CombinationOfInterventions ci) {
-        super(ciContext.getNetwork());
+        super(generationContext.getNetwork());
 
-        this.ciContext = ciContext;
-        this.scoringContext = scoringContext;
+        if (generationContext == null) {
+            throw new IllegalArgumentException("Generation stage context cannot be null");
+        }
+        this.generationContext = generationContext;
 
+        if (prioritizationContext == null) {
+            throw new IllegalArgumentException("Prioritization stage context cannot be null");
+        }
+        this.prioritizationContext = prioritizationContext;
+
+        if (prioritizationResults == null) {
+            throw new IllegalArgumentException("Prioritization stage results cannot be null");
+        }
+        this.prioritizationResults = prioritizationResults;
+
+        if (ci == null) {
+            throw new IllegalArgumentException("CI cannot be null");
+        }
         this.ci = ci;
     }
 
     @Override
     public void run (TaskMonitor taskMonitor) {
-        signedInterventions = scoringContext.ciSignAlgorithm.bestInterventions(ci, scoringContext.targetsToActivate);
-        scoringContext.optimalInterventionSignings.put(ci, signedInterventions);
+        signedInterventions = prioritizationContext.getCISignAlgorithm().bestInterventions(ci, prioritizationContext.getTargetsToActivate());
+        prioritizationResults.setOptimalInterventionSignings(ci, signedInterventions);
     }
 
     @Override

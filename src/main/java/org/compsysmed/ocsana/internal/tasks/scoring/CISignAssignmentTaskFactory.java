@@ -21,27 +21,31 @@ import org.cytoscape.work.TaskIterator;
 // OCSANA imports
 import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
 import org.compsysmed.ocsana.internal.stages.prioritization.PrioritizationContext;
+import org.compsysmed.ocsana.internal.stages.prioritization.PrioritizationResults;
 
 import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
 
 public class CISignAssignmentTaskFactory
     extends AbstractTaskFactory {
-    private GenerationContext ciContext;
-    private PrioritizationContext scoringContext;
-    private CombinationOfInterventions ci;
+    private final GenerationContext generationContext;
+    private final PrioritizationContext prioritizationContext;
+    private final PrioritizationResults prioritizationResults;
+    private final CombinationOfInterventions ci;
 
-    public CISignAssignmentTaskFactory (GenerationContext ciContext,
-                                        PrioritizationContext scoringContext,
+    public CISignAssignmentTaskFactory (GenerationContext generationContext,
+                                        PrioritizationContext prioritizationContext,
+                                        PrioritizationResults prioritizationResults,
                                         CombinationOfInterventions ci) {
-        this.ciContext = ciContext;
-        this.scoringContext = scoringContext;
+        this.generationContext = generationContext;
+        this.prioritizationContext = prioritizationContext;
+        this.prioritizationResults = prioritizationResults;
         this.ci = ci;
     }
 
     @Override
     public TaskIterator createTaskIterator () {
         TaskIterator tasks = new TaskIterator();
-        tasks.append(new CISignAssignmentTask(ciContext, scoringContext, ci));
+        tasks.append(new CISignAssignmentTask(generationContext, prioritizationContext, prioritizationResults, ci));
         return tasks;
     }
 }

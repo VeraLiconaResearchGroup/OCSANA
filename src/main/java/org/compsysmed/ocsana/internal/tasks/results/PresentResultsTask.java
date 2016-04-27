@@ -25,16 +25,16 @@ import org.compsysmed.ocsana.internal.stages.generation.GenerationResults;
 
 public class PresentResultsTask extends AbstractOCSANATask {
     private static final OCSANAStep algStep = OCSANAStep.PRESENT_RESULTS;
-    private GenerationContext ciContext;
-    private GenerationResults ciResults;
+    private GenerationContext generationContext;
+    private GenerationResults generationResults;
     private OCSANAResultsPanel resultsPanel;
 
-    public PresentResultsTask (GenerationContext ciContext,
-                               GenerationResults ciResults,
+    public PresentResultsTask (GenerationContext generationContext,
+                               GenerationResults generationResults,
                                OCSANAResultsPanel resultsPanel) {
-        super(ciContext.getNetwork());
-        this.ciContext = ciContext;
-        this.ciResults = ciResults;
+        super(generationContext.getNetwork());
+        this.generationContext = generationContext;
+        this.generationResults = generationResults;
         this.resultsPanel = resultsPanel;
     }
 
@@ -44,7 +44,7 @@ public class PresentResultsTask extends AbstractOCSANATask {
 
         taskMonitor.setStatusMessage("Generating results report.");
 
-        resultsPanel.updateResults(ciContext, ciResults);
+        resultsPanel.updateResults(generationContext, generationResults);
     }
 
     @Override

@@ -41,7 +41,7 @@ import org.cytoscape.application.swing.CytoPanelState;
 import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
 import org.compsysmed.ocsana.internal.stages.generation.GenerationResults;
 
-import org.compsysmed.ocsana.internal.stages.prioritization.PrioritizationContext;
+import org.compsysmed.ocsana.internal.stages.prioritization.PrioritizationResults;
 
 /**
  * Panel to display OCSANA results
@@ -52,10 +52,10 @@ public class OCSANAResultsPanel
     private final CySwingApplication cySwingApplication;
     private final CytoPanel cyResultsPanel;
 
-    GenerationContext ciContext;
-    GenerationResults ciResults;
+    GenerationContext generationContext;
+    GenerationResults generationResults;
 
-    PrioritizationContext scoreContext;
+    PrioritizationResults prioritizationResults;
 
     JPanel resultsPanel;
     JPanel operationsPanel;
@@ -79,23 +79,19 @@ public class OCSANAResultsPanel
     /**
      * Update the panel with the specified CI-stage results
      *
-     * @param ciContext  the CI stage context
-     * @param ciResults  the CI stage results to display
+     * @param generationContext  the CI stage context
+     * @param generationResults  the CI stage results to display
      **/
-    public void updateResults (GenerationContext ciContext,
-                               GenerationResults ciResults) {
-        System.out.println("Boop!");
-        this.ciContext = ciContext;
-        this.ciResults = ciResults;
-
-        this.scoreContext = null;
+    public void updateResults (GenerationContext generationContext,
+                               GenerationResults generationResults) {
+        this.generationContext = generationContext;
+        this.generationResults = generationResults;
 
         rebuildPanels();
     }
 
-    public void updateResults (PrioritizationContext scoreContext) {
-        System.out.println("Beep!");
-        this.scoreContext = scoreContext;
+    public void updateResults (PrioritizationResults prioritizationResults) {
+        this.prioritizationResults = prioritizationResults;
 
         rebuildPanels();
     }
@@ -156,7 +152,7 @@ public class OCSANAResultsPanel
                         File outFile = fileChooser.getSelectedFile();
                         try (BufferedWriter fileWriter =
                              new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFile), StandardCharsets.UTF_8))) {
-                            for (String reportLine: ciResults.getReportLines()) {
+                            for (String reportLine: generationResults.getReportLines()) {
                                 fileWriter.write(reportLine);
                                 fileWriter.newLine();
                             }
@@ -182,7 +178,7 @@ public class OCSANAResultsPanel
      **/
     private void showResultsReport () {
         JTextArea reportTextArea = new JTextArea(40, 120);
-        reportTextArea.setText(String.join("\n", ciResults.getReportLines()));
+        reportTextArea.setText(String.join("\n", generationResults.getReportLines()));
         reportTextArea.setEditable(false);
         reportTextArea.setCaretPosition(0); // Show top of file initially
 
@@ -199,7 +195,7 @@ public class OCSANAResultsPanel
     private JPanel getResultsPanel () {
         JPanel resultsPanel = new JPanel(new BorderLayout());
 
-        if (ciResults == null) {
+        if (generationResults == null) {
             return resultsPanel;
         }
 
@@ -207,18 +203,18 @@ public class OCSANAResultsPanel
         resultsPanel.add(resultsTabbedPane, BorderLayout.CENTER);
         resultsPanel.setBorder(null);
 
-        if (ciResults.CIs != null) {
-            UnscoredCIListPanel ciPanel = new UnscoredCIListPanel(ciContext, ciResults, cySwingApplication.getJFrame());
+        if (generationResults.CIs != null) {
+            UnscoredCIListPanel ciPanel = new UnscoredCIListPanel(generationContext, generationResults, cySwingApplication.getJFrame());
             resultsTabbedPane.addTab("Optimal CIs", ciPanel);
         }
 
-        if (ciResults.pathsToTargets != null) {
-            PathsPanel targetPathsPanel = new PathsPanel(ciContext, ciResults, PathsPanel.PathType.TO_TARGETS);
+        if (generationResults.pathsToTargets != null) {
+            PathsPanel targetPathsPanel = new PathsPanel(generationContext, generationResults, PathsPanel.PathType.TO_TARGETS);
             resultsTabbedPane.addTab("Paths to targets", targetPathsPanel);
         }
 
-        if (ciResults.pathsToOffTargets != null) {
-            PathsPanel targetPathsPanel = new PathsPanel(ciContext, ciResults, PathsPanel.PathType.TO_OFF_TARGETS);
+        if (generationResults.pathsToOffTargets != null) {
+            PathsPanel targetPathsPanel = new PathsPanel(generationContext, generationResults, PathsPanel.PathType.TO_OFF_TARGETS);
             resultsTabbedPane.addTab("Paths to Off-targets", targetPathsPanel);
         }
 

@@ -58,11 +58,11 @@ public class OCSANAControlPanel
     private OCSANAResultsPanel resultsPanel;
 
     private BasicCollapsiblePanel ciCollapsible;
-    private GenerationStageControlPanel ciControlPanel;
+    private GenerationStageControlPanel generationControlPanel;
 
-    private BasicCollapsiblePanel scoringCollapsible;
-    private PrioritizationStageControlPanel scoringControlPanel;
-    Boolean scoringPanelLocked = true;
+    private BasicCollapsiblePanel prioritizationCollapsible;
+    private PrioritizationStageControlPanel prioritizationControlPanel;
+    Boolean prioritizationPanelLocked = true;
 
     public OCSANAControlPanel (CyApplicationManager cyApplicationManager,
                                CySwingApplication cySwingApplication,
@@ -98,46 +98,46 @@ public class OCSANAControlPanel
         ciCollapsible.setCollapsed(false);
         add(ciCollapsible);
 
-        ciControlPanel = new GenerationStageControlPanel(network, resultsPanel, panelTaskManager);
-        ciControlPanel.addActionListener(this);
-        ciCollapsible.add(ciControlPanel);
+        generationControlPanel = new GenerationStageControlPanel(network, resultsPanel, panelTaskManager);
+        generationControlPanel.addActionListener(this);
+        ciCollapsible.add(generationControlPanel);
 
-        scoringCollapsible = new BasicCollapsiblePanel("2: Score and compare CIs");
-        scoringCollapsible.addCollapseListener(new BasicCollapsiblePanel.CollapseListener(){
+        prioritizationCollapsible = new BasicCollapsiblePanel("2: Score and compare CIs");
+        prioritizationCollapsible.addCollapseListener(new BasicCollapsiblePanel.CollapseListener(){
                 @Override
                 public void collapsed () {}
                 @Override
                 public void expanded () {
-                    if (scoringPanelLocked) {
-                        scoringCollapsible.setCollapsed(true);
+                    if (prioritizationPanelLocked) {
+                        prioritizationCollapsible.setCollapsed(true);
                     }
                 }
             });
-        add(scoringCollapsible);
+        add(prioritizationCollapsible);
 
 
-        scoringControlPanel = new PrioritizationStageControlPanel(network, resultsPanel, panelTaskManager);
-        scoringControlPanel.addActionListener(this);
-        scoringCollapsible.add(scoringControlPanel);
+        prioritizationControlPanel = new PrioritizationStageControlPanel(network, resultsPanel, panelTaskManager);
+        prioritizationControlPanel.addActionListener(this);
+        prioritizationCollapsible.add(prioritizationControlPanel);
 
         revalidate();
         repaint();
     }
 
     /**
-     * Put the scoring subpanel in "locked" state so user cannot access it
+     * Put the prioritization subpanel in "locked" state so user cannot access it
      **/
-    private void lockScoringCollapsible () {
-        scoringPanelLocked = true;
-        scoringCollapsible.setCollapsed(true);
+    private void lockPrioritizationCollapsible () {
+        prioritizationPanelLocked = true;
+        prioritizationCollapsible.setCollapsed(true);
     }
 
     /**
-     * Put the scoring subpanel in "unlocked" state so user can access it
+     * Put the prioritization subpanel in "unlocked" state so user can access it
      **/
-    private void unlockScoringCollapsible () {
-        scoringPanelLocked = false;
-        scoringCollapsible.setCollapsed(false);
+    private void unlockPrioritizationCollapsible () {
+        prioritizationPanelLocked = false;
+        prioritizationCollapsible.setCollapsed(false);
     }
 
     // Helper functions to get information about the panel
@@ -180,14 +180,14 @@ public class OCSANAControlPanel
     public void actionPerformed (ActionEvent event) {
         switch (event.getActionCommand()) {
         case GenerationStageControlPanel.START_CI_SIGNAL:
-            lockScoringCollapsible();
+            lockPrioritizationCollapsible();
             break;
 
         case GenerationStageControlPanel.END_CI_SIGNAL:
-            GenerationContext ciContext = ciControlPanel.getContext();
-            GenerationResults ciResults = ciControlPanel.getResults();
-            scoringControlPanel.populatePanel(ciContext, ciResults);
-            unlockScoringCollapsible();
+            GenerationContext generationContext = generationControlPanel.getContext();
+            GenerationResults generationResults = generationControlPanel.getResults();
+            prioritizationControlPanel.populatePanel(generationContext, generationResults);
+            unlockPrioritizationCollapsible();
             break;
 
         case PrioritizationStageControlPanel.END_SIGN_ASSIGNMENT_SIGNAL:

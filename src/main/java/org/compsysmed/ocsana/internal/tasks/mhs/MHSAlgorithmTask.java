@@ -33,35 +33,35 @@ import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
 public class MHSAlgorithmTask extends AbstractOCSANATask {
     private static final OCSANAStep algStep = OCSANAStep.FIND_MHSES;
 
-    private GenerationContext ciContext;
-    private GenerationResults ciResults;
+    private GenerationContext generationContext;
+    private GenerationResults generationResults;
 
-    public MHSAlgorithmTask (GenerationContext ciContext,
-                             GenerationResults ciResults) {
-        super(ciContext.getNetwork());
-        this.ciContext = ciContext;
-        this.ciResults = ciResults;
+    public MHSAlgorithmTask (GenerationContext generationContext,
+                             GenerationResults generationResults) {
+        super(generationContext.getNetwork());
+        this.generationContext = generationContext;
+        this.generationResults = generationResults;
     }
 
     @Override
     public void run (TaskMonitor taskMonitor) {
-        if (ciResults.pathFindingCanceled) {
+        if (generationResults.pathFindingCanceled) {
             return;
         }
 
         taskMonitor.setTitle("Minimal CIs");
 
-        if (ciResults.pathsToTargets == null) {
+        if (generationResults.pathsToTargets == null) {
             throw new IllegalStateException("Paths to targets not set.");
         }
 
-        taskMonitor.setStatusMessage(String.format("Converting %d paths to node sets.", ciResults.pathsToTargets.size()));
+        taskMonitor.setStatusMessage(String.format("Converting %d paths to node sets.", generationResults.pathsToTargets.size()));
         Long preConversionTime = System.nanoTime();
         List<Set<CyNode>> nodeSets = new ArrayList<>();
-        Set<CyNode> sourceNodes = ciContext.sourceNodes;
-        Set<CyNode> targetNodes = ciContext.targetNodes;
+        Set<CyNode> sourceNodes = generationContext.sourceNodes;
+        Set<CyNode> targetNodes = generationContext.targetNodes;
 
-        for (List<CyEdge> path: ciResults.pathsToTargets) {
+        for (List<CyEdge> path: generationResults.pathsToTargets) {
             Set<CyNode> nodes = new HashSet<>();
 
             // Scan every edge in the path, adding its nodes as
@@ -72,12 +72,12 @@ public class MHSAlgorithmTask extends AbstractOCSANATask {
                 // Since we're using a Set, we don't have to worry
                 // about multiple addition, so we'll just go ahead and
                 // add the source and target every time
-                if (ciContext.includeEndpointsInCIs ||
+                if (generationContext.includeEndpointsInCIs ||
                     (!sourceNodes.contains(edge.getSource()) && !targetNodes.contains(edge.getSource()))) {
                     nodes.add(edge.getSource());
                 }
 
-                if (ciContext.includeEndpointsInCIs ||
+                if (generationContext.includeEndpointsInCIs ||
                     (!sourceNodes.contains(edge.getTarget()) && !targetNodes.contains(edge.getTarget()))) {
                     nodes.add(edge.getTarget());
                 }
@@ -92,18 +92,18 @@ public class MHSAlgorithmTask extends AbstractOCSANATask {
         Double conversionTime = (postConversionTime - preConversionTime) / 1E9;
         taskMonitor.setStatusMessage(String.format("Converted paths in %f s.", conversionTime));
 
-        taskMonitor.setStatusMessage(String.format("Finding minimal combinations of interventions (algorithm: %s).", ciContext.mhsAlg.shortName()));
+        taskMonitor.setStatusMessage(String.format("Finding minimal combinations of interventions (algorithm: %s).", generationContext.mhsAlg.shortName()));
 
         Long preMHSTime = System.nanoTime();
-        Collection<Set<CyNode>> MHSes = ciContext.mhsAlg.MHSes(nodeSets);
+        Collection<Set<CyNode>> MHSes = generationContext.mhsAlg.MHSes(nodeSets);
 
-        ciResults.CIs = MHSes.stream().map(mhs -> new CombinationOfInterventions(mhs, targetNodes, node -> ciContext.nodeNameHandler.getNodeName(node))).collect(Collectors.toList());
+        generationResults.CIs = MHSes.stream().map(mhs -> new CombinationOfInterventions(mhs, targetNodes, node -> generationContext.nodeNameHandler.getNodeName(node))).collect(Collectors.toList());
         Long postMHSTime = System.nanoTime();
 
         Double mhsTime = (postMHSTime - preMHSTime) / 1E9;
-        taskMonitor.showMessage(TaskMonitor.Level.INFO, String.format("Found %d minimal CIs in %f s.", ciResults.CIs.size(), mhsTime));
+        taskMonitor.showMessage(TaskMonitor.Level.INFO, String.format("Found %d minimal CIs in %f s.", generationResults.CIs.size(), mhsTime));
 
-        ciResults.mhsExecutionSeconds = mhsTime;
+        generationResults.mhsExecutionSeconds = mhsTime;
     }
 
     @Override
@@ -112,14 +112,14 @@ public class MHSAlgorithmTask extends AbstractOCSANATask {
         if (type.isAssignableFrom(OCSANAStep.class)) {
             return (T) algStep;
         } else {
-            return (T) ciResults.CIs;
+            return (T) generationResults.CIs;
         }
     }
 
     @Override
     public void cancel () {
         super.cancel();
-        ciContext.mhsAlg.cancel();
-        ciResults.mhsFindingCanceled = true;
+        generationContext.mhsAlg.cancel();
+        generationResults.mhsFindingCanceled = true;
     }
 }

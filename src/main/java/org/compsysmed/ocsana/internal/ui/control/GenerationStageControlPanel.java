@@ -54,8 +54,8 @@ public class GenerationStageControlPanel
     private OCSANAResultsPanel resultsPanel;
     private PanelTaskManager taskManager;
 
-    private GenerationContext ciStageContext;
-    private GenerationResults ciStageResults;
+    private GenerationContext generationContext;
+    private GenerationResults generationResults;
     private CyNetwork network;
 
     private List<ActionListener> listeners;
@@ -83,7 +83,7 @@ public class GenerationStageControlPanel
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        ciStageContext = new GenerationContext(network);
+        generationContext = new GenerationContext(network);
 
         subpanels = new ArrayList<>();
 
@@ -100,7 +100,7 @@ public class GenerationStageControlPanel
      **/
     public GenerationContext getContext () {
         updateContext();
-        return ciStageContext;
+        return generationContext;
     }
 
     /**
@@ -109,7 +109,7 @@ public class GenerationStageControlPanel
      * @return the results (null if stage has not been run)
      **/
     public GenerationResults getResults () {
-        return ciStageResults;
+        return generationResults;
     }
 
     /**
@@ -142,15 +142,15 @@ public class GenerationStageControlPanel
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        networkConfigPanel = new CINetworkConfigurationPanel(ciStageContext, taskManager);
+        networkConfigPanel = new CINetworkConfigurationPanel(generationContext, taskManager);
         panel.add(networkConfigPanel);
         subpanels.add(networkConfigPanel);
 
-        pathFindingAlgorithmPanel = new PathFindingAlgorithmPanel(ciStageContext, taskManager);
+        pathFindingAlgorithmPanel = new PathFindingAlgorithmPanel(generationContext, taskManager);
         panel.add(pathFindingAlgorithmPanel);
         subpanels.add(pathFindingAlgorithmPanel);
 
-        mhsAlgorithmPanel = new MHSAlgorithmPanel(ciStageContext, taskManager);
+        mhsAlgorithmPanel = new MHSAlgorithmPanel(generationContext, taskManager);
         panel.add(mhsAlgorithmPanel);
         subpanels.add(mhsAlgorithmPanel);
 
@@ -175,8 +175,8 @@ public class GenerationStageControlPanel
         signalStartOfCITask();
 
         GenerationStageRunnerTaskFactory runnerTaskFactory
-            = new GenerationStageRunnerTaskFactory(taskManager, this, ciStageContext, resultsPanel);
-        taskManager.execute(runnerTaskFactory.createTaskIterator(), this);
+            = new GenerationStageRunnerTaskFactory(taskManager, this, generationContext, resultsPanel);
+        taskManager.execute(runnerTaskFactory.createTaskIterator());
     }
 
     private void signalStartOfCITask () {
@@ -196,7 +196,7 @@ public class GenerationStageControlPanel
 
     @Override
     public void taskFinished (ObservableTask task) {
-        ciStageResults = task.getResults(GenerationResults.class);
+        generationResults = task.getResults(GenerationResults.class);
         signalEndOfCITask();
     }
 

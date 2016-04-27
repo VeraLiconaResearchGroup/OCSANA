@@ -1,5 +1,5 @@
 /**
- * Panel to contain OCSANA controls for scoring stage
+ * Panel to contain OCSANA controls for prioritization stage
  *
  * Copyright Vera-Licona Research Group (C) 2015
  *
@@ -37,6 +37,9 @@ import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
 import org.compsysmed.ocsana.internal.stages.generation.GenerationResults;
 
 import org.compsysmed.ocsana.internal.stages.prioritization.PrioritizationContext;
+import org.compsysmed.ocsana.internal.stages.prioritization.PrioritizationContextBuilder;
+import org.compsysmed.ocsana.internal.stages.prioritization.PrioritizationResults;
+import org.compsysmed.ocsana.internal.stages.prioritization.PrioritizationStageRunnerTask;
 
 import org.compsysmed.ocsana.internal.tasks.scoring.CISignAssignmentTaskFactory;
 
@@ -47,34 +50,46 @@ import org.compsysmed.ocsana.internal.ui.control.panels.*;
 import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
 
 /**
- * Panel to configure and run OCSANA scoring stage
+ * Panel to configure and run OCSANA prioritization stage
  **/
 public class PrioritizationStageControlPanel
     extends JPanel
     implements ActionListener, TaskObserver {
     public static final String END_SIGN_ASSIGNMENT_SIGNAL = "Sign assignment task end";
 
-    private OCSANAResultsPanel resultsPanel;
-    private PanelTaskManager taskManager;
+    private final OCSANAResultsPanel resultsPanel;
+    private final PanelTaskManager taskManager;
 
-    private List<ActionListener> listeners;
+    private final List<ActionListener> listeners;
 
-    private PrioritizationContext scoringContext;
+    private PrioritizationContextBuilder prioritizationContextBuilder;
+    private PrioritizationResults prioritizationResults;
 
     private CyNetwork network;
 
-    private GenerationContext ciContext;
-    private GenerationResults ciResults;
+    private GenerationContext generationContext;
+    private GenerationResults generationResults;
 
-    private Collection<AbstractControlSubPanel> subpanels;
-    private JPanel optionsPanel;
-    private ScoringNetworkConfigurationPanel networkConfigPanel;
+    private final Collection<AbstractControlSubPanel> subpanels;
+    private final JPanel optionsPanel;
+    private TargetActivationConfigurationPanel targetActivationPanel;
 
     public PrioritizationStageControlPanel (CyNetwork network,
-                                     OCSANAResultsPanel resultsPanel,
-                                     PanelTaskManager taskManager) {
+                                            OCSANAResultsPanel resultsPanel,
+                                            PanelTaskManager taskManager) {
+        if (network == null) {
+            throw new IllegalArgumentException("Network cannot be null");
+        }
         this.network = network;
+
+        if (resultsPanel == null) {
+            throw new IllegalArgumentException("Results panel cannot be null");
+        }
         this.resultsPanel = resultsPanel;
+
+        if (taskManager == null) {
+            throw new IllegalArgumentException("Task manager cannot be null");
+        }
         this.taskManager = taskManager;
 
         subpanels = new ArrayList<>();
@@ -87,13 +102,13 @@ public class PrioritizationStageControlPanel
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
         add(optionsPanel);
 
-        JButton runScoringStageButton = new JButton("Run scoring stage computations");
-        add(runScoringStageButton);
+        JButton runPrioritizationStageButton = new JButton("Run prioritization stage computations");
+        add(runPrioritizationStageButton);
 
-        runScoringStageButton.addActionListener(new ActionListener() {
+        runPrioritizationStageButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed (ActionEvent e) {
-                    runScoringTasks();
+                    runPrioritizationTasks();
                 }
             });
 
@@ -104,26 +119,33 @@ public class PrioritizationStageControlPanel
     /**
      * Populate the panel with data from previous stage
      **/
-    public void populatePanel (GenerationContext ciContext,
-                               GenerationResults ciResults) {
-        this.ciContext = ciContext;
-        this.ciResults = ciResults;
+    public void populatePanel (GenerationContext generationContext,
+                               GenerationResults generationResults) {
+        if (generationContext == null) {
+            throw new IllegalArgumentException("Generation stage context cannot be null");
+        }
+        this.generationContext = generationContext;
+
+        if (generationResults == null) {
+            throw new IllegalArgumentException("Generation stage results cannot be null");
+        }
+        this.generationResults = generationResults;
 
         optionsPanel.removeAll();
         subpanels.clear();
 
-        scoringContext = new PrioritizationContext(network, ciContext, ciResults);
+        prioritizationContextBuilder = new PrioritizationContextBuilder(network, generationContext, generationResults);
 
-        networkConfigPanel = new ScoringNetworkConfigurationPanel(ciContext, scoringContext, taskManager);
-        optionsPanel.add(networkConfigPanel);
-        subpanels.add(networkConfigPanel);
+        targetActivationPanel = new TargetActivationConfigurationPanel(generationContext, prioritizationContextBuilder, taskManager);
+        optionsPanel.add(targetActivationPanel);
+        subpanels.add(targetActivationPanel);
 
         optionsPanel.revalidate();
         optionsPanel.repaint();
     }
 
     /**
-     * Update the ScoringStageContext with the settings in the UI
+     * Update the PrioritizationStageContext with the settings in the UI
      **/
     private void updateContext () {
         for (AbstractControlSubPanel subpanel: subpanels) {
@@ -132,22 +154,18 @@ public class PrioritizationStageControlPanel
     }
 
     /**
-     * Spawn the scoring stage task
+     * Spawn the prioritization stage task
      **/
-    private void runScoringTasks () {
+    private void runPrioritizationTasks () {
         updateContext();
 
-        TaskIterator signAssignmentTasks = new TaskIterator();
+        PrioritizationContext prioritizationContext = prioritizationContextBuilder.getContext();
+        prioritizationResults = new PrioritizationResults(prioritizationContext);
 
-        for (CombinationOfInterventions CI: ciResults.CIs) {
-            CISignAssignmentTaskFactory scorerTaskFactory
-                = new CISignAssignmentTaskFactory(ciContext, scoringContext, CI);
-            signAssignmentTasks.append(scorerTaskFactory.createTaskIterator());
-        }
+        TaskIterator prioritizationTasks = new TaskIterator();
+        prioritizationTasks.append(new PrioritizationStageRunnerTask(taskManager, this, generationContext, generationResults, prioritizationContext, resultsPanel));
 
-        if (signAssignmentTasks.hasNext()) {
-            taskManager.execute(signAssignmentTasks, this);
-        }
+        taskManager.execute(prioritizationTasks, this);
     }
 
     private void signalEndOfSignAssignmentTask () {
@@ -171,7 +189,7 @@ public class PrioritizationStageControlPanel
     public void allFinished(FinishStatus finishStatus) {
         // Called after the TaskManager finished up a TaskIterator.
         signalEndOfSignAssignmentTask();
-        resultsPanel.updateResults(scoringContext);
+        resultsPanel.updateResults(prioritizationResults);
     }
 
     // Helper functions to support listening for component changes

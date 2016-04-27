@@ -22,23 +22,23 @@ import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
 import org.compsysmed.ocsana.internal.stages.generation.GenerationResults;
 
 public class PresentResultsTaskFactory extends AbstractTaskFactory {
-    private GenerationContext ciContext;
-    private GenerationResults ciResults;
+    private GenerationContext generationContext;
+    private GenerationResults generationResults;
 
     private OCSANAResultsPanel resultsPanel;
 
-    public PresentResultsTaskFactory (GenerationContext ciContext,
-                                      GenerationResults ciResults,
+    public PresentResultsTaskFactory (GenerationContext generationContext,
+                                      GenerationResults generationResults,
                                       OCSANAResultsPanel resultsPanel) {
-        this.ciContext = ciContext;
-        this.ciResults = ciResults;
+        this.generationContext = generationContext;
+        this.generationResults = generationResults;
         this.resultsPanel = resultsPanel;
     }
 
     @Override
     public TaskIterator createTaskIterator () {
         TaskIterator tasks = new TaskIterator();
-        tasks.append(new PresentResultsTask(ciContext, ciResults, resultsPanel));
+        tasks.append(new PresentResultsTask(generationContext, generationResults, resultsPanel));
         return tasks;
     }
 }

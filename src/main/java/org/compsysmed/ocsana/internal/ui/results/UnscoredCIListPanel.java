@@ -45,23 +45,23 @@ import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
 public class UnscoredCIListPanel
     extends JPanel {
     private JFrame cytoscapeFrame;
-    private GenerationContext ciContext;
-    private GenerationResults ciResults;
+    private GenerationContext generationContext;
+    private GenerationResults generationResults;
 
-    public UnscoredCIListPanel (GenerationContext ciContext,
-                                GenerationResults ciResults,
+    public UnscoredCIListPanel (GenerationContext generationContext,
+                                GenerationResults generationResults,
                                 JFrame cytoscapeFrame) {
-        this.ciContext = ciContext;
-        this.ciResults = ciResults;
+        this.generationContext = generationContext;
+        this.generationResults = generationResults;
         this.cytoscapeFrame = cytoscapeFrame;
 
-        if (ciResults.CIs != null) {
+        if (generationResults.CIs != null) {
             MHSTable mhsTable = new MHSTable();
 
             JScrollPane mhsScrollPane = new JScrollPane(mhsTable);
 
             setLayout(new BorderLayout());
-            String mhsText = String.format("Found %d optimal CIs in %f s.", ciResults.CIs.size(), ciResults.mhsExecutionSeconds);
+            String mhsText = String.format("Found %d optimal CIs in %f s.", generationResults.CIs.size(), generationResults.mhsExecutionSeconds);
             add(new JLabel(mhsText), BorderLayout.PAGE_START);
             add(mhsScrollPane, BorderLayout.CENTER);
         }
@@ -71,9 +71,9 @@ public class UnscoredCIListPanel
         List<CombinationOfInterventions> CIs;
 
         public MHSTable () {
-            this.CIs = new ArrayList<>(ciResults.CIs);
+            this.CIs = new ArrayList<>(generationResults.CIs);
 
-            MHSTableModel mhsModel = new MHSTableModel(ciContext, CIs);
+            MHSTableModel mhsModel = new MHSTableModel(generationContext, CIs);
             setModel(mhsModel);
 
             // Sort the rows on CI size
@@ -97,17 +97,17 @@ public class UnscoredCIListPanel
 
         public void handleUserDoubleClick (Integer row) {
             CombinationOfInterventions ci = CIs.get(row);
-            //InterventionDetailsDialog detailsDialog = new InterventionDetailsDialog(cytoscapeFrame, ciContext.getNetwork(), CIs.get(row));
+            //InterventionDetailsDialog detailsDialog = new InterventionDetailsDialog(cytoscapeFrame, generationContext.getNetwork(), CIs.get(row));
         }
     }
 
     private static class MHSTableModel extends AbstractTableModel {
-        private GenerationContext ciContext;
+        private GenerationContext generationContext;
         private List<CombinationOfInterventions> CIs;
 
-        public MHSTableModel (GenerationContext ciContext,
+        public MHSTableModel (GenerationContext generationContext,
                               List<CombinationOfInterventions> CIs) {
-            this.ciContext = ciContext;
+            this.generationContext = generationContext;
             this.CIs = CIs;
         }
         String[] colNames = {"CI", "Size"};

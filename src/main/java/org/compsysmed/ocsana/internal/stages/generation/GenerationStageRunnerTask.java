@@ -44,25 +44,26 @@ import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
 public class GenerationStageRunnerTask
     extends AbstractNetworkTask
     implements TaskObserver, ObservableTask {
-    private TaskManager<?, ?> taskManager;
-    private GenerationContext context;
-    private GenerationResults results;
-    private TaskObserver observer;
-    private OCSANAResultsPanel resultsPanel;
+    private final TaskManager<?, ?> taskManager;
+    private final GenerationContext generationContext;
+    private final GenerationResults generationResults;
+    private final TaskObserver observer;
+    private final OCSANAResultsPanel resultsPanel;
 
     private Boolean hasCleanResults = false;
 
     public GenerationStageRunnerTask (TaskManager<?, ?> taskManager,
                                       TaskObserver observer,
-                                      GenerationContext context,
+                                      GenerationContext generationContext,
                                       OCSANAResultsPanel resultsPanel) {
-        super(context.getNetwork());
+        super(generationContext.getNetwork());
+
         this.taskManager = taskManager;
         this.observer = observer;
-        this.context = context;
+        this.generationContext = generationContext;
         this.resultsPanel = resultsPanel;
 
-        this.results = new GenerationResults();
+        this.generationResults = new GenerationResults();
     }
 
     @Override
@@ -81,7 +82,7 @@ public class GenerationStageRunnerTask
 
     private void spawnPathsToTargetsTask () {
         PathFindingAlgorithmTaskFactory pathsToTargetsTaskFactory =
-            new PathFindingAlgorithmTaskFactory(context, results,
+            new PathFindingAlgorithmTaskFactory(generationContext, generationResults,
                                                 OCSANAStep.FIND_PATHS_TO_TARGETS);
 
         taskManager.execute(pathsToTargetsTaskFactory.createTaskIterator(),
@@ -90,7 +91,7 @@ public class GenerationStageRunnerTask
 
     private void spawnPathsToOffTargetsTask () {
         PathFindingAlgorithmTaskFactory pathsToOffTargetsTaskFactory =
-            new PathFindingAlgorithmTaskFactory(context, results,
+            new PathFindingAlgorithmTaskFactory(generationContext, generationResults,
                                                 OCSANAStep.FIND_PATHS_TO_OFF_TARGETS);
 
         taskManager.execute(pathsToOffTargetsTaskFactory.createTaskIterator(),
@@ -99,21 +100,21 @@ public class GenerationStageRunnerTask
 
     private void spawnOCSANAScoringTask () {
         OCSANAScoringTaskFactory scoringTaskFactory =
-            new OCSANAScoringTaskFactory(context, results);
+            new OCSANAScoringTaskFactory(generationContext, generationResults);
 
         taskManager.execute(scoringTaskFactory.createTaskIterator(), this);
     }
 
     private void spawnMHSTask () {
         MHSAlgorithmTaskFactory mhsTaskFactory =
-            new MHSAlgorithmTaskFactory(context, results);
+            new MHSAlgorithmTaskFactory(generationContext, generationResults);
 
         taskManager.execute(mhsTaskFactory.createTaskIterator(), this);
     }
 
     private void spawnPresentResultsTask () {
         PresentResultsTaskFactory presentResultsTaskFactory =
-            new PresentResultsTaskFactory(context, results, resultsPanel);
+            new PresentResultsTaskFactory(generationContext, generationResults, resultsPanel);
 
         taskManager.execute(presentResultsTaskFactory.createTaskIterator(), this);
     }
@@ -121,13 +122,15 @@ public class GenerationStageRunnerTask
     private void spawnCleanupTask () {
         // Flag that the results are clean
         hasCleanResults = true;
+
         observer.taskFinished(this);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public <T> T getResults (Class<? extends T> type) {
         if (hasCleanResults) {
-            return (T) results;
+            return (T) generationResults;
         } else {
             return null;
         }

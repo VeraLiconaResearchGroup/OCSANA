@@ -1,5 +1,5 @@
 /**
- * Panel containing network configuration for scoring stage
+ * Panel containing configuration options for target activate
  *
  * Copyright Vera-Licona Research Group (C) 2016
  *
@@ -27,17 +27,17 @@ import org.cytoscape.work.swing.PanelTaskManager;
 
 // OCSANA imports
 import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
-import org.compsysmed.ocsana.internal.stages.prioritization.PrioritizationContext;
+import org.compsysmed.ocsana.internal.stages.prioritization.PrioritizationContextBuilder;
 
 import org.compsysmed.ocsana.internal.ui.control.widgets.*;
 
 /**
- * Subpanel for user configuration of network parameters in scoring stage
+ * Subpanel for configuring target activation
  **/
-public class ScoringNetworkConfigurationPanel
+public class TargetActivationConfigurationPanel
     extends AbstractControlSubPanel {
     private GenerationContext ciStageContext;
-    private PrioritizationContext scoringStageContext;
+    private PrioritizationContextBuilder prioritizationContextBuilder;
     private PanelTaskManager taskManager;
 
     // UI elements
@@ -49,12 +49,12 @@ public class ScoringNetworkConfigurationPanel
      * @param ciStageContext  the context for the CI stage
      * @param taskManager  a PanelTaskManager to provide @Tunable panels
      **/
-    public ScoringNetworkConfigurationPanel (GenerationContext ciStageContext,
-                                             PrioritizationContext scoringStageContext,
-                                             PanelTaskManager taskManager) {
+    public TargetActivationConfigurationPanel (GenerationContext ciStageContext,
+                                               PrioritizationContextBuilder prioritizationContextBuilder,
+                                               PanelTaskManager taskManager) {
         // Initial setup
         this.ciStageContext = ciStageContext;
-        this.scoringStageContext = scoringStageContext;
+        this.prioritizationContextBuilder = prioritizationContextBuilder;
         this.taskManager = taskManager;
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -68,6 +68,6 @@ public class ScoringNetworkConfigurationPanel
 
     @Override
     public void updateContext () {
-        scoringStageContext.setTargetsToActivate(activatedTargetsSelecter.getSelectedNodes());
+        prioritizationContextBuilder.setTargetsToActivate(activatedTargetsSelecter.getSelectedNodes());
     }
 }

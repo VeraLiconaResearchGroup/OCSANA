@@ -1,5 +1,5 @@
 /**
- * Context for the scoring stage of OCSANA
+ * Context for the prioritization stage of OCSANA
  *
  * Copyright Vera-Licona Research Group (C) 2016
  *
@@ -40,48 +40,112 @@ import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
 import org.compsysmed.ocsana.internal.util.results.SignedIntervention;
 
 /**
- * Context for the scoring stage of OCSANA
- *
+ * Context for the prioritization stage of OCSANA
+ * <p>
  * This class stores the configuration required to run the scoring
  * stage.  A populated instance will be passed to a
  * ScoringStageController which handles scoring tasks.
+ * <p>
+ * This class is immutable by design. Instances should be constructed using
+ * {@link PrioritizationContextBuilder}.
  **/
-public class PrioritizationContext {
-    public Set<CyNode> targetsToDeactivate;
-    public Set<CyNode> targetsToActivate;
+public final class PrioritizationContext {
+    private final CyNetwork network;
+    private final GenerationContext generationContext;
+    private final GenerationResults generationResults;
+    private final Collection<CyNode> targets;
 
-    // Internal data
-    private CyNetwork network;
-    private GenerationContext ciContext;
-    private GenerationResults ciResults;
-    private Collection<CyNode> targets;
+    private final Set<CyNode> targetsToActivate;
+    private final Set<CyNode> targetsToDeactivate;
 
-    public AbstractCISignAssignmentAlgorithm ciSignAlgorithm;
-    public Map<CombinationOfInterventions, Collection<SignedIntervention>> optimalInterventionSignings;
+    private final AbstractCISignAssignmentAlgorithm ciSignAlgorithm;
 
     public PrioritizationContext (CyNetwork network,
-                                GenerationContext ciContext,
-                                GenerationResults ciResults) {
+                                  GenerationContext generationContext,
+                                  GenerationResults generationResults,
+                                  Collection<CyNode> targets,
+                                  Set<CyNode> targetsToActivate,
+                                  Set<CyNode> targetsToDeactivate,
+                                  AbstractCISignAssignmentAlgorithm ciSignAlgorithm) {
+        // Sanity checks
+        if (!targets.containsAll(targetsToActivate) || !targets.containsAll(targetsToDeactivate)) {
+            throw new IllegalArgumentException("Targets to activate and deactivate must be in target set");
+        }
+
+        Set<CyNode> targetIntersection = new HashSet<>(targetsToActivate);
+        targetIntersection.retainAll(targetsToDeactivate);
+        if (!targetIntersection.isEmpty()) {
+            throw new IllegalArgumentException("Targets to activate and deactivate must be disjoint");
+        }
+
+        Set<CyNode> targetUnion = new HashSet<>(targetsToActivate);
+        targetUnion.addAll(targetsToDeactivate);
+        if (!targetUnion.equals(targets)) {
+            throw new IllegalArgumentException("Every target must be activated or deactivated");
+        }
+
+        // Assignments
+        if (network == null) {
+            throw new IllegalArgumentException("network cannot be null");
+        }
         this.network = network;
-        this.ciContext = ciContext;
-        this.ciResults = ciResults;
 
-        targets = ciContext.targetNodes;
-        targetsToActivate = new HashSet<>(targets);
-        updateTargetsToDeactivate();
+        if (generationContext == null) {
+            throw new IllegalArgumentException("Generation stage context cannot be null");
+        }
+        this.generationContext = generationContext;
 
-        BiFunction<CyNode, CyNode, Double> effectOnTargets = (source, target) -> ciContext.ocsanaAlg.effectOnTargetsScore(source, target);
-        ciSignAlgorithm = new ExhaustiveSearchCISignAssignmentAlgorithm(effectOnTargets);
-        optimalInterventionSignings = new HashMap<>();
-    }
+        if (generationResults == null) {
+            throw new IllegalArgumentException("Generation stage results cannot be null");
+        }
+        this.generationResults = generationResults;
 
-    public void setTargetsToActivate (Set<CyNode> targetsToActivate) {
+        if (targets == null) {
+            throw new IllegalArgumentException("Target set cannot be null");
+        }
+        this.targets = targets;
+
+        if (targetsToActivate == null) {
+            throw new IllegalArgumentException("Set of targets to activate cannot be null");
+        }
         this.targetsToActivate = targetsToActivate;
-        updateTargetsToDeactivate();
+
+        if (targetsToDeactivate == null) {
+            throw new IllegalArgumentException("Set of targets to deactivate cannot be null");
+        }
+        this.targetsToDeactivate = targetsToDeactivate;
+
+        if (ciSignAlgorithm == null) {
+            throw new IllegalArgumentException("CI sign assignment algorithm cannot be null");
+        }
+        this.ciSignAlgorithm = ciSignAlgorithm;
     }
 
-    private void updateTargetsToDeactivate () {
-        targetsToDeactivate = new HashSet<>(targets);
-        targetsToDeactivate.removeAll(targetsToActivate);
+    public CyNetwork getNetwork () {
+        return network;
+    }
+
+    public GenerationContext getGenerationContext () {
+        return generationContext;
+    }
+
+    public GenerationResults getGenerationResults () {
+        return generationResults;
+    }
+
+    public Collection<CyNode> getTargets () {
+        return targets;
+    }
+
+    public Set<CyNode> getTargetsToActivate () {
+        return targetsToActivate;
+    }
+
+    public Set<CyNode> getTargetsToDeactivate () {
+        return targetsToDeactivate;
+    }
+
+    public AbstractCISignAssignmentAlgorithm getCISignAlgorithm () {
+        return ciSignAlgorithm;
     }
 }
