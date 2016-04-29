@@ -57,13 +57,28 @@
         {% endif %}
     </p>
     <p>
-        {% if bundle.getDrProdisPrediction() is not null %}
-        DR.PRODIS predicts that {{bundle.getDrProdisPrediction().getCountOfBindingDrugs()}} drugs bind strongly.
-        For more details, see the DR.PRODIS <a href="{{bundle.getDrProdisPrediction().getDrProdisURL()}}">details page</a>.
+        {% if bundle.getDrProdisPredictions() is not null %}
+        DR.PRODIS binding predictions:
+        <table>
+            <tr>
+                <td>NCBI RefSeq</td>
+                <td>Novel bindings predicted</td>
+                <td>Known bindings predicted</td>
+                <td>DR.PRODIS details page</td>
+            </tr>
+            {% for prediction in bundle.getDrProdisPredictions() %}
+            <tr>
+                <td>{{prediction.getRefSeqID()}}</td>
+                <td>{{prediction.getCountOfNovelBindingDrugs()}}</td>
+                <td>{{prediction.getCountOfKnownBindingDrugs()}}</td>
+                <td><a href="{{prediction.getDrProdisURL()}}">{{prediction.getDrProdisURL()}}</a></td>
+            </tr>
+            {% endfor %}
+        </table>
         (Note that all access to the DR.PRODIS web service is subject to restrictions on commercial use.
         See the <a href="http://cssb.biology.gatech.edu/repurpose">home page</a> for details.)
         {% else %}
-        No DR.PRODIS prediction was found.
+        No DR.PRODIS predictions were found.
         {% endif %}
     {% endif %}
 </html>

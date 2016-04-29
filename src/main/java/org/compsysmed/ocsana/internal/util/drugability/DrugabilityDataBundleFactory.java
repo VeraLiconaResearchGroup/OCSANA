@@ -62,10 +62,10 @@ public class DrugabilityDataBundleFactory {
             return null;
         }
 
-        DrProdisDrugabilityPrediction drProdisPrediction = drProdisDB.getPrediction(protein);
+        Collection<DrProdisDrugabilityPrediction> drProdisPredictions = drProdisDB.getPredictions(protein);
         Collection<DrugProteinInteraction> interactions = drugBankDB.getInteractions(protein);
         Collection<DrugFEATURELigand> ligands = drugFeatureDB.getLigands(protein);
-        DrugabilityDataBundle bundle = new DrugabilityDataBundle(protein, drProdisPrediction, interactions, ligands);
+        DrugabilityDataBundle bundle = new DrugabilityDataBundle(protein, drProdisPredictions, interactions, ligands);
         return bundle;
     }
 

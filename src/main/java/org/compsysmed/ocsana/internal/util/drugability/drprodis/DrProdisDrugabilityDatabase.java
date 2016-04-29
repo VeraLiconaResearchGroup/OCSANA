@@ -33,7 +33,6 @@ public class DrProdisDrugabilityDatabase {
     private static final String DRPRODIS_PATH = "/drprodis/drprodis.stripped.json";
     private static final DrProdisDrugabilityDatabase internalDB = new DrProdisDrugabilityDatabase();
 
-    private final ProteinDatabase proteinDB = ProteinDatabase.getDB();
     private final Map<String, DrProdisDrugabilityPrediction> predictions = new HashMap<>();
 
     private DrProdisDrugabilityDatabase () {
@@ -46,27 +45,20 @@ public class DrProdisDrugabilityDatabase {
         }
 
         // Process prediction records
-        Iterator<String> proteinKeys = drProdisJSON.keys();
-        while (proteinKeys.hasNext()) {
-            String uniProtID = proteinKeys.next();
-            Protein protein = proteinDB.getProteinByID(uniProtID);
+        Iterator<String> refSeqIDs = drProdisJSON.keys();
+        while (refSeqIDs.hasNext()) {
+            String refSeqID = refSeqIDs.next();
 
-            // DR.PRODIS includes some proteins not in the UniProt
-            // proteome, typically because they are hypothetical. We
-            // simply drop these.
-            if (protein == null) {
-                continue;
-            }
-
-            JSONObject predictionJSON = drProdisJSON.getJSONObject(uniProtID);
+            JSONObject predictionJSON = drProdisJSON.getJSONObject(refSeqID);
 
             String drProdisCode = predictionJSON.getString("drprodisCode");
             String magicSubDirectory = predictionJSON.getString("magicSubdir");
-            Integer drugCount = predictionJSON.getInt("strongBindingPredictions");
+            Integer novelDrugCount = predictionJSON.getInt("strongBindingPredictions");
+            Integer knownDrugCount = predictionJSON.getInt("knownBindersMatched");
 
-            DrProdisDrugabilityPrediction prediction = new DrProdisDrugabilityPrediction(protein, drProdisCode, magicSubDirectory, drugCount);
+            DrProdisDrugabilityPrediction prediction = new DrProdisDrugabilityPrediction(refSeqID, drProdisCode, magicSubDirectory, novelDrugCount, knownDrugCount);
 
-            predictions.put(uniProtID, prediction);
+            predictions.put(refSeqID, prediction);
         }
     }
 
@@ -94,21 +86,22 @@ public class DrProdisDrugabilityDatabase {
     /**
      * Return the prediction for a specified protein
      *
-     * @param uniProtID the UniProt ID of the protein
+     * @param refSeqID  the RefSeq accession ID of the protein
      * @return the prediction for the protein, if found, or null if not
      **/
-    public DrProdisDrugabilityPrediction getPrediction (String uniProtID) {
-        return predictions.getOrDefault(uniProtID, null);
+    public DrProdisDrugabilityPrediction getPrediction (String refSeqID) {
+        refSeqID = refSeqID.split("\\.")[0];
+        return predictions.getOrDefault(refSeqID, null);
     }
 
     /**
-     * Return the prediction for a given protein
+     * Return the predictions for a given protein
      *
      * @param protein  the protein
-     * @return the prediction for the protein, if found, or null if not
+     * @return all predictions found for the given protein
      **/
-    public DrProdisDrugabilityPrediction getPrediction (Protein protein) {
-        return getPrediction(protein.getUniProtID());
+    public Collection<DrProdisDrugabilityPrediction> getPredictions (Protein protein) {
+        return protein.getRefSeqIDs().stream().map(this::getPrediction).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
 }

@@ -66,10 +66,18 @@ public class ProteinDatabase {
                 primaryIDBySecondaryID.put(geneName, uniProtID);
             }
 
+            Collection<String> refSeqIDs = new HashSet<>();
+            JSONArray refSeqJSON = proteinData.getJSONArray("refseqIDs");
+            for (int i = 0; i < refSeqJSON.length(); i++) {
+                String refSeqID = refSeqJSON.getString(i);
+                refSeqIDs.add(refSeqID);
+                primaryIDBySecondaryID.put(refSeqID, uniProtID);
+            }
+
             String name = proteinData.getString("name");
             String function = proteinData.getString("function");
 
-            Protein protein = new Protein(uniProtID, uniProtIDs, name, geneNames, function);
+            Protein protein = new Protein(uniProtID, uniProtIDs, name, geneNames, refSeqIDs, function);
             proteinByUniProtID.put(uniProtID, protein);
         }
     }

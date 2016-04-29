@@ -63,7 +63,9 @@ def parse_xml(filename):
         else:
             function = function_entry.findtext("dbns:text", namespaces=ns).strip()
 
-        protein_data = {"upids": all_ids, "name": protein_name, "geneNames": gene_names, "function": function}
+        all_refseq_ids = [entry.get("id").split(".")[0] for entry in protein.findall("dbns:dbReference[@type='RefSeq']", namespaces=ns)]
+
+        protein_data = {"upids": all_ids, "name": protein_name, "geneNames": gene_names, "function": function, "refseqIDs": all_refseq_ids}
         logging.debug("Protein data: {}".format(protein_data))
         proteins[primary_id] = protein_data
 

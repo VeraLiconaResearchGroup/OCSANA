@@ -56,7 +56,7 @@ public class SimpleSignedInterventionScoringAlgorithm
             return 10d;
         }
 
-        if (drugabilityBundle.getDrProdisPrediction().getCountOfBindingDrugs() > 1) {
+        if (drugabilityBundle.getDrProdisPredictions().stream().anyMatch(prediction -> prediction.getCountOfNovelBindingDrugs() > 1)) {
             return 4d;
         }
 

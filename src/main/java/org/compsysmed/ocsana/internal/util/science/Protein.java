@@ -28,6 +28,7 @@ public class Protein {
     private final Collection<String> allUniProtIDs;
     private final String name;
     private final Collection<String> geneNames;
+    private final Collection<String> refSeqIDs;
     private final String functionDescription;
 
     /**
@@ -37,6 +38,7 @@ public class Protein {
      * @param allUniProtIDs  the collection of UniProt IDs of the protein
      * @param name  the human-readable name of the protein
      * @param geneNames  the ENSEMBL IDs of the genes associated to the protein
+     * @param refSeqIDs  the RefSeq IDs of the isoforms of the protein
      * @param functionDescription  string description of the function
      * of the protein (can be null, in which case an empty string is
      * stored)
@@ -45,6 +47,7 @@ public class Protein {
                     Collection<String> allUniProtIDs,
                     String name,
                     Collection<String> geneNames,
+                    Collection<String> refSeqIDs,
                     String functionDescription) {
         if (uniProtID == null) {
             throw new IllegalArgumentException("Protein UniProt ID cannot be null");
@@ -69,6 +72,11 @@ public class Protein {
             throw new IllegalArgumentException("List of gene names cannot be null");
         }
         this.geneNames = geneNames;
+
+        if (refSeqIDs == null) {
+            throw new IllegalArgumentException("List of RefSeq IDs cannot be null");
+        }
+        this.refSeqIDs = refSeqIDs;
 
         if (functionDescription == null) {
             functionDescription = "";
@@ -102,6 +110,13 @@ public class Protein {
      **/
     public Collection<String> getAllUniProtIDs () {
         return allUniProtIDs;
+    }
+
+    /**
+     * Get all the RefSeq IDs associated with this protein
+     **/
+    public Collection<String> getRefSeqIDs () {
+        return refSeqIDs;
     }
 
     /**

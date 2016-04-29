@@ -28,30 +28,34 @@ import org.compsysmed.ocsana.internal.util.science.*;
 public class DrProdisDrugabilityPrediction {
     private static final String DRPRODIS_URL_BASE = "http://cssb2.biology.gatech.edu/FINDTA/doc/";
 
-    private final Protein protein;
+    private final String refSeqID;
     private final String drProdisCode;
     private final String magicSubDirectory;
-    private final Integer drugCount;
+    private final Integer novelDrugCount;
+    private final Integer knownDrugCount;
 
     /**
      * Constructor
      *
-     * @param protein  the protein
+     * @param refSeqID  the RefSeq accession ID of the protein
      * @param drProdisCode  the ID of this protein in the DR.PRODIS
      * database
      * @param magicSubDirectory  the subdirectory where this protein
      * appears on the DR.PRODIS site
-     * @param drugCount  the number of drugs predicted to bind strongly
-     * to this protein
+     * @param novelDrugCount  the number of novel drugs predicted to
+     * bind strongly to this protein
+     * @param knownDrugCount  the number of known drugs predicted to
+     * bind strongly to this protein
      **/
-    public DrProdisDrugabilityPrediction (Protein protein,
+    public DrProdisDrugabilityPrediction (String refSeqID,
                                           String drProdisCode,
                                           String magicSubDirectory,
-                                          Integer drugCount) {
-        if (protein == null) {
-            throw new IllegalArgumentException("Protein cannot be null");
+                                          Integer novelDrugCount,
+                                          Integer knownDrugCount) {
+        if (refSeqID == null) {
+            throw new IllegalArgumentException("RefSeq ID cannot be null");
         }
-        this.protein = protein;
+        this.refSeqID = refSeqID;
 
         if (drProdisCode == null) {
             throw new IllegalArgumentException("DR.PRODIS code cannot be null");
@@ -63,17 +67,22 @@ public class DrProdisDrugabilityPrediction {
         }
         this.magicSubDirectory = magicSubDirectory;
 
-        if (drugCount == null || drugCount < 0) {
-            throw new IllegalArgumentException("Drug count cannot be null or negative.");
+        if (novelDrugCount == null || novelDrugCount < 0) {
+            throw new IllegalArgumentException("Novel drug count cannot be null or negative.");
         }
-        this.drugCount = drugCount;
+        this.novelDrugCount = novelDrugCount;
+
+        if (knownDrugCount == null || knownDrugCount < 0) {
+            throw new IllegalArgumentException("Known drug count cannot be null or negative.");
+        }
+        this.knownDrugCount = knownDrugCount;
     }
 
     /**
-     * Return the protein for this prediction
+     * Return the RefSeq ID for this prediction
      **/
-    public Protein getProtein () {
-        return protein;
+    public String getRefSeqID () {
+        return refSeqID;
     }
 
     /**
@@ -94,10 +103,18 @@ public class DrProdisDrugabilityPrediction {
     }
 
     /**
-     * Return the number of drugs which are predicted to bind strongly
-     * to this protein
+     * Return the number of novel drugs which are predicted to bind
+     * strongly to this protein
      **/
-    public Integer getCountOfBindingDrugs () {
-        return drugCount;
+    public Integer getCountOfNovelBindingDrugs () {
+        return novelDrugCount;
+    }
+
+    /**
+     * Return the number of known drugs which are predicted to bind
+     * strongly to this protein
+     **/
+    public Integer getCountOfKnownBindingDrugs () {
+        return knownDrugCount;
     }
  }

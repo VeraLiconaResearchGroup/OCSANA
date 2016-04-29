@@ -27,13 +27,14 @@ public class DrProdisDrugabilityDatabaseTest {
     @Test
     public void buildDatabaseShouldWork () {
         DrProdisDrugabilityDatabase db = DrProdisDrugabilityDatabase.getDB();
-        assertEquals("Number of predictions in database", 14371, db.getAllPredictions().size());
+        assertEquals("Number of predictions in database", 32584, db.getAllPredictions().size());
     }
 
     @Test
     public void retrievePredictionShouldWork () {
         DrProdisDrugabilityDatabase db = DrProdisDrugabilityDatabase.getDB();
-        DrProdisDrugabilityPrediction prediction = db.getPrediction("P04626");
-        assertEquals("Number of predicted binders of erbB-2", (Integer) 14, prediction.getCountOfBindingDrugs());
+        DrProdisDrugabilityPrediction prediction = db.getPrediction("NP_001005862");
+        assertEquals("Number of novel predicted binders of erbB-2 isoform b", (Integer) 14, prediction.getCountOfNovelBindingDrugs());
+        assertEquals("Number of known predicted binders of erbB-2 isoform b", (Integer) 15, prediction.getCountOfKnownBindingDrugs());
     }
 }
