@@ -24,7 +24,6 @@ import org.json.JSONTokener;
 
 // OCSANA imports
 import org.compsysmed.ocsana.internal.util.science.*;
-import org.compsysmed.ocsana.internal.util.science.uniprot.ProteinDatabase;
 
 /**
  * Singleton class representing the DR.PRODIS database
@@ -70,9 +69,9 @@ public class DrProdisDrugabilityDatabase {
     }
 
     /**
-     * Return all UniProt IDs with predictions
+     * Return all RefSeq IDs with predictions
      **/
-    public Collection<String> getAllScoredProteinIDs () {
+    public Collection<String> getAllScoredIsoformIDs () {
         return predictions.keySet();
     }
 
@@ -84,24 +83,12 @@ public class DrProdisDrugabilityDatabase {
     }
 
     /**
-     * Return the prediction for a specified protein
+     * Return the predictions for a specified protein isoform
      *
-     * @param refSeqID  the RefSeq accession ID of the protein
-     * @return the prediction for the protein, if found, or null if not
+     * @param isoform  the isoform
+     * @return all predictions found for the isoform
      **/
-    public DrProdisDrugabilityPrediction getPrediction (String refSeqID) {
-        refSeqID = refSeqID.split("\\.")[0];
-        return predictions.getOrDefault(refSeqID, null);
+    public Collection<DrProdisDrugabilityPrediction> getPredictions (Isoform isoform) {
+        return isoform.getRefSeqIDs().stream().map(refSeqID -> predictions.getOrDefault(refSeqID, null)).filter(Objects::nonNull).collect(Collectors.toList());
     }
-
-    /**
-     * Return the predictions for a given protein
-     *
-     * @param protein  the protein
-     * @return all predictions found for the given protein
-     **/
-    public Collection<DrProdisDrugabilityPrediction> getPredictions (Protein protein) {
-        return protein.getRefSeqIDs().stream().map(this::getPrediction).filter(Objects::nonNull).collect(Collectors.toList());
-    }
-
 }

@@ -31,7 +31,7 @@ public class ProteinDatabaseTest {
     @Test
     public void getProteinByPrimaryUniProtIDShouldWork () {
         ProteinDatabase proteinDB = ProteinDatabase.getDB();
-        Protein protein = proteinDB.getProteinByID("P30613");
+        Protein protein = proteinDB.getProtein("P30613");
 
         assertEquals("UniProt ID", "P30613", protein.getUniProtID());
         assertEquals("Protein name", "Pyruvate kinase PKLR", protein.getName());
@@ -41,7 +41,7 @@ public class ProteinDatabaseTest {
     @Test
     public void getProteinBySeconaryUniProtIDShouldWork () {
         ProteinDatabase proteinDB = ProteinDatabase.getDB();
-        Protein protein = proteinDB.getProteinByID("O75758");
+        Protein protein = proteinDB.getProtein("O75758");
 
         assertEquals("UniProt ID", "P30613", protein.getUniProtID());
         assertEquals("Protein name", "Pyruvate kinase PKLR", protein.getName());
@@ -51,7 +51,7 @@ public class ProteinDatabaseTest {
     @Test
     public void getProteinByEnsemblIDShouldWork () {
         ProteinDatabase proteinDB = ProteinDatabase.getDB();
-        Protein protein = proteinDB.getProteinByID("PK1");
+        Protein protein = proteinDB.getProtein("PK1");
 
         assertEquals("UniProt ID", "P30613", protein.getUniProtID());
         assertEquals("Protein name", "Pyruvate kinase PKLR", protein.getName());

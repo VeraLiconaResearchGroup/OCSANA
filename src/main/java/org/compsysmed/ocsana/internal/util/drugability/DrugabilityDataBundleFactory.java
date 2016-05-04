@@ -13,6 +13,7 @@ package org.compsysmed.ocsana.internal.util.drugability;
 
 // Java imports
 import java.util.*;
+import java.util.stream.Collectors;
 
 // Cytoscape imports
 import org.cytoscape.model.CyNode;
@@ -28,43 +29,54 @@ import org.compsysmed.ocsana.internal.util.science.*;
 import org.compsysmed.ocsana.internal.util.science.uniprot.ProteinDatabase;
 
 /**
- * Singleton factory class to build DrugabilityDataBundles
+ * Factory class to build DrugabilityDataBundles
  **/
 public class DrugabilityDataBundleFactory {
-    private static final DrugabilityDataBundleFactory factory = new DrugabilityDataBundleFactory();
-
-    private final ProteinDatabase proteinDB = ProteinDatabase.getDB();
-    private final DrProdisDrugabilityDatabase drProdisDB = DrProdisDrugabilityDatabase.getDB();
-    private final DrugBankInteractionsDatabase drugBankDB = DrugBankInteractionsDatabase.getDB();
-    private final DrugFEATUREScoresDatabase drugFeatureDB = DrugFEATUREScoresDatabase.getDB();
-
-    private DrugabilityDataBundleFactory () {
-        // Nothing to do…
-    }
+    private final ProteinDatabase proteinDB;
+    private final DrProdisDrugabilityDatabase drProdisDB;
+    private final DrugBankInteractionsDatabase drugBankDB;
+    private final DrugFEATUREScoresDatabase drugFeatureDB;
 
     /**
-     * Retrieve the singleton bundle factory
+     * Constructor
      **/
-    public static DrugabilityDataBundleFactory getFactory () {
-        return factory;
+    public DrugabilityDataBundleFactory () {
+        proteinDB = ProteinDatabase.getDB();
+        drProdisDB = DrProdisDrugabilityDatabase.getDB();
+        drugBankDB = DrugBankInteractionsDatabase.getDB();
+        drugFeatureDB = DrugFEATUREScoresDatabase.getDB();
     }
 
     /**
-     * Build the DrugabilityDataBundle for a protein.
+     * Build the DrugabilityDataBundle for a protein or isoform
      *
-     * @param proteinID  an ID for the protein (see {@link ProteinDatabase#getProteinByID})
+     * @param id an ID for the protein or isoform (see {@link
+     * ProteinDatabase#getProtein} and {@link
+     * ProteinDatabase#getIsoform})
      * @return a bundle of all the drugability data available for the
-     * protein, if found, or null if not
+     * protein or isoform, if found, or null if not
      **/
-    public DrugabilityDataBundle getBundle (String proteinID) {
-        Protein protein = proteinDB.getProteinByID(proteinID);
-        if (protein == null) {
+    public DrugabilityDataBundle getBundle (String id) {
+        Protein protein;
+        Collection<DrProdisDrugabilityPrediction> drProdisPredictions;
+
+        // Handle cases that depend on whether id matches an isoform or a protein
+        if (proteinDB.isKnownIsoform(id)) {
+            Isoform isoform = proteinDB.getIsoform(id);
+            protein = isoform.getProtein();
+            drProdisPredictions = drProdisDB.getPredictions(isoform);
+        } else if (proteinDB.isKnownProtein(id)) {
+            protein = proteinDB.getProtein(id);
+            drProdisPredictions = protein.getIsoforms().stream().flatMap(isoform -> drProdisDB.getPredictions(isoform).stream()).collect(Collectors.toList());
+        } else {
             return null;
         }
 
-        Collection<DrProdisDrugabilityPrediction> drProdisPredictions = drProdisDB.getPredictions(protein);
+        // Handle cases that only operate on proteins
         Collection<DrugProteinInteraction> interactions = drugBankDB.getInteractions(protein);
         Collection<DrugFEATURELigand> ligands = drugFeatureDB.getLigands(protein);
+
+        // Build and return bundle
         DrugabilityDataBundle bundle = new DrugabilityDataBundle(protein, drProdisPredictions, interactions, ligands);
         return bundle;
     }

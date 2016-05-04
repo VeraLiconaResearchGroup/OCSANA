@@ -22,6 +22,7 @@ import static org.junit.Assert.*;
 import org.compsysmed.ocsana.internal.util.drugability.drprodis.*;
 
 import org.compsysmed.ocsana.internal.util.science.*;
+import org.compsysmed.ocsana.internal.util.science.uniprot.ProteinDatabase;
 
 public class DrProdisDrugabilityDatabaseTest {
     @Test
@@ -33,7 +34,13 @@ public class DrProdisDrugabilityDatabaseTest {
     @Test
     public void retrievePredictionShouldWork () {
         DrProdisDrugabilityDatabase db = DrProdisDrugabilityDatabase.getDB();
-        DrProdisDrugabilityPrediction prediction = db.getPrediction("NP_001005862");
+        ProteinDatabase proteinDB = ProteinDatabase.getDB();
+        Isoform isoform = proteinDB.getIsoform("NP_001005862");
+
+        Collection<DrProdisDrugabilityPrediction> predictions = db.getPredictions(isoform);
+        assertEquals("Number of DR.PRODIS prediction matches of erbB-2 isoform b", 1, predictions.size());
+
+        DrProdisDrugabilityPrediction prediction = predictions.stream().findFirst().get();
         assertEquals("Number of novel predicted binders of erbB-2 isoform b", (Integer) 14, prediction.getCountOfNovelBindingDrugs());
         assertEquals("Number of known predicted binders of erbB-2 isoform b", (Integer) 15, prediction.getCountOfKnownBindingDrugs());
     }

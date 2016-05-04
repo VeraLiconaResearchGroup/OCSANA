@@ -33,10 +33,11 @@ import org.compsysmed.ocsana.internal.util.results.SignedInterventionNode;
  **/
 public class SimpleSignedInterventionScoringAlgorithm
     extends AbstractSignedInterventionScoringAlgorithm {
-    private DrugabilityDataBundleFactory drugabilityDataBundleFactory = DrugabilityDataBundleFactory.getFactory();
+    private DrugabilityDataBundleFactory drugabilityDataBundleFactory;
 
     @Override
     public Double computePriorityScore (SignedIntervention signedIntervention) {
+        drugabilityDataBundleFactory = new DrugabilityDataBundleFactory();
         Collection<SignedInterventionNode> nodes = signedIntervention.getSignedInterventionNodes();
         return nodes.stream().mapToDouble(node -> computePriorityScore(node)).sum() / nodes.size();
     }

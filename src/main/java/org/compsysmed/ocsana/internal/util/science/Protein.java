@@ -4,7 +4,7 @@
  * Copyright Vera-Licona Research Group (C) 2016
  *
  * This software is licensed under the Artistic License 2.0, see the
- * LICENSE file or
+drddrc * LICENSE file or
  * http://www.opensource.org/licenses/artistic-license-2.0.php for
  * details
  **/
@@ -28,8 +28,9 @@ public class Protein {
     private final Collection<String> allUniProtIDs;
     private final String name;
     private final Collection<String> geneNames;
-    private final Collection<String> refSeqIDs;
     private final String functionDescription;
+
+    private Collection<Isoform> isoforms = new HashSet<>();
 
     /**
      * Constructor
@@ -38,7 +39,6 @@ public class Protein {
      * @param allUniProtIDs  the collection of UniProt IDs of the protein
      * @param name  the human-readable name of the protein
      * @param geneNames  the ENSEMBL IDs of the genes associated to the protein
-     * @param refSeqIDs  the RefSeq IDs of the isoforms of the protein
      * @param functionDescription  string description of the function
      * of the protein (can be null, in which case an empty string is
      * stored)
@@ -47,7 +47,6 @@ public class Protein {
                     Collection<String> allUniProtIDs,
                     String name,
                     Collection<String> geneNames,
-                    Collection<String> refSeqIDs,
                     String functionDescription) {
         if (uniProtID == null) {
             throw new IllegalArgumentException("Protein UniProt ID cannot be null");
@@ -73,10 +72,10 @@ public class Protein {
         }
         this.geneNames = geneNames;
 
-        if (refSeqIDs == null) {
-            throw new IllegalArgumentException("List of RefSeq IDs cannot be null");
+        if (isoforms == null) {
+            throw new IllegalArgumentException("Collection of isoforms cannot be null");
         }
-        this.refSeqIDs = refSeqIDs;
+        this.isoforms = isoforms;
 
         if (functionDescription == null) {
             functionDescription = "";
@@ -113,10 +112,27 @@ public class Protein {
     }
 
     /**
-     * Get all the RefSeq IDs associated with this protein
+     * Add an isoform of this protein
+     *
+     * @param isoform  the new isoform
      **/
-    public Collection<String> getRefSeqIDs () {
-        return refSeqIDs;
+    public void addIsoform (Isoform isoform) {
+        if (isoform == null) {
+            throw new IllegalArgumentException("Cannot add null isoform");
+        }
+
+        if (!isoform.getProtein().equals(this)) {
+            throw new IllegalArgumentException("Cannot add isoform for different protein");
+        }
+
+        isoforms.add(isoform);
+    }
+
+    /**
+     * Get all the isoforms associated with this protein
+     **/
+    public Collection<Isoform> getIsoforms () {
+        return isoforms;
     }
 
     /**

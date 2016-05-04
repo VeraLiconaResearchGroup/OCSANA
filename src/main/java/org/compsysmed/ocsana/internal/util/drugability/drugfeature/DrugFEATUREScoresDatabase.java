@@ -92,7 +92,7 @@ public class DrugFEATUREScoresDatabase {
      * Retrieve all proteins with known scores
      **/
     public Collection<Protein> getAllScoredProteins () {
-        return getAllScoredProteinIDs().stream().map(proteinID -> proteinDB.getProteinByID(proteinID)).collect(Collectors.toList());
+        return getAllScoredProteinIDs().stream().map(proteinID -> proteinDB.getProtein(proteinID)).collect(Collectors.toList());
     }
 
     /**

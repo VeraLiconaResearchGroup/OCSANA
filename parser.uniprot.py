@@ -63,9 +63,19 @@ def parse_xml(filename):
         else:
             function = function_entry.findtext("dbns:text", namespaces=ns).strip()
 
-        all_refseq_ids = [entry.get("id").split(".")[0] for entry in protein.findall("dbns:dbReference[@type='RefSeq']", namespaces=ns)]
+        isoforms = {}
+        for refseq_entry in protein.findall("dbns:dbReference[@type='RefSeq']", namespaces=ns):
+            refseq_id = refseq_entry.get("id").split(".")[0]
+            try:
+                isoform_id = refseq_entry.find("dbns:molecule", namespaces=ns).get("id").split("-")[1]
+            except AttributeError:
+                isoform_id = None
 
-        protein_data = {"upids": all_ids, "name": protein_name, "geneNames": gene_names, "function": function, "refseqIDs": all_refseq_ids}
+            if isoform_id not in isoforms:
+                isoforms[isoform_id] = []
+            isoforms[isoform_id].append(refseq_id)
+
+        protein_data = {"upids": all_ids, "name": protein_name, "geneNames": gene_names, "function": function, "isoforms": isoforms}
         logging.debug("Protein data: {}".format(protein_data))
         proteins[primary_id] = protein_data
 

@@ -67,7 +67,7 @@ public class InterventionDetailsDialog
         this.network = network;
         this.ci = ci;
 
-        drugabilityDataBundleFactory = DrugabilityDataBundleFactory.getFactory();
+        drugabilityDataBundleFactory = new DrugabilityDataBundleFactory();
 
 
         // Set up page skeleton

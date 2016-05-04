@@ -26,7 +26,7 @@ import org.compsysmed.ocsana.internal.util.drugability.drugbank.*;
 public class DrugabilityDataBundleTest {
     @Test
     public void getProteinShouldWork () {
-        DrugabilityDataBundleFactory factory = DrugabilityDataBundleFactory.getFactory();
+        DrugabilityDataBundleFactory factory = new DrugabilityDataBundleFactory();
         DrugabilityDataBundle bundle = factory.getBundle("P48169");
         Protein protein = bundle.getProtein();
 
@@ -37,7 +37,7 @@ public class DrugabilityDataBundleTest {
 
     @Test
     public void getInteractionsShouldWork () {
-        DrugabilityDataBundleFactory factory = DrugabilityDataBundleFactory.getFactory();
+        DrugabilityDataBundleFactory factory = new DrugabilityDataBundleFactory();
         DrugabilityDataBundle bundle = factory.getBundle("P48169");
         Protein protein = bundle.getProtein();
 

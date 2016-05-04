@@ -35,6 +35,8 @@ public class ProteinDatabase {
     private final Map<String, Protein> proteinByUniProtID = new HashMap<>();
     private final Map<String, String> primaryIDBySecondaryID = new HashMap<>();
 
+    private final Map<String, Isoform> isoformByRefSeqID = new HashMap<>();
+
     private ProteinDatabase () {
         JSONObject proteinsJSON;
         try (InputStream jsonFileStream = getClass().getResourceAsStream(UNIPROT_PATH)) {
@@ -66,19 +68,33 @@ public class ProteinDatabase {
                 primaryIDBySecondaryID.put(geneName, uniProtID);
             }
 
-            Collection<String> refSeqIDs = new HashSet<>();
-            JSONArray refSeqJSON = proteinData.getJSONArray("refseqIDs");
-            for (int i = 0; i < refSeqJSON.length(); i++) {
-                String refSeqID = refSeqJSON.getString(i);
-                refSeqIDs.add(refSeqID);
-                primaryIDBySecondaryID.put(refSeqID, uniProtID);
-            }
-
             String name = proteinData.getString("name");
             String function = proteinData.getString("function");
 
-            Protein protein = new Protein(uniProtID, uniProtIDs, name, geneNames, refSeqIDs, function);
+            Protein protein = new Protein(uniProtID, uniProtIDs, name, geneNames, function);
             proteinByUniProtID.put(uniProtID, protein);
+
+
+            JSONObject isoformJSON = proteinData.getJSONObject("isoforms");
+            Iterator<String> isoformKeys = isoformJSON.keys();
+            while (isoformKeys.hasNext()) {
+                String isoformKey = isoformKeys.next();
+                Integer isoformNumber = (isoformKey.equals("null")) ? null : Integer.parseInt(isoformKey);
+
+                JSONArray refSeqIDJSON = isoformJSON.getJSONArray(isoformKey);
+                Collection<String> refSeqIDs = new HashSet<>();
+                for (int i = 0; i < refSeqIDJSON.length(); i++) {
+                    refSeqIDs.add(refSeqIDJSON.getString(i));
+                }
+
+                Isoform isoform = new Isoform(protein, isoformNumber, refSeqIDs);
+
+                protein.addIsoform(isoform);
+                for (String refSeqID: refSeqIDs) {
+                    isoformByRefSeqID.put(refSeqID, isoform);
+                    primaryIDBySecondaryID.put(refSeqID, uniProtID);
+                }
+            }
         }
     }
 
@@ -97,12 +113,12 @@ public class ProteinDatabase {
     }
 
     /**
-     * Get the protein with a particular UniProt or Ensembl ID
+     * Get the protein with a particular UniProt, Ensembl, or RefSeq ID
      *
      * @param proteinID  the ID
      * @return the protein, if found, or null if not
      **/
-    public Protein getProteinByID (String proteinID) {
+    public Protein getProtein (String proteinID) {
         String cleanedID = proteinID.trim().toUpperCase();
 
         if (primaryIDBySecondaryID.containsKey(cleanedID)) {
@@ -120,5 +136,29 @@ public class ProteinDatabase {
         }
 
         return null;
+    }
+
+    /**
+     * Get the isoform with a particular RefSeq ID
+     *
+     * @param isoformID  the ID
+     * @return the isoform, if found, or null if not
+     **/
+    public Isoform getIsoform (String isoformID) {
+        return isoformByRefSeqID.get(isoformID);
+    }
+
+    /**
+     * Return true if the given ID matches a known isoform
+     **/
+    public boolean isKnownIsoform (String isoformID) {
+        return isoformByRefSeqID.containsKey(isoformID);
+    }
+
+    /**
+     * Return true if the given ID matches a known protein
+     **/
+    public boolean isKnownProtein (String proteinID) {
+        return proteinByUniProtID.containsKey(proteinID);
     }
 }

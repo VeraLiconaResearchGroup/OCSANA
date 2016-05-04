@@ -79,7 +79,7 @@ public class DrugBankInteractionsDatabase {
 
                 assert (drugID.equals(drugBankPrimaryID));
 
-                Protein protein = proteinDB.getProteinByID(proteinID);
+                Protein protein = proteinDB.getProtein(proteinID);
                 if (protein == null) {
                     // Not a human protein, so we move on.
                     continue;
