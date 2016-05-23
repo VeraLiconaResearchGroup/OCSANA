@@ -1,0 +1,137 @@
+<html>
+    <h1>Optimal cut sets report</h1>
+    <h2>Network configuration</h2>
+
+    <p>
+        Network name: {{generationContext.getNetworkName()}}
+    </p>
+
+    <p>
+        Node names from column: {{generationContext.getNodeNameColumnName()}}
+    </p>
+
+    <p>
+        {% if generationContext.getSourceNodes() is not null %}
+        Source nodes:
+        <ul>
+            {% for sourceNode in generationContext.getSourceNodes() %}
+            <li>{{generationContext.getNodeName(sourceNode)}}</li>
+            {% endfor %}
+        </ul>
+        {% else  %}
+        No source nodes selected.
+        {% endif %}
+    </p>
+
+    <p>
+        {% if generationContext.getTargetNodes() is not null %}
+        Target nodes:
+        <ul>
+            {% for targetNode in generationContext.getTargetNodes() %}
+            <li>{{generationContext.getNodeName(targetNode)}}</li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        No target nodes selected.
+        {% endif %}
+    </p>
+
+    <p>
+        {% if generationContext.getOffTargetNodes() is not null %}
+        Off-target nodes:
+        <ul>
+            {% for offTargetNode in generationContext.getOffTargetNodes() %}
+            <li>{{generationContext.getNodeName(offTargetNode)}}</li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        No off-target nodes selected.
+        {% endif %}
+    </p>
+
+    <h2>Paths</h2>
+    <p>
+        Path-finding algorithm: {{generationContext.getPathFindingAlgorithm().description()}}
+    </p>
+
+    <p>
+        Found {{generationResults.getPathsToTargets.size()}} elementary paths and {{generationResults.getElementaryNodes().size()}} elementary nodes.
+    </p>
+
+    <p>
+        Search times: {{generationResults.getPathsToTargetsExecutionSeconds()}}s. for targets, {{generationResults.getPathsToOffTargetsExecutionSeconds()}}s. for off-targets.
+    </p>
+
+    <p>
+        {% if generationResults.getPathsToTargets() is not empty %}
+        Paths to target nodes:
+        <ul>
+            {% for path in generationResults.getPathsToTargets() %}
+            <li>{{generationContext.pathString(path)}}</li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        No paths to target nodes found.
+        {% endif %}
+    </p>
+
+    <p>
+        {% if generationResults.getPathsToOffTargets() is not empty %}
+        Paths to off-target nodes:
+        <ul>
+            {% for path in generationResults.getPathsToOffTargets() %}
+            <li>{{generationContext.pathString(path)}}</li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        No paths to off-target nodes found.
+        {% endif %}
+    </p>
+
+    <h2>OCSANA scoring</h2>
+    {% if generationContext.getOCSANAAlgorithm().hasScores() and not generationResults.OCSANAScoringWasCanceled() %}
+    <p>
+        Scoring algorithm: {{generationContext.getOCSANAAlgorithm().description()}}
+    </p>
+
+    <p>
+        Computed OCSANA scores in {{generationResults.getOCSANAScoringExecutionSeconds()}}s.
+    </p>
+    {% else %}
+    <p>
+        OCSANA scoring disabled.
+    </p>
+    {% endif %}
+
+    <h2>CI generation</h2>
+    {% if not generationResults.mhsFindingWasCanceled() %}
+    <p>
+        MHS algorithm: {{generationContext.getMHSAlgorithm().description()}}
+    </p>
+
+    <p>
+        Found {{generationResults.getCIs().size()}} CIs in {{generationResults.getMHSExecutionSeconds()}}s.
+    </p>
+
+    <table>
+        <tr>
+            <th>Cut set</th>
+            <th>Size</th>
+            <th>OCSANA score</th>
+            <th>Target score</th>
+            <th>Side-effect score</th>
+        </tr>
+        {% for ci in generationResults.getCIs() %}
+        <tr>
+            <td>{{ci.interventionNodesString()}}</td>
+            <td>{{ci.size()}}</td>
+            <td>{{generationContext.getOCSANAAlgorithm().scoreNodeSet(ci.getNodes())}}</td>
+            <td>{{generationContext.getOCSANAAlgorithm().effectOnTargetsScore(ci.getNodes())}}</td>
+            <td>{{generationContext.getOCSANAAlgorithm().effectOnOffTargetsScore(ci.getNodes())}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    CI generation canceled.
+    {% endif %}
+</html>

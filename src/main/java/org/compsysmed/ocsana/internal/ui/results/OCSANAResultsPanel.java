@@ -11,14 +11,14 @@
 
 package org.compsysmed.ocsana.internal.ui.results;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-
 import java.awt.Component;
 import java.awt.BorderLayout;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
@@ -28,7 +28,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
+import javax.swing.JTextPane;
 
 // Cytoscape imports
 import org.cytoscape.application.swing.CySwingApplication;
@@ -41,7 +41,10 @@ import org.cytoscape.application.swing.CytoPanelState;
 import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
 import org.compsysmed.ocsana.internal.stages.generation.GenerationResults;
 
+import org.compsysmed.ocsana.internal.stages.prioritization.PrioritizationContext;
 import org.compsysmed.ocsana.internal.stages.prioritization.PrioritizationResults;
+
+import org.compsysmed.ocsana.internal.util.results.ResultsReportManager;
 
 /**
  * Panel to display OCSANA results
@@ -55,10 +58,14 @@ public class OCSANAResultsPanel
     GenerationContext generationContext;
     GenerationResults generationResults;
 
+    PrioritizationContext prioritizationContext;
     PrioritizationResults prioritizationResults;
+
+    ResultsReportManager resultsReportManager = new ResultsReportManager();
 
     JPanel resultsPanel;
     JPanel operationsPanel;
+    JPanel buttonPanel;
 
     /**
      * Constructor
@@ -87,11 +94,17 @@ public class OCSANAResultsPanel
         this.generationContext = generationContext;
         this.generationResults = generationResults;
 
+        resultsReportManager.update(generationContext, generationResults);
+
         rebuildPanels();
     }
 
-    public void updateResults (PrioritizationResults prioritizationResults) {
+    public void updateResults (PrioritizationContext prioritizationContext,
+                               PrioritizationResults prioritizationResults) {
+        this.prioritizationContext = prioritizationContext;
         this.prioritizationResults = prioritizationResults;
+
+        resultsReportManager.update(prioritizationContext, prioritizationResults);
 
         rebuildPanels();
     }
@@ -129,7 +142,7 @@ public class OCSANAResultsPanel
      * user operations
      **/
     private JPanel getOperationsPanel () {
-        JPanel buttonPanel = new JPanel();
+        buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
 
         JButton showReportButton = new JButton("Show report");
@@ -147,23 +160,7 @@ public class OCSANAResultsPanel
         saveReportButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed (ActionEvent event) {
-                    JFileChooser fileChooser = new JFileChooser();
-                    if (fileChooser.showSaveDialog(buttonPanel) == JFileChooser.APPROVE_OPTION) {
-                        File outFile = fileChooser.getSelectedFile();
-                        try (BufferedWriter fileWriter =
-                             new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFile), StandardCharsets.UTF_8))) {
-                            for (String reportLine: generationResults.getReportLines()) {
-                                fileWriter.write(reportLine);
-                                fileWriter.newLine();
-                            }
-                        } catch (IOException exception) {
-                            String message = "Could not save to " + outFile.toString() + "\n" + exception;
-                            JOptionPane.showMessageDialog(buttonPanel,
-                                                          message,
-                                                          "Error",
-                                                          JOptionPane.ERROR_MESSAGE);
-                        }
-                    }
+                    saveResultsReport();
                 }
             });
 
@@ -177,13 +174,37 @@ public class OCSANAResultsPanel
      * Show the CI results report in a dialog
      **/
     private void showResultsReport () {
-        JTextArea reportTextArea = new JTextArea(40, 120);
-        reportTextArea.setText(String.join("\n", generationResults.getReportLines()));
-        reportTextArea.setEditable(false);
-        reportTextArea.setCaretPosition(0); // Show top of file initially
+        JTextPane reportTextPane = new JTextPane();
+        reportTextPane.setContentType("text/html");
+        reportTextPane.setEditable(false);
+        reportTextPane.setCaretPosition(0); // Show top of file initially
 
-        JScrollPane reportPane = new JScrollPane(reportTextArea);
+        String reportText = resultsReportManager.generationReportAsHTML();
+        reportTextPane.setText(reportText);
+
+        JScrollPane reportPane = new JScrollPane(reportTextPane);
         JOptionPane.showMessageDialog(this, reportPane, "OCSANA report", JOptionPane.PLAIN_MESSAGE);
+    }
+
+    /**
+     * Let the user save the results report
+     **/
+    private void saveResultsReport () {
+        JFileChooser fileChooser = new JFileChooser();
+        if (fileChooser.showSaveDialog(buttonPanel) == JFileChooser.APPROVE_OPTION) {
+            File outFile = fileChooser.getSelectedFile();
+            try (BufferedWriter fileWriter =
+                 new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFile), StandardCharsets.UTF_8))) {
+                String reportText = resultsReportManager.generationReportAsText();
+                fileWriter.write(reportText);
+            } catch (IOException exception) {
+                String message = "Could not save to " + outFile.toString() + "\n" + exception;
+                JOptionPane.showMessageDialog(buttonPanel,
+                                              message,
+                                              "Error",
+                                              JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }
 
     /**

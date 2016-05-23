@@ -1,0 +1,77 @@
+--- Optimal cut sets report ---
+Network name: {{generationContext.getNetworkName()}}
+
+Node names from column: {{generationContext.getNodeNameColumnName()}}
+
+
+{% if generationContext.getSourceNodes() is not null %}
+Source nodes:
+{{generationContext.getSourceNodeNames() | join(', ')}}
+{% else  %}
+No source nodes selected.
+{% endif %}
+
+
+{% if generationContext.getTargetNodes() is not null %}
+Target nodes:
+{{generationContext.getTargetNodeNames() | join(', ')}}
+{% else %}
+No target nodes selected.
+{% endif %}
+
+
+{% if generationContext.getOffTargetNodes() is not null %}
+Off-target nodes:
+{{generationContext.getOffTargetNodeNames() | join(', ')}}
+{% else %}
+No off-target nodes selected.
+{% endif %}
+
+
+Path-finding algorithm: {{generationContext.getPathFindingAlgorithm().description()}}
+
+Found {{generationResults.getPathsToTargets.size()}} elementary paths and {{generationResults.getElementaryNodes().size()}} elementary nodes.
+
+Search times: {{generationResults.getPathsToTargetsExecutionSeconds()}}s. for targets, {{generationResults.getPathsToOffTargetsExecutionSeconds()}}s. for off-targets.
+
+{% if generationResults.getPathsToTargets() is not empty %}
+Paths to target nodes:
+{% for path in generationResults.getPathsToTargets() %}
+{{generationContext.pathString(path)}}
+
+{% endfor %}
+{% else %}
+No paths to target nodes found.
+{% endif %}
+
+{% if generationResults.getPathsToOffTargets() is not empty %}
+Paths to off-target nodes:
+{% for path in generationResults.getPathsToOffTargets() %}
+{{generationContext.pathString(path)}}
+
+{% endfor %}
+{% else %}
+No paths to off-target nodes found.
+{% endif %}
+
+{% if generationContext.getOCSANAAlgorithm().hasScores() and not generationResults.OCSANAScoringWasCanceled() %}
+Scoring algorithm: {{generationContext.getOCSANAAlgorithm().description()}}
+
+Computed OCSANA scores in {{generationResults.getOCSANAScoringExecutionSeconds()}}s.
+{% else %}
+OCSANA scoring disabled.
+{% endif %}
+
+{% if not generationResults.mhsFindingWasCanceled() %}
+MHS algorithm: {{generationContext.getMHSAlgorithm().description()}}
+
+Found {{generationResults.getCIs().size()}} CIs in {{generationResults.getMHSExecutionSeconds()}}s.
+
+Cut set	Size	OCSANA score	Target score	Side-effect score
+{% for ci in generationResults.getCIs() %}
+{{ci.interventionNodesString()}}	{{ci.size()}}	{{generationContext.getOCSANAAlgorithm().scoreNodeSet(ci.getNodes())}}	{{generationContext.getOCSANAAlgorithm().effectOnTargetsScore(ci.getNodes())}}	{{generationContext.getOCSANAAlgorithm().effectOnOffTargetsScore(ci.getNodes())}}
+
+{% endfor %}
+{% else %}
+CI generation canceled.
+{% endif %}

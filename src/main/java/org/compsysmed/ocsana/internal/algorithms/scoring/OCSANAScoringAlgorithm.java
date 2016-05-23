@@ -242,6 +242,18 @@ public class OCSANAScoringAlgorithm
     }
 
     /**
+     * Retrieve the EFFECT_ON_TARGETS score of a set of nodes
+     *
+     * @param nodes  the nodes
+     *
+     * @return the EFFECT_ON_TARGETS score of that node set (obtained
+     * by summing over all the nodes)
+     **/
+    public Double effectOnTargetsScore (Collection<CyNode> nodes) {
+        return nodes.stream().mapToDouble(node -> effectOnTargetsScore(node)).sum();
+    }
+
+    /**
      * Retrieve the EFFECT_ON_TARGETS score of a node on a target
      *
      * @param node  the node
@@ -275,6 +287,18 @@ public class OCSANAScoringAlgorithm
     }
 
     /**
+     * Retrieve the SIDE_EFFECTS score of a set of nodes
+     *
+     * @param nodes  the nodes
+     *
+     * @return the SIDE_EFFECTS score of that node set (obtained
+     * by summing over all the nodes)
+     **/
+    public Double effectOnOffTargetsScore (Collection<CyNode> nodes) {
+        return nodes.stream().mapToDouble(node -> effectOnOffTargetsScore(node)).sum();
+    }
+
+    /**
      * Retrieve the SIDE_EFFECTS score of a node on a target
      *
      * @param node  the node
@@ -295,7 +319,7 @@ public class OCSANAScoringAlgorithm
     /**
      * Retrieve the set of elementary nodes
      **/
-    public Set<CyNode> elementaryNodes () {
+    public Set<CyNode> getElementaryNodes () {
         return elementaryNodes;
     }
 

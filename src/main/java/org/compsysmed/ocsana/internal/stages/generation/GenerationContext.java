@@ -13,6 +13,7 @@ package org.compsysmed.ocsana.internal.stages.generation;
 
 // Java imports
 import java.util.*;
+import java.util.stream.Collectors;
 
 // Cytoscape imports
 import org.cytoscape.model.CyEdge;
@@ -144,10 +145,31 @@ public final class GenerationContext {
     }
 
     /**
+     * Return the name of the CyNetwork used by this context
+     **/
+    public String getNetworkName () {
+        return network.getRow(network).get(CyNetwork.NAME, String.class);
+    }
+
+    /**
+     * Get the name of the column that contains the node names
+     **/
+    public String getNodeNameColumnName () {
+        return nodeNameHandler.getNodeNameColumnName();
+    }
+
+    /**
      * Return the source nodes
      **/
     public Set<CyNode> getSourceNodes () {
         return sourceNodes;
+    }
+
+    /**
+     * Return the names of the source nodes
+     **/
+    public Collection<String> getSourceNodeNames () {
+        return sourceNodes.stream().map(node -> getNodeName(node)).collect(Collectors.toList());
     }
 
     /**
@@ -158,10 +180,24 @@ public final class GenerationContext {
     }
 
     /**
+     * Return the names of the target nodes
+     **/
+    public Collection<String> getTargetNodeNames () {
+        return targetNodes.stream().map(node -> getNodeName(node)).collect(Collectors.toList());
+    }
+
+    /**
      * Return the off-target nodes
      **/
     public Set<CyNode> getOffTargetNodes () {
         return offTargetNodes;
+    }
+
+    /**
+     * Return the names of the off-target nodes
+     **/
+    public Collection<String> getOffTargetNodeNames () {
+        return offTargetNodes.stream().map(node -> getNodeName(node)).collect(Collectors.toList());
     }
 
     /**
@@ -223,7 +259,7 @@ public final class GenerationContext {
         // Handle first node
         try {
             CyNode firstNode = path.iterator().next().getSource();
-            result.append(nodeNameHandler.getNodeName(firstNode));
+            result.append(getNodeName(firstNode));
         } catch (NoSuchElementException e) {
             return result.toString();
         }
@@ -235,9 +271,20 @@ public final class GenerationContext {
             } else {
                 result.append(" -> ");
             }
-            result.append(nodeNameHandler.getNodeName(edge.getTarget()));
+            result.append(getNodeName(edge.getTarget()));
         }
 
         return result.toString();
+    }
+
+    /**
+     * Get the name of a node
+     *
+     * @param node  the node
+     *
+     * @return the node's name
+     **/
+    public String getNodeName (CyNode node) {
+        return nodeNameHandler.getNodeName(node);
     }
 }

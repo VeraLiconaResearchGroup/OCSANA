@@ -187,7 +187,7 @@ public class PrioritizationStageControlPanel
     public void allFinished(FinishStatus finishStatus) {
         // Called after the TaskManager finished up a TaskIterator.
         signalEndOfSignAssignmentTask();
-        resultsPanel.updateResults(prioritizationResults);
+        resultsPanel.updateResults(prioritizationResults.getPrioritizationContext(), prioritizationResults);
     }
 
     // Helper functions to support listening for component changes

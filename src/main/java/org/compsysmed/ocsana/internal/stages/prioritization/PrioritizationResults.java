@@ -37,6 +37,13 @@ public class PrioritizationResults {
     }
 
     /**
+     * Get the configuration context used to generate these results
+     **/
+    public PrioritizationContext getPrioritizationContext () {
+        return prioritizationContext;
+    }
+
+    /**
      * Set the optimal signings for one CI
      *
      * @param ci  the CI

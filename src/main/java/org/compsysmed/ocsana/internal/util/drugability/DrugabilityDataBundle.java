@@ -24,8 +24,12 @@ import org.compsysmed.ocsana.internal.util.drugability.drugfeature.DrugFEATURELi
 
 import org.compsysmed.ocsana.internal.util.science.*;
 
+/**
+ * Class containing data about the drugability of a protein or isoform
+ **/
 public class DrugabilityDataBundle {
     private final Protein protein;
+    private final Isoform isoform;
     private final Collection<DrProdisDrugabilityPrediction> drProdisPredictions;
     private final Collection<DrugProteinInteraction> interactions;
     private final Collection<DrugFEATURELigand> ligands;
@@ -47,6 +51,44 @@ public class DrugabilityDataBundle {
             throw new IllegalArgumentException("Protein cannot be null.");
         }
         this.protein = protein;
+        this.isoform = null;
+
+        if (drProdisPredictions == null) {
+            throw new IllegalArgumentException("DR.PRODIS predictions collection cannot be null");
+        }
+        this.drProdisPredictions = drProdisPredictions;
+
+        // TODO: check whether interactions are for correct protein
+        if (interactions == null) {
+            throw new IllegalArgumentException("Interactions set cannot be null.");
+        }
+        this.interactions = interactions;
+
+        // TODO: check whether ligands are for correct protein
+        if (ligands == null) {
+            throw new IllegalArgumentException("Ligands collection cannot be null.");
+        }
+        this.ligands = ligands;
+    }
+
+    /**
+     * Constructor
+     *
+     * @param isoform  the isoform this bundle represents
+     * @param drProdisPredictions  the DR.PRODIS predictions for this
+     * protein
+     * @param interactions  the known drug-protein interactions for this protein
+     * @param ligands  the scored ligands of this protein in the PDB
+     **/
+    public DrugabilityDataBundle (Isoform isoform,
+                                  Collection<DrProdisDrugabilityPrediction> drProdisPredictions,
+                                  Collection<DrugProteinInteraction> interactions,
+                                  Collection<DrugFEATURELigand> ligands) {
+        if (isoform == null) {
+            throw new IllegalArgumentException("Isoform cannot be null.");
+        }
+        this.isoform = isoform;
+        this.protein = isoform.getProtein();
 
         if (drProdisPredictions == null) {
             throw new IllegalArgumentException("DR.PRODIS predictions collection cannot be null");
@@ -71,6 +113,13 @@ public class DrugabilityDataBundle {
      **/
     public Protein getProtein () {
         return protein;
+    }
+
+    /**
+     * Return the isoform, or null if this bundle is only for a protein
+     **/
+    public Isoform getIsoform () {
+        return isoform;
     }
 
     /**

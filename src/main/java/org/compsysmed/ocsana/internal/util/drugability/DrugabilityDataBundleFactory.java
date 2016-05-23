@@ -57,28 +57,29 @@ public class DrugabilityDataBundleFactory {
      * protein or isoform, if found, or null if not
      **/
     public DrugabilityDataBundle getBundle (String id) {
-        Protein protein;
-        Collection<DrProdisDrugabilityPrediction> drProdisPredictions;
-
-        // Handle cases that depend on whether id matches an isoform or a protein
         if (proteinDB.isKnownIsoform(id)) {
             Isoform isoform = proteinDB.getIsoform(id);
-            protein = isoform.getProtein();
-            drProdisPredictions = drProdisDB.getPredictions(isoform);
+            Protein protein = isoform.getProtein();
+
+            Collection<DrProdisDrugabilityPrediction> drProdisPredictions = drProdisDB.getPredictions(isoform);
+            Collection<DrugProteinInteraction> interactions = drugBankDB.getInteractions(protein);
+            Collection<DrugFEATURELigand> ligands = drugFeatureDB.getLigands(protein);
+
+            DrugabilityDataBundle bundle = new DrugabilityDataBundle(protein, drProdisPredictions, interactions, ligands);
+            return bundle;
         } else if (proteinDB.isKnownProtein(id)) {
-            protein = proteinDB.getProtein(id);
-            drProdisPredictions = protein.getIsoforms().stream().flatMap(isoform -> drProdisDB.getPredictions(isoform).stream()).collect(Collectors.toList());
+            Protein protein = proteinDB.getProtein(id);
+
+            Collection<DrProdisDrugabilityPrediction> drProdisPredictions = protein.getIsoforms().stream().flatMap(isoform -> drProdisDB.getPredictions(isoform).stream()).collect(Collectors.toList());
+            Collection<DrugProteinInteraction> interactions = drugBankDB.getInteractions(protein);
+            Collection<DrugFEATURELigand> ligands = drugFeatureDB.getLigands(protein);
+
+            DrugabilityDataBundle bundle = new DrugabilityDataBundle(protein, drProdisPredictions, interactions, ligands);
+            return bundle;
         } else {
             return null;
         }
 
-        // Handle cases that only operate on proteins
-        Collection<DrugProteinInteraction> interactions = drugBankDB.getInteractions(protein);
-        Collection<DrugFEATURELigand> ligands = drugFeatureDB.getLigands(protein);
-
-        // Build and return bundle
-        DrugabilityDataBundle bundle = new DrugabilityDataBundle(protein, drProdisPredictions, interactions, ligands);
-        return bundle;
     }
 
     /**

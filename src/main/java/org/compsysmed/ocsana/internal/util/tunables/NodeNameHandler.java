@@ -57,6 +57,13 @@ public class NodeNameHandler {
     }
 
     /**
+     * Get the name of the column node names are taken from
+     **/
+    public String getNodeNameColumnName () {
+        return nodeNameColumn.getName();
+    }
+
+    /**
      * Get the name of a node
      *
      * @param node  the node

@@ -13,7 +13,7 @@ package org.compsysmed.ocsana.internal.stages.generation;
 
 // Java imports
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.stream.*;
 
 // Cytoscape imports
 import org.cytoscape.model.CyNode;
@@ -41,7 +41,47 @@ public class GenerationResults {
     public Double mhsExecutionSeconds;
     public Boolean mhsFindingCanceled = false;
 
-    public List<String> getReportLines () {
-        return new ArrayList<String>();
+    public Collection<List<CyEdge>> getPathsToTargets () {
+        return pathsToTargets;
+    }
+
+    public Collection<List<CyEdge>> getPathsToOffTargets () {
+        return pathsToOffTargets;
+    }
+
+    public Double getPathsToTargetsExecutionSeconds () {
+        return pathsToTargetsExecutionSeconds;
+    }
+
+    public Double getPathsToOffTargetsExecutionSeconds () {
+        return pathsToOffTargetsExecutionSeconds;
+    }
+
+    public Boolean pathFindingWasCanceled () {
+        return pathFindingCanceled;
+    }
+
+    public Double getOCSANAScoringExecutionSeconds () {
+        return OCSANAScoringExecutionSeconds;
+    }
+
+    public Boolean OCSANAScoringWasCanceled () {
+        return OCSANAScoringCanceled;
+    }
+
+    public Collection<CombinationOfInterventions> getCIs () {
+        return CIs;
+    }
+
+    public Double getMHSExecutionSeconds () {
+        return mhsExecutionSeconds;
+    }
+
+    public Boolean MHSFindingWasCanceled () {
+        return mhsFindingCanceled;
+    }
+
+    public Set<CyNode> getElementaryNodes () {
+        return pathsToTargets.stream().flatMap(path -> path.stream()).flatMap(edge -> Stream.of(edge.getSource(), edge.getTarget())).collect(Collectors.toSet());
     }
 }
