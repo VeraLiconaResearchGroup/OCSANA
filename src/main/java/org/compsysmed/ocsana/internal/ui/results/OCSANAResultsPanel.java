@@ -179,7 +179,7 @@ public class OCSANAResultsPanel
         reportTextPane.setEditable(false);
         reportTextPane.setCaretPosition(0); // Show top of file initially
 
-        String reportText = resultsReportManager.generationReportAsHTML();
+        String reportText = resultsReportManager.reportAsHTML();
         reportTextPane.setText(reportText);
 
         JScrollPane reportPane = new JScrollPane(reportTextPane);
@@ -195,7 +195,7 @@ public class OCSANAResultsPanel
             File outFile = fileChooser.getSelectedFile();
             try (BufferedWriter fileWriter =
                  new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFile), StandardCharsets.UTF_8))) {
-                String reportText = resultsReportManager.generationReportAsText();
+                String reportText = resultsReportManager.reportAsText();
                 fileWriter.write(reportText);
             } catch (IOException exception) {
                 String message = "Could not save to " + outFile.toString() + "\n" + exception;

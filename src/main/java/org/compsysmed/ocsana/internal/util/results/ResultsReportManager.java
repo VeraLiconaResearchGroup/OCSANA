@@ -21,6 +21,8 @@ import com.mitchellbosecke.pebble.PebbleEngine;
 import com.mitchellbosecke.pebble.error.PebbleException;
 import com.mitchellbosecke.pebble.template.PebbleTemplate;
 
+import com.mitchellbosecke.pebble.loader.ClasspathLoader;
+
 // OCSANA imports
 import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
 import org.compsysmed.ocsana.internal.stages.generation.GenerationResults;
@@ -33,10 +35,10 @@ import org.compsysmed.ocsana.internal.stages.prioritization.PrioritizationResult
  **/
 
 public class ResultsReportManager {
-    private static String GENERATION_REPORT_HTML_TEMPLATE = "templates/results-reports/GenerationResultsReport.html";
-    private static String GENERATION_REPORT_TXT_TEMPLATE = "templates/results-reports/GenerationResultsReport.txt";
-    private static String PRIORITIZATION_REPORT_HTML_TEMPLATE = "templates/results-reports/PrioritizationResultsReport.html";
-    private static String PRIORITIZATION_REPORT_TXT_TEMPLATE = "templates/results-reports/PrioritizationResultsReport.txt";
+    private static String GENERATION_STAGE_ONLY_REPORT_HTML_TEMPLATE = "results-reports/GenerationStageOnlyReport.html";
+    private static String GENERATION_STAGE_ONLY_REPORT_TXT_TEMPLATE = "results-reports/GenerationStageOnlyReport.txt";
+    private static String FULL_REPORT_HTML_TEMPLATE = "results-reports/FullResultsReport.html";
+    private static String FULL_REPORT_TXT_TEMPLATE = "results-reports/FullResultsReport.txt";
 
 
     private GenerationContext generationContext;
@@ -48,19 +50,22 @@ public class ResultsReportManager {
     private PrioritizationContext prioritizationContext;
     private PrioritizationResults prioritizationResults;
 
-    private PebbleTemplate prioritizationReportHTMLTemplate;
-    private PebbleTemplate prioritizationReportTXTTemplate;
+    private PebbleTemplate fullReportHTMLTemplate;
+    private PebbleTemplate fullReportTXTTemplate;
 
     public ResultsReportManager () {
         // Compile templates
-        PebbleEngine htmlEngine = new PebbleEngine.Builder().strictVariables(true).build();
-        PebbleEngine textEngine = new PebbleEngine.Builder().strictVariables(true).autoEscaping(false).build();
-        try {
-            generationReportHTMLTemplate = htmlEngine.getTemplate(GENERATION_REPORT_HTML_TEMPLATE);
-            generationReportTXTTemplate = textEngine.getTemplate(GENERATION_REPORT_TXT_TEMPLATE);
+        ClasspathLoader loader = new ClasspathLoader();
+        loader.setPrefix("templates/");
 
-            prioritizationReportHTMLTemplate = htmlEngine.getTemplate(PRIORITIZATION_REPORT_HTML_TEMPLATE);
-            prioritizationReportTXTTemplate = textEngine.getTemplate(PRIORITIZATION_REPORT_TXT_TEMPLATE);
+        PebbleEngine htmlEngine = new PebbleEngine.Builder().loader(loader).strictVariables(true).build();
+        PebbleEngine textEngine = new PebbleEngine.Builder().loader(loader).strictVariables(true).autoEscaping(false).build();
+        try {
+            generationReportHTMLTemplate = htmlEngine.getTemplate(GENERATION_STAGE_ONLY_REPORT_HTML_TEMPLATE);
+            generationReportTXTTemplate = textEngine.getTemplate(GENERATION_STAGE_ONLY_REPORT_TXT_TEMPLATE);
+
+            fullReportHTMLTemplate = htmlEngine.getTemplate(FULL_REPORT_HTML_TEMPLATE);
+            fullReportTXTTemplate = textEngine.getTemplate(FULL_REPORT_TXT_TEMPLATE);
         } catch (PebbleException e) {
             throw new IllegalStateException("Could not load result report templates. Please report the following error to the plugin author: " + e.getMessage());
         }
@@ -81,14 +86,31 @@ public class ResultsReportManager {
         this.prioritizationResults = prioritizationResults;
     }
 
-    public String generationReportAsHTML () {
+    private Boolean hasPrioritizationResults () {
+        return prioritizationContext != null;
+    }
+
+    private Map<String, Object> getData () {
         Map<String, Object> data = new HashMap<>();
         data.put("generationContext", generationContext);
         data.put("generationResults", generationResults);
 
+        if (hasPrioritizationResults()) {
+            data.put("prioritizationContext", prioritizationContext);
+            data.put("prioritizationResults", prioritizationResults);
+        }
+
+        return data;
+    }
+
+    public String reportAsHTML () {
         Writer writer = new StringWriter();
         try {
-            generationReportHTMLTemplate.evaluate(writer, data);
+            if (hasPrioritizationResults()) {
+                fullReportHTMLTemplate.evaluate(writer, getData());
+            } else {
+                generationReportHTMLTemplate.evaluate(writer, getData());
+            }
         }  catch (PebbleException|IOException e) {
             throw new IllegalStateException("Could not produce generation stage HTML report. Please report the following error to the plugin author: " + e.getMessage());
         }
@@ -96,14 +118,14 @@ public class ResultsReportManager {
         return writer.toString();
     }
 
-    public String generationReportAsText () {
-        Map<String, Object> data = new HashMap<>();
-        data.put("generationContext", generationContext);
-        data.put("generationResults", generationResults);
-
+    public String reportAsText () {
         Writer writer = new StringWriter();
         try {
-            generationReportTXTTemplate.evaluate(writer, data);
+            if (hasPrioritizationResults()) {
+                fullReportTXTTemplate.evaluate(writer, getData());
+            } else {
+                generationReportTXTTemplate.evaluate(writer, getData());
+            }
         }  catch (PebbleException|IOException e) {
             throw new IllegalStateException("Could not produce generation stage HTML report. Please report the following error to the plugin author: " + e.getMessage());
         }

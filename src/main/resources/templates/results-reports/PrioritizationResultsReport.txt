@@ -1,0 +1,23 @@
+Prioritization configuration
+
+{% if prioritizationContext.getTargetsToActivate() is not empty %}
+Targets to activate:
+{{prioritizationContext.getTargetsToActivateNames() | join(', ')}}
+{% else %}
+No targets to activate.
+{% endif %}
+
+{% if prioritizationContext.getTargetsToDeactivate() is not empty %}
+Targets to deactivate:
+{{prioritizationContext.getTargetsToDeactivateNames() | join(', ')}}
+{% else %}
+No targets to deactivate.
+{% endif %}
+
+Sign assignment
+
+Sign assignment algorithm: {{prioritizationContext.getCISignAlgorithm().description()}}
+TODO: display sign assignment results
+
+Signed intervention scoring algorithm: {{prioritizationContext.getSIScoringAlgorithm().description}
+TODO: display signed intervention scoring results

@@ -1,4 +1,3 @@
---- Optimal cut sets report ---
 Network name: {{generationContext.getNetworkName()}}
 
 Node names from column: {{generationContext.getNodeNameColumnName()}}

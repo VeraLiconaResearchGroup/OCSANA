@@ -1,0 +1,6 @@
+{% extends "results-reports/Report.txt" %}
+
+{% block content %}
+{% include "results-reports/GenerationResultsReport.txt" %}
+{% include "results-reports/PrioritizationResultsReport.txt" %}
+{% endblock %}

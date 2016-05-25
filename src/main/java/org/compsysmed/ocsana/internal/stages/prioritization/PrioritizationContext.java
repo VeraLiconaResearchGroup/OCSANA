@@ -14,6 +14,7 @@ package org.compsysmed.ocsana.internal.stages.prioritization;
 // Java imports
 import java.util.*;
 import java.util.function.*;
+import java.util.stream.Collectors;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -149,8 +150,16 @@ public final class PrioritizationContext {
         return targetsToActivate;
     }
 
+    public Collection<String> getTargetsToActivateNames () {
+        return targetsToActivate.stream().map(node -> generationContext.getNodeName(node)).collect(Collectors.toList());
+    }
+
     public Set<CyNode> getTargetsToDeactivate () {
         return targetsToDeactivate;
+    }
+
+    public Collection<String> getTargetsToDeactivateNames () {
+        return targetsToDeactivate.stream().map(node -> generationContext.getNodeName(node)).collect(Collectors.toList());
     }
 
     public AbstractCISignAssignmentAlgorithm getCISignAlgorithm () {
