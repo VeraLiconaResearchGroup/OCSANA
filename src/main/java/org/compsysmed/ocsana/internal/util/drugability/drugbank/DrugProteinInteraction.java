@@ -11,10 +11,6 @@
 
 package org.compsysmed.ocsana.internal.util.drugability.drugbank;
 
-// Java imports
-import java.util.*;
-import java.util.stream.Collectors;
-
 // OCSANA imports
 import org.compsysmed.ocsana.internal.util.science.*;
 

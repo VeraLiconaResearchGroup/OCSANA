@@ -11,16 +11,12 @@
 
 package org.compsysmed.ocsana.internal.ui.control;
 
-// Java imports
-import java.util.*;
-
 import java.awt.Component;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.BoxLayout;
-import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.Icon;
 

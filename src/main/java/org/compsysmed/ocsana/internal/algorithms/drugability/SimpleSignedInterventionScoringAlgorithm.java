@@ -14,16 +14,11 @@ package org.compsysmed.ocsana.internal.algorithms.drugability;
 // Java imports
 import java.util.*;
 
-// Cytoscape imports
-import org.cytoscape.model.CyNode;
-
 // OCSANA imports
 import org.compsysmed.ocsana.internal.util.drugability.DrugabilityDataBundle;
 import org.compsysmed.ocsana.internal.util.drugability.DrugabilityDataBundleFactory;
 
 import org.compsysmed.ocsana.internal.util.drugability.drugbank.DrugProteinInteraction;
-
-import org.compsysmed.ocsana.internal.util.drugability.drprodis.DrProdisDrugabilityPrediction;
 
 import org.compsysmed.ocsana.internal.util.results.SignedIntervention;
 import org.compsysmed.ocsana.internal.util.results.SignedInterventionNode;

@@ -18,9 +18,6 @@ import java.util.*;
 import org.junit.*;
 import static org.junit.Assert.*;
 
-// OCSANA imports
-import org.compsysmed.ocsana.internal.util.drugability.drprodis.*;
-
 import org.compsysmed.ocsana.internal.util.science.*;
 import org.compsysmed.ocsana.internal.util.science.uniprot.ProteinDatabase;
 

@@ -11,16 +11,11 @@
 
 package org.compsysmed.ocsana.internal.ui.control.panels;
 
-// Java imports
-import java.util.*;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 // Cytoscape imports
 import org.cytoscape.model.CyColumn;
-import org.cytoscape.model.CyNetwork;
-
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;

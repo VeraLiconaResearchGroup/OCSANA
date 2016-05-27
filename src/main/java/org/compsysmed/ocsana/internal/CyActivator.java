@@ -25,11 +25,8 @@ import org.cytoscape.application.events.SetCurrentNetworkListener;
 import org.cytoscape.application.swing.CySwingApplication;
 import org.cytoscape.application.swing.CytoPanelComponent;
 
-import static org.cytoscape.work.ServiceProperties.*;
 import org.cytoscape.service.util.AbstractCyActivator;
 import org.osgi.framework.BundleContext;
-import org.cytoscape.task.NetworkTaskFactory;
-
 // OCSANA imports
 import org.compsysmed.ocsana.internal.ui.control.OCSANAControlPanel;
 import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;

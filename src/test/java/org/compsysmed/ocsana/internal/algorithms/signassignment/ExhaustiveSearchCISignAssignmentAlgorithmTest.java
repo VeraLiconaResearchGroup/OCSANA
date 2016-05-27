@@ -16,7 +16,6 @@ import java.io.*;
 
 // Cytoscape imports
 import org.cytoscape.model.CyNetwork;
-import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNode;
 
 // OCSANA imports

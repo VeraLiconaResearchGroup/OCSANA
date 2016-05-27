@@ -18,7 +18,6 @@ import java.util.*;
 import org.cytoscape.model.CyColumn;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.model.CyNetwork;
-import org.cytoscape.model.CyTable;
 
 /**
  * Widget to process node names based on a user-selected table column

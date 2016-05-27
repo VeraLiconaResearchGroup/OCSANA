@@ -16,13 +16,10 @@ import java.util.*;
 
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 // Cytoscape imports
 import org.cytoscape.model.CyNetwork;
-import org.cytoscape.model.CyNode;
-
 // OCSANA improts
 import org.compsysmed.ocsana.internal.ui.OCSANADialog;
 
@@ -31,8 +28,6 @@ import org.compsysmed.ocsana.internal.ui.results.panels.*;
 import org.compsysmed.ocsana.internal.util.results.*;
 
 import org.compsysmed.ocsana.internal.util.drugability.*;
-
-import org.compsysmed.ocsana.internal.util.science.*;
 
 /**
  * Dialog presenting details of a given CombinationOfInterventions

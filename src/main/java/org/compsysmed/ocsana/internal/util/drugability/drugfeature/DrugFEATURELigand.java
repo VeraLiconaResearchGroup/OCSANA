@@ -11,9 +11,6 @@
 
 package org.compsysmed.ocsana.internal.util.drugability.drugfeature;
 
-// Java imports
-import java.util.*;
-
 import java.net.URL;
 import java.net.MalformedURLException;
 

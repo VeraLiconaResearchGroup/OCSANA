@@ -12,12 +12,6 @@
 
 package org.compsysmed.ocsana.internal.algorithms.drugability;
 
-// Java imports
-import java.util.*;
-
-// Cytoscape imports
-import org.cytoscape.model.CyNode;
-
 // OCSANA imports
 import org.compsysmed.ocsana.internal.algorithms.AbstractOCSANAAlgorithm;
 

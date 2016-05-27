@@ -11,9 +11,6 @@
 
 package org.compsysmed.ocsana.internal.ui.control.panels;
 
-// Java imports
-import java.util.*;
-
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 

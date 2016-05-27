@@ -23,7 +23,6 @@ import java.awt.event.MouseListener;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -32,9 +31,6 @@ import javax.swing.RowSorter;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-
-// Cytoscape imports
-import org.cytoscape.model.CyNode;
 
 // OCSANA imports
 import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;

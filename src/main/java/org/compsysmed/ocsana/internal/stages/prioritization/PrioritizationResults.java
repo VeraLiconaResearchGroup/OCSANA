@@ -13,12 +13,6 @@ package org.compsysmed.ocsana.internal.stages.prioritization;
 
 // Java imports
 import java.util.*;
-import java.util.stream.Collectors;
-
-// Cytoscape imports
-import org.cytoscape.model.CyNode;
-import org.cytoscape.model.CyEdge;
-
 // OCSANA imports
 import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
 import org.compsysmed.ocsana.internal.util.results.SignedIntervention;

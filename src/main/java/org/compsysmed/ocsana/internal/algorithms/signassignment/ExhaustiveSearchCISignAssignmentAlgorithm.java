@@ -14,15 +14,10 @@ package org.compsysmed.ocsana.internal.algorithms.signassignment;
 // Java imports
 import java.util.*;
 import java.util.function.*;
-import java.util.stream.Collectors;
-
 // la4j imports
 import org.la4j.Vector;
 import org.la4j.vector.dense.BasicVector;
 
-// Cytoscape imports
-import org.cytoscape.model.CyNetwork;
-import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNode;
 
 // OCSANA imports

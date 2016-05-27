@@ -12,8 +12,6 @@
 package org.compsysmed.ocsana.internal.util.results;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
-
 import java.util.*;
 
 // Templating engine imports

@@ -14,12 +14,9 @@ package org.compsysmed.ocsana.internal.util.drugability.drugbank;
 // Java imports
 import java.io.*;
 import java.util.*;
-import java.util.stream.Collectors;
-
 // JSON imports
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.json.JSONString;
 import org.json.JSONTokener;
 
 // OCSANA imports

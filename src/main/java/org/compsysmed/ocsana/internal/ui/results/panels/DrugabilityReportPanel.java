@@ -15,14 +15,9 @@ package org.compsysmed.ocsana.internal.ui.results.panels;
 import java.io.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
-
 import java.awt.Desktop;
 import java.net.URISyntaxException;
 import java.io.IOException;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.BoxLayout;
 import javax.swing.JOptionPane;
@@ -36,12 +31,6 @@ import javax.swing.event.HyperlinkListener;
 import com.mitchellbosecke.pebble.PebbleEngine;
 import com.mitchellbosecke.pebble.error.PebbleException;
 import com.mitchellbosecke.pebble.template.PebbleTemplate;
-
-// Cytoscape imports
-import org.cytoscape.model.CyNode;
-
-// OCSANA imports
-import org.compsysmed.ocsana.internal.util.results.*;
 
 import org.compsysmed.ocsana.internal.util.drugability.*;
 import org.compsysmed.ocsana.internal.util.science.*;

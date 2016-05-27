@@ -15,8 +15,6 @@ package org.compsysmed.ocsana.internal.tasks.scoring;
 import org.cytoscape.work.AbstractTaskFactory;
 import org.cytoscape.work.TaskIterator;
 
-import org.cytoscape.model.CyNetwork;
-
 // OCSANA imports
 import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
 import org.compsysmed.ocsana.internal.stages.generation.GenerationResults;

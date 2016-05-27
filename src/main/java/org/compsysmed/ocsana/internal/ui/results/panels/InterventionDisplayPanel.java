@@ -11,10 +11,6 @@
 
 package org.compsysmed.ocsana.internal.ui.results.panels;
 
-// Java imports
-import java.util.*;
-
-import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
 

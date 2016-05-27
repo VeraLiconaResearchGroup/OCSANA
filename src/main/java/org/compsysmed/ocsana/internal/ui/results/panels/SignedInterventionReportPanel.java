@@ -28,9 +28,6 @@ import com.mitchellbosecke.pebble.PebbleEngine;
 import com.mitchellbosecke.pebble.error.PebbleException;
 import com.mitchellbosecke.pebble.template.PebbleTemplate;
 
-// Cytoscape imports
-import org.cytoscape.model.CyNode;
-
 // OCSANA imports
 import org.compsysmed.ocsana.internal.ui.results.InterventionDetailsDialog;
 

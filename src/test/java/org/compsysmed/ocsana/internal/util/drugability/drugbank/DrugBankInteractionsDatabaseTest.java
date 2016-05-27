@@ -11,9 +11,6 @@
 
 package org.compsysmed.ocsana.internal.util.drugability.drugbank;
 
-// Java imports
-import java.util.*;
-
 // JUnit imports
 import org.junit.*;
 import static org.junit.Assert.*;

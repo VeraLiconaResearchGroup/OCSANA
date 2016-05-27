@@ -11,11 +11,6 @@
 
 package org.compsysmed.ocsana.internal.stages.generation;
 
-// Cytoscape imports
-import org.cytoscape.model.CyNetwork;
-import org.cytoscape.model.CyEdge;
-import org.cytoscape.model.CyNode;
-
 import org.cytoscape.task.AbstractNetworkTask;
 import org.cytoscape.work.FinishStatus;
 import org.cytoscape.work.ObservableTask;

@@ -11,17 +11,12 @@
 
 package org.compsysmed.ocsana.internal.util.drugability;
 
-// Java imports
-import java.util.*;
-
 // JUnit imports
 import org.junit.*;
 import static org.junit.Assert.*;
 
 // OCSANA imports
 import org.compsysmed.ocsana.internal.util.science.*;
-import org.compsysmed.ocsana.internal.util.drugability.*;
-import org.compsysmed.ocsana.internal.util.drugability.drugbank.*;
 
 public class DrugabilityDataBundleTest {
     @Test

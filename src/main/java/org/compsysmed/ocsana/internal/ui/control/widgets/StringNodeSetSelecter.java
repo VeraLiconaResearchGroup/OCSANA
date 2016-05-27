@@ -15,7 +15,6 @@ package org.compsysmed.ocsana.internal.ui.control.widgets;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 

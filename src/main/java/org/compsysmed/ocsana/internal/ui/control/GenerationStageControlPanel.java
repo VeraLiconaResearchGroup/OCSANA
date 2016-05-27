@@ -19,7 +19,6 @@ import java.awt.event.ActionListener;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 // Cytoscape imports
@@ -31,13 +30,9 @@ import org.cytoscape.work.TaskObserver;
 
 import org.cytoscape.work.swing.PanelTaskManager;
 
-// OCSANA imports
-import org.compsysmed.ocsana.internal.algorithms.mhs.*;
-
 import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
 import org.compsysmed.ocsana.internal.stages.generation.GenerationContextBuilder;
 import org.compsysmed.ocsana.internal.stages.generation.GenerationResults;
-import org.compsysmed.ocsana.internal.stages.generation.GenerationStageRunnerTask;
 import org.compsysmed.ocsana.internal.stages.generation.GenerationStageRunnerTaskFactory;
 
 import org.compsysmed.ocsana.internal.ui.control.panels.*;

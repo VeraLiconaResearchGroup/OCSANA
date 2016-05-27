@@ -15,9 +15,6 @@ package org.compsysmed.ocsana.internal.util.drugability;
 import java.util.*;
 import java.util.stream.Collectors;
 
-// Cytoscape imports
-import org.cytoscape.model.CyNode;
-
 // OCSANA imports
 import org.compsysmed.ocsana.internal.util.drugability.drprodis.*;
 import org.compsysmed.ocsana.internal.util.drugability.drugbank.*;

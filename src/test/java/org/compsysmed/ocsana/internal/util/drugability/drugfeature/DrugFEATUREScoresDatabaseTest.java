@@ -19,11 +19,6 @@ import java.util.stream.Collectors;
 import org.junit.*;
 import static org.junit.Assert.*;
 
-// OCSANA imports
-import org.compsysmed.ocsana.internal.util.science.uniprot.ProteinDatabase;
-
-import org.compsysmed.ocsana.internal.util.drugability.drugfeature.*;
-
 public class DrugFEATUREScoresDatabaseTest {
     @Test
     public void buildDatabaseShouldWork () {

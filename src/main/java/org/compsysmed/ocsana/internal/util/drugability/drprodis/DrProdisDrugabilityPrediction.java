@@ -11,15 +11,8 @@
 
 package org.compsysmed.ocsana.internal.util.drugability.drprodis;
 
-// Java imports
-import java.util.*;
-import java.util.stream.Collectors;
-
 import java.net.URL;
 import java.net.MalformedURLException;
-
-// OCSANA imports
-import org.compsysmed.ocsana.internal.util.science.*;
 
 
 /**

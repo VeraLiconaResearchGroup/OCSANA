@@ -17,10 +17,6 @@ import java.util.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-// Cytoscape imports
-import org.cytoscape.model.CyColumn;
-import org.cytoscape.model.CyNetwork;
-
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;

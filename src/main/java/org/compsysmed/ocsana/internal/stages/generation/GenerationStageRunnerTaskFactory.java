@@ -11,9 +11,6 @@
 
 package org.compsysmed.ocsana.internal.stages.generation;
 
-// Java imports
-import java.util.*;
-
 // Cytoscape imports
 import org.cytoscape.work.AbstractTaskFactory;
 import org.cytoscape.work.TaskIterator;
@@ -22,8 +19,6 @@ import org.cytoscape.work.TaskObserver;
 
 // OCSANA imports
 import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
-import org.compsysmed.ocsana.internal.stages.generation.GenerationResults;
-
 import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
 
 public class GenerationStageRunnerTaskFactory extends AbstractTaskFactory {

@@ -14,9 +14,6 @@ package org.compsysmed.ocsana.internal.stages.generation;
 // Java imports
 import java.util.*;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 // Cytoscape imports
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;

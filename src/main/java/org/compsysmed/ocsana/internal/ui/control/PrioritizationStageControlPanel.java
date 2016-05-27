@@ -23,8 +23,6 @@ import javax.swing.JPanel;
 
 // Cytoscape imports
 import org.cytoscape.model.CyNetwork;
-import org.cytoscape.model.CyNode;
-
 import org.cytoscape.work.FinishStatus;
 import org.cytoscape.work.ObservableTask;
 import org.cytoscape.work.TaskIterator;
@@ -44,8 +42,6 @@ import org.compsysmed.ocsana.internal.stages.prioritization.PrioritizationStageR
 import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
 
 import org.compsysmed.ocsana.internal.ui.control.panels.*;
-
-import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
 
 /**
  * Panel to configure and run OCSANA prioritization stage

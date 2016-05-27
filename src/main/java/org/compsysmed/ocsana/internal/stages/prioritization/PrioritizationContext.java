@@ -13,22 +13,10 @@ package org.compsysmed.ocsana.internal.stages.prioritization;
 
 // Java imports
 import java.util.*;
-import java.util.function.*;
 import java.util.stream.Collectors;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-// Cytoscape imports
-import org.cytoscape.model.CyColumn;
 import org.cytoscape.model.CyNetwork;
-import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNode;
-
-import org.cytoscape.work.ContainsTunables;
-import org.cytoscape.work.Tunable;
-
-import org.cytoscape.work.util.ListMultipleSelection;
 
 // OCSANA imports
 import org.compsysmed.ocsana.internal.algorithms.signassignment.AbstractCISignAssignmentAlgorithm;
@@ -37,9 +25,6 @@ import org.compsysmed.ocsana.internal.algorithms.drugability.AbstractSignedInter
 
 import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
 import org.compsysmed.ocsana.internal.stages.generation.GenerationResults;
-
-import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
-import org.compsysmed.ocsana.internal.util.results.SignedIntervention;
 
 /**
  * Context for the prioritization stage of OCSANA
