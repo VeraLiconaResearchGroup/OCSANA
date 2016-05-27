@@ -24,8 +24,6 @@ import org.compsysmed.ocsana.internal.algorithms.AbstractOCSANAAlgorithm;
 
 /**
  * Public abstract base class for all path-finding algorithms.
- *
- * @param network  the CyNetwork to compute on
  **/
 
 public abstract class AbstractPathFindingAlgorithm
