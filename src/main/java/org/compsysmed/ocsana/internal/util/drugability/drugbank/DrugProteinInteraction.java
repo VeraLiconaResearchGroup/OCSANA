@@ -11,6 +11,8 @@
 
 package org.compsysmed.ocsana.internal.util.drugability.drugbank;
 
+import java.util.Objects;
+
 // OCSANA imports
 import org.compsysmed.ocsana.internal.util.science.*;
 
@@ -25,14 +27,10 @@ public class DrugProteinInteraction {
     public DrugProteinInteraction (Drug drug,
                                    Protein protein,
                                    String action) {
-        if (drug == null) {
-            throw new IllegalArgumentException("Drug cannot be null");
-        }
+    	Objects.requireNonNull(drug, "Drug cannot be null");
         this.drug = drug;
 
-        if (protein == null) {
-            throw new IllegalArgumentException("Protein cannot be null");
-        }
+        Objects.requireNonNull(protein, "Protein cannot be null");
         this.protein = protein;
 
         this.action = DrugActionType.getByDescription(action);

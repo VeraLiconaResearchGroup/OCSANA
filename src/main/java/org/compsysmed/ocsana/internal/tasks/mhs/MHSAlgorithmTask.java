@@ -51,9 +51,7 @@ public class MHSAlgorithmTask extends AbstractOCSANATask {
 
         taskMonitor.setTitle("Minimal CIs");
 
-        if (generationResults.pathsToTargets == null) {
-            throw new IllegalStateException("Paths to targets not set.");
-        }
+        Objects.requireNonNull(generationResults.pathsToTargets, "Paths to targets not set.");
 
         taskMonitor.setStatusMessage(String.format("Converting %d paths to node sets.", generationResults.pathsToTargets.size()));
         Long preConversionTime = System.nanoTime();

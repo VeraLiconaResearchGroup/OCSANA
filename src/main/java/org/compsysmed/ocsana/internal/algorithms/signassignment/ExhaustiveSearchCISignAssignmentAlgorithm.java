@@ -221,9 +221,8 @@ public class ExhaustiveSearchCISignAssignmentAlgorithm
     }
 
     private static PosetRelation compareVectors (Vector left, Vector right) {
-        if (left == null || right == null) {
-            throw new IllegalArgumentException("Cannot compare a null vector.");
-        }
+    	Objects.requireNonNull(left, "Cannot compare a null vector");
+    	Objects.requireNonNull(right, "Cannot compare a null vector");
 
         if (left.length() != right.length()) {
             throw new IllegalArgumentException("Cannot compare vectors of different lengths.");

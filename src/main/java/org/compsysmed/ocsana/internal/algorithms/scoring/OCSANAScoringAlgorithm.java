@@ -167,8 +167,8 @@ public class OCSANAScoringAlgorithm
             }
 
             // Handle empty and null paths
-            // TODO: A null path is probably an error
-            if (path == null || path.isEmpty()) {
+            Objects.requireNonNull(path, "Cannot score a null path");
+            if (path.isEmpty()) {
                 continue;
             }
 

@@ -38,9 +38,7 @@ public class Isoform {
     public Isoform (Protein protein,
                     Integer isoformNumber,
                     Collection<String> refSeqIDs) {
-        if (protein == null) {
-            throw new IllegalArgumentException("Protein cannot be null");
-        }
+    	Objects.requireNonNull(protein, "Protein cannot be null");
         this.protein = protein;
 
         if (isoformNumber != null && isoformNumber < 1) {

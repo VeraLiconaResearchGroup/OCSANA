@@ -44,19 +44,13 @@ public class CombinationOfInterventions {
     public CombinationOfInterventions (Set<CyNode> ciNodes,
                                        Set<CyNode> targetNodes,
                                        Function<CyNode, String> nodeNameFunction) {
-        if (ciNodes == null) {
-            throw new IllegalArgumentException("CI nodes cannot be null");
-        }
+    	Objects.requireNonNull(ciNodes, "CI nodes cannot be null");
         this.ciNodes = ciNodes;
 
-        if (targetNodes == null) {
-            throw new IllegalArgumentException("Target nodes cannot be null");
-        }
+        Objects.requireNonNull(targetNodes, "Target nodes collection cannot be null");
         this.targetNodes = targetNodes;
 
-        if (nodeNameFunction == null) {
-            throw new IllegalArgumentException("Node name function cannot be null");
-        }
+        Objects.requireNonNull(nodeNameFunction, "Node name function cannot be null");
         this.nodeNameFunction = nodeNameFunction;
     }
 

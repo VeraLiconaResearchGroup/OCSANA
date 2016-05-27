@@ -18,6 +18,8 @@ import org.cytoscape.work.TaskMonitor;
 import org.compsysmed.ocsana.internal.tasks.AbstractOCSANATask;
 import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
 
+import java.util.Objects;
+
 import org.compsysmed.ocsana.internal.stages.prioritization.PrioritizationContext;
 import org.compsysmed.ocsana.internal.stages.prioritization.PrioritizationResults;
 
@@ -35,14 +37,10 @@ public class SignedInterventionScoringAlgorithmTask
                                                    PrioritizationResults prioritizationResults) {
         super(prioritizationContext.getGenerationContext().getNetwork());
 
-        if (prioritizationContext == null) {
-            throw new IllegalArgumentException("Prioritization context cannot be null");
-        }
+        Objects.requireNonNull(prioritizationContext, "Prioritization context cannot be null");
         this.prioritizationContext = prioritizationContext;
 
-        if (prioritizationResults == null) {
-            throw new IllegalArgumentException("Prioritization results cannot be null");
-        }
+        Objects.requireNonNull(prioritizationResults, "Prioritization results cannot be null");
         this.prioritizationResults = prioritizationResults;
     }
 

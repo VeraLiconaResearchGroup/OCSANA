@@ -71,19 +71,13 @@ public class PrioritizationStageControlPanel
     public PrioritizationStageControlPanel (CyNetwork network,
                                             OCSANAResultsPanel resultsPanel,
                                             PanelTaskManager taskManager) {
-        if (network == null) {
-            throw new IllegalArgumentException("Network cannot be null");
-        }
+    	Objects.requireNonNull(network, "Network cannot be null");
         this.network = network;
 
-        if (resultsPanel == null) {
-            throw new IllegalArgumentException("Results panel cannot be null");
-        }
+        Objects.requireNonNull(resultsPanel, "Results panel cannot be null");
         this.resultsPanel = resultsPanel;
 
-        if (taskManager == null) {
-            throw new IllegalArgumentException("Task manager cannot be null");
-        }
+        Objects.requireNonNull(taskManager, "Task manager cannot be null");
         this.taskManager = taskManager;
 
         subpanels = new ArrayList<>();
@@ -115,14 +109,10 @@ public class PrioritizationStageControlPanel
      **/
     public void populatePanel (GenerationContext generationContext,
                                GenerationResults generationResults) {
-        if (generationContext == null) {
-            throw new IllegalArgumentException("Generation stage context cannot be null");
-        }
+    	Objects.requireNonNull(generationContext, "Generation stage context cannot be null");
         this.generationContext = generationContext;
 
-        if (generationResults == null) {
-            throw new IllegalArgumentException("Generation stage results cannot be null");
-        }
+        Objects.requireNonNull(generationResults, "Generation stage results cannot be null");
         this.generationResults = generationResults;
 
         optionsPanel.removeAll();

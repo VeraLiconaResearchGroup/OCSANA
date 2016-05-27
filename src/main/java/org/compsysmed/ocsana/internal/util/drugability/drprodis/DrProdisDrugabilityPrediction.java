@@ -12,6 +12,7 @@
 package org.compsysmed.ocsana.internal.util.drugability.drprodis;
 
 import java.net.URL;
+import java.util.Objects;
 import java.net.MalformedURLException;
 
 
@@ -45,19 +46,13 @@ public class DrProdisDrugabilityPrediction {
                                           String magicSubDirectory,
                                           Integer novelDrugCount,
                                           Integer knownDrugCount) {
-        if (refSeqID == null) {
-            throw new IllegalArgumentException("RefSeq ID cannot be null");
-        }
+    	Objects.requireNonNull(refSeqID, "RefSeq ID cannot be null");
         this.refSeqID = refSeqID;
 
-        if (drProdisCode == null) {
-            throw new IllegalArgumentException("DR.PRODIS code cannot be null");
-        }
+        Objects.requireNonNull(drProdisCode, "DR.PRODIS code cannot be null");
         this.drProdisCode = drProdisCode;
 
-        if (magicSubDirectory == null) {
-            throw new IllegalArgumentException("Subdirectory cannot be null");
-        }
+        Objects.requireNonNull(magicSubDirectory, "Subdirectory cannot be null");
         this.magicSubDirectory = magicSubDirectory;
 
         if (novelDrugCount == null || novelDrugCount < 0) {

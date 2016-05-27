@@ -48,33 +48,23 @@ public class Protein {
                     String name,
                     Collection<String> geneNames,
                     String functionDescription) {
-        if (uniProtID == null) {
-            throw new IllegalArgumentException("Protein UniProt ID cannot be null");
-        }
+    	Objects.requireNonNull(uniProtID, "Protein UniProt ID cannot be null");
         this.uniProtID = uniProtID;
 
-        if (allUniProtIDs == null) {
-            throw new IllegalArgumentException("Protein UniProt ID collection cannot be null");
-        }
+        Objects.requireNonNull(allUniProtIDs, "Protein UniProt ID collection cannot be null");
         this.allUniProtIDs = allUniProtIDs;
 
         if (!this.allUniProtIDs.contains(uniProtID)) {
             this.allUniProtIDs.add(uniProtID);
         }
 
-        if (name == null) {
-            throw new IllegalArgumentException("Protein name cannot be null");
-        }
+        Objects.requireNonNull(name, "Protein name cannot be null");
         this.name = name;
 
-        if (geneNames == null) {
-            throw new IllegalArgumentException("List of gene names cannot be null");
-        }
+        Objects.requireNonNull(geneNames, "List of gene names cannot be null");
         this.geneNames = geneNames;
 
-        if (isoforms == null) {
-            throw new IllegalArgumentException("Collection of isoforms cannot be null");
-        }
+        Objects.requireNonNull(isoforms, "Collection of isoforms cannot be null");
         this.isoforms = isoforms;
 
         if (functionDescription == null) {
@@ -117,9 +107,7 @@ public class Protein {
      * @param isoform  the new isoform
      **/
     public void addIsoform (Isoform isoform) {
-        if (isoform == null) {
-            throw new IllegalArgumentException("Cannot add null isoform");
-        }
+    	Objects.requireNonNull(isoform, "Cannot add null isoform");
 
         if (!isoform.getProtein().equals(this)) {
             throw new IllegalArgumentException("Cannot add isoform for different protein");

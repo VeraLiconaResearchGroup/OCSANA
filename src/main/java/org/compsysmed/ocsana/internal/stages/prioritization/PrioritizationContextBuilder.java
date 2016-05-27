@@ -56,19 +56,13 @@ public class PrioritizationContextBuilder {
     public PrioritizationContextBuilder (CyNetwork network,
                                          GenerationContext generationContext,
                                          GenerationResults generationResults) {
-        if (network == null) {
-            throw new IllegalArgumentException("network cannot be null");
-        }
+    	Objects.requireNonNull(network, "network cannot be null");
         this.network = network;
 
-        if (generationContext == null) {
-            throw new IllegalArgumentException("Generation stage context cannot be null");
-        }
+        Objects.requireNonNull(generationContext, "Generation stage context cannot be null");
         this.generationContext = generationContext;
 
-        if (generationResults == null) {
-            throw new IllegalArgumentException("Generation stage results cannot be null");
-        }
+        Objects.requireNonNull(generationResults, "Generation stage results cannot be null");
         this.generationResults = generationResults;
 
         targets = generationContext.getTargetNodes();
@@ -91,14 +85,11 @@ public class PrioritizationContextBuilder {
      * @param targetsToActivate  the target nodes to activate
      **/
     public void setTargetsToActivate (Set<CyNode> targetsToActivate) {
-        if (targetsToActivate == null) {
-            throw new IllegalArgumentException("Set of targets to activate cannot be null");
-        }
+    	Objects.requireNonNull(targetsToActivate, "Set of targets to activate cannot be null");
         this.targetsToActivate = targetsToActivate;
 
         targetsToDeactivate = new HashSet<>(targets);
         targetsToDeactivate.removeAll(targetsToActivate);
-
     }
 
     /**
@@ -107,10 +98,7 @@ public class PrioritizationContextBuilder {
      * @param ciSignAlgorithm  the algorithm
      **/
     public void setCISignAlgorithm (AbstractCISignAssignmentAlgorithm ciSignAlgorithm) {
-        if (ciSignAlgorithm == null) {
-            throw new IllegalArgumentException("CI sign assignment algorithm cannot be null");
-        }
-
+        Objects.requireNonNull(ciSignAlgorithm, "CI sign assignment algorithm cannot be null");
         this.ciSignAlgorithm = ciSignAlgorithm;
     }
 

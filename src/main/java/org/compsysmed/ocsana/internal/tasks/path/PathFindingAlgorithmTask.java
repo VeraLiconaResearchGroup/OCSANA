@@ -62,10 +62,9 @@ public class PathFindingAlgorithmTask extends AbstractOCSANATask {
             throw new IllegalStateException("Invalid algorithm step for path-finding");
         }
 
-        if (targetsForThisRun == null || sourceNodes == null) {
-            throw new IllegalStateException("Nodes not set by user.");
-        }
-
+        Objects.requireNonNull(sourceNodes, "Source nodes not set by user");
+        Objects.requireNonNull(targetsForThisRun, "Target nodes not set by user");
+        
         taskMonitor.setTitle(String.format("Paths to %ss", targetType));
 
         taskMonitor.setStatusMessage(String.format("Finding paths from %d source nodes to %d %s nodes (algorithm: %s).", sourceNodes.size(), targetsForThisRun.size(), targetType, generationContext.getPathFindingAlgorithm().shortName()));

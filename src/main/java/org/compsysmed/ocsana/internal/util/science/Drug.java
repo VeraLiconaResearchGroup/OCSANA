@@ -42,28 +42,20 @@ public class Drug {
                  String drugBankPrimaryID,
                  Set<String> drugBankIDs,
                  Set<FDACategory> categories) {
-        if (name == null) {
-            throw new IllegalArgumentException("Drug name cannot be null");
-        }
+    	Objects.requireNonNull(name, "Drug name cannot be null");
         this.name = name;
 
-        if (drugBankPrimaryID == null) {
-            throw new IllegalArgumentException("Drug primary ID cannot be null");
-        }
+        Objects.requireNonNull(drugBankPrimaryID, "Drug primary ID cannot be null");
         this.drugBankPrimaryID = drugBankPrimaryID;
 
-        if (drugBankIDs == null) {
-            throw new IllegalArgumentException("List of DrugBank IDs cannot be null");
-        }
+        Objects.requireNonNull(drugBankIDs, "DrugBank ID collection cannot be null");
         if (!drugBankIDs.contains(drugBankPrimaryID)) {
             drugBankIDs = new HashSet<>(drugBankIDs);
             drugBankIDs.add(drugBankPrimaryID);
         }
         this.drugBankIDs = drugBankIDs;
 
-        if (categories == null) {
-            throw new IllegalArgumentException("List of drug approval categories cannot be null");
-        }
+        Objects.requireNonNull(categories, "Drug approval category collection cannot be null");
         this.categories = categories;
     }
 

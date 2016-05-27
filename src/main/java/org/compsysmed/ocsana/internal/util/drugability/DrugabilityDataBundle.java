@@ -47,27 +47,19 @@ public class DrugabilityDataBundle {
                                   Collection<DrProdisDrugabilityPrediction> drProdisPredictions,
                                   Collection<DrugProteinInteraction> interactions,
                                   Collection<DrugFEATURELigand> ligands) {
-        if (protein == null) {
-            throw new IllegalArgumentException("Protein cannot be null.");
-        }
+    	Objects.requireNonNull(protein, "Protein cannot be null.");
         this.protein = protein;
         this.isoform = null;
 
-        if (drProdisPredictions == null) {
-            throw new IllegalArgumentException("DR.PRODIS predictions collection cannot be null");
-        }
+        Objects.requireNonNull(drProdisPredictions, "DR.PRODIS predictions collection cannot be null");
         this.drProdisPredictions = drProdisPredictions;
 
         // TODO: check whether interactions are for correct protein
-        if (interactions == null) {
-            throw new IllegalArgumentException("Interactions set cannot be null.");
-        }
+        Objects.requireNonNull(interactions, "Interactions set cannot be null.");
         this.interactions = interactions;
 
         // TODO: check whether ligands are for correct protein
-        if (ligands == null) {
-            throw new IllegalArgumentException("Ligands collection cannot be null.");
-        }
+        Objects.requireNonNull(ligands, "Ligands collection cannot be null.");
         this.ligands = ligands;
     }
 
@@ -84,27 +76,19 @@ public class DrugabilityDataBundle {
                                   Collection<DrProdisDrugabilityPrediction> drProdisPredictions,
                                   Collection<DrugProteinInteraction> interactions,
                                   Collection<DrugFEATURELigand> ligands) {
-        if (isoform == null) {
-            throw new IllegalArgumentException("Isoform cannot be null.");
-        }
+    	Objects.requireNonNull(isoform, "Isoform cannot be null.");
         this.isoform = isoform;
         this.protein = isoform.getProtein();
 
-        if (drProdisPredictions == null) {
-            throw new IllegalArgumentException("DR.PRODIS predictions collection cannot be null");
-        }
+        Objects.requireNonNull(drProdisPredictions, "DR.PRODIS predictions collection cannot be null");
         this.drProdisPredictions = drProdisPredictions;
 
         // TODO: check whether interactions are for correct protein
-        if (interactions == null) {
-            throw new IllegalArgumentException("Interactions set cannot be null.");
-        }
+        Objects.requireNonNull(interactions, "Interactions collection cannot be null.");
         this.interactions = interactions;
 
         // TODO: check whether ligands are for correct protein
-        if (ligands == null) {
-            throw new IllegalArgumentException("Ligands collection cannot be null.");
-        }
+        Objects.requireNonNull(ligands, "Ligands collection cannot be null.");
         this.ligands = ligands;
     }
 

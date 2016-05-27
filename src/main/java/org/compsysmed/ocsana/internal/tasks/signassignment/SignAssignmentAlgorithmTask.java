@@ -38,14 +38,10 @@ public class SignAssignmentAlgorithmTask
                                         PrioritizationResults prioritizationResults) {
         super(prioritizationContext.getGenerationContext().getNetwork());
 
-        if (prioritizationContext == null) {
-            throw new IllegalArgumentException("Prioritization context cannot be null");
-        }
+        Objects.requireNonNull(prioritizationContext, "Prioritization context cannot be null");
         this.prioritizationContext = prioritizationContext;
 
-        if (prioritizationResults == null) {
-            throw new IllegalArgumentException("Prioritization results cannot be null");
-        }
+        Objects.requireNonNull(prioritizationResults, "Prioritization results cannot be null");
         this.prioritizationResults = prioritizationResults;
     }
 

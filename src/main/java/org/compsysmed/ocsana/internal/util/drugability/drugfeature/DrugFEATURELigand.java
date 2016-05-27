@@ -12,6 +12,7 @@
 package org.compsysmed.ocsana.internal.util.drugability.drugfeature;
 
 import java.net.URL;
+import java.util.Objects;
 import java.net.MalformedURLException;
 
 /**
@@ -43,34 +44,22 @@ public class DrugFEATURELigand {
                               Integer index,
                               String ligandName,
                               Double score) {
-        if (uniProtID == null) {
-            throw new IllegalArgumentException("UniProt ID cannot be null");
-        }
+    	Objects.requireNonNull(uniProtID, "UniProt ID cannot be null");
         this.uniProtID = uniProtID;
 
-        if (pdbID == null) {
-            throw new IllegalArgumentException("PDB ID cannot be null");
-        }
+        Objects.requireNonNull(pdbID, "PDB ID cannot be null");
         this.pdbID = pdbID;
 
-        if (chain == null) {
-            throw new IllegalArgumentException("Chain cannot be null");
-        }
+        Objects.requireNonNull(chain, "Chain cannot be null");
         this.chain = chain;
 
-        if (index == null) {
-            throw new IllegalArgumentException("Index cannot be null");
-        }
+        Objects.requireNonNull(index, "Index cannot be null");
         this.index = index;
 
-        if (ligandName == null) {
-            throw new IllegalArgumentException("Ligand name cannot be null");
-        }
+        Objects.requireNonNull(ligandName, "Ligand name cannot be null");
         this.ligandName = ligandName;
 
-        if (score == null) {
-            throw new IllegalArgumentException("Score cannot be null");
-        }
+        Objects.requireNonNull(score, "Score cannot be null");
         this.score = score;
     }
 

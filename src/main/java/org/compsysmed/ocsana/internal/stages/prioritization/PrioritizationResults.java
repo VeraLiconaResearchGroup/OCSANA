@@ -24,9 +24,7 @@ public class PrioritizationResults {
     private final Map<SignedIntervention, Double> signedInterventionScores = new HashMap<>();
 
     public PrioritizationResults (PrioritizationContext prioritizationContext) {
-        if (prioritizationContext == null) {
-            throw new IllegalArgumentException("Prioritization stage context cannot be null");
-        }
+    	Objects.requireNonNull(prioritizationContext, "Prioritization stage context cannot be null");
         this.prioritizationContext = prioritizationContext;
     }
 
@@ -45,13 +43,8 @@ public class PrioritizationResults {
      **/
     public void setOptimalInterventionSignings (CombinationOfInterventions ci,
                                                 Collection<SignedIntervention> optimalSignings) {
-        if (ci == null) {
-            throw new IllegalArgumentException("CI cannot be null");
-        }
-
-        if (optimalSignings == null) {
-            throw new IllegalArgumentException("Optimal signings collection cannot be null");
-        }
+    	Objects.requireNonNull(ci, "CI cannot be null");
+    	Objects.requireNonNull(optimalSignings, "Optimal signings collection cannot be null");
 
         if (!optimalSignings.stream().allMatch(si -> si.hasUnderlyingCI(ci))) {
             throw new IllegalArgumentException("Sign assignments do not match given CI");
@@ -74,10 +67,7 @@ public class PrioritizationResults {
      * if assigned, or an empty collection if not.
      **/
     public Collection<SignedIntervention> getOptimalInterventionSignings (CombinationOfInterventions ci) {
-        if (ci == null) {
-            throw new IllegalArgumentException("CI cannot be null");
-        }
-
+        Objects.requireNonNull(ci, "CI cannot be null");
         return optimalInterventionSignings.getOrDefault(ci, Collections.emptyList());
     }
 
@@ -89,13 +79,8 @@ public class PrioritizationResults {
      **/
     public void setSignedInterventionScore (SignedIntervention si,
                                             Double score) {
-        if (si == null) {
-            throw new IllegalArgumentException("Signed intervention cannot be null");
-        }
-
-        if (score == null) {
-            throw new IllegalArgumentException("Score cannot be null");
-        }
+        Objects.requireNonNull(si, "Signed intervention cannot be null");
+        Objects.requireNonNull(score, "Score cannot be null");
 
         signedInterventionScores.put(si, score);
     }

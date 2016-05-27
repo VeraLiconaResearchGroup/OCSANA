@@ -11,6 +11,7 @@
 
 package org.compsysmed.ocsana.internal.tasks.scoring;
 
+import java.util.Objects;
 import java.util.function.Predicate;
 
 // Cytoscape imports
@@ -44,9 +45,8 @@ public class OCSANAScoringTask extends AbstractOCSANATask {
             return;
         }
 
-        if (generationResults.pathsToTargets == null || generationResults.pathsToOffTargets == null) {
-            throw new IllegalStateException("Paths have not been computed.");
-        }
+        Objects.requireNonNull(generationResults.pathsToTargets, "Paths to targets have not been computed");
+        Objects.requireNonNull(generationResults.pathsToOffTargets, "Paths to off-targets have not been computed");
 
         Predicate<CyEdge> inhibitionEdgeTester = (CyEdge edge) -> generationContext.getEdgeProcessor().edgeIsInhibition(edge);
 

@@ -17,6 +17,8 @@ package org.compsysmed.ocsana.internal.tasks.signassignment;
 import org.cytoscape.work.AbstractTaskFactory;
 import org.cytoscape.work.TaskIterator;
 
+import java.util.Objects;
+
 // OCSANA imports
 import org.compsysmed.ocsana.internal.stages.prioritization.PrioritizationContext;
 import org.compsysmed.ocsana.internal.stages.prioritization.PrioritizationResults;
@@ -30,14 +32,10 @@ public class SignAssignmentAlgorithmTaskFactory
                                                PrioritizationResults prioritizationResults) {
         super();
 
-        if (prioritizationContext == null) {
-            throw new IllegalArgumentException("Prioritization context cannot be null");
-        }
+        Objects.requireNonNull(prioritizationContext, "Prioritization context cannot be null");
         this.prioritizationContext = prioritizationContext;
 
-        if (prioritizationResults == null) {
-            throw new IllegalArgumentException("Prioritization results cannot be null");
-        }
+        Objects.requireNonNull(prioritizationResults, "Prioritization results cannot be null");
         this.prioritizationResults = prioritizationResults;
     }
 

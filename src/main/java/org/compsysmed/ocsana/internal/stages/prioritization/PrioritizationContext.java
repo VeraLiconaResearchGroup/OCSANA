@@ -74,44 +74,28 @@ public final class PrioritizationContext {
         }
 
         // Assignments
-        if (network == null) {
-            throw new IllegalArgumentException("network cannot be null");
-        }
+        Objects.requireNonNull(network, "Network cannot be null");
         this.network = network;
 
-        if (generationContext == null) {
-            throw new IllegalArgumentException("Generation stage context cannot be null");
-        }
+        Objects.requireNonNull(generationContext, "Generation context cannot be null");
         this.generationContext = generationContext;
 
-        if (generationResults == null) {
-            throw new IllegalArgumentException("Generation stage results cannot be null");
-        }
+        Objects.requireNonNull(generationResults, "Generation results cannot be null");
         this.generationResults = generationResults;
 
-        if (targets == null) {
-            throw new IllegalArgumentException("Target set cannot be null");
-        }
+        Objects.requireNonNull(targets, "Targets set cannot be null");
         this.targets = targets;
 
-        if (targetsToActivate == null) {
-            throw new IllegalArgumentException("Set of targets to activate cannot be null");
-        }
+        Objects.requireNonNull(targetsToActivate, "Set of targets to activate cannot be null");
         this.targetsToActivate = targetsToActivate;
 
-        if (targetsToDeactivate == null) {
-            throw new IllegalArgumentException("Set of targets to deactivate cannot be null");
-        }
+        Objects.requireNonNull(targetsToDeactivate, "Set of targets to deactivate cannot be null");
         this.targetsToDeactivate = targetsToDeactivate;
 
-        if (ciSignAlgorithm == null) {
-            throw new IllegalArgumentException("CI sign assignment algorithm cannot be null");
-        }
+        Objects.requireNonNull(ciSignAlgorithm, "CI sign assignment algorithm cannot be null");
         this.ciSignAlgorithm = ciSignAlgorithm;
 
-        if (siScoringAlgorithm == null) {
-            throw new IllegalArgumentException("Signed intervention scoring algorithm cannot be null");
-        }
+        Objects.requireNonNull(siScoringAlgorithm, "SI scoring algorithm cannot be null");
         this.siScoringAlgorithm = siScoringAlgorithm;
     }
 

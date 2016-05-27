@@ -16,6 +16,8 @@ package org.compsysmed.ocsana.internal.util.results;
 // Cytoscape imports
 import org.cytoscape.model.CyNode;
 
+import java.util.Objects;
+
 // OCSANA imports
 import org.compsysmed.ocsana.internal.util.science.InteractionSign;
 
@@ -27,19 +29,13 @@ public class SignedInterventionNode {
     public SignedInterventionNode (CyNode node,
                                    InteractionSign sign,
                                    String name) {
-        if (node == null) {
-            throw new IllegalArgumentException("Node cannot be null");
-        }
+    	Objects.requireNonNull(node, "Node cannot be null");
         this.node = node;
 
-        if (sign == null) {
-            throw new IllegalArgumentException("Sign cannot be null");
-        }
+        Objects.requireNonNull(sign, "Sign cannot be null");
         this.sign = sign;
 
-        if (name == null) {
-            throw new IllegalArgumentException("Name cannot be null");
-        }
+        Objects.requireNonNull(name, "Name cannot be null");
         this.name = name;
     }
 

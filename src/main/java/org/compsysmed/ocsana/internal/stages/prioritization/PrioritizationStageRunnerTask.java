@@ -18,6 +18,8 @@ import org.cytoscape.work.TaskManager;
 import org.cytoscape.work.TaskMonitor;
 import org.cytoscape.work.TaskObserver;
 
+import java.util.Objects;
+
 // OCSANA imports
 import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
 import org.compsysmed.ocsana.internal.stages.generation.GenerationResults;
@@ -52,39 +54,25 @@ public class PrioritizationStageRunnerTask
                                           OCSANAResultsPanel resultsPanel) {
         super(generationContext.getNetwork());
 
-        if (taskManager == null) {
-            throw new IllegalArgumentException("Task manager cannot be null");
-        }
+        Objects.requireNonNull(taskManager, "Task manager cannot be null");
         this.taskManager = taskManager;
 
-        if (observer == null) {
-            throw new IllegalArgumentException("Task observer cannot be null");
-        }
+        Objects.requireNonNull(observer, "Task observer cannot be null");
         this.observer = observer;
 
-        if (generationContext == null) {
-            throw new IllegalArgumentException("Generation context cannot be null");
-        }
+        Objects.requireNonNull(generationContext, "Generation context cannot be null");
         this.generationContext = generationContext;
 
-        if (generationResults == null) {
-            throw new IllegalArgumentException("Generation results cannot be null");
-        }
+        Objects.requireNonNull(generationResults, "Generation results cannot be null");
         this.generationResults = generationResults;
 
-        if (prioritizationContext == null) {
-            throw new IllegalArgumentException("Prioritization context cannot be null");
-        }
+        Objects.requireNonNull(prioritizationContext, "Prioritization context cannot be null");
         this.prioritizationContext = prioritizationContext;
 
-        if (prioritizationResults == null) {
-            throw new IllegalArgumentException("Prioritization context cannot be null");
-        }
+        Objects.requireNonNull(prioritizationResults, "Prioritization results cannot be null");
         this.prioritizationResults = prioritizationResults;
 
-        if (resultsPanel == null) {
-            throw new IllegalArgumentException("Results panel cannot be null");
-        }
+        Objects.requireNonNull(resultsPanel, "Results panel cannot be null");
         this.resultsPanel = resultsPanel;
     }
 

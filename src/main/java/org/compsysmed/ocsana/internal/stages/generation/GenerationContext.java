@@ -89,51 +89,33 @@ public final class GenerationContext {
         }
 
         // Assignments
-        if (network == null) {
-            throw new IllegalArgumentException("Network cannot be null");
-        }
+        Objects.requireNonNull(network, "Network cannot be null");
         this.network = network;
 
-        if (sourceNodes == null) {
-            throw new IllegalArgumentException("Source node set cannot be null");
-        }
+        Objects.requireNonNull(sourceNodes, "Source node set cannot be null");
         this.sourceNodes = sourceNodes;
 
-        if (targetNodes == null) {
-            throw new IllegalArgumentException("Target node set cannot be null");
-        }
+        Objects.requireNonNull(targetNodes, "Target node set cannot be null");
         this.targetNodes = targetNodes;
 
-        if (offTargetNodes == null) {
-            throw new IllegalArgumentException("Off-target node set cannot be null");
-        }
+        Objects.requireNonNull(offTargetNodes, "Off-target node set cannot be null");
         this.offTargetNodes = offTargetNodes;
 
-        if (nodeNameHandler == null) {
-            throw new IllegalArgumentException("Node name handler cannot be null");
-        }
+        Objects.requireNonNull(nodeNameHandler, "Node name handler cannot be null");
         this.nodeNameHandler = nodeNameHandler;
 
-        if (edgeProcessor == null) {
-            throw new IllegalArgumentException("Edge processor cannot be null");
-        }
+        Objects.requireNonNull(edgeProcessor, "Edge processor cannot be null");
         this.edgeProcessor = edgeProcessor;
 
         this.includeEndpointsInCIs = includeEndpointsInCIs;
 
-        if (pathFindingAlgorithm == null) {
-            throw new IllegalArgumentException("Path-finding algorithm cannot be null");
-        }
+        Objects.requireNonNull(pathFindingAlgorithm, "Path-finding algorithm cannot be null");
         this.pathFindingAlgorithm = pathFindingAlgorithm;
 
-        if (mhsAlgorithm == null) {
-            throw new IllegalArgumentException("MHS algorithm cannot be null");
-        }
+        Objects.requireNonNull(mhsAlgorithm, "MHS algorithm cannot be null");
         this.mhsAlgorithm = mhsAlgorithm;
 
-        if (ocsanaAlgorithm == null) {
-            throw new IllegalArgumentException("OCSANA scoring algorithm cannot be null");
-        }
+        Objects.requireNonNull(ocsanaAlgorithm, "OCSANA scoring algorithm cannot be null");
         this.ocsanaAlgorithm = ocsanaAlgorithm;
     }
 
@@ -250,9 +232,7 @@ public final class GenerationContext {
      * @param path  the path
      **/
     public String pathString(List<CyEdge> path) {
-        if (path == null) {
-            return "";
-        }
+    	Objects.requireNonNull(path, "Cannot convert a null path to a string");
 
         StringBuilder result = new StringBuilder();
 

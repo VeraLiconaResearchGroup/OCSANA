@@ -55,9 +55,7 @@ public class GenerationContextBuilder {
     private OCSANAScoringAlgorithm ocsanaAlgorithm;
 
     public GenerationContextBuilder (CyNetwork network) {
-        if (network == null) {
-            throw new IllegalArgumentException("Network cannot be null");
-        }
+    	Objects.requireNonNull(network, "Network cannot be null");
         this.network = network;
 
         ocsanaAlgorithm = new OCSANAScoringAlgorithm(network);
@@ -81,9 +79,7 @@ public class GenerationContextBuilder {
      * Set the source nodes
      **/
     public void setSourceNodes (Set<CyNode> sourceNodes) {
-        if (sourceNodes == null) {
-            throw new IllegalArgumentException("Source node set cannot be null");
-        }
+    	Objects.requireNonNull(sourceNodes, "Source node set cannot be null");
 
         if (sourceNodes.stream().anyMatch(node -> !network.containsNode(node))) {
             throw new IllegalArgumentException("All source nodes must come from underlying network");
@@ -103,11 +99,9 @@ public class GenerationContextBuilder {
      * Set the target nodes
      **/
     public void setTargetNodes (Set<CyNode> targetNodes) {
-        if (targetNodes == null) {
-            throw new IllegalArgumentException("Target node set cannot be null");
-        }
-
-        if (targetNodes.stream().anyMatch(node -> !network.containsNode(node))) {
+    	Objects.requireNonNull(targetNodes, "Target node set cannot be null");
+    	
+    	if (targetNodes.stream().anyMatch(node -> !network.containsNode(node))) {
             throw new IllegalArgumentException("All target nodes must come from underlying network");
         }
 
@@ -125,10 +119,8 @@ public class GenerationContextBuilder {
      * Set the off-target nodes
      **/
     public void setOffTargetNodes (Set<CyNode> offTargetNodes) {
-        if (offTargetNodes == null) {
-            throw new IllegalArgumentException("Off-target node set cannot be null");
-        }
-
+        Objects.requireNonNull(offTargetNodes, "Off-target node set cannot be null");
+        	
         if (offTargetNodes.stream().anyMatch(node -> !network.containsNode(node))) {
             throw new IllegalArgumentException("All off-target nodes must come from underlying network");
         }
@@ -147,9 +139,7 @@ public class GenerationContextBuilder {
      * Set the node name handler
      **/
     public void setNodeNameHandler (NodeNameHandler nodeNameHandler) {
-        if (nodeNameHandler == null) {
-            throw new IllegalArgumentException("Node name handler cannot be null");
-        }
+    	Objects.requireNonNull(nodeNameHandler, "Node name handler cannot be null");
 
         this.nodeNameHandler = nodeNameHandler;
     }
@@ -165,10 +155,8 @@ public class GenerationContextBuilder {
      * Set the edge processor
      **/
     public void setEdgeProcessor (EdgeProcessor edgeProcessor) {
-        if (edgeProcessor == null) {
-            throw new IllegalArgumentException("Edge processor cannot be null");
-        }
-
+    	Objects.requireNonNull(edgeProcessor, "Edge processor cannot be null");
+    	
         this.edgeProcessor = edgeProcessor;
     }
 
@@ -197,9 +185,7 @@ public class GenerationContextBuilder {
      * Set the path-finding algorithm
      **/
     public void setPathFindingAlgorithm (AbstractPathFindingAlgorithm pathFindingAlgorithm) {
-        if (pathFindingAlgorithm == null) {
-            throw new IllegalArgumentException("Path-finding algorithm cannot be null");
-        }
+    	Objects.requireNonNull(pathFindingAlgorithm, "Path-finding algorithm cannot be null");
 
         this.pathFindingAlgorithm = pathFindingAlgorithm;
     }
@@ -215,9 +201,7 @@ public class GenerationContextBuilder {
      * Set the MHS-finding algorithm
      **/
     public void setMHSAlgorithm (AbstractMHSAlgorithm mhsAlgorithm) {
-        if (mhsAlgorithm == null) {
-            throw new IllegalArgumentException("MHS-finding algorithm cannot be null");
-        }
+    	Objects.requireNonNull(mhsAlgorithm, "MHS-finding algorithm cannot be null");
 
         this.mhsAlgorithm = mhsAlgorithm;
     }
