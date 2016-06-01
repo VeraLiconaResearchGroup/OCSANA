@@ -84,11 +84,11 @@ public class OCSANAControlPanel
     }
 
     private void buildPanel (CyNetwork network) {
+        removeAll();
+
         if (network == null) {
             return;
         }
-
-        removeAll();
 
         ciCollapsible = new BasicCollapsiblePanel("1: Find CIs");
         ciCollapsible.setCollapsed(false);

@@ -94,6 +94,9 @@ public class OCSANAResultsPanel
         this.generationContext = generationContext;
         this.generationResults = generationResults;
 
+        prioritizationContext = null;
+        prioritizationResults = null;
+
         resultsReportManager.update(generationContext, generationResults);
 
         rebuildPanels();
@@ -110,17 +113,10 @@ public class OCSANAResultsPanel
     }
 
     private void rebuildPanels () {
+        reset();
+
         resultsPanel = getResultsPanel();
         operationsPanel = getOperationsPanel();
-        reset();
-    }
-
-
-    /**
-     * Reset the panel to display the
-     **/
-    public void reset () {
-        removeAll();
 
         add(resultsPanel, BorderLayout.CENTER);
         add(operationsPanel, BorderLayout.SOUTH);
@@ -133,6 +129,16 @@ public class OCSANAResultsPanel
         if (cyResultsPanel.getState() == CytoPanelState.HIDE) {
             cyResultsPanel.setState(CytoPanelState.DOCK);
         }
+    }
+
+
+    /**
+     * Reset the panel to display nothing
+     **/
+    public void reset () {
+        removeAll();
+        revalidate();
+        repaint();
     }
 
     /**
