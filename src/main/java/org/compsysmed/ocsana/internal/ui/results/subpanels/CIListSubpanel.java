@@ -9,7 +9,7 @@
  * details
  **/
 
-package org.compsysmed.ocsana.internal.ui.results;
+package org.compsysmed.ocsana.internal.ui.results.subpanels;
 
 // Java imports
 import java.util.*;
@@ -33,43 +33,48 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
-import org.compsysmed.ocsana.internal.stages.generation.GenerationResults;
+import org.compsysmed.ocsana.internal.util.context.ContextBundle;
+import org.compsysmed.ocsana.internal.util.results.ResultsBundle;
 
 import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
 
-public class UnscoredCIListPanel
+public class CIListSubpanel
     extends JPanel {
-    private JFrame cytoscapeFrame;
-    private GenerationContext generationContext;
-    private GenerationResults generationResults;
+    private final ContextBundle contextBundle;
+    private final ResultsBundle resultsBundle;
+    private final JFrame cytoscapeFrame;
 
-    public UnscoredCIListPanel (GenerationContext generationContext,
-                                GenerationResults generationResults,
-                                JFrame cytoscapeFrame) {
-        this.generationContext = generationContext;
-        this.generationResults = generationResults;
+    public CIListSubpanel (ContextBundle contextBundle,
+                           ResultsBundle resultsBundle,
+                           JFrame cytoscapeFrame) {
+        Objects.requireNonNull(contextBundle, "Context bundle cannot be null");
+        this.contextBundle = contextBundle;
+
+        Objects.requireNonNull(resultsBundle, "Context results cannot be null");
+        this.resultsBundle = resultsBundle;
+
+        Objects.requireNonNull(cytoscapeFrame, "Cytoscape frame cannot be null");
         this.cytoscapeFrame = cytoscapeFrame;
 
-        if (generationResults.CIs != null) {
+        if (resultsBundle.getCIs() != null) {
             MHSTable mhsTable = new MHSTable();
 
             JScrollPane mhsScrollPane = new JScrollPane(mhsTable);
 
             setLayout(new BorderLayout());
-            String mhsText = String.format("Found %d optimal CIs in %f s.", generationResults.CIs.size(), generationResults.mhsExecutionSeconds);
+            String mhsText = String.format("Found %d optimal CIs in %f s.", resultsBundle.getCIs().size(), resultsBundle.getMHSExecutionSeconds());
             add(new JLabel(mhsText), BorderLayout.PAGE_START);
             add(mhsScrollPane, BorderLayout.CENTER);
         }
     }
 
     private class MHSTable extends JTable {
-        List<CombinationOfInterventions> CIs;
+        private final List<CombinationOfInterventions> CIs;
 
         public MHSTable () {
-            this.CIs = new ArrayList<>(generationResults.CIs);
+            this.CIs = new ArrayList<>(resultsBundle.getCIs());
 
-            MHSTableModel mhsModel = new MHSTableModel(generationContext, CIs);
+            MHSTableModel mhsModel = new MHSTableModel(contextBundle, resultsBundle, CIs);
             setModel(mhsModel);
 
             // Sort the rows on CI size
@@ -98,12 +103,21 @@ public class UnscoredCIListPanel
     }
 
     private static class MHSTableModel extends AbstractTableModel {
-        private GenerationContext generationContext;
-        private List<CombinationOfInterventions> CIs;
+        // TODO: update to include signed intervention information
+        private final ContextBundle contextBundle;
+        private final ResultsBundle resultsBundle;
+        private final List<CombinationOfInterventions> CIs;
 
-        public MHSTableModel (GenerationContext generationContext,
+        public MHSTableModel (ContextBundle contextBundle,
+                              ResultsBundle resultsBundle,
                               List<CombinationOfInterventions> CIs) {
-            this.generationContext = generationContext;
+            Objects.requireNonNull(contextBundle, "Context bundle cannot be null");
+            this.contextBundle = contextBundle;
+
+            Objects.requireNonNull(resultsBundle, "Context results cannot be null");
+            this.resultsBundle = resultsBundle;
+
+            Objects.requireNonNull(CIs, "CIs collection cannot be null");
             this.CIs = CIs;
         }
         String[] colNames = {"CI", "Size"};

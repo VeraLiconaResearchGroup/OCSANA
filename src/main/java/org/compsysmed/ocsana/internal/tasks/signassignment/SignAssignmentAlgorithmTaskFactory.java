@@ -20,29 +20,29 @@ import org.cytoscape.work.TaskIterator;
 import java.util.Objects;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.stages.prioritization.PrioritizationContext;
-import org.compsysmed.ocsana.internal.stages.prioritization.PrioritizationResults;
+import org.compsysmed.ocsana.internal.util.context.ContextBundle;
+import org.compsysmed.ocsana.internal.util.results.ResultsBundle;
 
 public class SignAssignmentAlgorithmTaskFactory
     extends AbstractTaskFactory {
-    private final PrioritizationContext prioritizationContext;
-    private final PrioritizationResults prioritizationResults;
+    private final ContextBundle contextBundle;
+    private final ResultsBundle resultsBundle;
 
-    public SignAssignmentAlgorithmTaskFactory (PrioritizationContext prioritizationContext,
-                                               PrioritizationResults prioritizationResults) {
+    public SignAssignmentAlgorithmTaskFactory (ContextBundle contextBundle,
+                                               ResultsBundle resultsBundle) {
         super();
 
-        Objects.requireNonNull(prioritizationContext, "Prioritization context cannot be null");
-        this.prioritizationContext = prioritizationContext;
+        Objects.requireNonNull(contextBundle, "Context bundle cannot be null");
+        this.contextBundle = contextBundle;
 
-        Objects.requireNonNull(prioritizationResults, "Prioritization results cannot be null");
-        this.prioritizationResults = prioritizationResults;
+        Objects.requireNonNull(resultsBundle, "Context results cannot be null");
+        this.resultsBundle = resultsBundle;
     }
 
     @Override
     public TaskIterator createTaskIterator () {
         TaskIterator tasks = new TaskIterator();
-        tasks.append(new SignAssignmentAlgorithmTask(prioritizationContext, prioritizationResults));
+        tasks.append(new SignAssignmentAlgorithmTask(contextBundle, resultsBundle));
         return tasks;
     }
 }

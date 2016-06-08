@@ -1,5 +1,5 @@
 /**
- * Context for the CI stage of OCSANA
+ * Context for an OCSANA run
  *
  * Copyright Vera-Licona Research Group (C) 2016
  *
@@ -9,7 +9,7 @@
  * details
  **/
 
-package org.compsysmed.ocsana.internal.stages.generation;
+package org.compsysmed.ocsana.internal.util.context;
 
 // Java imports
 import java.util.*;
@@ -24,21 +24,23 @@ import org.cytoscape.model.CyNode;
 import org.compsysmed.ocsana.internal.util.tunables.NodeNameHandler;
 import org.compsysmed.ocsana.internal.util.tunables.EdgeProcessor;
 
+import org.compsysmed.ocsana.internal.algorithms.signassignment.AbstractCISignAssignmentAlgorithm;
+import org.compsysmed.ocsana.internal.algorithms.drugability.AbstractSignedInterventionScoringAlgorithm;
 import org.compsysmed.ocsana.internal.algorithms.path.AbstractPathFindingAlgorithm;
 import org.compsysmed.ocsana.internal.algorithms.mhs.AbstractMHSAlgorithm;
 import org.compsysmed.ocsana.internal.algorithms.scoring.OCSANAScoringAlgorithm;
 
 /**
- * Context for the CI stage of OCSANA
+ * Context for an OCSANA run
  *
- * This class stores the configuration required to run the CI stage. A
- * populated instance will be passed to a CIStageRunner at the
+ * This class stores the configuration required to run OCSANA. A
+ * populated instance will be passed to a RunnerTask at the
  * beginning of a run.
  * <p>
  * This class is immutable by design. Instances should be constructed using
- * {@link GenerationContextBuilder}.
+ * {@link ContextBundleBuilder}.
  **/
-public final class GenerationContext {
+public final class ContextBundle {
     private final CyNetwork network;
 
     private final Set<CyNode> sourceNodes;
@@ -53,41 +55,25 @@ public final class GenerationContext {
     private final AbstractMHSAlgorithm mhsAlgorithm;
     private final OCSANAScoringAlgorithm ocsanaAlgorithm;
 
-    public GenerationContext (CyNetwork network,
-                              Set<CyNode> sourceNodes,
-                              Set<CyNode> targetNodes,
-                              Set<CyNode> offTargetNodes,
-                              NodeNameHandler nodeNameHandler,
-                              EdgeProcessor edgeProcessor,
-                              boolean includeEndpointsInCIs,
-                              AbstractPathFindingAlgorithm pathFindingAlgorithm,
-                              AbstractMHSAlgorithm mhsAlgorithm,
-                              OCSANAScoringAlgorithm ocsanaAlgorithm) {
-        // Sanity checks
-        if (sourceNodes.stream().anyMatch(node -> !network.containsNode(node))) {
-            throw new IllegalArgumentException("All source nodes must come from underlying network");
-        }
+    private final Set<CyNode> targetsToActivate;
+    private final Set<CyNode> targetsToDeactivate;
 
-        if (targetNodes.stream().anyMatch(node -> !network.containsNode(node))) {
-            throw new IllegalArgumentException("All target nodes must come from underlying network");
-        }
+    private final AbstractCISignAssignmentAlgorithm ciSignAlgorithm;
+    private final AbstractSignedInterventionScoringAlgorithm siScoringAlgorithm;
 
-        if (offTargetNodes.stream().anyMatch(node -> !network.containsNode(node))) {
-            throw new IllegalArgumentException("All off-target nodes must come from underlying network");
-        }
-
-        if (!Collections.disjoint(sourceNodes, targetNodes)) {
-            throw new IllegalArgumentException("Source and target nodes must be disjoint");
-        }
-
-        if (!Collections.disjoint(sourceNodes, offTargetNodes)) {
-            throw new IllegalArgumentException("Source and off-target nodes must be disjoint");
-        }
-
-        if (!Collections.disjoint(targetNodes, offTargetNodes)) {
-            throw new IllegalArgumentException("Target and off-target nodes must be disjoint");
-        }
-
+    public ContextBundle (CyNetwork network,
+                          Set<CyNode> sourceNodes,
+                          Set<CyNode> targetNodes,
+                          Set<CyNode> offTargetNodes,
+                          NodeNameHandler nodeNameHandler,
+                          EdgeProcessor edgeProcessor,
+                          boolean includeEndpointsInCIs,
+                          AbstractPathFindingAlgorithm pathFindingAlgorithm,
+                          AbstractMHSAlgorithm mhsAlgorithm,
+                          OCSANAScoringAlgorithm ocsanaAlgorithm,
+                          Set<CyNode> targetsToActivate,
+                          AbstractCISignAssignmentAlgorithm ciSignAlgorithm,
+                          AbstractSignedInterventionScoringAlgorithm siScoringAlgorithm) {
         // Assignments
         Objects.requireNonNull(network, "Network cannot be null");
         this.network = network;
@@ -117,6 +103,46 @@ public final class GenerationContext {
 
         Objects.requireNonNull(ocsanaAlgorithm, "OCSANA scoring algorithm cannot be null");
         this.ocsanaAlgorithm = ocsanaAlgorithm;
+
+        Objects.requireNonNull(targetsToActivate, "Set of targets to activate cannot be empty");
+        this.targetsToActivate = targetsToActivate;
+        targetsToDeactivate = new HashSet<>(targetNodes);
+        targetsToDeactivate.removeAll(targetsToActivate);
+
+        Objects.requireNonNull(ciSignAlgorithm, "CI sign assignment algorithm cannot be null");
+        this.ciSignAlgorithm = ciSignAlgorithm;
+
+        Objects.requireNonNull(siScoringAlgorithm, "SI scoring algorithm cannot be null");
+        this.siScoringAlgorithm = siScoringAlgorithm;
+
+        // Sanity checks
+        if (sourceNodes.stream().anyMatch(node -> !network.containsNode(node))) {
+            throw new IllegalArgumentException("All source nodes must come from underlying network");
+        }
+
+        if (targetNodes.stream().anyMatch(node -> !network.containsNode(node))) {
+            throw new IllegalArgumentException("All target nodes must come from underlying network");
+        }
+
+        if (offTargetNodes.stream().anyMatch(node -> !network.containsNode(node))) {
+            throw new IllegalArgumentException("All off-target nodes must come from underlying network");
+        }
+
+        if (!Collections.disjoint(sourceNodes, targetNodes)) {
+            throw new IllegalArgumentException("Source and target nodes must be disjoint");
+        }
+
+        if (!Collections.disjoint(sourceNodes, offTargetNodes)) {
+            throw new IllegalArgumentException("Source and off-target nodes must be disjoint");
+        }
+
+        if (!Collections.disjoint(targetNodes, offTargetNodes)) {
+            throw new IllegalArgumentException("Target and off-target nodes must be disjoint");
+        }
+
+        if (!targetNodes.containsAll(targetsToActivate)) {
+            throw new IllegalArgumentException("Targets to activate must be in target set");
+        }
     }
 
     /**
@@ -148,13 +174,6 @@ public final class GenerationContext {
     }
 
     /**
-     * Return the names of the source nodes
-     **/
-    public Collection<String> getSourceNodeNames () {
-        return sourceNodes.stream().map(node -> getNodeName(node)).collect(Collectors.toList());
-    }
-
-    /**
      * Return the target nodes
      **/
     public Set<CyNode> getTargetNodes () {
@@ -162,10 +181,17 @@ public final class GenerationContext {
     }
 
     /**
-     * Return the names of the target nodes
+     * Return the target nodes which are to be activated
      **/
-    public Collection<String> getTargetNodeNames () {
-        return targetNodes.stream().map(node -> getNodeName(node)).collect(Collectors.toList());
+    public Set<CyNode> getTargetsToActivate () {
+        return targetsToActivate;
+    }
+
+    /**
+     * Return the target nodes which are to be deactivated
+     **/
+    public Set<CyNode> getTargetsToDeactivate () {
+        return targetsToDeactivate;
     }
 
     /**
@@ -176,10 +202,10 @@ public final class GenerationContext {
     }
 
     /**
-     * Return the names of the off-target nodes
+     * Helper method to convert a collection of nodes to their names
      **/
-    public Collection<String> getOffTargetNodeNames () {
-        return offTargetNodes.stream().map(node -> getNodeName(node)).collect(Collectors.toList());
+    public Collection<String> getNodeNames (Collection<CyNode> nodes) {
+        return nodes.stream().map(node -> getNodeName(node)).collect(Collectors.toList());
     }
 
     /**
@@ -222,6 +248,20 @@ public final class GenerationContext {
      **/
     public OCSANAScoringAlgorithm getOCSANAAlgorithm () {
         return ocsanaAlgorithm;
+    }
+
+    /**
+     * Return the CI sign assignment algorithm
+     **/
+    public AbstractCISignAssignmentAlgorithm getCISignAlgorithm () {
+        return ciSignAlgorithm;
+    }
+
+    /**
+     * Return the signed intervention scoring algorithm
+     **/
+    public AbstractSignedInterventionScoringAlgorithm getSIScoringAlgorithm () {
+        return siScoringAlgorithm;
     }
 
     /**

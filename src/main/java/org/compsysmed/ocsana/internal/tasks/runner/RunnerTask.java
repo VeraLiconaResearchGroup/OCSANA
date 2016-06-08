@@ -1,5 +1,5 @@
 /**
- * Runner for the generation stage of OCSANA
+ * Runner task for the OCSANA process
  *
  * Copyright Vera-Licona Research Group (C) 2016
  *
@@ -9,8 +9,12 @@
  * details
  **/
 
-package org.compsysmed.ocsana.internal.stages.generation;
+package org.compsysmed.ocsana.internal.tasks.runner;
 
+// Java imports
+import java.util.*;
+
+// Cytoscape imports
 import org.cytoscape.task.AbstractNetworkTask;
 import org.cytoscape.work.FinishStatus;
 import org.cytoscape.work.ObservableTask;
@@ -20,15 +24,20 @@ import org.cytoscape.work.TaskObserver;
 
 // OCSANA imports
 import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
-import org.compsysmed.ocsana.internal.tasks.path.PathFindingAlgorithmTaskFactory;
-import org.compsysmed.ocsana.internal.tasks.scoring.OCSANAScoringTaskFactory;
+import org.compsysmed.ocsana.internal.tasks.drugability.SignedInterventionScoringAlgorithmTaskFactory;
 import org.compsysmed.ocsana.internal.tasks.mhs.MHSAlgorithmTaskFactory;
+import org.compsysmed.ocsana.internal.tasks.path.PathFindingAlgorithmTaskFactory;
 import org.compsysmed.ocsana.internal.tasks.results.PresentResultsTaskFactory;
+import org.compsysmed.ocsana.internal.tasks.scoring.OCSANAScoringTaskFactory;
+import org.compsysmed.ocsana.internal.tasks.signassignment.SignAssignmentAlgorithmTaskFactory;
+
+import org.compsysmed.ocsana.internal.util.context.ContextBundle;
+import org.compsysmed.ocsana.internal.util.results.ResultsBundle;
 
 import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
 
 /**
- * Runner task for the generation stage of OCSANA
+ * Runner task for the OCSANA process
  *
  * This task runs the OCSANA algorithm on the inputs specified in a
  * CIStageContext. In particular, it:
@@ -36,33 +45,44 @@ import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
  * 2) Finds MHSes/CIs of those paths; and
  * 3) Scores the influence of the CI nodes on the targets.
  **/
-public class GenerationStageRunnerTask
+public class RunnerTask
     extends AbstractNetworkTask
     implements TaskObserver, ObservableTask {
     private final TaskManager<?, ?> taskManager;
-    private final GenerationContext generationContext;
-    private final GenerationResults generationResults;
-    private final TaskObserver observer;
+    private final ContextBundle contextBundle;
+    private final ResultsBundle resultsBundle;
     private final OCSANAResultsPanel resultsPanel;
 
-    private Boolean hasCleanResults = false;
+    private Boolean hasCleanResults = true;
 
-    public GenerationStageRunnerTask (TaskManager<?, ?> taskManager,
-                                      TaskObserver observer,
-                                      GenerationContext generationContext,
-                                      OCSANAResultsPanel resultsPanel) {
-        super(generationContext.getNetwork());
+    /**
+     * Constructor
+     *
+     * @param taskManager  a TaskManager to run child tasks
+     * @param contextBundle  the context for this run
+     * @param resultsPanel  the panel to display the results
+     **/
+    public RunnerTask (TaskManager<?, ?> taskManager,
+                       ContextBundle contextBundle,
+                       OCSANAResultsPanel resultsPanel) {
+        super(contextBundle.getNetwork());
 
+        Objects.requireNonNull(taskManager, "Task manager cannot be null");
         this.taskManager = taskManager;
-        this.observer = observer;
-        this.generationContext = generationContext;
+
+        Objects.requireNonNull(contextBundle, "Context bundle cannot be null");
+        this.contextBundle = contextBundle;
+
+        Objects.requireNonNull(resultsPanel, "Results panel cannot be null");
         this.resultsPanel = resultsPanel;
 
-        this.generationResults = new GenerationResults();
+        this.resultsBundle = new ResultsBundle();
     }
 
     @Override
     public void run (TaskMonitor taskMonitor) {
+        Objects.requireNonNull(taskMonitor, "Task monitor cannot be null");
+
         // Give the task a title
         taskMonitor.setTitle("OCSANA");
 
@@ -77,7 +97,7 @@ public class GenerationStageRunnerTask
 
     private void spawnPathsToTargetsTask () {
         PathFindingAlgorithmTaskFactory pathsToTargetsTaskFactory =
-            new PathFindingAlgorithmTaskFactory(generationContext, generationResults,
+            new PathFindingAlgorithmTaskFactory(contextBundle, resultsBundle,
                                                 OCSANAStep.FIND_PATHS_TO_TARGETS);
 
         taskManager.execute(pathsToTargetsTaskFactory.createTaskIterator(),
@@ -86,7 +106,7 @@ public class GenerationStageRunnerTask
 
     private void spawnPathsToOffTargetsTask () {
         PathFindingAlgorithmTaskFactory pathsToOffTargetsTaskFactory =
-            new PathFindingAlgorithmTaskFactory(generationContext, generationResults,
+            new PathFindingAlgorithmTaskFactory(contextBundle, resultsBundle,
                                                 OCSANAStep.FIND_PATHS_TO_OFF_TARGETS);
 
         taskManager.execute(pathsToOffTargetsTaskFactory.createTaskIterator(),
@@ -95,21 +115,35 @@ public class GenerationStageRunnerTask
 
     private void spawnOCSANAScoringTask () {
         OCSANAScoringTaskFactory scoringTaskFactory =
-            new OCSANAScoringTaskFactory(generationContext, generationResults);
+            new OCSANAScoringTaskFactory(contextBundle, resultsBundle);
 
         taskManager.execute(scoringTaskFactory.createTaskIterator(), this);
     }
 
     private void spawnMHSTask () {
         MHSAlgorithmTaskFactory mhsTaskFactory =
-            new MHSAlgorithmTaskFactory(generationContext, generationResults);
+            new MHSAlgorithmTaskFactory(contextBundle, resultsBundle);
 
         taskManager.execute(mhsTaskFactory.createTaskIterator(), this);
     }
 
+    private void spawnSignAssignmentTask () {
+        SignAssignmentAlgorithmTaskFactory ciSignTaskFactory =
+            new SignAssignmentAlgorithmTaskFactory(contextBundle, resultsBundle);
+
+        taskManager.execute(ciSignTaskFactory.createTaskIterator(), this);
+    }
+
+    private void spawnSignedInterventionScoringTask () {
+        SignedInterventionScoringAlgorithmTaskFactory siScoringTaskFactory =
+            new SignedInterventionScoringAlgorithmTaskFactory(contextBundle, resultsBundle);
+
+        taskManager.execute(siScoringTaskFactory.createTaskIterator(), this);
+    }
+
     private void spawnPresentResultsTask () {
         PresentResultsTaskFactory presentResultsTaskFactory =
-            new PresentResultsTaskFactory(generationContext, generationResults, resultsPanel);
+            new PresentResultsTaskFactory(contextBundle, resultsBundle, resultsPanel);
 
         taskManager.execute(presentResultsTaskFactory.createTaskIterator(), this);
     }
@@ -118,14 +152,14 @@ public class GenerationStageRunnerTask
         // Flag that the results are clean
         hasCleanResults = true;
 
-        observer.taskFinished(this);
+        //observer.taskFinished(this);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T> T getResults (Class<? extends T> type) {
         if (hasCleanResults) {
-            return (T) generationResults;
+            return (T) resultsBundle;
         } else {
             return null;
         }
@@ -133,6 +167,8 @@ public class GenerationStageRunnerTask
 
     @Override
     public void taskFinished(ObservableTask task) {
+        Objects.requireNonNull(task, "Task cannot be null");
+
         if (cancelled) {
             return;
         }
@@ -157,6 +193,14 @@ public class GenerationStageRunnerTask
             break;
 
         case FIND_MHSES:
+            spawnSignAssignmentTask();
+            break;
+
+        case ASSIGN_CI_SIGNS:
+            spawnSignedInterventionScoringTask();
+            break;
+
+        case SCORE_SIGNED_INTERVENTIONS:
             spawnPresentResultsTask();
             break;
 

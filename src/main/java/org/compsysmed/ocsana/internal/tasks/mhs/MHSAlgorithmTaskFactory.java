@@ -12,30 +12,35 @@
 package org.compsysmed.ocsana.internal.tasks.mhs;
 
 // Java imports
+import java.util.*;
 
 // Cytoscape imports
 import org.cytoscape.work.AbstractTaskFactory;
 import org.cytoscape.work.TaskIterator;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
-import org.compsysmed.ocsana.internal.stages.generation.GenerationResults;
+import org.compsysmed.ocsana.internal.util.context.ContextBundle;
+import org.compsysmed.ocsana.internal.util.results.ResultsBundle;
 
 public class MHSAlgorithmTaskFactory extends AbstractTaskFactory {
-    private GenerationContext context;
-    private GenerationResults results;
+    private final ContextBundle contextBundle;
+    private final ResultsBundle resultsBundle;
 
-    public MHSAlgorithmTaskFactory (GenerationContext context,
-                                    GenerationResults results) {
+    public MHSAlgorithmTaskFactory (ContextBundle contextBundle,
+                                    ResultsBundle resultsBundle) {
         super();
-        this.context = context;
-        this.results = results;
+
+        Objects.requireNonNull(contextBundle, "Context bundle cannot be null");
+        this.contextBundle = contextBundle;
+
+        Objects.requireNonNull(resultsBundle, "Context results cannot be null");
+        this.resultsBundle = resultsBundle;
     }
 
     @Override
     public TaskIterator createTaskIterator () {
         TaskIterator tasks = new TaskIterator();
-        tasks.append(new MHSAlgorithmTask(context, results));
+        tasks.append(new MHSAlgorithmTask(contextBundle, resultsBundle));
         return tasks;
     }
 }

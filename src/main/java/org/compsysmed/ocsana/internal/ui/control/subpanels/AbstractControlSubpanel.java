@@ -9,13 +9,29 @@
  * details
  **/
 
-package org.compsysmed.ocsana.internal.ui.control.panels;
+package org.compsysmed.ocsana.internal.ui.control.subpanels;
 
+// Java imports
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-abstract public class AbstractControlSubPanel
+// Cytoscape imports
+
+// OCSANA imports
+import org.compsysmed.ocsana.internal.ui.control.OCSANAControlPanel;
+
+abstract public class AbstractControlSubpanel
     extends JPanel {
+    protected final OCSANAControlPanel controlPanel;
+    /**
+     * Constructor
+     *
+     * @param controlPanel  the parent OCSANAControlPanel
+     **/
+    protected AbstractControlSubpanel(OCSANAControlPanel controlPanel) {
+        this.controlPanel = controlPanel;
+    }
+
     /**
      * Update the ContextBuilder with the changes in the UI
      **/
@@ -30,5 +46,12 @@ abstract public class AbstractControlSubPanel
     protected static JLabel makeHeader (String label) {
         JLabel header = new JLabel(String.format("<html><h3>%s</h3></html>", label));
         return header;
+    }
+
+    /**
+     * Request context bundle builder update
+     **/
+    protected void requestContextBundleBuilderUpdate () {
+        controlPanel.updateContextBundleBuilder();
     }
 }

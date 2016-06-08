@@ -23,43 +23,50 @@ import org.cytoscape.model.CyEdge;
 import org.compsysmed.ocsana.internal.tasks.AbstractOCSANATask;
 import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
 
-import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
-import org.compsysmed.ocsana.internal.stages.generation.GenerationResults;
+import org.compsysmed.ocsana.internal.util.context.ContextBundle;
+import org.compsysmed.ocsana.internal.util.results.ResultsBundle;
 
-public class OCSANAScoringTask extends AbstractOCSANATask {
+public class OCSANAScoringTask
+    extends AbstractOCSANATask {
     private static final OCSANAStep algStep = OCSANAStep.SCORE_PATHS;
 
-    private GenerationContext generationContext;
-    private GenerationResults generationResults;
+    private final ContextBundle contextBundle;
+    private final ResultsBundle resultsBundle;
 
-    public OCSANAScoringTask (GenerationContext generationContext,
-                              GenerationResults generationResults) {
-        super(generationContext.getNetwork());
-        this.generationContext = generationContext;
-        this.generationResults = generationResults;
+    public OCSANAScoringTask (ContextBundle contextBundle,
+                              ResultsBundle resultsBundle) {
+        super(contextBundle.getNetwork());
+
+        Objects.requireNonNull(contextBundle, "Context bundle cannot be null");
+        this.contextBundle = contextBundle;
+
+        Objects.requireNonNull(resultsBundle, "Context results cannot be null");
+        this.resultsBundle = resultsBundle;
     }
 
     @Override
     public void run (TaskMonitor taskMonitor) {
-        if (generationResults.pathFindingCanceled) {
+        Objects.requireNonNull(taskMonitor, "Task monitor cannot be null");
+
+        if (resultsBundle.pathFindingWasCanceled()) {
             return;
         }
 
-        Objects.requireNonNull(generationResults.pathsToTargets, "Paths to targets have not been computed");
-        Objects.requireNonNull(generationResults.pathsToOffTargets, "Paths to off-targets have not been computed");
+        Objects.requireNonNull(resultsBundle.getPathsToTargets(), "Paths to targets have not been computed");
+        Objects.requireNonNull(resultsBundle.getPathsToOffTargets(), "Paths to off-targets have not been computed");
 
-        Predicate<CyEdge> inhibitionEdgeTester = (CyEdge edge) -> generationContext.getEdgeProcessor().edgeIsInhibition(edge);
+        Predicate<CyEdge> inhibitionEdgeTester = (CyEdge edge) -> contextBundle.getEdgeProcessor().edgeIsInhibition(edge);
 
         taskMonitor.setTitle("OCSANA scoring");
 
         taskMonitor.setStatusMessage("Computing OCSANA scores.");
 
         Long OCSANAPreTime = System.nanoTime();
-        generationContext.getOCSANAAlgorithm().computeScores(generationResults.pathsToTargets, generationResults.pathsToOffTargets, inhibitionEdgeTester);
+        contextBundle.getOCSANAAlgorithm().computeScores(resultsBundle.getPathsToTargets(), resultsBundle.getPathsToOffTargets(), inhibitionEdgeTester);
         Long OCSANAPostTime = System.nanoTime();
 
         Double OCSANARunTime = (OCSANAPostTime - OCSANAPreTime) / 1E9;
-        generationResults.OCSANAScoringExecutionSeconds = OCSANARunTime;
+        resultsBundle.setOCSANAScoringExecutionSeconds(OCSANARunTime);
         taskMonitor.setStatusMessage(String.format("Computed OCSANA scores in %fs.", OCSANARunTime));
     }
 
@@ -76,7 +83,7 @@ public class OCSANAScoringTask extends AbstractOCSANATask {
     @Override
     public void cancel () {
         super.cancel();
-        generationContext.getOCSANAAlgorithm().cancel();
-        generationResults.OCSANAScoringCanceled = true;
+        contextBundle.getOCSANAAlgorithm().cancel();
+        resultsBundle.setOCSANAScoringWasCanceled();
     }
 }

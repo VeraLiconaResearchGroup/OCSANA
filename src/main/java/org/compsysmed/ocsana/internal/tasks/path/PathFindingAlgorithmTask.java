@@ -24,38 +24,46 @@ import org.cytoscape.model.CyEdge;
 import org.compsysmed.ocsana.internal.tasks.AbstractOCSANATask;
 import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
 
-import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
-import org.compsysmed.ocsana.internal.stages.generation.GenerationResults;
+import org.compsysmed.ocsana.internal.util.context.ContextBundle;
+import org.compsysmed.ocsana.internal.util.results.ResultsBundle;
 
 public class PathFindingAlgorithmTask extends AbstractOCSANATask {
-    private GenerationContext generationContext;
-    private GenerationResults generationResults;
-    private OCSANAStep algStep;
+    private final ContextBundle contextBundle;
+    private final ResultsBundle resultsBundle;
+    private final OCSANAStep algStep;
     private Collection<List<CyEdge>> paths;
 
-    public PathFindingAlgorithmTask (GenerationContext generationContext,
-                                     GenerationResults generationResults,
+    public PathFindingAlgorithmTask (ContextBundle contextBundle,
+                                     ResultsBundle resultsBundle,
                                      OCSANAStep algStep) {
-        super(generationContext.getNetwork());
-        this.generationContext = generationContext;
-        this.generationResults = generationResults;
+        super(contextBundle.getNetwork());
+
+        Objects.requireNonNull(contextBundle, "Context bundle cannot be null");
+        this.contextBundle = contextBundle;
+
+        Objects.requireNonNull(resultsBundle, "Context results cannot be null");
+        this.resultsBundle = resultsBundle;
+
+        Objects.requireNonNull(algStep, "Algorithm step cannot be null");
         this.algStep = algStep;
     }
 
     @Override
     public void run (TaskMonitor taskMonitor) {
+        Objects.requireNonNull(taskMonitor, "Task monitor cannot be null");
+
         String targetType;
-        Set<CyNode> sourceNodes = generationContext.getSourceNodes();
+        Set<CyNode> sourceNodes = contextBundle.getSourceNodes();
         Set<CyNode> targetsForThisRun;
         switch (algStep) {
         case FIND_PATHS_TO_TARGETS:
             targetType = "target";
-            targetsForThisRun = generationContext.getTargetNodes();
+            targetsForThisRun = contextBundle.getTargetNodes();
             break;
 
         case FIND_PATHS_TO_OFF_TARGETS:
             targetType = "off-target";
-            targetsForThisRun = generationContext.getOffTargetNodes();
+            targetsForThisRun = contextBundle.getOffTargetNodes();
             break;
 
         default:
@@ -64,26 +72,26 @@ public class PathFindingAlgorithmTask extends AbstractOCSANATask {
 
         Objects.requireNonNull(sourceNodes, "Source nodes not set by user");
         Objects.requireNonNull(targetsForThisRun, "Target nodes not set by user");
-        
+
         taskMonitor.setTitle(String.format("Paths to %ss", targetType));
 
-        taskMonitor.setStatusMessage(String.format("Finding paths from %d source nodes to %d %s nodes (algorithm: %s).", sourceNodes.size(), targetsForThisRun.size(), targetType, generationContext.getPathFindingAlgorithm().shortName()));
+        taskMonitor.setStatusMessage(String.format("Finding paths from %d source nodes to %d %s nodes (algorithm: %s).", sourceNodes.size(), targetsForThisRun.size(), targetType, contextBundle.getPathFindingAlgorithm().shortName()));
 
         Long preTime = System.nanoTime();
-        paths = generationContext.getPathFindingAlgorithm().paths(sourceNodes, targetsForThisRun);
+        paths = contextBundle.getPathFindingAlgorithm().paths(sourceNodes, targetsForThisRun);
         Long postTime = System.nanoTime();
 
         Double runTime = (postTime - preTime) / 1E9;
 
         switch (algStep) {
         case FIND_PATHS_TO_TARGETS:
-            generationResults.pathsToTargets = paths;
-            generationResults.pathsToTargetsExecutionSeconds = runTime;
+            resultsBundle.setPathsToTargets(paths);
+            resultsBundle.setPathsToTargetsExecutionSeconds(runTime);
             break;
 
         case FIND_PATHS_TO_OFF_TARGETS:
-            generationResults.pathsToOffTargets = paths;
-            generationResults.pathsToOffTargetsExecutionSeconds = runTime;
+            resultsBundle.setPathsToOffTargets(paths);
+            resultsBundle.setPathsToOffTargetsExecutionSeconds(runTime);
             break;
 
         default:
@@ -114,7 +122,7 @@ public class PathFindingAlgorithmTask extends AbstractOCSANATask {
     @Override
     public void cancel () {
         super.cancel();
-        generationContext.getPathFindingAlgorithm().cancel();
-        generationResults.pathFindingCanceled = true;
+        contextBundle.getPathFindingAlgorithm().cancel();
+        resultsBundle.setPathFindingWasCanceled();
     }
 }

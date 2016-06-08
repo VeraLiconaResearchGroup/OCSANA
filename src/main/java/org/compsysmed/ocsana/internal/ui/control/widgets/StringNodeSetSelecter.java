@@ -27,9 +27,10 @@ import org.compsysmed.ocsana.internal.util.tunables.NodeNameHandler;
 public class StringNodeSetSelecter
     extends AbstractNodeSetSelecter {
     private JTextField nodeSetStringField;
+    private Set<CyNode> availableNodes;
 
     public StringNodeSetSelecter (String label,
-                                  Collection<CyNode> availableNodes,
+                                  Set<CyNode> availableNodes,
                                   Set<CyNode> selectedNodes,
                                   NodeNameHandler nodeNameHandler) {
         super(label, availableNodes, selectedNodes, nodeNameHandler);
@@ -37,7 +38,7 @@ public class StringNodeSetSelecter
     }
 
     public StringNodeSetSelecter (String label,
-                                  Collection<CyNode> availableNodes,
+                                  Set<CyNode> availableNodes,
                                   NodeNameHandler nodeNameHandler) {
         super(label, availableNodes, nodeNameHandler);
         draw();
@@ -65,6 +66,11 @@ public class StringNodeSetSelecter
     }
 
     @Override
+    protected void handleAvailableNodesUpdate () {
+        nodeSetStringField = new JTextField(20);
+    }
+
+    @Override
     public Set<CyNode> getSelectedNodes () {
         Set<String> selectedNodeNames = Arrays.asList(nodeSetStringField.getText().trim().split(",")).stream().map(nodeName -> nodeName.trim()).filter(nodeName -> !nodeName.isEmpty()).collect(Collectors.toSet());
         Set<CyNode> selectedNodes = selectedNodeNames.stream().map(nodeName -> nodeNameHandler.getNode(nodeName)).filter(node -> node != null).collect(Collectors.toSet());
@@ -73,8 +79,9 @@ public class StringNodeSetSelecter
 
     @Override
     public void setSelectedNodes (Set<CyNode> selectedNodes) {
-        if (nodeSetStringField == null) {
-            nodeSetStringField = new JTextField(20);
+        Objects.requireNonNull(selectedNodes, "Set of selected nodes must not be empty");
+        if (!getAvailableNodes().containsAll(selectedNodes)) {
+            throw new IllegalArgumentException("Selected nodes must be in set of available nodes");
         }
 
         String nodeSetString = selectedNodes.stream().map(node -> nodeNameHandler.getNodeName(node)).collect(Collectors.joining(", "));

@@ -11,6 +11,9 @@
 
 package org.compsysmed.ocsana.internal.tasks.path;
 
+// Java imports
+import java.util.*;
+
 // Cytoscape imports
 import org.cytoscape.work.AbstractTaskFactory;
 import org.cytoscape.work.TaskIterator;
@@ -18,27 +21,33 @@ import org.cytoscape.work.TaskIterator;
 // OCSANA imports
 import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
 
-import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
-import org.compsysmed.ocsana.internal.stages.generation.GenerationResults;
+import org.compsysmed.ocsana.internal.util.context.ContextBundle;
+import org.compsysmed.ocsana.internal.util.results.ResultsBundle;
 
-public class PathFindingAlgorithmTaskFactory extends AbstractTaskFactory {
-    private GenerationContext context;
-    private GenerationResults results;
-    private OCSANAStep algStep;
+public class PathFindingAlgorithmTaskFactory
+    extends AbstractTaskFactory {
+    private final ContextBundle contextBundle;
+    private final ResultsBundle resultsBundle;
+    private final OCSANAStep algStep;
 
-    public PathFindingAlgorithmTaskFactory (GenerationContext context,
-                                            GenerationResults results,
+    public PathFindingAlgorithmTaskFactory (ContextBundle contextBundle,
+                                            ResultsBundle resultsBundle,
                                             OCSANAStep algStep) {
         super();
-        this.context = context;
-        this.results = results;
+        Objects.requireNonNull(contextBundle, "Context bundle cannot be null");
+        this.contextBundle = contextBundle;
+
+        Objects.requireNonNull(resultsBundle, "Context results cannot be null");
+        this.resultsBundle = resultsBundle;
+
+        Objects.requireNonNull(algStep, "Algorithm step cannot be null");
         this.algStep = algStep;
     }
 
     @Override
     public TaskIterator createTaskIterator () {
         TaskIterator tasks = new TaskIterator();
-        tasks.append(new PathFindingAlgorithmTask(context, results, algStep));
+        tasks.append(new PathFindingAlgorithmTask(contextBundle, resultsBundle, algStep));
         return tasks;
     }
 }

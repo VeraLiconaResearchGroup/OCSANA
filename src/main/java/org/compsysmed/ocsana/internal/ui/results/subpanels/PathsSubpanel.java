@@ -9,7 +9,7 @@
  * details
  **/
 
-package org.compsysmed.ocsana.internal.ui.results;
+package org.compsysmed.ocsana.internal.ui.results.subpanels;
 
 // Java imports
 import java.util.*;
@@ -24,26 +24,26 @@ import javax.swing.JTextArea;
 import org.cytoscape.model.CyEdge;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
-import org.compsysmed.ocsana.internal.stages.generation.GenerationResults;
+import org.compsysmed.ocsana.internal.util.context.ContextBundle;
+import org.compsysmed.ocsana.internal.util.results.ResultsBundle;
 
-public class PathsPanel
+public class PathsSubpanel
     extends JPanel {
-    public PathsPanel (GenerationContext context,
-                       GenerationResults results,
+    public PathsSubpanel (ContextBundle contextBundle,
+                       ResultsBundle resultsBundle,
                        PathType pathType) {
         Collection<List<CyEdge>> paths;
         Double pathFindingTime;
 
         switch (pathType) {
         case TO_TARGETS:
-            paths = results.pathsToTargets;
-            pathFindingTime = results.pathsToTargetsExecutionSeconds;
+            paths = resultsBundle.getPathsToTargets();
+            pathFindingTime = resultsBundle.getPathsToTargetsExecutionSeconds();
             break;
 
         case TO_OFF_TARGETS:
-            paths = results.pathsToOffTargets;
-            pathFindingTime = results.pathsToOffTargetsExecutionSeconds;
+            paths = resultsBundle.getPathsToOffTargets();
+            pathFindingTime = resultsBundle.getPathsToOffTargetsExecutionSeconds();
             break;
 
         default:
@@ -53,7 +53,7 @@ public class PathsPanel
         if (paths != null) {
             List<String> pathLines = new ArrayList<>();
             for (List<CyEdge> path: paths) {
-                pathLines.add(context.pathString(path));
+                pathLines.add(contextBundle.pathString(path));
             }
 
             // Sort alphabetically

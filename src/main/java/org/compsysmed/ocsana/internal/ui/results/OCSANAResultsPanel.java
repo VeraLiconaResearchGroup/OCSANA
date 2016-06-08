@@ -11,6 +11,7 @@
 
 package org.compsysmed.ocsana.internal.ui.results;
 
+// Java imports
 import java.awt.Component;
 import java.awt.BorderLayout;
 
@@ -19,6 +20,8 @@ import java.awt.event.ActionListener;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+
+import java.util.*;
 
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
@@ -38,13 +41,12 @@ import org.cytoscape.application.swing.CytoPanelName;
 import org.cytoscape.application.swing.CytoPanelState;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
-import org.compsysmed.ocsana.internal.stages.generation.GenerationResults;
-
-import org.compsysmed.ocsana.internal.stages.prioritization.PrioritizationContext;
-import org.compsysmed.ocsana.internal.stages.prioritization.PrioritizationResults;
+import org.compsysmed.ocsana.internal.util.context.ContextBundle;
+import org.compsysmed.ocsana.internal.util.results.ResultsBundle;
 
 import org.compsysmed.ocsana.internal.util.results.ResultsReportManager;
+
+import org.compsysmed.ocsana.internal.ui.results.subpanels.*;
 
 /**
  * Panel to display OCSANA results
@@ -55,17 +57,14 @@ public class OCSANAResultsPanel
     private final CySwingApplication cySwingApplication;
     private final CytoPanel cyResultsPanel;
 
-    GenerationContext generationContext;
-    GenerationResults generationResults;
+    private ContextBundle contextBundle;
+    private ResultsBundle resultsBundle;
 
-    PrioritizationContext prioritizationContext;
-    PrioritizationResults prioritizationResults;
+    private ResultsReportManager resultsReportManager = new ResultsReportManager();
 
-    ResultsReportManager resultsReportManager = new ResultsReportManager();
-
-    JPanel resultsPanel;
-    JPanel operationsPanel;
-    JPanel buttonPanel;
+    private JPanel resultsPanel;
+    private JPanel operationsPanel;
+    private JPanel buttonPanel;
 
     /**
      * Constructor
@@ -84,30 +83,20 @@ public class OCSANAResultsPanel
     }
 
     /**
-     * Update the panel with the specified CI-stage results
+     * Update the panel with the specified results
      *
-     * @param generationContext  the CI stage context
-     * @param generationResults  the CI stage results to display
+     * @param contextBundle  the configuration context
+     * @param resultsBundle  the results
      **/
-    public void updateResults (GenerationContext generationContext,
-                               GenerationResults generationResults) {
-        this.generationContext = generationContext;
-        this.generationResults = generationResults;
+    public void update (ContextBundle contextBundle,
+                        ResultsBundle resultsBundle) {
+        Objects.requireNonNull(contextBundle, "Context bundle cannot be null");
+        this.contextBundle = contextBundle;
 
-        prioritizationContext = null;
-        prioritizationResults = null;
+        Objects.requireNonNull(resultsBundle, "Context results cannot be null");
+        this.resultsBundle = resultsBundle;
 
-        resultsReportManager.update(generationContext, generationResults);
-
-        rebuildPanels();
-    }
-
-    public void updateResults (PrioritizationContext prioritizationContext,
-                               PrioritizationResults prioritizationResults) {
-        this.prioritizationContext = prioritizationContext;
-        this.prioritizationResults = prioritizationResults;
-
-        resultsReportManager.update(prioritizationContext, prioritizationResults);
+        resultsReportManager.update(contextBundle, resultsBundle);
 
         rebuildPanels();
     }
@@ -222,7 +211,7 @@ public class OCSANAResultsPanel
     private JPanel getResultsPanel () {
         JPanel resultsPanel = new JPanel(new BorderLayout());
 
-        if (generationResults == null) {
+        if (resultsBundle == null) {
             return resultsPanel;
         }
 
@@ -230,19 +219,19 @@ public class OCSANAResultsPanel
         resultsPanel.add(resultsTabbedPane, BorderLayout.CENTER);
         resultsPanel.setBorder(null);
 
-        if (generationResults.CIs != null) {
-            UnscoredCIListPanel ciPanel = new UnscoredCIListPanel(generationContext, generationResults, cySwingApplication.getJFrame());
-            resultsTabbedPane.addTab("Optimal CIs", ciPanel);
+        if (resultsBundle.getCIs() != null) {
+            CIListSubpanel ciSubpanel = new CIListSubpanel(contextBundle, resultsBundle, cySwingApplication.getJFrame());
+            resultsTabbedPane.addTab("Optimal CIs", ciSubpanel);
         }
 
-        if (generationResults.pathsToTargets != null) {
-            PathsPanel targetPathsPanel = new PathsPanel(generationContext, generationResults, PathsPanel.PathType.TO_TARGETS);
-            resultsTabbedPane.addTab("Paths to targets", targetPathsPanel);
+        if (resultsBundle.getPathsToTargets() != null) {
+            PathsSubpanel targetPathsSubpanel = new PathsSubpanel(contextBundle, resultsBundle, PathsSubpanel.PathType.TO_TARGETS);
+            resultsTabbedPane.addTab("Paths to targets", targetPathsSubpanel);
         }
 
-        if (generationResults.pathsToOffTargets != null) {
-            PathsPanel targetPathsPanel = new PathsPanel(generationContext, generationResults, PathsPanel.PathType.TO_OFF_TARGETS);
-            resultsTabbedPane.addTab("Paths to Off-targets", targetPathsPanel);
+        if (resultsBundle.getPathsToOffTargets() != null) {
+            PathsSubpanel targetPathsSubpanel = new PathsSubpanel(contextBundle, resultsBundle, PathsSubpanel.PathType.TO_OFF_TARGETS);
+            resultsTabbedPane.addTab("Paths to Off-targets", targetPathsSubpanel);
         }
 
         return resultsPanel;

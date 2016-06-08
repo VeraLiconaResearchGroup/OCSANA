@@ -1,2 +1,0 @@
-{% block title %}--- Optimal cut sets report ---{% endblock %}
-{% block content %}{% endblock %}

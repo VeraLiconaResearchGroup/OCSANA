@@ -25,41 +25,44 @@ import org.cytoscape.model.CyEdge;
 import org.compsysmed.ocsana.internal.tasks.AbstractOCSANATask;
 import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
 
-import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
-import org.compsysmed.ocsana.internal.stages.generation.GenerationResults;
-
+import org.compsysmed.ocsana.internal.util.context.ContextBundle;
+import org.compsysmed.ocsana.internal.util.results.ResultsBundle;
 import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
 
 public class MHSAlgorithmTask extends AbstractOCSANATask {
     private static final OCSANAStep algStep = OCSANAStep.FIND_MHSES;
 
-    private GenerationContext generationContext;
-    private GenerationResults generationResults;
+    private final ContextBundle contextBundle;
+    private final ResultsBundle resultsBundle;
 
-    public MHSAlgorithmTask (GenerationContext generationContext,
-                             GenerationResults generationResults) {
-        super(generationContext.getNetwork());
-        this.generationContext = generationContext;
-        this.generationResults = generationResults;
+    public MHSAlgorithmTask (ContextBundle contextBundle,
+                             ResultsBundle resultsBundle) {
+        super(contextBundle.getNetwork());
+
+        Objects.requireNonNull(contextBundle, "Context bundle cannot be null");
+        this.contextBundle = contextBundle;
+
+        Objects.requireNonNull(resultsBundle, "Context results cannot be null");
+        this.resultsBundle = resultsBundle;
     }
 
     @Override
     public void run (TaskMonitor taskMonitor) {
-        if (generationResults.pathFindingCanceled) {
+        if (resultsBundle.pathFindingWasCanceled()) {
             return;
         }
 
         taskMonitor.setTitle("Minimal CIs");
 
-        Objects.requireNonNull(generationResults.pathsToTargets, "Paths to targets not set.");
+        Objects.requireNonNull(resultsBundle.getPathsToTargets(), "Paths to targets not set.");
 
-        taskMonitor.setStatusMessage(String.format("Converting %d paths to node sets.", generationResults.pathsToTargets.size()));
+        taskMonitor.setStatusMessage(String.format("Converting %d paths to node sets.", resultsBundle.getPathsToTargets().size()));
         Long preConversionTime = System.nanoTime();
         List<Set<CyNode>> nodeSets = new ArrayList<>();
-        Set<CyNode> sourceNodes = generationContext.getSourceNodes();
-        Set<CyNode> targetNodes = generationContext.getTargetNodes();
+        Set<CyNode> sourceNodes = contextBundle.getSourceNodes();
+        Set<CyNode> targetNodes = contextBundle.getTargetNodes();
 
-        for (List<CyEdge> path: generationResults.pathsToTargets) {
+        for (List<CyEdge> path: resultsBundle.getPathsToTargets()) {
             Set<CyNode> nodes = new HashSet<>();
 
             // Scan every edge in the path, adding its nodes as
@@ -70,12 +73,12 @@ public class MHSAlgorithmTask extends AbstractOCSANATask {
                 // Since we're using a Set, we don't have to worry
                 // about multiple addition, so we'll just go ahead and
                 // add the source and target every time
-                if (generationContext.getIncludeEndpointsInCIs() ||
+                if (contextBundle.getIncludeEndpointsInCIs() ||
                     (!sourceNodes.contains(edge.getSource()) && !targetNodes.contains(edge.getSource()))) {
                     nodes.add(edge.getSource());
                 }
 
-                if (generationContext.getIncludeEndpointsInCIs() ||
+                if (contextBundle.getIncludeEndpointsInCIs() ||
                     (!sourceNodes.contains(edge.getTarget()) && !targetNodes.contains(edge.getTarget()))) {
                     nodes.add(edge.getTarget());
                 }
@@ -90,18 +93,18 @@ public class MHSAlgorithmTask extends AbstractOCSANATask {
         Double conversionTime = (postConversionTime - preConversionTime) / 1E9;
         taskMonitor.setStatusMessage(String.format("Converted paths in %f s.", conversionTime));
 
-        taskMonitor.setStatusMessage(String.format("Finding minimal combinations of interventions (algorithm: %s).", generationContext.getMHSAlgorithm().shortName()));
+        taskMonitor.setStatusMessage(String.format("Finding minimal combinations of interventions (algorithm: %s).", contextBundle.getMHSAlgorithm().shortName()));
 
         Long preMHSTime = System.nanoTime();
-        Collection<Set<CyNode>> MHSes = generationContext.getMHSAlgorithm().MHSes(nodeSets);
+        Collection<Set<CyNode>> MHSes = contextBundle.getMHSAlgorithm().MHSes(nodeSets);
 
-        generationResults.CIs = MHSes.stream().map(mhs -> new CombinationOfInterventions(mhs, targetNodes, node -> generationContext.getNodeNameHandler().getNodeName(node))).collect(Collectors.toList());
+        resultsBundle.setCIs(MHSes.stream().map(mhs -> new CombinationOfInterventions(mhs, targetNodes, node -> contextBundle.getNodeNameHandler().getNodeName(node))).collect(Collectors.toList()));
         Long postMHSTime = System.nanoTime();
 
         Double mhsTime = (postMHSTime - preMHSTime) / 1E9;
-        taskMonitor.showMessage(TaskMonitor.Level.INFO, String.format("Found %d minimal CIs in %f s.", generationResults.CIs.size(), mhsTime));
+        taskMonitor.showMessage(TaskMonitor.Level.INFO, String.format("Found %d minimal CIs in %f s.", resultsBundle.getCIs().size(), mhsTime));
 
-        generationResults.mhsExecutionSeconds = mhsTime;
+        resultsBundle.setMHSExecutionSeconds(mhsTime);
     }
 
     @Override
@@ -110,14 +113,14 @@ public class MHSAlgorithmTask extends AbstractOCSANATask {
         if (type.isAssignableFrom(OCSANAStep.class)) {
             return (T) algStep;
         } else {
-            return (T) generationResults.CIs;
+            return (T) resultsBundle.getCIs();
         }
     }
 
     @Override
     public void cancel () {
         super.cancel();
-        generationContext.getMHSAlgorithm().cancel();
-        generationResults.mhsFindingCanceled = true;
+        contextBundle.getMHSAlgorithm().cancel();
+        resultsBundle.setMHSFindingWasCancelled();
     }
 }

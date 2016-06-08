@@ -35,7 +35,7 @@ public class ListNodeSetSelecter
     private JList<CyNode> nodeSetListField;
 
     public ListNodeSetSelecter (String label,
-                                Collection<CyNode> availableNodes,
+                                Set<CyNode> availableNodes,
                                 Set<CyNode> selectedNodes,
                                 NodeNameHandler nodeNameHandler) {
         super(label, availableNodes, selectedNodes, nodeNameHandler);
@@ -43,7 +43,7 @@ public class ListNodeSetSelecter
     }
 
     public ListNodeSetSelecter (String label,
-                                Collection<CyNode> availableNodes,
+                                Set<CyNode> availableNodes,
                                 NodeNameHandler nodeNameHandler) {
         super(label, availableNodes, nodeNameHandler);
         draw();
@@ -64,11 +64,27 @@ public class ListNodeSetSelecter
      * Build the JPanel after the constructors populate the data
      **/
     private void draw () {
+        removeAll();
+
+        nodeSetListField.setCellRenderer(new NodeListCellRenderer(nodeNameHandler));
+
         JLabel title = new JLabel(label);
         add(title);
 
         JScrollPane listPane = new JScrollPane(nodeSetListField);
         add(listPane);
+
+        revalidate();
+        repaint();
+    }
+
+    @Override
+    protected void handleAvailableNodesUpdate () {
+        CyNode[] availableNodesArray = getAvailableNodes().toArray(new CyNode[0]);
+        nodeSetListField = new JList<>(availableNodesArray);
+        nodeSetListField.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+
+        draw();
     }
 
     @Override
@@ -78,14 +94,7 @@ public class ListNodeSetSelecter
 
     @Override
     public void setSelectedNodes (Set<CyNode> selectedNodes) {
-        // Build selecter if needed
-        if (nodeSetListField == null) {
-            nodeSetListField = new JList<>(availableNodes.toArray(new CyNode[availableNodes.size()]));
-            nodeSetListField.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        }
-
-        // Install cell renderer to show correct names
-        nodeSetListField.setCellRenderer(new NodeListCellRenderer(nodeNameHandler));
+        Objects.requireNonNull(selectedNodes, "Set of selected nodes cannot be empty");
 
         // Select specified nodes
         nodeSetListField.clearSelection();

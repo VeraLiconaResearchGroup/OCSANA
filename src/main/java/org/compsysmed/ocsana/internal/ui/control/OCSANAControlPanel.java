@@ -16,7 +16,10 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import java.util.*;
+
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.Icon;
 
@@ -34,43 +37,65 @@ import org.cytoscape.application.swing.CytoPanel;
 import org.cytoscape.application.swing.CytoPanelComponent;
 import org.cytoscape.application.swing.CytoPanelName;
 
-import org.cytoscape.util.swing.BasicCollapsiblePanel;
-
 // OCSANA imports
-import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
-import org.compsysmed.ocsana.internal.stages.generation.GenerationResults;
+import org.compsysmed.ocsana.internal.tasks.runner.RunnerTaskFactory;
+
+import org.compsysmed.ocsana.internal.util.context.ContextBundle;
+import org.compsysmed.ocsana.internal.util.context.ContextBundleBuilder;
+import org.compsysmed.ocsana.internal.util.results.ResultsBundle;
 
 import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
+
+import org.compsysmed.ocsana.internal.ui.control.subpanels.*;
 
 /**
  * Panel to configure and run OCSANA
  **/
 public class OCSANAControlPanel
     extends JPanel
-    implements CytoPanelComponent, SetCurrentNetworkListener, ActionListener {
-    private CyApplicationManager cyApplicationManager;
-    private PanelTaskManager panelTaskManager;
-    private CytoPanel cyControlPanel;
-    private OCSANAResultsPanel resultsPanel;
+    implements CytoPanelComponent, SetCurrentNetworkListener {
+    // Cytoscape pieces and parts
+    private final CyApplicationManager cyApplicationManager;
+    private final PanelTaskManager panelTaskManager;
+    private final CytoPanel cyControlPanel;
 
-    private BasicCollapsiblePanel ciCollapsible;
-    private GenerationStageControlPanel generationControlPanel;
+    // Other parts of OCSANA
+    private final OCSANAResultsPanel resultsPanel;
 
-    private BasicCollapsiblePanel prioritizationCollapsible;
-    private PrioritizationStageControlPanel prioritizationControlPanel;
-    Boolean prioritizationPanelLocked = true;
+    // Internal data
+    private ContextBundleBuilder contextBundleBuilder;
+    private ResultsBundle resultsBundle;
 
+    // UI elements
+    private Collection<AbstractControlSubpanel> subpanels;
+    private NetworkConfigurationSubpanel networkConfigSubpanel;
+    private PathFindingSubpanel pathFindingSubpanel;
+    private MHSSubpanel mhsSubpanel;
+    private TargetActivationSubpanel targetSubpanel;
+
+    /**
+     * Constructor
+     **/
     public OCSANAControlPanel (CyApplicationManager cyApplicationManager,
-                               CySwingApplication cySwingApplication,
+                               CytoPanel cyControlPanel,
                                OCSANAResultsPanel resultsPanel,
                                PanelTaskManager panelTaskManager) {
         super();
+
+        Objects.requireNonNull(cyApplicationManager, "Cytoscape application manager cannot be null");
+        this.cyApplicationManager = cyApplicationManager;
+
+        Objects.requireNonNull(cyControlPanel, "Cytoscape control panel cannot be null");
+        this.cyControlPanel = cyControlPanel;
+
+        Objects.requireNonNull(resultsPanel, "Results panel cannot be null");
         this.resultsPanel = resultsPanel;
+
+        Objects.requireNonNull(panelTaskManager, "Panel task manager cannot be null");
         this.panelTaskManager = panelTaskManager;
-        this.cyControlPanel = cySwingApplication.getCytoPanel(getCytoPanelName());
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        buildPanel(cyApplicationManager.getCurrentNetwork());
+        handleNewNetwork(cyApplicationManager.getCurrentNetwork());
     }
 
     /**
@@ -78,7 +103,23 @@ public class OCSANAControlPanel
      **/
     @Override
     public void handleEvent (SetCurrentNetworkEvent e) {
-        CyNetwork network = e.getNetwork();
+        handleNewNetwork(e.getNetwork());
+    }
+
+    /**
+     * (Re)build the panel to reflect a specified network
+     *
+     * @param network  the network
+     **/
+    private void handleNewNetwork (CyNetwork network) {
+        if (network == null) {
+            return;
+        }
+
+        contextBundleBuilder = new ContextBundleBuilder(network);
+
+        subpanels = new ArrayList<>();
+
         resultsPanel.reset();
         buildPanel(network);
     }
@@ -90,50 +131,83 @@ public class OCSANAControlPanel
             return;
         }
 
-        ciCollapsible = new BasicCollapsiblePanel("1: Find CIs");
-        ciCollapsible.setCollapsed(false);
-        add(ciCollapsible);
+        JPanel tunablePanel = getContextBundleBuilderPanel();
+        add(tunablePanel);
 
-        generationControlPanel = new GenerationStageControlPanel(network, resultsPanel, panelTaskManager);
-        generationControlPanel.addActionListener(this);
-        ciCollapsible.add(generationControlPanel);
+        JButton runButton = new JButton("Run OCSANA calculations");
+        add(runButton);
 
-        prioritizationCollapsible = new BasicCollapsiblePanel("2: Score and compare CIs");
-        prioritizationCollapsible.addCollapseListener(new BasicCollapsiblePanel.CollapseListener(){
+        runButton.addActionListener(new ActionListener() {
                 @Override
-                public void collapsed () {}
-                @Override
-                public void expanded () {
-                    if (prioritizationPanelLocked) {
-                        prioritizationCollapsible.setCollapsed(true);
-                    }
+                public void actionPerformed (ActionEvent e) {
+                    runTask();
                 }
             });
-        add(prioritizationCollapsible);
-
-
-        prioritizationControlPanel = new PrioritizationStageControlPanel(network, resultsPanel, panelTaskManager);
-        prioritizationControlPanel.addActionListener(this);
-        prioritizationCollapsible.add(prioritizationControlPanel);
 
         revalidate();
         repaint();
     }
 
     /**
-     * Put the prioritization subpanel in "locked" state so user cannot access it
+     * Retrieve the ContextBundle corresponding to the current
+     * settings in the UI
      **/
-    private void lockPrioritizationCollapsible () {
-        prioritizationPanelLocked = true;
-        prioritizationCollapsible.setCollapsed(true);
+    public ContextBundle getContextBundle () {
+        updateContextBundleBuilder();
+        return contextBundleBuilder.getContextBundle();
     }
 
     /**
-     * Put the prioritization subpanel in "unlocked" state so user can access it
+     * Update the ContextBundleBuilder with the latest changes in the UI
      **/
-    private void unlockPrioritizationCollapsible () {
-        prioritizationPanelLocked = false;
-        prioritizationCollapsible.setCollapsed(false);
+    public void updateContextBundleBuilder () {
+        for (AbstractControlSubpanel subpanel: subpanels) {
+            subpanel.updateContextBuilder();
+        }
+    }
+
+    /**
+     * Retrieve the results of the run if available
+     *
+     * @return the results (or null if there has been no run with the
+     * current settings)
+     **/
+    public ResultsBundle getResultsBundle () {
+        return resultsBundle;
+    }
+
+    /**
+     * Build a panel with the UI elements for the ContextBundleBuilder
+     **/
+    private JPanel getContextBundleBuilderPanel () {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
+        networkConfigSubpanel = new NetworkConfigurationSubpanel(this, contextBundleBuilder, panelTaskManager);
+        panel.add(networkConfigSubpanel);
+        subpanels.add(networkConfigSubpanel);
+
+        pathFindingSubpanel = new PathFindingSubpanel(this, contextBundleBuilder, panelTaskManager);
+        panel.add(pathFindingSubpanel);
+        subpanels.add(pathFindingSubpanel);
+
+        mhsSubpanel = new MHSSubpanel(this, contextBundleBuilder, panelTaskManager);
+        panel.add(mhsSubpanel);
+        subpanels.add(mhsSubpanel);
+
+        targetSubpanel = new TargetActivationSubpanel(this, contextBundleBuilder, panelTaskManager);
+        panel.add(targetSubpanel);
+        subpanels.add(targetSubpanel);
+
+        return panel;
+    }
+
+    /**
+     * Launch the task
+     **/
+    private void runTask () {
+        RunnerTaskFactory runnerTaskFactory = new RunnerTaskFactory(panelTaskManager, getContextBundle(), resultsPanel);
+        panelTaskManager.execute(runnerTaskFactory.createTaskIterator());
     }
 
     // Helper functions to get information about the panel
@@ -167,31 +241,5 @@ public class OCSANAControlPanel
     @Override
     public Icon getIcon() {
         return null;
-    }
-
-    /**
-     * Respond to an event
-     **/
-    @Override
-    public void actionPerformed (ActionEvent event) {
-        switch (event.getActionCommand()) {
-        case GenerationStageControlPanel.START_CI_SIGNAL:
-            lockPrioritizationCollapsible();
-            break;
-
-        case GenerationStageControlPanel.END_CI_SIGNAL:
-            GenerationContext generationContext = generationControlPanel.getContext();
-            GenerationResults generationResults = generationControlPanel.getResults();
-            prioritizationControlPanel.populatePanel(generationContext, generationResults);
-            unlockPrioritizationCollapsible();
-            break;
-
-        case PrioritizationStageControlPanel.END_SIGN_ASSIGNMENT_SIGNAL:
-            // Currently, do nothing
-            break;
-
-        default:
-            throw new IllegalStateException(String.format("Unknown event %s heard by OCSANA control panel", event.paramString()));
-        }
     }
 }

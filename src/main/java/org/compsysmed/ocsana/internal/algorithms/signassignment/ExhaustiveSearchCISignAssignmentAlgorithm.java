@@ -14,6 +14,7 @@ package org.compsysmed.ocsana.internal.algorithms.signassignment;
 // Java imports
 import java.util.*;
 import java.util.function.*;
+
 // la4j imports
 import org.la4j.Vector;
 import org.la4j.vector.dense.BasicVector;
@@ -21,6 +22,8 @@ import org.la4j.vector.dense.BasicVector;
 import org.cytoscape.model.CyNode;
 
 // OCSANA imports
+import org.compsysmed.ocsana.internal.util.context.ContextBundleBuilder;
+
 import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
 import org.compsysmed.ocsana.internal.util.results.SignedIntervention;
 
@@ -40,22 +43,21 @@ public class ExhaustiveSearchCISignAssignmentAlgorithm
     public static final String NAME = "CI sign testing";
     public static final String SHORTNAME = "CI-sign";
 
-    private BiFunction<CyNode, CyNode, Double> effectOnTarget;
-    private Boolean paretoOptimalOnly;
+    private final ContextBundleBuilder contextBundleBuilder;
+    private final Boolean paretoOptimalOnly;
 
     /**
      * Constructor
      *
-     * @param effectOnTarget function which computes for a pair of
-     * CyNodes (source, target) the EFFECT_ON_TARGETS score of source
-     * on target
+     * @param contextBundleBuilder  the builder for the configuration context
      * @param paretoOptimalOnly if true, filter out sign assignments
      * which are sub-optimal by total effect score (NOTE: this may be
      * expensive if the original set is large)
      **/
-    public ExhaustiveSearchCISignAssignmentAlgorithm (BiFunction<CyNode, CyNode, Double> effectOnTarget,
+    // TODO: Fix this very silly signature
+    public ExhaustiveSearchCISignAssignmentAlgorithm (ContextBundleBuilder contextBundleBuilder,
                                                       Boolean paretoOptimalOnly) {
-        this.effectOnTarget = effectOnTarget;
+        this.contextBundleBuilder = contextBundleBuilder;
         this.paretoOptimalOnly = paretoOptimalOnly;
     }
 
@@ -64,14 +66,12 @@ public class ExhaustiveSearchCISignAssignmentAlgorithm
      * <p>
      * Sets {@code paretoOptimalOnly} true
      *
-     * @see #ExhaustiveSearchCISignAssignmentAlgorithm(BiFunction, Boolean)
+     * @see #ExhaustiveSearchCISignAssignmentAlgorithm(ContextBundleBuilder)
      *
-     * @param effectOnTarget function which computes for a pair of
-     * CyNodes (source, target) the EFFECT_ON_TARGETS score of source
-     * on target
+     * @param contextBundleBuilder  the builder for the configuration context
      **/
-    public ExhaustiveSearchCISignAssignmentAlgorithm (BiFunction<CyNode, CyNode, Double> effectOnTarget) {
-        this(effectOnTarget, true);
+    public ExhaustiveSearchCISignAssignmentAlgorithm (ContextBundleBuilder contextBundleBuilder) {
+        this(contextBundleBuilder, true);
     }
 
     /**
@@ -88,9 +88,9 @@ public class ExhaustiveSearchCISignAssignmentAlgorithm
         // Generate a signed EFFECT_ON_TARGETS function
         BiFunction<CyNode, CyNode, Double> signedEffectOnTarget = (source, target) -> {
             if (targetsToActivate.contains(target)) {
-                return effectOnTarget.apply(source, target);
+                return contextBundleBuilder.getOCSANAAlgorithm().effectOnTargetsScore(source, target);
             } else {
-                return -effectOnTarget.apply(source, target);
+                return -contextBundleBuilder.getOCSANAAlgorithm().effectOnTargetsScore(source, target);
             }
         };
 

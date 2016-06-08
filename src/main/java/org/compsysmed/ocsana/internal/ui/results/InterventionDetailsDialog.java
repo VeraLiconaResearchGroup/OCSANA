@@ -23,7 +23,7 @@ import org.cytoscape.model.CyNetwork;
 // OCSANA improts
 import org.compsysmed.ocsana.internal.ui.OCSANADialog;
 
-import org.compsysmed.ocsana.internal.ui.results.panels.*;
+import org.compsysmed.ocsana.internal.ui.results.subpanels.*;
 
 import org.compsysmed.ocsana.internal.util.results.*;
 
@@ -41,8 +41,8 @@ public class InterventionDetailsDialog
 
     // UI elements
     private JPanel contentPanel;
-    private SignedInterventionReportPanel signedInterventionPanel;
-    private DrugabilityReportPanel drugabilityPanel;
+    private SignedInterventionReportSubpanel signedInterventionPanel;
+    private DrugabilityReportSubpanel drugabilityPanel;
 
     /**
      * Constructor
@@ -72,7 +72,7 @@ public class InterventionDetailsDialog
         add(contentPanel);
         add(getButtonPanel());
 
-        signedInterventionPanel = new SignedInterventionReportPanel(this);
+        signedInterventionPanel = new SignedInterventionReportSubpanel(this);
         contentPanel.add(signedInterventionPanel);
 
         if (signedInterventions != null && !signedInterventions.isEmpty()) {
@@ -92,7 +92,7 @@ public class InterventionDetailsDialog
      **/
     public void processNodeClick (SignedInterventionNode signedNode) {
         if (drugabilityPanel == null) {
-            drugabilityPanel = new DrugabilityReportPanel();
+            drugabilityPanel = new DrugabilityReportSubpanel();
             contentPanel.add(drugabilityPanel);
         }
 

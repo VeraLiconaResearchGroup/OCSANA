@@ -21,8 +21,8 @@ import org.cytoscape.work.TaskMonitor;
 import org.compsysmed.ocsana.internal.tasks.AbstractOCSANATask;
 import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
 
-import org.compsysmed.ocsana.internal.stages.prioritization.PrioritizationContext;
-import org.compsysmed.ocsana.internal.stages.prioritization.PrioritizationResults;
+import org.compsysmed.ocsana.internal.util.context.ContextBundle;
+import org.compsysmed.ocsana.internal.util.results.ResultsBundle;
 
 import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
 import org.compsysmed.ocsana.internal.util.results.SignedIntervention;
@@ -31,18 +31,18 @@ public class SignAssignmentAlgorithmTask
     extends AbstractOCSANATask {
     private static final OCSANAStep algStep = OCSANAStep.ASSIGN_CI_SIGNS;
 
-    private final PrioritizationContext prioritizationContext;
-    private final PrioritizationResults prioritizationResults;
+    private final ContextBundle contextBundle;
+    private final ResultsBundle resultsBundle;
 
-    public SignAssignmentAlgorithmTask (PrioritizationContext prioritizationContext,
-                                        PrioritizationResults prioritizationResults) {
-        super(prioritizationContext.getGenerationContext().getNetwork());
+    public SignAssignmentAlgorithmTask (ContextBundle contextBundle,
+                                        ResultsBundle resultsBundle) {
+        super(contextBundle.getNetwork());
 
-        Objects.requireNonNull(prioritizationContext, "Prioritization context cannot be null");
-        this.prioritizationContext = prioritizationContext;
+        Objects.requireNonNull(contextBundle, "Context bundle cannot be null");
+        this.contextBundle = contextBundle;
 
-        Objects.requireNonNull(prioritizationResults, "Prioritization results cannot be null");
-        this.prioritizationResults = prioritizationResults;
+        Objects.requireNonNull(resultsBundle, "Context results cannot be null");
+        this.resultsBundle = resultsBundle;
     }
 
     @Override
@@ -51,13 +51,13 @@ public class SignAssignmentAlgorithmTask
 
         Long preTime = System.nanoTime();
 
-        for (CombinationOfInterventions ci: prioritizationContext.getGenerationResults().CIs) {
+        for (CombinationOfInterventions ci: resultsBundle.getCIs()) {
             if (cancelled) {
                 break;
             }
 
-            Collection<SignedIntervention> optimalSignings = prioritizationContext.getCISignAlgorithm().bestInterventions(ci, prioritizationContext.getTargetsToActivate());
-            prioritizationResults.setOptimalInterventionSignings(ci, optimalSignings);
+            Collection<SignedIntervention> optimalSignings = contextBundle.getCISignAlgorithm().bestInterventions(ci, contextBundle.getTargetsToActivate());
+            resultsBundle.setOptimalInterventionSignings(ci, optimalSignings);
         }
         Long postTime = System.nanoTime();
 
@@ -72,13 +72,13 @@ public class SignAssignmentAlgorithmTask
         if (type.isAssignableFrom(OCSANAStep.class)) {
             return (T) algStep;
         } else {
-            return (T) prioritizationResults;
+            return (T) resultsBundle;
         }
     }
 
     @Override
     public void cancel () {
         super.cancel();
-        prioritizationContext.getCISignAlgorithm().cancel();
+        contextBundle.getCISignAlgorithm().cancel();
     }
 }

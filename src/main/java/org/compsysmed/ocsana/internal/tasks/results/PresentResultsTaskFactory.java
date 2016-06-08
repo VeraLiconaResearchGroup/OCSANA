@@ -11,6 +11,9 @@
 
 package org.compsysmed.ocsana.internal.tasks.results;
 
+// Java imports
+import java.util.*;
+
 // Cytoscape imports
 import org.cytoscape.work.AbstractTaskFactory;
 import org.cytoscape.work.TaskIterator;
@@ -18,27 +21,32 @@ import org.cytoscape.work.TaskIterator;
 // OCSANA imports
 import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
 
-import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
-import org.compsysmed.ocsana.internal.stages.generation.GenerationResults;
+import org.compsysmed.ocsana.internal.util.context.ContextBundle;
+import org.compsysmed.ocsana.internal.util.results.ResultsBundle;
 
-public class PresentResultsTaskFactory extends AbstractTaskFactory {
-    private GenerationContext generationContext;
-    private GenerationResults generationResults;
+public class PresentResultsTaskFactory
+    extends AbstractTaskFactory {
+    private final ContextBundle contextBundle;
+    private final ResultsBundle resultsBundle;
+    private final OCSANAResultsPanel resultsPanel;
 
-    private OCSANAResultsPanel resultsPanel;
-
-    public PresentResultsTaskFactory (GenerationContext generationContext,
-                                      GenerationResults generationResults,
+    public PresentResultsTaskFactory (ContextBundle contextBundle,
+                                      ResultsBundle resultsBundle,
                                       OCSANAResultsPanel resultsPanel) {
-        this.generationContext = generationContext;
-        this.generationResults = generationResults;
+        Objects.requireNonNull(contextBundle, "Context bundle cannot be null");
+        this.contextBundle = contextBundle;
+
+        Objects.requireNonNull(resultsBundle, "Context results cannot be null");
+        this.resultsBundle = resultsBundle;
+
+        Objects.requireNonNull(resultsPanel, "Results panel cannot be null");
         this.resultsPanel = resultsPanel;
     }
 
     @Override
     public TaskIterator createTaskIterator () {
         TaskIterator tasks = new TaskIterator();
-        tasks.append(new PresentResultsTask(generationContext, generationResults, resultsPanel));
+        tasks.append(new PresentResultsTask(contextBundle, resultsBundle, resultsPanel));
         return tasks;
     }
 }

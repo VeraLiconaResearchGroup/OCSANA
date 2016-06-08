@@ -9,7 +9,7 @@
  * details
  **/
 
-package org.compsysmed.ocsana.internal.ui.results.panels;
+package org.compsysmed.ocsana.internal.ui.results.subpanels;
 
 // Java imports
 import java.io.*;
@@ -37,10 +37,10 @@ import org.compsysmed.ocsana.internal.util.results.*;
  * Panel presenting details of a Signed Intervention
  * <p>
  * NOTE: this panel does <em>not</em> display information about any
- * the underlying CombinationOfInterventions. Use InterventionReportPanel for
+ * the underlying CombinationOfInterventions. Use InterventionReportSubpanel for
  * that.
  **/
-public class SignedInterventionReportPanel
+public class SignedInterventionReportSubpanel
     extends JPanel {
     private InterventionDetailsDialog parentDialog;
     private SignedIntervention signedIntervention;
@@ -53,7 +53,7 @@ public class SignedInterventionReportPanel
      *
      * @param parentDialog  the parent dialog of this panel
      **/
-    public SignedInterventionReportPanel (InterventionDetailsDialog parentDialog) {
+    public SignedInterventionReportSubpanel (InterventionDetailsDialog parentDialog) {
         this.parentDialog = parentDialog;
         this.signedIntervention = signedIntervention;
 

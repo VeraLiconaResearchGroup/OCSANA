@@ -20,9 +20,8 @@ import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
 
 import java.util.Objects;
 
-import org.compsysmed.ocsana.internal.stages.prioritization.PrioritizationContext;
-import org.compsysmed.ocsana.internal.stages.prioritization.PrioritizationResults;
-
+import org.compsysmed.ocsana.internal.util.context.ContextBundle;
+import org.compsysmed.ocsana.internal.util.results.ResultsBundle;
 import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
 import org.compsysmed.ocsana.internal.util.results.SignedIntervention;
 
@@ -30,18 +29,18 @@ public class SignedInterventionScoringAlgorithmTask
     extends AbstractOCSANATask {
     private static final OCSANAStep algStep = OCSANAStep.SCORE_SIGNED_INTERVENTIONS;
 
-    private final PrioritizationContext prioritizationContext;
-    private final PrioritizationResults prioritizationResults;
+    private final ContextBundle contextBundle;
+    private final ResultsBundle resultsBundle;
 
-    public SignedInterventionScoringAlgorithmTask (PrioritizationContext prioritizationContext,
-                                                   PrioritizationResults prioritizationResults) {
-        super(prioritizationContext.getGenerationContext().getNetwork());
+    public SignedInterventionScoringAlgorithmTask (ContextBundle contextBundle,
+                                                   ResultsBundle resultsBundle) {
+        super(contextBundle.getNetwork());
 
-        Objects.requireNonNull(prioritizationContext, "Prioritization context cannot be null");
-        this.prioritizationContext = prioritizationContext;
+        Objects.requireNonNull(contextBundle, "Context bundle cannot be null");
+        this.contextBundle = contextBundle;
 
-        Objects.requireNonNull(prioritizationResults, "Prioritization results cannot be null");
-        this.prioritizationResults = prioritizationResults;
+        Objects.requireNonNull(resultsBundle, "Results bundle cannot be null");
+        this.resultsBundle = resultsBundle;
     }
 
     @Override
@@ -49,18 +48,18 @@ public class SignedInterventionScoringAlgorithmTask
         taskMonitor.setTitle("Scoring signed interventions");
 
         Long preTime = System.nanoTime();
-        for (CombinationOfInterventions ci: prioritizationContext.getGenerationResults().CIs) {
+        for (CombinationOfInterventions ci: resultsBundle.getCIs()) {
             if (cancelled) {
                 break;
             }
 
-            for (SignedIntervention si: prioritizationResults.getOptimalInterventionSignings(ci)) {
+            for (SignedIntervention si: resultsBundle.getOptimalInterventionSignings(ci)) {
                 if (cancelled) {
                     break;
                 }
 
-                Double siScore = prioritizationContext.getSIScoringAlgorithm().computePriorityScore(si);
-                prioritizationResults.setSignedInterventionScore(si, siScore);
+                Double siScore = contextBundle.getSIScoringAlgorithm().computePriorityScore(si);
+                resultsBundle.setSignedInterventionScore(si, siScore);
             }
         }
         Long postTime = System.nanoTime();
@@ -76,13 +75,13 @@ public class SignedInterventionScoringAlgorithmTask
         if (type.isAssignableFrom(OCSANAStep.class)) {
             return (T) algStep;
         } else {
-            return (T) prioritizationResults;
+            return (T) resultsBundle;
         }
     }
 
     @Override
     public void cancel () {
         super.cancel();
-        prioritizationContext.getCISignAlgorithm().cancel();
+        contextBundle.getCISignAlgorithm().cancel();
     }
 }

@@ -9,7 +9,7 @@
  * details
  **/
 
-package org.compsysmed.ocsana.internal.ui.results.panels;
+package org.compsysmed.ocsana.internal.ui.results.subpanels;
 
 // Java imports
 import java.io.*;
@@ -42,7 +42,7 @@ import org.compsysmed.ocsana.internal.util.science.*;
  * the underlying CombinationOfInterventions. Use InterventionDisplayPanel for
  * that.
  **/
-public class DrugabilityReportPanel
+public class DrugabilityReportSubpanel
     extends JPanel {
     private JTextPane textPane;
     private PebbleTemplate compiledTemplate;
@@ -50,7 +50,7 @@ public class DrugabilityReportPanel
     /**
      * Constructor
      **/
-    public DrugabilityReportPanel () {
+    public DrugabilityReportSubpanel () {
         // Set up dialog
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 

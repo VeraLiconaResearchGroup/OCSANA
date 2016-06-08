@@ -1,5 +1,5 @@
 /**
- * Panel configuring path-finding algorithm in OCSANA CI stage
+ * Subpanel configuring MHS algorithm
  *
  * Copyright Vera-Licona Research Group (C) 2016
  *
@@ -9,7 +9,7 @@
  * details
  **/
 
-package org.compsysmed.ocsana.internal.ui.control.panels;
+package org.compsysmed.ocsana.internal.ui.control.subpanels;
 
 // Java imports
 import java.util.*;
@@ -18,6 +18,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.BoxLayout;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -26,40 +27,46 @@ import javax.swing.JPanel;
 import org.cytoscape.work.swing.PanelTaskManager;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.algorithms.path.*;
+import org.compsysmed.ocsana.internal.algorithms.mhs.*;
 
-import org.compsysmed.ocsana.internal.stages.generation.GenerationContextBuilder;
+import org.compsysmed.ocsana.internal.ui.control.OCSANAControlPanel;
+
+import org.compsysmed.ocsana.internal.util.context.ContextBundleBuilder;
 
 /**
- * Subpanel for user configuration of path-finding algorithm
+ * Subpanel for user configuration of MHS algorithm
  **/
-public class PathFindingAlgorithmPanel
-    extends AbstractControlSubPanel
+public class MHSSubpanel
+    extends AbstractControlSubpanel
     implements ActionListener {
-    private GenerationContextBuilder generationContextBuilder;
+    private ContextBundleBuilder contextBundleBuilder;
     private PanelTaskManager taskManager;
 
     // UI elements
     private JPanel algSelectionPanel;
-    private JComboBox<AbstractPathFindingAlgorithm> algorithmSelecter;
+    private JComboBox<AbstractMHSAlgorithm> algorithmSelecter;
+    private JCheckBox includeEndpointsInCIs;
 
     private JPanel tunablePanel;
 
     /**
      * Constructor
      *
-     * @param generationContextBuilder  the context for the CI stage
+     * @param contextBundleBuilder  the context bundle builder
      * @param taskManager  a PanelTaskManager to provide @Tunable panels
      **/
-    public PathFindingAlgorithmPanel (GenerationContextBuilder generationContextBuilder,
-                                      PanelTaskManager taskManager) {
+    public MHSSubpanel (OCSANAControlPanel controlPanel,
+                        ContextBundleBuilder contextBundleBuilder,
+                        PanelTaskManager taskManager) {
+        super(controlPanel);
+
         // Initial setup
-        this.generationContextBuilder = generationContextBuilder;
+        this.contextBundleBuilder = contextBundleBuilder;
         this.taskManager = taskManager;
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        add(makeHeader("Configure path-finding"));
+        add(makeHeader("Configure CI discovery"));
 
         // Algorithm selecter
         algSelectionPanel = new JPanel();
@@ -67,13 +74,18 @@ public class PathFindingAlgorithmPanel
 
         algSelectionPanel.add(new JLabel("Algorithm:"));
 
-        List<AbstractPathFindingAlgorithm> algorithms = new ArrayList<>();
-        algorithms.add(new AllNonSelfIntersectingPathsAlgorithm(generationContextBuilder.getNetwork()));
-        algorithms.add(new ShortestPathsAlgorithm(generationContextBuilder.getNetwork()));
+        List<AbstractMHSAlgorithm> algorithms = new ArrayList<>();
+        algorithms.add(new MMCSAlgorithm());
+        algorithms.add(new RSAlgorithm());
+        algorithms.add(new BergeAlgorithm());
 
-        algorithmSelecter = new JComboBox<>(algorithms.toArray(new AbstractPathFindingAlgorithm[algorithms.size()]));
+        algorithmSelecter = new JComboBox<>(algorithms.toArray(new AbstractMHSAlgorithm[algorithms.size()]));
         algSelectionPanel.add(algorithmSelecter);
         algorithmSelecter.addActionListener(this);
+
+        // CI configuration
+        includeEndpointsInCIs = new JCheckBox("Allow sources and targets in CIs", contextBundleBuilder.getIncludeEndpointsInCIs());
+        add(includeEndpointsInCIs);
 
         // Algorithm configuration panel
         tunablePanel = new JPanel();
@@ -91,8 +103,8 @@ public class PathFindingAlgorithmPanel
         tunablePanel.repaint();
     }
 
-    private AbstractPathFindingAlgorithm getAlgorithm () {
-        return (AbstractPathFindingAlgorithm) algorithmSelecter.getSelectedItem();
+    private AbstractMHSAlgorithm getAlgorithm () {
+        return (AbstractMHSAlgorithm) algorithmSelecter.getSelectedItem();
     }
 
     @Override
@@ -102,6 +114,7 @@ public class PathFindingAlgorithmPanel
 
     @Override
     public void updateContextBuilder () {
-        generationContextBuilder.setPathFindingAlgorithm(getAlgorithm());
+        contextBundleBuilder.setIncludeEndpointsInCIs(includeEndpointsInCIs.isSelected());
+        contextBundleBuilder.setMHSAlgorithm(getAlgorithm());
     }
 }

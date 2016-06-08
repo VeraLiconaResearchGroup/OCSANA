@@ -11,6 +11,9 @@
 
 package org.compsysmed.ocsana.internal.tasks.results;
 
+// Java imports
+import java.util.*;
+
 // Cytoscape imports
 import org.cytoscape.work.TaskMonitor;
 
@@ -20,31 +23,40 @@ import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
 
 import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
 
-import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
-import org.compsysmed.ocsana.internal.stages.generation.GenerationResults;
+import org.compsysmed.ocsana.internal.util.context.ContextBundle;
+import org.compsysmed.ocsana.internal.util.results.ResultsBundle;
 
-public class PresentResultsTask extends AbstractOCSANATask {
+public class PresentResultsTask
+    extends AbstractOCSANATask {
     private static final OCSANAStep algStep = OCSANAStep.PRESENT_RESULTS;
-    private GenerationContext generationContext;
-    private GenerationResults generationResults;
-    private OCSANAResultsPanel resultsPanel;
+    private final ContextBundle contextBundle;
+    private final ResultsBundle resultsBundle;
+    private final OCSANAResultsPanel resultsPanel;
 
-    public PresentResultsTask (GenerationContext generationContext,
-                               GenerationResults generationResults,
+    public PresentResultsTask (ContextBundle contextBundle,
+                               ResultsBundle resultsBundle,
                                OCSANAResultsPanel resultsPanel) {
-        super(generationContext.getNetwork());
-        this.generationContext = generationContext;
-        this.generationResults = generationResults;
+        super(contextBundle.getNetwork());
+
+        Objects.requireNonNull(contextBundle, "Context bundle cannot be null");
+        this.contextBundle = contextBundle;
+
+        Objects.requireNonNull(resultsBundle, "Context results cannot be null");
+        this.resultsBundle = resultsBundle;
+
+        Objects.requireNonNull(resultsPanel, "Results panel cannot be null");
         this.resultsPanel = resultsPanel;
     }
 
     @Override
     public void run (TaskMonitor taskMonitor) {
+        Objects.requireNonNull(taskMonitor, "Task monitor cannot be null");
+
         taskMonitor.setTitle("Results");
 
         taskMonitor.setStatusMessage("Generating results report.");
 
-        resultsPanel.updateResults(generationContext, generationResults);
+        resultsPanel.update(contextBundle, resultsBundle);
     }
 
     @Override

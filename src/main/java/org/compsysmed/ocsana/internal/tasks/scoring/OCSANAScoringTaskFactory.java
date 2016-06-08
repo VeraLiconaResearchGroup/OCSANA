@@ -11,28 +11,35 @@
 
 package org.compsysmed.ocsana.internal.tasks.scoring;
 
+// Java imports
+import java.util.*;
+
 // Cytoscape imports
 import org.cytoscape.work.AbstractTaskFactory;
 import org.cytoscape.work.TaskIterator;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
-import org.compsysmed.ocsana.internal.stages.generation.GenerationResults;
+import org.compsysmed.ocsana.internal.util.context.ContextBundle;
+import org.compsysmed.ocsana.internal.util.results.ResultsBundle;
 
-public class OCSANAScoringTaskFactory extends AbstractTaskFactory {
-    private GenerationContext context;
-    private GenerationResults results;
+public class OCSANAScoringTaskFactory
+    extends AbstractTaskFactory {
+    private final ContextBundle contextBundle;
+    private final ResultsBundle resultsBundle;
 
-    public OCSANAScoringTaskFactory (GenerationContext context,
-                                     GenerationResults results) {
-        this.context = context;
-        this.results = results;
+    public OCSANAScoringTaskFactory (ContextBundle contextBundle,
+                                     ResultsBundle resultsBundle) {
+        Objects.requireNonNull(contextBundle, "Context bundle cannot be null");
+        this.contextBundle = contextBundle;
+
+        Objects.requireNonNull(resultsBundle, "Context results cannot be null");
+        this.resultsBundle = resultsBundle;
     }
 
     @Override
     public TaskIterator createTaskIterator () {
         TaskIterator tasks = new TaskIterator();
-        tasks.append(new OCSANAScoringTask(context, results));
+        tasks.append(new OCSANAScoringTask(contextBundle, resultsBundle));
         return tasks;
     }
 }

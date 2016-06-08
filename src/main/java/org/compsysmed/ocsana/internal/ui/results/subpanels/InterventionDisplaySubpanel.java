@@ -9,7 +9,7 @@
  * details
  **/
 
-package org.compsysmed.ocsana.internal.ui.results.panels;
+package org.compsysmed.ocsana.internal.ui.results.subpanels;
 
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
@@ -24,9 +24,9 @@ import org.compsysmed.ocsana.internal.util.results.*;
  * Panel presenting details of a CombinationOfInterventions
  * <p>
  * NOTE: this panel does <em>not</em> display information about any
- * SignedInterventions. Use SignedInterventionDisplayPanel for that.
+ * SignedInterventions. Use SignedInterventionDisplaySubpanel for that.
  **/
-public class InterventionDisplayPanel
+public class InterventionDisplaySubpanel
     extends JPanel {
     private CombinationOfInterventions ci;
 
@@ -35,7 +35,7 @@ public class InterventionDisplayPanel
      *
      * @param ci  the CombinationOfInterventions
      **/
-    public InterventionDisplayPanel (CombinationOfInterventions ci) {
+    public InterventionDisplaySubpanel (CombinationOfInterventions ci) {
         this.ci = ci;
 
         JTextPane textPane = new JTextPane();

@@ -22,34 +22,22 @@ import com.mitchellbosecke.pebble.template.PebbleTemplate;
 import com.mitchellbosecke.pebble.loader.ClasspathLoader;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.stages.generation.GenerationContext;
-import org.compsysmed.ocsana.internal.stages.generation.GenerationResults;
-
-import org.compsysmed.ocsana.internal.stages.prioritization.PrioritizationContext;
-import org.compsysmed.ocsana.internal.stages.prioritization.PrioritizationResults;
+import org.compsysmed.ocsana.internal.util.context.ContextBundle;
+import org.compsysmed.ocsana.internal.util.results.ResultsBundle;
 
 /**
  * Manager to generate user reports for OCSANA results
  **/
 
 public class ResultsReportManager {
-    private static String GENERATION_STAGE_ONLY_REPORT_HTML_TEMPLATE = "results-reports/GenerationStageOnlyReport.html";
-    private static String GENERATION_STAGE_ONLY_REPORT_TXT_TEMPLATE = "results-reports/GenerationStageOnlyReport.txt";
-    private static String FULL_REPORT_HTML_TEMPLATE = "results-reports/FullResultsReport.html";
-    private static String FULL_REPORT_TXT_TEMPLATE = "results-reports/FullResultsReport.txt";
+    private static String REPORT_HTML_TEMPLATE = "ResultsReport.html";
+    private static String REPORT_TXT_TEMPLATE = "ResultsReport.txt";
 
+    private final PebbleTemplate reportHTMLTemplate;
+    private final PebbleTemplate reportTXTTemplate;
 
-    private GenerationContext generationContext;
-    private GenerationResults generationResults;
-
-    private PebbleTemplate generationReportHTMLTemplate;
-    private PebbleTemplate generationReportTXTTemplate;
-
-    private PrioritizationContext prioritizationContext;
-    private PrioritizationResults prioritizationResults;
-
-    private PebbleTemplate fullReportHTMLTemplate;
-    private PebbleTemplate fullReportTXTTemplate;
+    private ContextBundle contextBundle;
+    private ResultsBundle resultsBundle;
 
     public ResultsReportManager () {
         // Compile templates
@@ -59,44 +47,26 @@ public class ResultsReportManager {
         PebbleEngine htmlEngine = new PebbleEngine.Builder().loader(loader).strictVariables(true).build();
         PebbleEngine textEngine = new PebbleEngine.Builder().loader(loader).strictVariables(true).autoEscaping(false).build();
         try {
-            generationReportHTMLTemplate = htmlEngine.getTemplate(GENERATION_STAGE_ONLY_REPORT_HTML_TEMPLATE);
-            generationReportTXTTemplate = textEngine.getTemplate(GENERATION_STAGE_ONLY_REPORT_TXT_TEMPLATE);
-
-            fullReportHTMLTemplate = htmlEngine.getTemplate(FULL_REPORT_HTML_TEMPLATE);
-            fullReportTXTTemplate = textEngine.getTemplate(FULL_REPORT_TXT_TEMPLATE);
+            reportHTMLTemplate = htmlEngine.getTemplate(REPORT_HTML_TEMPLATE);
+            reportTXTTemplate = textEngine.getTemplate(REPORT_TXT_TEMPLATE);
         } catch (PebbleException e) {
             throw new IllegalStateException("Could not load result report templates. Please report the following error to the plugin author: " + e.getMessage());
         }
     }
 
-    public void update (GenerationContext generationContext,
-                        GenerationResults generationResults) {
-        this.generationContext = generationContext;
-        this.generationResults = generationResults;
+    public void update (ContextBundle contextBundle,
+                        ResultsBundle resultsBundle) {
+        Objects.requireNonNull(contextBundle, "Context bundle cannot be null");
+        this.contextBundle = contextBundle;
 
-        prioritizationContext = null;
-        prioritizationResults = null;
-    }
-
-    public void update (PrioritizationContext prioritizationContext,
-                        PrioritizationResults prioritizationResults) {
-        this.prioritizationContext = prioritizationContext;
-        this.prioritizationResults = prioritizationResults;
-    }
-
-    private Boolean hasPrioritizationResults () {
-        return prioritizationContext != null;
+        Objects.requireNonNull(resultsBundle, "Context results cannot be null");
+        this.resultsBundle = resultsBundle;
     }
 
     private Map<String, Object> getData () {
         Map<String, Object> data = new HashMap<>();
-        data.put("generationContext", generationContext);
-        data.put("generationResults", generationResults);
-
-        if (hasPrioritizationResults()) {
-            data.put("prioritizationContext", prioritizationContext);
-            data.put("prioritizationResults", prioritizationResults);
-        }
+        data.put("contextBundle", contextBundle);
+        data.put("resultsBundle", resultsBundle);
 
         return data;
     }
@@ -104,13 +74,9 @@ public class ResultsReportManager {
     public String reportAsHTML () {
         Writer writer = new StringWriter();
         try {
-            if (hasPrioritizationResults()) {
-                fullReportHTMLTemplate.evaluate(writer, getData());
-            } else {
-                generationReportHTMLTemplate.evaluate(writer, getData());
-            }
+            reportHTMLTemplate.evaluate(writer, getData());
         }  catch (PebbleException|IOException e) {
-            throw new IllegalStateException("Could not produce generation stage HTML report. Please report the following error to the plugin author: " + e.getMessage());
+            throw new IllegalStateException("Could not produce HTML report. Please report the following error to the plugin author: " + e.getMessage());
         }
 
         return writer.toString();
@@ -119,13 +85,9 @@ public class ResultsReportManager {
     public String reportAsText () {
         Writer writer = new StringWriter();
         try {
-            if (hasPrioritizationResults()) {
-                fullReportTXTTemplate.evaluate(writer, getData());
-            } else {
-                generationReportTXTTemplate.evaluate(writer, getData());
-            }
+            reportTXTTemplate.evaluate(writer, getData());
         }  catch (PebbleException|IOException e) {
-            throw new IllegalStateException("Could not produce generation stage HTML report. Please report the following error to the plugin author: " + e.getMessage());
+            throw new IllegalStateException("Could not produce text report. Please report the following error to the plugin author: " + e.getMessage());
         }
 
         return writer.toString();

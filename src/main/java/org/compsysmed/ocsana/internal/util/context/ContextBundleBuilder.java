@@ -1,5 +1,5 @@
 /**
- * Context builder for the CI stage of OCSANA
+ * Builder for contexts for an OCSANA run
  *
  * Copyright Vera-Licona Research Group (C) 2016
  *
@@ -9,7 +9,7 @@
  * details
  **/
 
-package org.compsysmed.ocsana.internal.stages.generation;
+package org.compsysmed.ocsana.internal.util.context;
 
 // Java imports
 import java.util.*;
@@ -22,29 +22,36 @@ import org.cytoscape.model.CyNode;
 import org.compsysmed.ocsana.internal.util.tunables.NodeNameHandler;
 import org.compsysmed.ocsana.internal.util.tunables.EdgeProcessor;
 
-import org.compsysmed.ocsana.internal.algorithms.path.AbstractPathFindingAlgorithm;
-import org.compsysmed.ocsana.internal.algorithms.path.AllNonSelfIntersectingPathsAlgorithm;
+import org.compsysmed.ocsana.internal.algorithms.drugability.AbstractSignedInterventionScoringAlgorithm;
+import org.compsysmed.ocsana.internal.algorithms.drugability.SimpleSignedInterventionScoringAlgorithm;
 
 import org.compsysmed.ocsana.internal.algorithms.mhs.AbstractMHSAlgorithm;
 import org.compsysmed.ocsana.internal.algorithms.mhs.MMCSAlgorithm;
 
+import org.compsysmed.ocsana.internal.algorithms.path.AbstractPathFindingAlgorithm;
+import org.compsysmed.ocsana.internal.algorithms.path.AllNonSelfIntersectingPathsAlgorithm;
+
 import org.compsysmed.ocsana.internal.algorithms.scoring.OCSANAScoringAlgorithm;
 
+import org.compsysmed.ocsana.internal.algorithms.signassignment.AbstractCISignAssignmentAlgorithm
+;import org.compsysmed.ocsana.internal.algorithms.signassignment.ExhaustiveSearchCISignAssignmentAlgorithm;
 
 /**
- * Context builder for the generation stage of OCSANA
+ * Context builder for an OCSANA run
  * <p>
  * This class allows incremental construction of a
- * {@link GenerationContext}.
+ * {@link ContextBundle}.
  * Its getters should only be used during configuration; the immutable
- * GenerationContext should be used once configuration is complete.
+ * ContextBundle should be used once configuration is complete.
  **/
-public class GenerationContextBuilder {
+public class ContextBundleBuilder {
     private final CyNetwork network;
 
     private Set<CyNode> sourceNodes = new HashSet<>();
     private Set<CyNode> targetNodes = new HashSet<>();
     private Set<CyNode> offTargetNodes = new HashSet<>();
+
+    private Set<CyNode> targetsToActivate = new HashSet<>();
 
     private NodeNameHandler nodeNameHandler;
     private EdgeProcessor edgeProcessor;
@@ -53,9 +60,11 @@ public class GenerationContextBuilder {
     private AbstractPathFindingAlgorithm pathFindingAlgorithm;
     private AbstractMHSAlgorithm mhsAlgorithm;
     private OCSANAScoringAlgorithm ocsanaAlgorithm;
+    private AbstractCISignAssignmentAlgorithm ciSignAlgorithm;
+    private AbstractSignedInterventionScoringAlgorithm siScoringAlgorithm;
 
-    public GenerationContextBuilder (CyNetwork network) {
-    	Objects.requireNonNull(network, "Network cannot be null");
+    public ContextBundleBuilder (CyNetwork network) {
+        Objects.requireNonNull(network, "Network cannot be null");
         this.network = network;
 
         ocsanaAlgorithm = new OCSANAScoringAlgorithm(network);
@@ -66,6 +75,10 @@ public class GenerationContextBuilder {
 
         setPathFindingAlgorithm(new AllNonSelfIntersectingPathsAlgorithm(network));
         setMHSAlgorithm(new MMCSAlgorithm());
+
+        setCISignAssignmentAlgorithm(new ExhaustiveSearchCISignAssignmentAlgorithm(this));
+
+        setSIScoringAlgorithm(new SimpleSignedInterventionScoringAlgorithm());
     }
 
     /**
@@ -79,7 +92,7 @@ public class GenerationContextBuilder {
      * Set the source nodes
      **/
     public void setSourceNodes (Set<CyNode> sourceNodes) {
-    	Objects.requireNonNull(sourceNodes, "Source node set cannot be null");
+        Objects.requireNonNull(sourceNodes, "Source node set cannot be null");
 
         if (sourceNodes.stream().anyMatch(node -> !network.containsNode(node))) {
             throw new IllegalArgumentException("All source nodes must come from underlying network");
@@ -97,15 +110,19 @@ public class GenerationContextBuilder {
 
     /**
      * Set the target nodes
+     * <p>
+     * NOTE: this has the side effect of clearing the configured targets
+     * to activate
      **/
     public void setTargetNodes (Set<CyNode> targetNodes) {
-    	Objects.requireNonNull(targetNodes, "Target node set cannot be null");
-    	
-    	if (targetNodes.stream().anyMatch(node -> !network.containsNode(node))) {
+        Objects.requireNonNull(targetNodes, "Target node set cannot be null");
+
+        if (targetNodes.stream().anyMatch(node -> !network.containsNode(node))) {
             throw new IllegalArgumentException("All target nodes must come from underlying network");
         }
 
         this.targetNodes = targetNodes;
+        setTargetsToActivate(new HashSet<>());
     }
 
     /**
@@ -116,11 +133,31 @@ public class GenerationContextBuilder {
     }
 
     /**
+     * Set the target nodes which should be activated by the sign
+     * assignment algorithm
+     **/
+    public void setTargetsToActivate (Set<CyNode> targetsToActivate) {
+        Objects.requireNonNull(targetsToActivate, "Set of targets to activate cannot be null");
+        if (!targetNodes.containsAll(targetsToActivate)) {
+            throw new IllegalArgumentException("Targets to activate must be in target set");
+        }
+
+        this.targetsToActivate = targetsToActivate;
+    }
+
+    /**
+     * Return the targets which should be activated
+     **/
+    public Set<CyNode> getTargetsToActivate () {
+        return targetsToActivate;
+    }
+
+    /**
      * Set the off-target nodes
      **/
     public void setOffTargetNodes (Set<CyNode> offTargetNodes) {
         Objects.requireNonNull(offTargetNodes, "Off-target node set cannot be null");
-        	
+
         if (offTargetNodes.stream().anyMatch(node -> !network.containsNode(node))) {
             throw new IllegalArgumentException("All off-target nodes must come from underlying network");
         }
@@ -139,7 +176,7 @@ public class GenerationContextBuilder {
      * Set the node name handler
      **/
     public void setNodeNameHandler (NodeNameHandler nodeNameHandler) {
-    	Objects.requireNonNull(nodeNameHandler, "Node name handler cannot be null");
+        Objects.requireNonNull(nodeNameHandler, "Node name handler cannot be null");
 
         this.nodeNameHandler = nodeNameHandler;
     }
@@ -155,8 +192,8 @@ public class GenerationContextBuilder {
      * Set the edge processor
      **/
     public void setEdgeProcessor (EdgeProcessor edgeProcessor) {
-    	Objects.requireNonNull(edgeProcessor, "Edge processor cannot be null");
-    	
+        Objects.requireNonNull(edgeProcessor, "Edge processor cannot be null");
+
         this.edgeProcessor = edgeProcessor;
     }
 
@@ -185,7 +222,7 @@ public class GenerationContextBuilder {
      * Set the path-finding algorithm
      **/
     public void setPathFindingAlgorithm (AbstractPathFindingAlgorithm pathFindingAlgorithm) {
-    	Objects.requireNonNull(pathFindingAlgorithm, "Path-finding algorithm cannot be null");
+        Objects.requireNonNull(pathFindingAlgorithm, "Path-finding algorithm cannot be null");
 
         this.pathFindingAlgorithm = pathFindingAlgorithm;
     }
@@ -201,7 +238,7 @@ public class GenerationContextBuilder {
      * Set the MHS-finding algorithm
      **/
     public void setMHSAlgorithm (AbstractMHSAlgorithm mhsAlgorithm) {
-    	Objects.requireNonNull(mhsAlgorithm, "MHS-finding algorithm cannot be null");
+        Objects.requireNonNull(mhsAlgorithm, "MHS-finding algorithm cannot be null");
 
         this.mhsAlgorithm = mhsAlgorithm;
     }
@@ -221,9 +258,42 @@ public class GenerationContextBuilder {
     }
 
     /**
+     * Set the CI sign assignment algorithm
+     *
+     * @param ciSignAlgorithm  the algorithm
+     **/
+    public void setCISignAssignmentAlgorithm (AbstractCISignAssignmentAlgorithm ciSignAlgorithm) {
+        Objects.requireNonNull(ciSignAlgorithm, "CI sign assignment algorithm cannot be null");
+        this.ciSignAlgorithm = ciSignAlgorithm;
+    }
+
+    /**
+     * Return the CI sign assignment algorithm
+     **/
+    public AbstractCISignAssignmentAlgorithm getCISignAlgorithm () {
+        return ciSignAlgorithm;
+    }
+
+    /**
+     * Set the SI scoring algorithm
+     *
+     * @param siScoringAlgorithm  the algorithm
+     **/
+    public void setSIScoringAlgorithm (AbstractSignedInterventionScoringAlgorithm siScoringAlgorithm) {
+        this.siScoringAlgorithm = siScoringAlgorithm;
+    }
+
+    /**
+     * Return the SI scoring algorithm
+     **/
+    public AbstractSignedInterventionScoringAlgorithm getSIScoringAlgorithm () {
+        return siScoringAlgorithm;
+    }
+
+    /**
      * Return the context as currently configured
      **/
-    public GenerationContext getContext () {
-        return new GenerationContext(network, sourceNodes, targetNodes, offTargetNodes, nodeNameHandler, edgeProcessor, includeEndpointsInCIs, pathFindingAlgorithm, mhsAlgorithm, ocsanaAlgorithm);
+    public ContextBundle getContextBundle () {
+        return new ContextBundle(network, sourceNodes, targetNodes, offTargetNodes, nodeNameHandler, edgeProcessor, includeEndpointsInCIs, pathFindingAlgorithm, mhsAlgorithm, ocsanaAlgorithm, targetsToActivate, ciSignAlgorithm, siScoringAlgorithm);
     }
 }
