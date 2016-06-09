@@ -97,7 +97,10 @@ public class MHSSubpanel
     private void updateTunablePanel () {
         tunablePanel.removeAll();
 
-        tunablePanel.add(taskManager.getConfiguration(null, getAlgorithm()));
+        JPanel content = taskManager.getConfiguration(null, getAlgorithm());
+        if (content != null) {
+            tunablePanel.add(content);
+        }
 
         tunablePanel.revalidate();
         tunablePanel.repaint();

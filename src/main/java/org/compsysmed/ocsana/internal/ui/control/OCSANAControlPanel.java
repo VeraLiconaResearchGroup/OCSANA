@@ -72,6 +72,7 @@ public class OCSANAControlPanel
     private PathFindingSubpanel pathFindingSubpanel;
     private MHSSubpanel mhsSubpanel;
     private TargetActivationSubpanel targetSubpanel;
+    private PrioritizationAlgorithmsSubpanel prioritizationAlgorithmsSubpanel;
 
     /**
      * Constructor
@@ -198,6 +199,10 @@ public class OCSANAControlPanel
         targetSubpanel = new TargetActivationSubpanel(this, contextBundleBuilder, panelTaskManager);
         panel.add(targetSubpanel);
         subpanels.add(targetSubpanel);
+
+        prioritizationAlgorithmsSubpanel = new PrioritizationAlgorithmsSubpanel(this, contextBundleBuilder, panelTaskManager);
+        panel.add(prioritizationAlgorithmsSubpanel);
+        subpanels.add(prioritizationAlgorithmsSubpanel);
 
         return panel;
     }
