@@ -33,6 +33,7 @@ import com.mitchellbosecke.pebble.error.PebbleException;
 import com.mitchellbosecke.pebble.template.PebbleTemplate;
 
 import org.compsysmed.ocsana.internal.util.drugability.*;
+import org.compsysmed.ocsana.internal.util.results.SignedInterventionNode;
 import org.compsysmed.ocsana.internal.util.science.*;
 
 /**
@@ -90,19 +91,16 @@ public class DrugabilityReportSubpanel
      * Display the report for a particular protein with a particular
      * intervention sign
      *
-     * @param name  the name of the node
+     * @param signedNode  the SignedInterventionNode for the intervention
      * @param bundle  the DrugabilityDataBundle for the protein
-     * @param sign  the sign
      **/
-    public void showReport (String name,
-                            DrugabilityDataBundle bundle,
-                            InteractionSign sign) {
+    public void showReport (SignedInterventionNode signedNode,
+                            DrugabilityDataBundle bundle) {
         // Set up data
         Map<String, Object> data = new HashMap<>();
 
-        data.put("name", name);
+        data.put("node", signedNode);
         data.put("bundle", bundle);
-        data.put("sign", sign);
 
         Writer writer = new StringWriter();
         try {

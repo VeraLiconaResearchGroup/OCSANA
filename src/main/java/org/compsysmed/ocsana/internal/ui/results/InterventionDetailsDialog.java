@@ -14,12 +14,17 @@ package org.compsysmed.ocsana.internal.ui.results;
 // Java imports
 import java.util.*;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.BoxLayout;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 // Cytoscape imports
 import org.cytoscape.model.CyNetwork;
+
 // OCSANA improts
 import org.compsysmed.ocsana.internal.ui.OCSANADialog;
 
@@ -33,13 +38,15 @@ import org.compsysmed.ocsana.internal.util.drugability.*;
  * Dialog presenting details of a given CombinationOfInterventions
  **/
 public class InterventionDetailsDialog
-    extends OCSANADialog {
+    extends OCSANADialog
+    implements ActionListener {
     private CombinationOfInterventions ci;
     private Collection<SignedIntervention> signedInterventions;
     private CyNetwork network;
     private DrugabilityDataBundleFactory drugabilityDataBundleFactory;
 
     // UI elements
+    private JComboBox<SignedIntervention> siSelecter;
     private JPanel contentPanel;
     private SignedInterventionReportSubpanel signedInterventionPanel;
     private DrugabilityReportSubpanel drugabilityPanel;
@@ -52,21 +59,31 @@ public class InterventionDetailsDialog
      * @param parentFrame the parent JFrame of this dialog (used for
      * positioning)
      * @param ci  the CombinationOfInterventions
-     * @param signedInterventions  the optimal SignedInterventions of ci
+     * @param signedInterventions  the optimal SignedInterventions of the CI
     **/
     public InterventionDetailsDialog (JFrame parentFrame,
                                       CyNetwork network,
                                       CombinationOfInterventions ci,
                                       Collection<SignedIntervention> signedInterventions) {
         super(parentFrame, "Intervention details report");
+
+        Objects.requireNonNull(network, "Network cannot be null");
         this.network = network;
+
+        Objects.requireNonNull(ci, "CI cannot be null");
         this.ci = ci;
+
+        Objects.requireNonNull(signedInterventions, "Collection of signed interventions cannot be null");
+        this.signedInterventions = signedInterventions;
 
         drugabilityDataBundleFactory = new DrugabilityDataBundleFactory();
 
-
         // Set up page skeleton
         setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
+
+        siSelecter = new JComboBox<SignedIntervention>(signedInterventions.toArray(new SignedIntervention[0]));
+        siSelecter.addActionListener(this);
+        add(siSelecter);
 
         contentPanel = new JPanel();
         add(contentPanel);
@@ -75,11 +92,7 @@ public class InterventionDetailsDialog
         signedInterventionPanel = new SignedInterventionReportSubpanel(this);
         contentPanel.add(signedInterventionPanel);
 
-        if (signedInterventions != null && !signedInterventions.isEmpty()) {
-            // TODO: Allow user to select SignedIntervention to display
-            SignedIntervention signedIntervention = signedInterventions.stream().findFirst().get();
-            signedInterventionPanel.updateIntervention(signedIntervention);
-        }
+        updateSignedInterventionPanel();
 
         // Format for presentation
         pack();
@@ -97,9 +110,19 @@ public class InterventionDetailsDialog
         }
 
         DrugabilityDataBundle bundle = drugabilityDataBundleFactory.getBundle(signedNode);
-        drugabilityPanel.showReport(signedNode.getName(), bundle, signedNode.getSign());
+        drugabilityPanel.showReport(signedNode, bundle);
 
         pack();
         setLocationRelativeTo(getOwner());
+    }
+
+    private void updateSignedInterventionPanel () {
+        SignedIntervention selectedSI = (SignedIntervention) siSelecter.getSelectedItem();
+        signedInterventionPanel.updateIntervention(selectedSI);
+    }
+
+    @Override
+    public void actionPerformed (ActionEvent e) {
+        updateSignedInterventionPanel();
     }
 }

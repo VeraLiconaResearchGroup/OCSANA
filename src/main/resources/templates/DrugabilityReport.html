@@ -1,5 +1,6 @@
 <html>
-    <h3>Drugability report ({{name}})</h3>
+    <h3>Drugability report (Node {{node.getName()}}: {{node.getBiomoleculeID}})</h3>
+    <h4>Desired effect: {{node.getSign()}}</h4>
     {%if bundle is null %}
     <p>
         Protein name could not be found.
@@ -21,13 +22,13 @@
     </p>
     {% else %}
     <p>
-        Known drug interactions (effect: {{sign}})
+        Known drug interactions (effect: {{node.getSign()}})
         <ul>
-            {% for interaction in bundle.getAllInteractionsOfSign(sign) %}
+            {% for interaction in bundle.getAllInteractionsOfSign(node.getSign()) %}
             <li><a href="{{interaction.getDrug().getDrugBankURL()}}">{{interaction.getDrug().getName()}}</a> ({{interaction.getDrugActionType().getDescription()}})</li>
             {% endfor %}
         </ul>
-        ({{bundle.getAllInteractionsNotOfSign(sign).size()}} other interactions are known. See <a href="{{interaction.getProtein().getDrugBankBioDBURL()}}">DrugBank BioDB page</a> for details.)
+        ({{bundle.getAllInteractionsNotOfSign(node.getSign()).size()}} other interactions are known. See <a href="{{interaction.getProtein().getDrugBankBioDBURL()}}">DrugBank BioDB page</a> for details.)
     </p>
     {% endif %}
     <h4>Drugability predictions</h4>

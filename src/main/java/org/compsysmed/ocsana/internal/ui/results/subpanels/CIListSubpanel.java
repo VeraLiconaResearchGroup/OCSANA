@@ -33,9 +33,10 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
 // OCSANA imports
+import org.compsysmed.ocsana.internal.ui.results.InterventionDetailsDialog;
+
 import org.compsysmed.ocsana.internal.util.context.ContextBundle;
 import org.compsysmed.ocsana.internal.util.results.ResultsBundle;
-
 import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
 
 public class CIListSubpanel
@@ -98,12 +99,11 @@ public class CIListSubpanel
 
         public void handleUserDoubleClick (Integer row) {
             CombinationOfInterventions ci = CIs.get(row);
-            //InterventionDetailsDialog detailsDialog = new InterventionDetailsDialog(cytoscapeFrame, generationContext.getNetwork(), CIs.get(row));
+            InterventionDetailsDialog detailsDialog = new InterventionDetailsDialog(cytoscapeFrame, contextBundle.getNetwork(), ci, resultsBundle.getOptimalInterventionSignings(ci));
         }
     }
 
     private static class MHSTableModel extends AbstractTableModel {
-        // TODO: update to include signed intervention information
         private final ContextBundle contextBundle;
         private final ResultsBundle resultsBundle;
         private final List<CombinationOfInterventions> CIs;
@@ -120,7 +120,7 @@ public class CIListSubpanel
             Objects.requireNonNull(CIs, "CIs collection cannot be null");
             this.CIs = CIs;
         }
-        String[] colNames = {"CI", "Size"};
+        String[] colNames = {"CI", "Size", "Sign assignment success rate", "Number of optimal sign assignemnts"};
 
         @Override
         public String getColumnName (int col) {
@@ -134,7 +134,7 @@ public class CIListSubpanel
 
         @Override
         public int getColumnCount () {
-            return 2;
+            return 4;
         }
 
         @Override
@@ -147,9 +147,20 @@ public class CIListSubpanel
             case 1:
                 return ci.size();
 
+            case 2:
+                return getSignAssignmentSuccessRate(ci);
+
+            case 3:
+                return resultsBundle.getOptimalInterventionSignings(ci).size();
+
             default:
                 throw new IllegalArgumentException(String.format("Table does not have %d columns", col));
             }
+        }
+
+        private Double getSignAssignmentSuccessRate(CombinationOfInterventions ci) {
+            Long maxCorrectEffects = resultsBundle.getOptimalInterventionSignings(ci).stream().mapToLong(si -> si.numberOfCorrectEffects()).max().orElse(0);
+            return maxCorrectEffects.doubleValue() / ci.size();
         }
 
         @Override

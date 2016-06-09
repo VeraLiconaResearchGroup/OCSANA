@@ -6,7 +6,7 @@
     <ul>
         {% for node in nodes %}
         {# We attach a hyperlink whose URL encodes information about the node #}
-        <li><a href="http://ocsana.internal/node?suid={{node.getSUID()}}">{{node.name()}}</a></li>
+        <li><a href="http://ocsana.internal/node?suid={{node.getSUID()}}">{{node.getName()}}: ({{node.getBiomoleculeID()}})</a></li>
         {% endfor %}
     </ul>
     {% endif %}

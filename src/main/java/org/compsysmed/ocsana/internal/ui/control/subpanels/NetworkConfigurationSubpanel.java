@@ -117,13 +117,12 @@ public class NetworkConfigurationSubpanel
 
     @Override
     public void actionPerformed (ActionEvent e) {
+        updateContextBuilder();
+
         if (e.getSource().equals(nodeNameColumnSelecter)) {
-            CyColumn nodeNameColumn = (CyColumn) nodeNameColumnSelecter.getSelectedItem();
-            contextBundleBuilder.getNodeHandler().setNodeNameColumn(nodeNameColumn);
             rebuildNodeSetSelecters();
         } else if (e.getSource().equals(nodeIDColumnSelecter)) {
-            CyColumn nodeIDColumn = (CyColumn) nodeIDColumnSelecter.getSelectedItem();
-            contextBundleBuilder.getNodeHandler().setNodeIDColumn(nodeIDColumn);
+            // Do nothing
         } else if (e.getSource().equals(nodeSelectionModeSelecter)) {
             rebuildNodeSetSelecters();
         } else {
@@ -209,6 +208,12 @@ public class NetworkConfigurationSubpanel
         contextBundleBuilder.setSourceNodes(sourceNodeSelecter.getSelectedNodes());
         contextBundleBuilder.setTargetNodes(targetNodeSelecter.getSelectedNodes());
         contextBundleBuilder.setOffTargetNodes(offTargetNodeSelecter.getSelectedNodes());
+
+        CyColumn nodeNameColumn = (CyColumn) nodeNameColumnSelecter.getSelectedItem();
+        contextBundleBuilder.getNodeHandler().setNodeNameColumn(nodeNameColumn);
+
+        CyColumn nodeIDColumn = (CyColumn) nodeIDColumnSelecter.getSelectedItem();
+        contextBundleBuilder.getNodeHandler().setNodeIDColumn(nodeIDColumn);
     }
 
     private static enum SelectionMode {
