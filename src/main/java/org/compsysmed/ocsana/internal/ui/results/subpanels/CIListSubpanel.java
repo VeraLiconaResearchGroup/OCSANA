@@ -160,7 +160,7 @@ public class CIListSubpanel
 
         private Double getSignAssignmentSuccessRate(CombinationOfInterventions ci) {
             Long maxCorrectEffects = resultsBundle.getOptimalInterventionSignings(ci).stream().mapToLong(si -> si.numberOfCorrectEffects()).max().orElse(0);
-            return maxCorrectEffects.doubleValue() / ci.size();
+            return maxCorrectEffects.doubleValue() / contextBundle.getTargetNodes().size();
         }
 
         @Override
