@@ -64,8 +64,12 @@ public class DrugabilityDataBundleFactory {
 
             DrugabilityDataBundle bundle = new DrugabilityDataBundle(protein, drProdisPredictions, interactions, ligands);
             return bundle;
-        } else if (proteinDB.isKnownProtein(id)) {
+        } else {
             Protein protein = proteinDB.getProtein(id);
+
+            if (protein == null) {
+                return null;
+            }
 
             Collection<DrProdisDrugabilityPrediction> drProdisPredictions = protein.getIsoforms().stream().flatMap(isoform -> drProdisDB.getPredictions(isoform).stream()).collect(Collectors.toList());
             Collection<DrugProteinInteraction> interactions = drugBankDB.getInteractions(protein);
@@ -73,10 +77,7 @@ public class DrugabilityDataBundleFactory {
 
             DrugabilityDataBundle bundle = new DrugabilityDataBundle(protein, drProdisPredictions, interactions, ligands);
             return bundle;
-        } else {
-            return null;
         }
-
     }
 
     /**

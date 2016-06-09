@@ -64,7 +64,6 @@ public class OCSANAControlPanel
 
     // Internal data
     private ContextBundleBuilder contextBundleBuilder;
-    private ResultsBundle resultsBundle;
 
     // UI elements
     private Collection<AbstractControlSubpanel> subpanels;
@@ -165,16 +164,6 @@ public class OCSANAControlPanel
         for (AbstractControlSubpanel subpanel: subpanels) {
             subpanel.updateContextBuilder();
         }
-    }
-
-    /**
-     * Retrieve the results of the run if available
-     *
-     * @return the results (or null if there has been no run with the
-     * current settings)
-     **/
-    public ResultsBundle getResultsBundle () {
-        return resultsBundle;
     }
 
     /**

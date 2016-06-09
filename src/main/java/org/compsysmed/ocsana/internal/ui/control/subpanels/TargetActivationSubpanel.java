@@ -66,6 +66,7 @@ public class TargetActivationSubpanel
         refreshButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed (ActionEvent e) {
+                    activatedTargetsSelecter.clearSelectedNodes();
                     requestContextBundleBuilderUpdate();
                     activatedTargetsSelecter.setAvailableNodes(contextBundleBuilder.getTargetNodes());
                 }

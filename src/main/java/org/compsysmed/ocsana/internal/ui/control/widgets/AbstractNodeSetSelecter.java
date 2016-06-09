@@ -134,4 +134,11 @@ abstract public class AbstractNodeSetSelecter
      * Note to implementers: you should handle updating your UI in this method
      **/
     abstract public void setSelectedNodes (Set<CyNode> selectedNodes);
+
+    /**
+     * Clear the selected nodes
+     **/
+    public void clearSelectedNodes () {
+        setSelectedNodes(new HashSet<>());
+    }
 }
