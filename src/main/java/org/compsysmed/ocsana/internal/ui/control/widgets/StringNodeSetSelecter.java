@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
-import javax.swing.JTextField;
+import javax.swing.JTextArea;
 
 // Cytoscape imports
 import org.cytoscape.model.CyNode;
@@ -27,7 +27,7 @@ import org.compsysmed.ocsana.internal.util.tunables.NodeHandler;
 
 public class StringNodeSetSelecter
     extends AbstractNodeSetSelecter {
-    private JTextField nodeSetStringField;
+    private JTextArea nodeSetStringField;
     private Set<CyNode> availableNodes;
 
     public StringNodeSetSelecter (String label,
@@ -70,7 +70,10 @@ public class StringNodeSetSelecter
 
     @Override
     protected void handleAvailableNodesUpdate () {
-        nodeSetStringField = new JTextField(20);
+        nodeSetStringField = new JTextArea();
+        nodeSetStringField.setEditable(true);
+        nodeSetStringField.setLineWrap(true);
+        nodeSetStringField.setWrapStyleWord(true);
     }
 
     @Override
