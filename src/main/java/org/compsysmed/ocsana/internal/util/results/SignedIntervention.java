@@ -65,12 +65,12 @@ public class SignedIntervention
 
         signedInterventionNodes = new HashSet<>();
         for (CyNode node: interventionNodesToActivate) {
-            SignedInterventionNode signedNode = new SignedInterventionNode(node, InteractionSign.POSITIVE, nodeName(node));
+            SignedInterventionNode signedNode = new SignedInterventionNode(node, InteractionSign.POSITIVE, nodeName(node), nodeID(node));
             signedInterventionNodes.add(signedNode);
         }
 
         for (CyNode node: interventionNodesToInhibit) {
-            SignedInterventionNode signedNode = new SignedInterventionNode(node, InteractionSign.NEGATIVE, nodeName(node));
+            SignedInterventionNode signedNode = new SignedInterventionNode(node, InteractionSign.NEGATIVE, nodeName(node), nodeID(node));
             signedInterventionNodes.add(signedNode);
         }
 

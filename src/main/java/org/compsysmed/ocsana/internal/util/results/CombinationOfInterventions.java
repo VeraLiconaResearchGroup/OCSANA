@@ -27,6 +27,7 @@ public class CombinationOfInterventions {
     private final Set<CyNode> ciNodes;
     private final Set<CyNode> targetNodes;
     private final Function<CyNode, String> nodeNameFunction;
+    private final Function<CyNode, String> nodeIDFunction;
 
     private Double classicalOCSANAScore;
 
@@ -40,18 +41,31 @@ public class CombinationOfInterventions {
      * @param nodeNameFunction  function returning the name of a given
      * node (if null, use Cytoscape's automatic name, which is based
      * on SUID)
+     * @param nodeIDFunction  function returning the biomolecule ID of
+     * a given node (if null, use Cytoscape's automatic name, which is
+     * based on SUID)
      **/
     public CombinationOfInterventions (Set<CyNode> ciNodes,
                                        Set<CyNode> targetNodes,
-                                       Function<CyNode, String> nodeNameFunction) {
+                                       Function<CyNode, String> nodeNameFunction,
+                                       Function<CyNode, String> nodeIDFunction) {
     	Objects.requireNonNull(ciNodes, "CI nodes cannot be null");
         this.ciNodes = ciNodes;
 
         Objects.requireNonNull(targetNodes, "Target nodes collection cannot be null");
         this.targetNodes = targetNodes;
 
-        Objects.requireNonNull(nodeNameFunction, "Node name function cannot be null");
-        this.nodeNameFunction = nodeNameFunction;
+        if (nodeNameFunction == null) {
+            this.nodeNameFunction = node -> node.toString();
+        } else {
+            this.nodeNameFunction = nodeNameFunction;
+        }
+
+        if (nodeIDFunction == null) {
+            this.nodeIDFunction = node -> node.toString();
+        } else {
+            this.nodeIDFunction = nodeIDFunction;
+        }
     }
 
     /**
@@ -64,6 +78,7 @@ public class CombinationOfInterventions {
         targetNodes = new HashSet<>(other.targetNodes);
 
         nodeNameFunction = other.nodeNameFunction;
+        nodeIDFunction = other.nodeIDFunction;
 
         classicalOCSANAScore = other.classicalOCSANAScore;
 
@@ -120,11 +135,14 @@ public class CombinationOfInterventions {
      * Return the name of a node
      **/
     public String nodeName (CyNode node) {
-        if (nodeNameFunction != null) {
-            return nodeNameFunction.apply(node);
-        } else {
-            return node.toString();
-        }
+        return nodeNameFunction.apply(node);
+    }
+
+    /**
+     * Return the biomolecule ID of a node
+     **/
+    public String nodeID (CyNode node) {
+        return nodeIDFunction.apply(node);
     }
 
     /**

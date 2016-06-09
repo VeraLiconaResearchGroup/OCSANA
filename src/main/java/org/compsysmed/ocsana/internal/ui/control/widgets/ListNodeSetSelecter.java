@@ -17,18 +17,20 @@ import java.util.stream.Collectors;
 
 import java.awt.Component;
 
+import javax.swing.BoxLayout;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
 
 // Cytoscape imports
 import org.cytoscape.model.CyNode;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.util.tunables.NodeNameHandler;
+import org.compsysmed.ocsana.internal.util.tunables.NodeHandler;
 
 public class ListNodeSetSelecter
     extends AbstractNodeSetSelecter {
@@ -37,15 +39,15 @@ public class ListNodeSetSelecter
     public ListNodeSetSelecter (String label,
                                 Set<CyNode> availableNodes,
                                 Set<CyNode> selectedNodes,
-                                NodeNameHandler nodeNameHandler) {
-        super(label, availableNodes, selectedNodes, nodeNameHandler);
+                                NodeHandler nodeHandler) {
+        super(label, availableNodes, selectedNodes, nodeHandler);
         draw();
     }
 
     public ListNodeSetSelecter (String label,
                                 Set<CyNode> availableNodes,
-                                NodeNameHandler nodeNameHandler) {
-        super(label, availableNodes, nodeNameHandler);
+                                NodeHandler nodeHandler) {
+        super(label, availableNodes, nodeHandler);
         draw();
     }
 
@@ -55,8 +57,8 @@ public class ListNodeSetSelecter
     }
 
     public ListNodeSetSelecter (AbstractNodeSetSelecter other,
-                                NodeNameHandler nodeNameHandler) {
-        super(other, nodeNameHandler);
+                                NodeHandler nodeHandler) {
+        super(other, nodeHandler);
         draw();
     }
 
@@ -66,12 +68,16 @@ public class ListNodeSetSelecter
     private void draw () {
         removeAll();
 
-        nodeSetListField.setCellRenderer(new NodeListCellRenderer(nodeNameHandler));
+        setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+
+        nodeSetListField.setCellRenderer(new NodeListCellRenderer(nodeHandler));
 
         JLabel title = new JLabel(label);
         add(title);
 
         JScrollPane listPane = new JScrollPane(nodeSetListField);
+        listPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        listPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         add(listPane);
 
         revalidate();
@@ -113,9 +119,9 @@ public class ListNodeSetSelecter
 
     private class NodeListCellRenderer
         extends DefaultListCellRenderer {
-        private NodeNameHandler nodeNameHandler;
-        public NodeListCellRenderer (NodeNameHandler nodeNameHandler) {
-            this.nodeNameHandler = nodeNameHandler;
+        private NodeHandler nodeHandler;
+        public NodeListCellRenderer (NodeHandler nodeHandler) {
+            this.nodeHandler = nodeHandler;
         }
 
         @Override
@@ -127,7 +133,7 @@ public class ListNodeSetSelecter
             JLabel cell = (JLabel) super.getListCellRendererComponent(list, nodeObj, index, isSelected, cellHasFocus);
 
             CyNode node = (CyNode) nodeObj;
-            cell.setText(nodeNameHandler.getNodeName(node));
+            cell.setText(nodeHandler.getNodeName(node));
 
             return cell;
         }

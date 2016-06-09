@@ -21,7 +21,7 @@ import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.util.tunables.NodeNameHandler;
+import org.compsysmed.ocsana.internal.util.tunables.NodeHandler;
 import org.compsysmed.ocsana.internal.util.tunables.EdgeProcessor;
 
 import org.compsysmed.ocsana.internal.algorithms.signassignment.AbstractCISignAssignmentAlgorithm;
@@ -47,7 +47,7 @@ public final class ContextBundle {
     private final Set<CyNode> targetNodes;
     private final Set<CyNode> offTargetNodes;
 
-    private final NodeNameHandler nodeNameHandler;
+    private final NodeHandler nodeHandler;
     private final EdgeProcessor edgeProcessor;
     private final boolean includeEndpointsInCIs;
 
@@ -65,7 +65,7 @@ public final class ContextBundle {
                           Set<CyNode> sourceNodes,
                           Set<CyNode> targetNodes,
                           Set<CyNode> offTargetNodes,
-                          NodeNameHandler nodeNameHandler,
+                          NodeHandler nodeHandler,
                           EdgeProcessor edgeProcessor,
                           boolean includeEndpointsInCIs,
                           AbstractPathFindingAlgorithm pathFindingAlgorithm,
@@ -87,8 +87,8 @@ public final class ContextBundle {
         Objects.requireNonNull(offTargetNodes, "Off-target node set cannot be null");
         this.offTargetNodes = offTargetNodes;
 
-        Objects.requireNonNull(nodeNameHandler, "Node name handler cannot be null");
-        this.nodeNameHandler = nodeNameHandler;
+        Objects.requireNonNull(nodeHandler, "Node name handler cannot be null");
+        this.nodeHandler = nodeHandler;
 
         Objects.requireNonNull(edgeProcessor, "Edge processor cannot be null");
         this.edgeProcessor = edgeProcessor;
@@ -163,7 +163,7 @@ public final class ContextBundle {
      * Get the name of the column that contains the node names
      **/
     public String getNodeNameColumnName () {
-        return nodeNameHandler.getNodeNameColumnName();
+        return nodeHandler.getNodeNameColumnName();
     }
 
     /**
@@ -211,8 +211,8 @@ public final class ContextBundle {
     /**
      * Return the node name handler
      **/
-    public NodeNameHandler getNodeNameHandler () {
-        return nodeNameHandler;
+    public NodeHandler getNodeHandler () {
+        return nodeHandler;
     }
 
     /**
@@ -305,6 +305,6 @@ public final class ContextBundle {
      * @return the node's name
      **/
     public String getNodeName (CyNode node) {
-        return nodeNameHandler.getNodeName(node);
+        return nodeHandler.getNodeName(node);
     }
 }

@@ -47,7 +47,7 @@ public class DrugabilityDataBundle {
                                   Collection<DrProdisDrugabilityPrediction> drProdisPredictions,
                                   Collection<DrugProteinInteraction> interactions,
                                   Collection<DrugFEATURELigand> ligands) {
-    	Objects.requireNonNull(protein, "Protein cannot be null.");
+        Objects.requireNonNull(protein, "Protein cannot be null.");
         this.protein = protein;
         this.isoform = null;
 
@@ -76,7 +76,7 @@ public class DrugabilityDataBundle {
                                   Collection<DrProdisDrugabilityPrediction> drProdisPredictions,
                                   Collection<DrugProteinInteraction> interactions,
                                   Collection<DrugFEATURELigand> ligands) {
-    	Objects.requireNonNull(isoform, "Isoform cannot be null.");
+        Objects.requireNonNull(isoform, "Isoform cannot be null.");
         this.isoform = isoform;
         this.protein = isoform.getProtein();
 

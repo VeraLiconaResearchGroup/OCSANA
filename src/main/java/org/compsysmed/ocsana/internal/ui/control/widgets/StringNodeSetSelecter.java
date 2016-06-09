@@ -15,6 +15,7 @@ package org.compsysmed.ocsana.internal.ui.control.widgets;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
@@ -22,7 +23,7 @@ import javax.swing.JTextField;
 import org.cytoscape.model.CyNode;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.util.tunables.NodeNameHandler;
+import org.compsysmed.ocsana.internal.util.tunables.NodeHandler;
 
 public class StringNodeSetSelecter
     extends AbstractNodeSetSelecter {
@@ -32,15 +33,15 @@ public class StringNodeSetSelecter
     public StringNodeSetSelecter (String label,
                                   Set<CyNode> availableNodes,
                                   Set<CyNode> selectedNodes,
-                                  NodeNameHandler nodeNameHandler) {
-        super(label, availableNodes, selectedNodes, nodeNameHandler);
+                                  NodeHandler nodeHandler) {
+        super(label, availableNodes, selectedNodes, nodeHandler);
         draw();
     }
 
     public StringNodeSetSelecter (String label,
                                   Set<CyNode> availableNodes,
-                                  NodeNameHandler nodeNameHandler) {
-        super(label, availableNodes, nodeNameHandler);
+                                  NodeHandler nodeHandler) {
+        super(label, availableNodes, nodeHandler);
         draw();
     }
 
@@ -50,8 +51,8 @@ public class StringNodeSetSelecter
     }
 
     public StringNodeSetSelecter (AbstractNodeSetSelecter other,
-                                  NodeNameHandler nodeNameHandler) {
-        super(other, nodeNameHandler);
+                                  NodeHandler nodeHandler) {
+        super(other, nodeHandler);
         draw();
     }
 
@@ -59,6 +60,8 @@ public class StringNodeSetSelecter
      * Build the JPanel after the constructors populate the data
      **/
     private void draw () {
+        setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+
         JLabel title = new JLabel(label);
         add(title);
 
@@ -73,7 +76,7 @@ public class StringNodeSetSelecter
     @Override
     public Set<CyNode> getSelectedNodes () {
         Set<String> selectedNodeNames = Arrays.asList(nodeSetStringField.getText().trim().split(",")).stream().map(nodeName -> nodeName.trim()).filter(nodeName -> !nodeName.isEmpty()).collect(Collectors.toSet());
-        Set<CyNode> selectedNodes = selectedNodeNames.stream().map(nodeName -> nodeNameHandler.getNode(nodeName)).filter(node -> node != null).collect(Collectors.toSet());
+        Set<CyNode> selectedNodes = selectedNodeNames.stream().map(nodeName -> nodeHandler.getNodeByName(nodeName)).filter(node -> node != null).collect(Collectors.toSet());
         return selectedNodes;
     }
 
@@ -84,7 +87,7 @@ public class StringNodeSetSelecter
             throw new IllegalArgumentException("Selected nodes must be in set of available nodes");
         }
 
-        String nodeSetString = selectedNodes.stream().map(node -> nodeNameHandler.getNodeName(node)).collect(Collectors.joining(", "));
+        String nodeSetString = selectedNodes.stream().map(node -> nodeHandler.getNodeName(node)).collect(Collectors.joining(", "));
         nodeSetStringField.setText(nodeSetString);
     }
 }

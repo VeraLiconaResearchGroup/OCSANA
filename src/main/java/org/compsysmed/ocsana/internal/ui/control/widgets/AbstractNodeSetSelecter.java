@@ -20,12 +20,12 @@ import javax.swing.JPanel;
 import org.cytoscape.model.CyNode;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.util.tunables.NodeNameHandler;
+import org.compsysmed.ocsana.internal.util.tunables.NodeHandler;
 
 abstract public class AbstractNodeSetSelecter
     extends JPanel {
     protected final String label;
-    protected NodeNameHandler nodeNameHandler;
+    protected NodeHandler nodeHandler;
     private Set<CyNode> availableNodes;
 
     /**
@@ -34,19 +34,19 @@ abstract public class AbstractNodeSetSelecter
      * @param label  the label text for the selecter
      * @param availableNodes  the nodes the user should choose from
      * @param selectedNodes  the selected nodes (defaults to an empty set)
-     * @param nodeNameHandler  the handler to compute node names
+     * @param nodeHandler  the handler to compute node names
      **/
     public AbstractNodeSetSelecter (String label,
                                     Set<CyNode> availableNodes,
                                     Set<CyNode> selectedNodes,
-                                    NodeNameHandler nodeNameHandler) {
+                                    NodeHandler nodeHandler) {
         super();
 
         Objects.requireNonNull(label, "Label cannot be null");
         this.label = label;
 
-        Objects.requireNonNull(nodeNameHandler, "Node name handler cannot be null");
-        this.nodeNameHandler = nodeNameHandler;
+        Objects.requireNonNull(nodeHandler, "Node name handler cannot be null");
+        this.nodeHandler = nodeHandler;
 
         Objects.requireNonNull(availableNodes, "Set of available nodes cannot be null");
         setAvailableNodes(availableNodes);
@@ -60,12 +60,12 @@ abstract public class AbstractNodeSetSelecter
      *
      * @param label  the label text for the selecter
      * @param availableNodes  the nodes the user should choose from
-     * @param nodeNameHandler  the handler to compute node names
+     * @param nodeHandler  the handler to compute node names
      **/
     public AbstractNodeSetSelecter (String label,
                                     Set<CyNode> availableNodes,
-                                    NodeNameHandler nodeNameHandler) {
-        this(label, availableNodes, new HashSet<>(), nodeNameHandler);
+                                    NodeHandler nodeHandler) {
+        this(label, availableNodes, new HashSet<>(), nodeHandler);
     }
 
     /**
@@ -74,27 +74,27 @@ abstract public class AbstractNodeSetSelecter
      * @param other  another AbstractNodeSetSelecter
      **/
     public AbstractNodeSetSelecter (AbstractNodeSetSelecter other) {
-        this(other.label, other.getAvailableNodes(), other.getSelectedNodes(), other.nodeNameHandler);
+        this(other.label, other.getAvailableNodes(), other.getSelectedNodes(), other.nodeHandler);
     }
 
     /**
-     * Copy constructor with replacement NodeNameHandler
+     * Copy constructor with replacement NodeHandler
      *
      * @param other  another AbstractNodeSetSelecter
-     * @param nodeNameHandler  the new NodeNameHandler
+     * @param nodeHandler  the new NodeHandler
      **/
     public AbstractNodeSetSelecter (AbstractNodeSetSelecter other,
-                                    NodeNameHandler nodeNameHandler) {
-        this(other.label, other.getAvailableNodes(), other.getSelectedNodes(), nodeNameHandler);
+                                    NodeHandler nodeHandler) {
+        this(other.label, other.getAvailableNodes(), other.getSelectedNodes(), nodeHandler);
     }
 
     /**
-     * Update the selecter with a new NodeNameHandler
+     * Update the selecter with a new NodeHandler
      *
-     * @param nodeNameHandler the new NodeNameHandler
+     * @param nodeHandler the new NodeHandler
      **/
-    public void updateNodeNameHandler (NodeNameHandler nodeNameHandler) {
-        this.nodeNameHandler = nodeNameHandler;
+    public void updateNodeHandler (NodeHandler nodeHandler) {
+        this.nodeHandler = nodeHandler;
 
         setSelectedNodes(getSelectedNodes());
     }

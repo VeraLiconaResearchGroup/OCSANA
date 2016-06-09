@@ -57,7 +57,7 @@ public class TargetActivationSubpanel
         add(makeHeader("Configure network processing"));
 
         // Node set selection widgets
-        activatedTargetsSelecter = new ListNodeSetSelecter("Targets to activate", contextBundleBuilder.getTargetNodes(), contextBundleBuilder.getNodeNameHandler());
+        activatedTargetsSelecter = new ListNodeSetSelecter("Targets to activate", contextBundleBuilder.getTargetNodes(), contextBundleBuilder.getNodeHandler());
         add(activatedTargetsSelecter);
 
         // Target list refresh button

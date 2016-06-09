@@ -46,6 +46,11 @@ public class SimpleSignedInterventionScoringAlgorithm
         // TODO: Write a real algorithm
         DrugabilityDataBundle drugabilityBundle = drugabilityDataBundleFactory.getBundle(node);
 
+        if (drugabilityBundle == null) {
+            // Case that the ID is not in the database
+            return 0d;
+        }
+
         Collection<DrugProteinInteraction> knownSignedInteractions = drugabilityBundle.getAllInteractionsOfSign(node.getSign());
 
         if (!knownSignedInteractions.isEmpty()) {

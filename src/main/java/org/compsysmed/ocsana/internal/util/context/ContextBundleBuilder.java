@@ -19,7 +19,7 @@ import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.util.tunables.NodeNameHandler;
+import org.compsysmed.ocsana.internal.util.tunables.NodeHandler;
 import org.compsysmed.ocsana.internal.util.tunables.EdgeProcessor;
 
 import org.compsysmed.ocsana.internal.algorithms.drugability.AbstractSignedInterventionScoringAlgorithm;
@@ -53,7 +53,7 @@ public class ContextBundleBuilder {
 
     private Set<CyNode> targetsToActivate = new HashSet<>();
 
-    private NodeNameHandler nodeNameHandler;
+    private NodeHandler nodeHandler;
     private EdgeProcessor edgeProcessor;
     private boolean includeEndpointsInCIs;
 
@@ -69,7 +69,7 @@ public class ContextBundleBuilder {
 
         ocsanaAlgorithm = new OCSANAScoringAlgorithm(network);
 
-        setNodeNameHandler(new NodeNameHandler(network));
+        setNodeHandler(new NodeHandler(network));
         setEdgeProcessor(new EdgeProcessor(network));
         setIncludeEndpointsInCIs(false);
 
@@ -175,17 +175,17 @@ public class ContextBundleBuilder {
     /**
      * Set the node name handler
      **/
-    public void setNodeNameHandler (NodeNameHandler nodeNameHandler) {
-        Objects.requireNonNull(nodeNameHandler, "Node name handler cannot be null");
+    public void setNodeHandler (NodeHandler nodeHandler) {
+        Objects.requireNonNull(nodeHandler, "Node name handler cannot be null");
 
-        this.nodeNameHandler = nodeNameHandler;
+        this.nodeHandler = nodeHandler;
     }
 
     /**
      * Return the currently-selected node name handler
      **/
-    public NodeNameHandler getNodeNameHandler () {
-        return nodeNameHandler;
+    public NodeHandler getNodeHandler () {
+        return nodeHandler;
     }
 
     /**
@@ -294,6 +294,6 @@ public class ContextBundleBuilder {
      * Return the context as currently configured
      **/
     public ContextBundle getContextBundle () {
-        return new ContextBundle(network, sourceNodes, targetNodes, offTargetNodes, nodeNameHandler, edgeProcessor, includeEndpointsInCIs, pathFindingAlgorithm, mhsAlgorithm, ocsanaAlgorithm, targetsToActivate, ciSignAlgorithm, siScoringAlgorithm);
+        return new ContextBundle(network, sourceNodes, targetNodes, offTargetNodes, nodeHandler, edgeProcessor, includeEndpointsInCIs, pathFindingAlgorithm, mhsAlgorithm, ocsanaAlgorithm, targetsToActivate, ciSignAlgorithm, siScoringAlgorithm);
     }
 }

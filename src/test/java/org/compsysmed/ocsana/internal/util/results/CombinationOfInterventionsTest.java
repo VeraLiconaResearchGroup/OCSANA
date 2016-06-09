@@ -34,6 +34,7 @@ public class CombinationOfInterventionsTest {
     Set<CyNode> toyNetworkTargets;
 
     Function<CyNode, String> toyNetworkNodeNameFunction;
+    Function<CyNode, String> toyNetworkNodeBiomoleculeIDFunction;
 
     @Before
     public void setUp ()
@@ -61,6 +62,9 @@ public class CombinationOfInterventionsTest {
         assert toyNetworkTargets.size() == 2;
 
         toyNetworkNodeNameFunction = (node -> toyNetwork.getDefaultNodeTable().getRow(node).get(CyNetwork.NAME, String.class));
+        toyNetworkNodeBiomoleculeIDFunction = (node -> toyNetwork.getDefaultNodeTable().getRow(node).get(CyNetwork.NAME, String.class));
+
+
     }
 
     @After
@@ -75,7 +79,7 @@ public class CombinationOfInterventionsTest {
 
     @Test
     public void constructorShouldWork () {
-        CombinationOfInterventions ci = new CombinationOfInterventions(toyNetworkSources, toyNetworkTargets, toyNetworkNodeNameFunction);
+        CombinationOfInterventions ci = new CombinationOfInterventions(toyNetworkSources, toyNetworkTargets, toyNetworkNodeNameFunction, toyNetworkNodeBiomoleculeIDFunction);
         assertEquals("CI size", (Integer) 2, ci.size());
     }
 }

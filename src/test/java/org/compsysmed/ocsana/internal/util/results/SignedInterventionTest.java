@@ -36,6 +36,7 @@ public class SignedInterventionTest {
     Set<CyNode> toyNetworkTargets;
 
     Function<CyNode, String> toyNetworkNodeNameFunction;
+    Function<CyNode, String> toyNetworkNodeBiomoleculeIDFunction;
     Map<CyNode, Double> toyNetworkEffectOnTargets;
 
     @Before
@@ -64,6 +65,7 @@ public class SignedInterventionTest {
         assert toyNetworkTargets.size() == 2;
 
         toyNetworkNodeNameFunction = (node -> toyNetwork.getRow(node).get(CyNetwork.NAME, String.class));
+        toyNetworkNodeBiomoleculeIDFunction = (node -> toyNetwork.getRow(node).get(CyNetwork.NAME, String.class));
 
         toyNetworkEffectOnTargets = new HashMap<>();
         for (CyNode node: toyNetwork.getNodeList()) {
@@ -83,7 +85,7 @@ public class SignedInterventionTest {
 
     @Test
     public void constructorShouldWork () {
-        CombinationOfInterventions ci = new CombinationOfInterventions(toyNetworkSources, toyNetworkTargets, toyNetworkNodeNameFunction);
+        CombinationOfInterventions ci = new CombinationOfInterventions(toyNetworkSources, toyNetworkTargets, toyNetworkNodeNameFunction, toyNetworkNodeBiomoleculeIDFunction);
 
         SignedIntervention si = new SignedIntervention(ci, toyNetworkSources.stream().limit(1).collect(Collectors.toSet()), toyNetworkEffectOnTargets);
 

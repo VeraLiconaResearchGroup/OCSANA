@@ -98,7 +98,7 @@ public class MHSAlgorithmTask extends AbstractOCSANATask {
         Long preMHSTime = System.nanoTime();
         Collection<Set<CyNode>> MHSes = contextBundle.getMHSAlgorithm().MHSes(nodeSets);
 
-        resultsBundle.setCIs(MHSes.stream().map(mhs -> new CombinationOfInterventions(mhs, targetNodes, node -> contextBundle.getNodeNameHandler().getNodeName(node))).collect(Collectors.toList()));
+        resultsBundle.setCIs(MHSes.stream().map(mhs -> new CombinationOfInterventions(mhs, targetNodes, node -> contextBundle.getNodeHandler().getNodeName(node), node -> contextBundle.getNodeHandler().getNodeID(node))).collect(Collectors.toList()));
         Long postMHSTime = System.nanoTime();
 
         Double mhsTime = (postMHSTime - preMHSTime) / 1E9;

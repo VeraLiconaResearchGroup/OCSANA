@@ -88,7 +88,7 @@ public class DrugabilityDataBundleFactory {
      **/
     public DrugabilityDataBundle getBundle (SignedInterventionNode node) {
         // TODO: allow user to configure how name is processed
-        String proteinID = node.getName();
+        String proteinID = node.getBiomoleculeID();
 
         return getBundle(proteinID);
     }

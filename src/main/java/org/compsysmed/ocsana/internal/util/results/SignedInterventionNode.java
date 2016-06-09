@@ -25,11 +25,13 @@ public class SignedInterventionNode {
     private final CyNode node;
     private final InteractionSign sign;
     private final String name;
+    private final String biomoleculeID;
 
     public SignedInterventionNode (CyNode node,
                                    InteractionSign sign,
-                                   String name) {
-    	Objects.requireNonNull(node, "Node cannot be null");
+                                   String name,
+                                   String biomoleculeID) {
+        Objects.requireNonNull(node, "Node cannot be null");
         this.node = node;
 
         Objects.requireNonNull(sign, "Sign cannot be null");
@@ -37,6 +39,9 @@ public class SignedInterventionNode {
 
         Objects.requireNonNull(name, "Name cannot be null");
         this.name = name;
+
+        Objects.requireNonNull(biomoleculeID, "Biomoledule ID cannot be null");
+        this.biomoleculeID = biomoleculeID;
     }
 
     public CyNode getNode () {
@@ -49,6 +54,10 @@ public class SignedInterventionNode {
 
     public String getName () {
         return name;
+    }
+
+    public String getBiomoleculeID () {
+        return biomoleculeID;
     }
 
     public Long getSUID () {
