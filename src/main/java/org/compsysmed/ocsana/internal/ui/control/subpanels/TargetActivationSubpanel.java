@@ -14,7 +14,6 @@ package org.compsysmed.ocsana.internal.ui.control.subpanels;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 
 import org.cytoscape.work.swing.PanelTaskManager;
@@ -52,7 +51,7 @@ public class TargetActivationSubpanel
         this.contextBundleBuilder = contextBundleBuilder;
         this.taskManager = taskManager;
 
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setStandardLayout(this);
 
         add(makeHeader("Configure network processing"));
 

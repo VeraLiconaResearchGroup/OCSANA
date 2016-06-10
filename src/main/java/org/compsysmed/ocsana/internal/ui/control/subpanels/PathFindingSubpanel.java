@@ -17,7 +17,6 @@ import java.util.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -62,12 +61,13 @@ public class PathFindingSubpanel
         this.contextBundleBuilder = contextBundleBuilder;
         this.taskManager = taskManager;
 
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setStandardLayout(this);
 
         add(makeHeader("Configure path-finding"));
 
         // Algorithm selecter
         algSelectionPanel = new JPanel();
+        setStandardLayout(algSelectionPanel);
         add(algSelectionPanel);
 
         algSelectionPanel.add(new JLabel("Algorithm:"));
@@ -82,6 +82,7 @@ public class PathFindingSubpanel
 
         // Algorithm configuration panel
         tunablePanel = new JPanel();
+        setStandardLayout(tunablePanel);
         add(tunablePanel);
 
         updateTunablePanel();

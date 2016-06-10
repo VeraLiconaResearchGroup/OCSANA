@@ -15,14 +15,15 @@ package org.compsysmed.ocsana.internal.ui.control.subpanels;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
+
 import java.util.*;
 
 // Cytoscape imports
 import org.cytoscape.model.CyColumn;
-import javax.swing.BoxLayout;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 import org.cytoscape.work.swing.PanelTaskManager;
 
@@ -71,13 +72,14 @@ public class NetworkConfigurationSubpanel
         this.contextBundleBuilder = contextBundleBuilder;
         this.taskManager = taskManager;
 
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setStandardLayout(this);
 
         // Selection mode selection widgets
         JLabel header = makeHeader("Configure network processing");
         add(header);
 
         modePanel = new JPanel();
+        setStandardLayout(modePanel);
         add(modePanel);
 
         modePanel.add(new JLabel("Selection mode"));
@@ -88,7 +90,7 @@ public class NetworkConfigurationSubpanel
         modePanel.add(nodeSelectionModeSelecter);
 
         columnPanel = new JPanel();
-        columnPanel.setLayout(new BoxLayout(columnPanel, BoxLayout.Y_AXIS));
+        setStandardLayout(columnPanel);
         add(columnPanel);
 
         CyColumn[] nodeNameColumns = contextBundleBuilder.getNetwork().getDefaultNodeTable().getColumns().stream().toArray(CyColumn[]::new);
@@ -105,7 +107,7 @@ public class NetworkConfigurationSubpanel
 
         // Node set selection widgets
         nodeSetsPanel = new JPanel();
-        nodeSetsPanel.setLayout(new BoxLayout(nodeSetsPanel, BoxLayout.Y_AXIS));
+        setStandardLayout(nodeSetsPanel);
 
         add(nodeSetsPanel);
 

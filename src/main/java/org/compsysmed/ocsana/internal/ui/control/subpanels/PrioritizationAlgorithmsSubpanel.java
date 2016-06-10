@@ -17,7 +17,6 @@ import java.util.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -67,12 +66,13 @@ public class PrioritizationAlgorithmsSubpanel
         this.contextBundleBuilder = contextBundleBuilder;
         this.taskManager = taskManager;
 
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setStandardLayout(this);
 
         add(makeHeader("Configure prioritization algorithms"));
 
         // Sign assignment algorithms
         signAssignmentAlgorithmPanel = new JPanel();
+        setStandardLayout(signAssignmentAlgorithmPanel);
         add(signAssignmentAlgorithmPanel);
 
         signAssignmentAlgorithmPanel.add(new JLabel("Sign assignent algorithm:"));
@@ -86,11 +86,13 @@ public class PrioritizationAlgorithmsSubpanel
         add(signAssignmentAlgorithmPanel);
 
         signAssignmentTunablesPanel = new JPanel();
+        setStandardLayout(signAssignmentTunablesPanel);
         add(signAssignmentTunablesPanel);
         updateSignAssignmentTunablesPanel();
 
         // Signed intervention scoring algorithms
         signedInterventionScoringAlgorithmPanel = new JPanel();
+        setStandardLayout(signedInterventionScoringAlgorithmPanel);
         add(signedInterventionScoringAlgorithmPanel);
 
         signedInterventionScoringAlgorithmPanel.add(new JLabel("Sign assignent algorithm:"));
@@ -104,6 +106,7 @@ public class PrioritizationAlgorithmsSubpanel
         add(signedInterventionScoringAlgorithmPanel);
 
         signedInterventionScoringTunablesPanel = new JPanel();
+        setStandardLayout(signedInterventionScoringTunablesPanel);
         add(signedInterventionScoringTunablesPanel);
         updateSignedInterventionScoringTunablesPanel();
     }

@@ -12,6 +12,7 @@
 package org.compsysmed.ocsana.internal.ui.control.subpanels;
 
 // Java imports
+import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -53,5 +54,12 @@ abstract public class AbstractControlSubpanel
      **/
     protected void requestContextBundleBuilderUpdate () {
         controlPanel.updateContextBundleBuilder();
+    }
+
+    /**
+     * Set the standard layout on a given panel
+     **/
+    protected static void setStandardLayout (JPanel panel) {
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
     }
 }

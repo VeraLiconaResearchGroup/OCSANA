@@ -12,6 +12,8 @@
 package org.compsysmed.ocsana.internal.ui.control;
 
 import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Rectangle;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -21,7 +23,10 @@ import java.util.*;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JViewport;
 import javax.swing.Icon;
+import javax.swing.Scrollable;
 
 // Cytoscape imports
 import org.cytoscape.model.CyNetwork;
@@ -94,7 +99,6 @@ public class OCSANAControlPanel
         Objects.requireNonNull(panelTaskManager, "Panel task manager cannot be null");
         this.panelTaskManager = panelTaskManager;
 
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         handleNewNetwork(cyApplicationManager.getCurrentNetwork());
     }
 
@@ -131,8 +135,11 @@ public class OCSANAControlPanel
             return;
         }
 
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+
         JPanel tunablePanel = getContextBundleBuilderPanel();
-        add(tunablePanel);
+        JScrollPane contentScrollPane = new JScrollPane(tunablePanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        add(contentScrollPane);
 
         JButton runButton = new JButton("Run OCSANA calculations");
         add(runButton);
@@ -170,7 +177,7 @@ public class OCSANAControlPanel
      * Build a panel with the UI elements for the ContextBundleBuilder
      **/
     private JPanel getContextBundleBuilderPanel () {
-        JPanel panel = new JPanel();
+        JPanel panel = new ScrollablePanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
         networkConfigSubpanel = new NetworkConfigurationSubpanel(this, contextBundleBuilder, panelTaskManager);
@@ -235,5 +242,34 @@ public class OCSANAControlPanel
     @Override
     public Icon getIcon() {
         return null;
+    }
+
+    private static class ScrollablePanel
+        extends JPanel
+        implements Scrollable {
+        @Override
+        public Dimension getPreferredScrollableViewportSize() {
+            return getPreferredSize();
+        }
+
+        @Override
+        public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
+            return 20;
+        }
+
+        @Override
+        public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
+            return 60;
+        }
+
+        @Override
+        public boolean getScrollableTracksViewportWidth() {
+            return true;
+        }
+
+        @Override
+        public boolean getScrollableTracksViewportHeight() {
+            return (getParent().getHeight() > getPreferredSize().height);
+        }
     }
 }
