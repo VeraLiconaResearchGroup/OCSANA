@@ -97,11 +97,11 @@ public class AllNonSelfIntersectingPathsAlgorithmTest {
         // Algorithm
         AllNonSelfIntersectingPathsAlgorithm pathAlg = new AllNonSelfIntersectingPathsAlgorithm(toyNetwork);
         pathAlg.dijkstra.restrictPathLength = true;
-        pathAlg.dijkstra.maxPathLength = 20;
+        pathAlg.dijkstra.maxPathLength = 3;
 
         // path-finding
         Collection<List<CyEdge>> paths = pathAlg.paths(toyNetworkSources, toyNetworkTargets);
-        assertEquals("Path count", 5, paths.size());
+        assertEquals("Path count", 4, paths.size());
 
         for (List<CyEdge> path: paths) {
             assertTrue("Path starts at a source", toyNetworkSources.contains(path.get(0).getSource()));
@@ -113,7 +113,6 @@ public class AllNonSelfIntersectingPathsAlgorithmTest {
     public void toyNetworkShouldHaveRightNumberOfLongPaths () {
         // Algorithm
         AllNonSelfIntersectingPathsAlgorithm pathAlg = new AllNonSelfIntersectingPathsAlgorithm(toyNetwork);
-        pathAlg.discardNodeRedundantPaths = false;
         pathAlg.dijkstra.restrictPathLength = true;
         pathAlg.dijkstra.maxPathLength = 20;
 
@@ -132,11 +131,11 @@ public class AllNonSelfIntersectingPathsAlgorithmTest {
         // Algorithm
         AllNonSelfIntersectingPathsAlgorithm pathAlg = new AllNonSelfIntersectingPathsAlgorithm(HER2Network);
         pathAlg.dijkstra.restrictPathLength = true;
-        pathAlg.dijkstra.maxPathLength = 20;
+        pathAlg.dijkstra.maxPathLength = 5;
 
         // Path-finding
         Collection<List<CyEdge>> paths = pathAlg.paths(HER2NetworkSources, HER2NetworkTargets);
-        assertEquals("Path count", 5330, paths.size());
+        assertEquals("Path count", 3, paths.size());
 
         for (List<CyEdge> path: paths) {
             assertTrue("Path starts at a source", HER2NetworkSources.contains(path.get(0).getSource()));
@@ -148,7 +147,6 @@ public class AllNonSelfIntersectingPathsAlgorithmTest {
     public void HER2NetworkShouldHaveRightNumberOfLongPaths () {
         // Algorithm
         AllNonSelfIntersectingPathsAlgorithm pathAlg = new AllNonSelfIntersectingPathsAlgorithm(HER2Network);
-        pathAlg.discardNodeRedundantPaths = false;
         pathAlg.dijkstra.restrictPathLength = true;
         pathAlg.dijkstra.maxPathLength = 20;
 

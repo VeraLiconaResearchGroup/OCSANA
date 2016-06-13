@@ -40,12 +40,6 @@ public class AllNonSelfIntersectingPathsAlgorithm
     @ContainsTunables
     public DijkstraPathDecoratorAlgorithm dijkstra;
 
-    @Tunable(description="Discard redundant paths",
-             groups = {AbstractPathFindingAlgorithm.CONFIG_GROUP},
-             gravity=220,
-             tooltip="If selected, scan for and discard paths which are nodewise supersets of other paths. This saves (possibly substantial) memory but adds computation time.")
-    public Boolean discardNodeRedundantPaths = true;
-
     public AllNonSelfIntersectingPathsAlgorithm (CyNetwork network) {
         super(network);
         dijkstra = new DijkstraPathDecoratorAlgorithm(network);
@@ -100,12 +94,8 @@ public class AllNonSelfIntersectingPathsAlgorithm
 
                 assert outEdge.getSource().equals(sourceNode);
 
-                // Ignore edges that aren't marked or that connect a source to another source that isn't a target
-                if (edgeMinDistancesFromTargets.containsKey(outEdge) &&
-                    (!discardNodeRedundantPaths || (!sources.contains(outEdge.getTarget()) || targets.contains(outEdge.getTarget())))) {
-                    List<CyEdge> newPath = Arrays.asList(outEdge);
-                    incompletePaths.add(newPath);
-                }
+                List<CyEdge> newPath = Arrays.asList(outEdge);
+                incompletePaths.add(newPath);
             }
         }
 
@@ -158,36 +148,21 @@ public class AllNonSelfIntersectingPathsAlgorithm
                         continue edgeTestingLoop;
                     }
 
-                    // Make sure this path doesn't "take the long way"
-                    // around a single edge
-                    if (discardNodeRedundantPaths) {
-                        for (CyEdge inEdge: network.getAdjacentEdgeIterable(outEdge.getTarget(), CyEdge.Type.INCOMING)) {
-                            if (!inEdge.getSource().equals(outEdge.getSource()) &&
-                                pathNodes.contains(inEdge.getSource())) {
-                                continue edgeTestingLoop;
-                            }
-                        }
-                    }
-
-                    // Otherwise, create the new path
+                    // Create the new path
                     List<CyEdge> newPath = new ArrayList<>(incompletePath.size() + 1);
                     newPath.addAll(incompletePath);
                     newPath.add(outEdge);
 
-                    // Process the new path appropriately
+                    // If the new path ends at a target, it's complete
                     if (targets.contains(outEdge.getTarget())) {
-                        // If the new path ends at a target, it's complete
                         assert (!dijkstra.restrictPathLength || newPath.size() <= dijkstra.maxPathLength);
                         assert sources.contains(newPath.get(0).getSource());
                         assert targets.contains(newPath.get(newPath.size() - 1).getTarget());
                         completePaths.add(newPath);
                     }
 
-                    if (!discardNodeRedundantPaths || (!sources.contains(outEdge.getTarget()) && !targets.contains(outEdge.getTarget()))) {
-                        // Otherwise, we should consider further
-                        // extensions of it
-                        incompletePaths.addFirst(newPath);
-                    }
+                    // Regardless, we consider further extensions of it
+                    incompletePaths.addFirst(newPath);
                 }
             }
         }
@@ -223,12 +198,6 @@ public class AllNonSelfIntersectingPathsAlgorithm
         StringBuilder result = new StringBuilder(fullName());
 
         result.append(" (");
-
-        if (discardNodeRedundantPaths) {
-            result.append("discard redundant paths; ");
-        } else {
-            result.append("include redundant paths; ");
-        }
 
         if (dijkstra.restrictPathLength) {
             result.append(String.format("max path length: %d", dijkstra.maxPathLength));
