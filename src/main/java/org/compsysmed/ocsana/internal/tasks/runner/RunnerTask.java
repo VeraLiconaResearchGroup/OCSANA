@@ -100,8 +100,7 @@ public class RunnerTask
             new PathFindingAlgorithmTaskFactory(contextBundle, resultsBundle,
                                                 OCSANAStep.FIND_PATHS_TO_TARGETS);
 
-        taskManager.execute(pathsToTargetsTaskFactory.createTaskIterator(),
-                            this);
+        taskManager.execute(pathsToTargetsTaskFactory.createTaskIterator(), this);
     }
 
     private void spawnPathsToOffTargetsTask () {
@@ -109,8 +108,7 @@ public class RunnerTask
             new PathFindingAlgorithmTaskFactory(contextBundle, resultsBundle,
                                                 OCSANAStep.FIND_PATHS_TO_OFF_TARGETS);
 
-        taskManager.execute(pathsToOffTargetsTaskFactory.createTaskIterator(),
-                            this);
+        taskManager.execute(pathsToOffTargetsTaskFactory.createTaskIterator(), this);
     }
 
     private void spawnOCSANAScoringTask () {
