@@ -124,6 +124,10 @@ public class RSAlgorithm extends AbstractMHSAlgorithm {
         // Construct a Hypergraph with the resulting MHSes
         Hypergraph MHSes = new Hypergraph(H.numVerts());
         for (BitSet edge: results) {
+            if (isCanceled()) {
+                break;
+            }
+
             MHSes.add(edge);
         }
 
@@ -220,6 +224,10 @@ public class RSAlgorithm extends AbstractMHSAlgorithm {
 
             // Iterate through the vertices in the search edge in reverse order
             for (int v = searchEdge.length(); (v = searchEdge.previousSetBit(v-1)) >= 0; ) {
+                if (isCanceled()) {
+                    return;
+                }
+
                 // Update crit and uncov
                 Map<Integer, BitSet> critMark = updateCritAndUncov(v);
 

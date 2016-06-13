@@ -116,6 +116,10 @@ public class DijkstraPathDecoratorAlgorithm
             assert nodeMinDistances.containsKey(nodeToProcess);
             // Look at all the edges connected to this node
             for (CyEdge edge: network.getAdjacentEdgeIterable(nodeToProcess, edgeType)) {
+                if (isCanceled()) {
+                    break;
+                }
+
                 if (!edge.isDirected()) {
                     throw new IllegalArgumentException("Undirected edges are not supported.");
                 }

@@ -123,6 +123,10 @@ public class ShortestPathsAlgorithm
                 continue;
             }
 
+            if (isCanceled()) {
+                continue;
+            }
+
             if (closestIncomingEdges.isEmpty() ||
                 edgeMinDistancesFromSource.get(incomingEdge) < closestIncomingEdgeWeight) {
                 closestIncomingEdges.clear();
@@ -136,9 +140,17 @@ public class ShortestPathsAlgorithm
         Collection<List<CyEdge>> shortestPaths = new ArrayList<>();
         // Recurse to find the upstream paths
         for (CyEdge incomingEdge: closestIncomingEdges) {
+            if (isCanceled()) {
+                break;
+            }
+
             Collection<List<CyEdge>> upstreamPaths = shortestPaths(source, incomingEdge.getSource(), edgeMinDistancesFromSource);
 
             for (List<CyEdge> upstreamPath: upstreamPaths) {
+                if (isCanceled()) {
+                    break;
+                }
+
                 List<CyEdge> result = new ArrayList<>(upstreamPath);
                 result.add(incomingEdge);
                 shortestPaths.add(result);

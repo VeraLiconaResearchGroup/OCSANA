@@ -28,7 +28,7 @@
             <li><a href="{{interaction.getDrug().getDrugBankURL()}}">{{interaction.getDrug().getName()}}</a> ({{interaction.getDrugActionType().getDescription()}})</li>
             {% endfor %}
         </ul>
-        ({{bundle.getAllInteractionsNotOfSign(node.getSign()).size()}} other interactions are known. See <a href="{{interaction.getProtein().getDrugBankBioDBURL()}}">DrugBank BioDB page</a> for details.)
+        ({{bundle.getAllInteractionsNotOfSign(node.getSign()).size()}} other interactions are known. See <a href="{{bundle.getProtein().getDrugBankBioDBURL()}}">DrugBank BioDB page</a> for details.)
     </p>
     {% endif %}
     <h4>Drugability predictions</h4>

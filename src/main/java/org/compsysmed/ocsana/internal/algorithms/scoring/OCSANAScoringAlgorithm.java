@@ -184,6 +184,10 @@ public class OCSANAScoringAlgorithm
             // For each path, we walk backwards from the endpoint,
             // considering the source of each edge
             for (int i = path.size() - 1; i >= 0; i--) {
+                if (isCanceled()) {
+                    return;
+                }
+
                 assert Math.abs(pathSign) == 1;
 
                 CyEdge edge = path.get(i);

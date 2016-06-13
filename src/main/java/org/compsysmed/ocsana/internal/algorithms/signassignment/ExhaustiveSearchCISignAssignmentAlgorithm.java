@@ -156,6 +156,10 @@ public class ExhaustiveSearchCISignAssignmentAlgorithm
 
         candidateTestingLoop:
             for (BitSetWithEffect newCandidate: bestSignsSoFar) {
+                if (isCanceled()) {
+                    break;
+                }
+
                 Collection<BitSetWithEffect> assignmentsInferiorToCandidate = new HashSet<>();
                 for (BitSetWithEffect oldAssignment: trimmedOptimalAssignments) {
                     switch (compareVectors(newCandidate.effect, oldAssignment.effect)) {
@@ -185,6 +189,10 @@ public class ExhaustiveSearchCISignAssignmentAlgorithm
         // construct the corresponding SignedInterventions
         Collection<SignedIntervention> interventions = new ArrayList<>();
         for (BitSetWithEffect result: bestSignsSoFar) {
+            if (isCanceled()) {
+                break;
+            }
+
             BitSet resultSigns = result.bitset;
             Set<CyNode> activatedSources = activatedSources(sourceList, resultSigns);
 

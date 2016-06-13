@@ -126,6 +126,10 @@ public class MMCSAlgorithm extends AbstractMHSAlgorithm {
         // Construct a Hypergraph with the resulting MHSes
         Hypergraph MHSes = new Hypergraph(H.numVerts());
         for (BitSet edge: results) {
+            if (isCanceled()) {
+                break;
+            }
+
             MHSes.add(edge);
         }
         MHSes.updateNumVerts();
@@ -222,6 +226,10 @@ public class MMCSAlgorithm extends AbstractMHSAlgorithm {
 
             // Iterate through the vertices in the intersection (in reverse order)
             for (int v = C.length(); (v = C.previousSetBit(v-1)) >= 0; ) {
+                if (isCanceled()) {
+                    return;
+                }
+
                 // First, check for violators
                 if (vertexWouldViolate(v)) {
                     violators.set(v);
