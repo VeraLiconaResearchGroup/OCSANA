@@ -53,6 +53,8 @@ public class BergeAlgorithm extends AbstractMHSAlgorithm {
         HypergraphOfSetsOfCyNodes inputHypergraph
             = new HypergraphOfSetsOfCyNodes(sets);
 
+        inputHypergraph.minimize();
+
         Hypergraph resultHypergraph = transversalHypergraph(inputHypergraph);
 
         return inputHypergraph.getCyNodeSetsFromHypergraph(resultHypergraph);
