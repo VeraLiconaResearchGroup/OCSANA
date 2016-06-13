@@ -35,19 +35,15 @@ import org.cytoscape.model.CyTable;
  **/
 
 public class EdgeProcessor {
-    private static final String CONFIG_GROUP = "Process edges";
-
     // User configuration
-    @Tunable(description = "Process edge signs",
-             tooltip = "If enabled, consider whether each edge represents an activation or an inhibition, using information from an edge attribute in the table",
-             gravity = 190,
-             groups = {CONFIG_GROUP})
+    @Tunable(description = "Configure edge signs",
+             tooltip = "If enabled, treat edges as signed, using information taken from a column in the edge attribute table",
+             gravity = 190)
     public Boolean processEdgeSigns = false;
 
-    @Tunable(description = "Edge sign column",
-             gravity = 191,
-             groups = {CONFIG_GROUP},
-             dependsOn = "processEdgeSigns=true")
+    @Tunable(description = "Select edge sign attribute",
+             tooltip = "Choose one column from the edge attribute table whose value indicates the sign of each edge",
+             gravity = 191)
     public ListSingleSelection<CyColumn> getEdgeSignColumnSelecter () {
         return edgeSignColumnSelecter;
     };
@@ -59,10 +55,9 @@ public class EdgeProcessor {
 
     private ListSingleSelection<CyColumn> edgeSignColumnSelecter;
 
-    @Tunable(description = "Values representing inhibition",
-             tooltip = "All other values will be interpreted as activation",
+    @Tunable(description = "Select value(s) for inhibition",
+             tooltip = "Select one or more values of the edge sign attribute to represent inhibition edges. All other values will represent activation edges.",
              gravity = 192,
-             groups = {CONFIG_GROUP},
              dependsOn = "processEdgeSigns=true",
              listenForChange = "EdgeSignColumnSelecter")
     public ListMultipleSelection<Object> edgeInhibitionValueSelecter;
