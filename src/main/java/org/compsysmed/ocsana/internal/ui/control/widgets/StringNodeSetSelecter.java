@@ -27,6 +27,8 @@ import org.compsysmed.ocsana.internal.util.tunables.NodeHandler;
 
 public class StringNodeSetSelecter
     extends AbstractNodeSetSelecter {
+    private static final String toolTipText = "Enter node names separated by commas, tabs, or newlines";
+
     private JTextArea nodeSetStringField;
     private Set<CyNode> availableNodes;
 
@@ -60,7 +62,7 @@ public class StringNodeSetSelecter
      * Build the JPanel after the constructors populate the data
      **/
     private void draw () {
-        setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         JLabel title = new JLabel(label);
         add(title);
@@ -74,11 +76,12 @@ public class StringNodeSetSelecter
         nodeSetStringField.setEditable(true);
         nodeSetStringField.setLineWrap(true);
         nodeSetStringField.setWrapStyleWord(true);
+        nodeSetStringField.setToolTipText(toolTipText);
     }
 
     @Override
     public Set<CyNode> getSelectedNodes () {
-        Set<String> selectedNodeNames = Arrays.asList(nodeSetStringField.getText().trim().split(",")).stream().map(nodeName -> nodeName.trim()).filter(nodeName -> !nodeName.isEmpty()).collect(Collectors.toSet());
+        Set<String> selectedNodeNames = Arrays.asList(nodeSetStringField.getText().trim().split("[,\t\n]")).stream().map(nodeName -> nodeName.trim()).filter(nodeName -> !nodeName.isEmpty()).collect(Collectors.toSet());
         Set<CyNode> selectedNodes = selectedNodeNames.stream().map(nodeName -> nodeHandler.getNodeByName(nodeName)).filter(node -> node != null).collect(Collectors.toSet());
         return selectedNodes;
     }

@@ -82,11 +82,12 @@ public class NetworkConfigurationSubpanel
         setStandardLayout(modePanel);
         add(modePanel);
 
-        modePanel.add(new JLabel("Selection mode"));
+        modePanel.add(new JLabel("Node selection mode"));
 
         SelectionMode[] modes = {SelectionMode.listMode, SelectionMode.stringMode};
         nodeSelectionModeSelecter = new JComboBox<>(modes);
         nodeSelectionModeSelecter.addActionListener(this);
+        nodeSelectionModeSelecter.setToolTipText(String.format("Choose %s to select nodes with a multi-select combo box; choose %s to enter the list as text.", SelectionMode.listMode, SelectionMode.stringMode));
         modePanel.add(nodeSelectionModeSelecter);
 
         columnPanel = new JPanel();
@@ -94,15 +95,17 @@ public class NetworkConfigurationSubpanel
         add(columnPanel);
 
         CyColumn[] nodeNameColumns = contextBundleBuilder.getNetwork().getDefaultNodeTable().getColumns().stream().toArray(CyColumn[]::new);
-        columnPanel.add(new JLabel("Node name column"));
+        columnPanel.add(new JLabel("Select node name column"));
         nodeNameColumnSelecter = new JComboBox<>(nodeNameColumns);
         nodeNameColumnSelecter.addActionListener(this);
+        nodeNameColumnSelecter.setToolTipText("Each node will be assigned a name taken from the selected column of the node table. In particular, this will be the name used in the selecters below.");
         columnPanel.add(nodeNameColumnSelecter);
 
         CyColumn[] nodeIDColumns = contextBundleBuilder.getNetwork().getDefaultNodeTable().getColumns().stream().toArray(CyColumn[]::new);
-        columnPanel.add(new JLabel("Node biomolecule ID column"));
+        columnPanel.add(new JLabel("Select node biomolecule ID column"));
         nodeIDColumnSelecter = new JComboBox<>(nodeIDColumns);
         nodeIDColumnSelecter.addActionListener(this);
+        nodeIDColumnSelecter.setToolTipText("The drugability features of OCSANA will only work if you provide information about which biomolecule is associated with each node. Create a string column in the node table and record a UniProt, RefSeq, or ENSMBL ID for each node that has one, then select it here.");
         columnPanel.add(nodeIDColumnSelecter);
 
         // Node set selection widgets

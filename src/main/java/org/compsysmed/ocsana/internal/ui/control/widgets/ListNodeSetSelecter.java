@@ -34,6 +34,8 @@ import org.compsysmed.ocsana.internal.util.tunables.NodeHandler;
 
 public class ListNodeSetSelecter
     extends AbstractNodeSetSelecter {
+    private static final String toolTipText = "Ctrl+click to select multiple nodes";
+
     private JList<CyNode> nodeSetListField;
 
     public ListNodeSetSelecter (String label,
@@ -68,7 +70,7 @@ public class ListNodeSetSelecter
     private void draw () {
         removeAll();
 
-        setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         nodeSetListField.setCellRenderer(new NodeListCellRenderer(nodeHandler));
 
@@ -89,6 +91,7 @@ public class ListNodeSetSelecter
         CyNode[] availableNodesArray = getAvailableNodes().toArray(new CyNode[0]);
         nodeSetListField = new JList<>(availableNodesArray);
         nodeSetListField.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        nodeSetListField.setToolTipText(toolTipText);
 
         draw();
     }

@@ -14,6 +14,7 @@ package org.compsysmed.ocsana.internal.ui.control.widgets;
 // Java imports
 import java.util.*;
 
+import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
 // Cytoscape imports
