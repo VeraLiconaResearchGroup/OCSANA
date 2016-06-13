@@ -31,8 +31,8 @@ import org.cytoscape.model.CyNode;
  **/
 public class ShortestPathsAlgorithm
     extends AbstractPathFindingAlgorithm {
-    public static final String NAME = "Shortest paths";
-    public static final String SHORTNAME = "SHORT";
+    private static final String NAME = "Shortest paths";
+    private static final String SHORTNAME = "SHORT";
 
     @ContainsTunables
     public DijkstraPathDecoratorAlgorithm dijkstra;
@@ -174,11 +174,6 @@ public class ShortestPathsAlgorithm
     @Override
     public String shortName () {
         return SHORTNAME;
-    }
-
-    @Override
-    public String toString () {
-        return this.shortName();
     }
 
     @Override

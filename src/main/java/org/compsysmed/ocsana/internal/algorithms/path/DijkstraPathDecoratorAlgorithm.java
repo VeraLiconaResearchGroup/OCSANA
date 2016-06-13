@@ -28,19 +28,17 @@ import org.compsysmed.ocsana.internal.algorithms.AbstractOCSANAAlgorithm;
 public class DijkstraPathDecoratorAlgorithm
     extends AbstractOCSANAAlgorithm {
     @Tunable(description = "Bound path length",
-             groups = {AbstractPathFindingAlgorithm.CONFIG_GROUP},
              gravity=210)
     public Boolean restrictPathLength = true;
 
     // TODO: require non-negative
     @Tunable(description = "Maximum path length",
              tooltip = "Maximum number of edges to allow in a path",
-             groups = {AbstractPathFindingAlgorithm.CONFIG_GROUP},
              gravity = 211,
              dependsOn = "restrictPathLength=true")
     public Integer maxPathLength = 20;
 
-    private CyNetwork network;
+    private final CyNetwork network;
 
     public DijkstraPathDecoratorAlgorithm (CyNetwork network) {
         this.network = network;

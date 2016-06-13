@@ -30,33 +30,29 @@ import org.cytoscape.model.CyNode;
  **/
 
 public class MMCSAlgorithm extends AbstractMHSAlgorithm {
-    public static final String NAME = "MMCS algorithm";
-    public static final String SHORTNAME = "MMCS";
+    private static final String NAME = "MMCS algorithm";
+    private static final String SHORTNAME = "MMCS";
 
     // Tunables for threading
     @Tunable(description = "Bound thread count",
              gravity = 350,
-             tooltip="By default, all CPUs will be utilized",
-             groups = {AbstractMHSAlgorithm.CONFIG_GROUP + ": " + SHORTNAME})
+             tooltip="By default, all CPUs will be utilized")
     public Boolean configureThreads = false;
 
     @Tunable(description = "Number of threads",
              gravity = 351,
-             dependsOn = "configureThreads=true",
-             groups={AbstractMHSAlgorithm.CONFIG_GROUP + ": " + SHORTNAME})
+             dependsOn = "configureThreads=true")
     public BoundedInteger numThreads;
 
     // Tunables for bounded-cardinality search
     @Tunable(description = "Bound CI size",
              gravity = 352,
-             tooltip="Unbounded search may take a very long time!",
-             groups = {AbstractMHSAlgorithm.CONFIG_GROUP + ": " + SHORTNAME})
+             tooltip="Unbounded search may take a very long time!")
     public Boolean useMaxCardinality = true;
 
     @Tunable(description = "Maximum CI size",
              gravity = 353,
-             dependsOn = "useMaxCardinality=true",
-             groups = {AbstractMHSAlgorithm.CONFIG_GROUP + ": " + SHORTNAME})
+             dependsOn = "useMaxCardinality=true")
     public BoundedInteger maxCardinalityBInt;
 
     public MMCSAlgorithm () {
@@ -291,11 +287,6 @@ public class MMCSAlgorithm extends AbstractMHSAlgorithm {
     @Override
     public String shortName () {
         return SHORTNAME;
-    }
-
-    @Override
-    public String toString () {
-        return this.shortName();
     }
 
     @Override

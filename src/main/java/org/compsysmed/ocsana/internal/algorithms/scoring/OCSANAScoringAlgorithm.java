@@ -37,8 +37,8 @@ import org.compsysmed.ocsana.internal.algorithms.AbstractOCSANAAlgorithm;
 
 public class OCSANAScoringAlgorithm
     extends AbstractOCSANAAlgorithm {
-    public static final String NAME = "OCSANA scoring";
-    public static final String SHORTNAME = "OCSANA";
+    private static final String NAME = "OCSANA scoring";
+    private static final String SHORTNAME = "OCSANA";
 
     // User configuration
     @Tunable(description = "Create score column",
@@ -54,7 +54,7 @@ public class OCSANAScoringAlgorithm
              public String storeScoresColumn = "ocsanaScore";
 
     // Internal data
-    private CyNetwork network;
+    private final CyNetwork network;
 
     // Per-node subscores for each target and off-target
     Map<CyNode, Map<CyNode, Double>> effectsOnTargets;
@@ -477,11 +477,6 @@ public class OCSANAScoringAlgorithm
     @Override
     public String shortName () {
         return SHORTNAME;
-    }
-
-    @Override
-    public String toString () {
-        return this.shortName();
     }
 
     @Override

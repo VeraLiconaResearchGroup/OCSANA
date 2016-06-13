@@ -27,20 +27,18 @@ import org.cytoscape.model.CyNode;
  **/
 
 public class BergeAlgorithm extends AbstractMHSAlgorithm {
-    public static final String NAME = "Berge's algorithm";
-    public static final String SHORTNAME = "Berge";
+    private static final String NAME = "Berge's algorithm";
+    private static final String SHORTNAME = "Berge";
 
     // Tunables for bounded-cardinality search
     @Tunable(description = "Bound CI size",
              gravity = 350,
-             tooltip="Unbounded search may take a very long time!",
-             groups = {AbstractMHSAlgorithm.CONFIG_GROUP + ": " + SHORTNAME})
+             tooltip="Unbounded search may take a very long time!")
     public Boolean useMaxCardinality = true;
 
     @Tunable(description = "Maximum CI size",
              gravity = 351,
-             dependsOn = "useMaxCardinality=true",
-             groups = {AbstractMHSAlgorithm.CONFIG_GROUP + ": " + SHORTNAME})
+             dependsOn = "useMaxCardinality=true")
     public BoundedInteger maxCardinalityBInt = new BoundedInteger(1, 6, 20, false, false);
 
     public BergeAlgorithm() {
@@ -159,11 +157,6 @@ public class BergeAlgorithm extends AbstractMHSAlgorithm {
     @Override
     public String shortName () {
         return SHORTNAME;
-    }
-
-    @Override
-    public String toString () {
-        return this.shortName();
     }
 
     @Override

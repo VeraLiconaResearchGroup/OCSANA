@@ -40,8 +40,8 @@ import org.compsysmed.ocsana.internal.util.results.SignedIntervention;
  **/
 public class ExhaustiveSearchCISignAssignmentAlgorithm
     extends AbstractCISignAssignmentAlgorithm {
-    public static final String NAME = "CI sign testing";
-    public static final String SHORTNAME = "CI-sign";
+    private static final String NAME = "CI sign testing";
+    private static final String SHORTNAME = "CI-sign";
 
     private final ContextBundleBuilder contextBundleBuilder;
     private final Boolean paretoOptimalOnly;
@@ -302,11 +302,6 @@ public class ExhaustiveSearchCISignAssignmentAlgorithm
     @Override
     public String shortName () {
         return SHORTNAME;
-    }
-
-    @Override
-    public String toString () {
-        return this.shortName();
     }
 
     @Override

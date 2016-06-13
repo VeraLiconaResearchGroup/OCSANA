@@ -34,8 +34,8 @@ import org.cytoscape.model.CyNode;
  **/
 public class AllNonSelfIntersectingPathsAlgorithm
     extends AbstractPathFindingAlgorithm {
-    public static final String NAME = "All non-self-intersecting paths";
-    public static final String SHORTNAME = "ALL";
+    private static final String NAME = "All non-self-intersecting paths";
+    private static final String SHORTNAME = "ALL";
 
     @ContainsTunables
     public DijkstraPathDecoratorAlgorithm dijkstra;
@@ -186,11 +186,6 @@ public class AllNonSelfIntersectingPathsAlgorithm
     @Override
     public String shortName () {
         return SHORTNAME;
-    }
-
-    @Override
-    public String toString () {
-        return this.shortName();
     }
 
     @Override

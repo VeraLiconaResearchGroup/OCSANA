@@ -50,10 +50,14 @@ public abstract class AbstractOCSANAAlgorithm {
     public abstract String shortName ();
 
     /**
-     * Return a name suitable for printing in a menu or status message
+     * Return a name suitable for printing in a dropdown menu or
+     * status message
+     * <p>
+     * NOTE: returns {@link #fullName()} by default, but can be overridden
      **/
-    @Override
-    public abstract String toString ();
+    public String toString () {
+        return fullName();
+    }
 
     /**
      * Return a descriptive string suitable for printing in a report

@@ -21,8 +21,8 @@ import org.cytoscape.model.CyNode;
 // OCSANA imports
 
 public class HypergraphOfSetsOfCyNodes extends Hypergraph {
-    private Map<CyNode, Integer> mapNodeToHash;
-    private Map<Integer, CyNode> mapHashToNode;
+    private final Map<CyNode, Integer> mapNodeToHash;
+    private final Map<Integer, CyNode> mapHashToNode;
 
     private Integer nextKey = 0;
 

@@ -28,11 +28,9 @@ import org.compsysmed.ocsana.internal.algorithms.AbstractOCSANAAlgorithm;
 
 public abstract class AbstractPathFindingAlgorithm
     extends AbstractOCSANAAlgorithm {
-    protected static final String CONFIG_GROUP = "Path-finding algorithm";
-
     protected static final String UNDIRECTED_ERROR_MESSAGE = "Undirected edges are not supported";
 
-    protected CyNetwork network;
+    protected final CyNetwork network;
 
     public AbstractPathFindingAlgorithm (CyNetwork network) {
         this.network = network;

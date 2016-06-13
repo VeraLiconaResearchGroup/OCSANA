@@ -78,11 +78,6 @@ public class SimpleSignedInterventionScoringAlgorithm
     }
 
     @Override
-    public String toString () {
-        return shortName();
-    }
-
-    @Override
     public String description () {
         StringBuilder result = new StringBuilder(fullName());
 
