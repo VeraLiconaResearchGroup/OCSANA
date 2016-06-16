@@ -58,7 +58,7 @@
         {% endif %}
     </p>
     <p>
-        {% if bundle.getDrProdisPredictions() is not null %}
+        {% if bundle.getDrProdisPredictions() is not null and bundle.getDrProdisPredictions() is not empty %}
         DR.PRODIS binding predictions:
         <table>
             <tr>
