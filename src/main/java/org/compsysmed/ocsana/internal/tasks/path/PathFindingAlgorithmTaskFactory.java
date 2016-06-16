@@ -20,20 +20,27 @@ import org.cytoscape.work.TaskIterator;
 
 // OCSANA imports
 import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
+import org.compsysmed.ocsana.internal.tasks.runner.RunnerTask;
 
 import org.compsysmed.ocsana.internal.util.context.ContextBundle;
 import org.compsysmed.ocsana.internal.util.results.ResultsBundle;
 
 public class PathFindingAlgorithmTaskFactory
     extends AbstractTaskFactory {
+    private final RunnerTask runnerTask;
     private final ContextBundle contextBundle;
     private final ResultsBundle resultsBundle;
     private final OCSANAStep algStep;
 
-    public PathFindingAlgorithmTaskFactory (ContextBundle contextBundle,
+    public PathFindingAlgorithmTaskFactory (RunnerTask runnerTask,
+                                            ContextBundle contextBundle,
                                             ResultsBundle resultsBundle,
                                             OCSANAStep algStep) {
         super();
+
+        Objects.requireNonNull(runnerTask, "Runner task cannot be null");
+        this.runnerTask = runnerTask;
+
         Objects.requireNonNull(contextBundle, "Context bundle cannot be null");
         this.contextBundle = contextBundle;
 
@@ -47,7 +54,7 @@ public class PathFindingAlgorithmTaskFactory
     @Override
     public TaskIterator createTaskIterator () {
         TaskIterator tasks = new TaskIterator();
-        tasks.append(new PathFindingAlgorithmTask(contextBundle, resultsBundle, algStep));
+        tasks.append(new PathFindingAlgorithmTask(runnerTask, contextBundle, resultsBundle, algStep));
         return tasks;
     }
 }

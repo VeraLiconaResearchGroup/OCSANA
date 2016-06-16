@@ -23,20 +23,26 @@ import org.cytoscape.model.CyEdge;
 // OCSANA imports
 import org.compsysmed.ocsana.internal.tasks.AbstractOCSANATask;
 import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
+import org.compsysmed.ocsana.internal.tasks.runner.RunnerTask;
 
 import org.compsysmed.ocsana.internal.util.context.ContextBundle;
 import org.compsysmed.ocsana.internal.util.results.ResultsBundle;
 
 public class PathFindingAlgorithmTask extends AbstractOCSANATask {
+    private final RunnerTask runnerTask;
     private final ContextBundle contextBundle;
     private final ResultsBundle resultsBundle;
     private final OCSANAStep algStep;
     private Collection<List<CyEdge>> paths;
 
-    public PathFindingAlgorithmTask (ContextBundle contextBundle,
+    public PathFindingAlgorithmTask (RunnerTask runnerTask,
+                                     ContextBundle contextBundle,
                                      ResultsBundle resultsBundle,
                                      OCSANAStep algStep) {
         super(contextBundle.getNetwork());
+
+        Objects.requireNonNull(runnerTask, "Runner task cannot be null");
+        this.runnerTask = runnerTask;
 
         Objects.requireNonNull(contextBundle, "Context bundle cannot be null");
         this.contextBundle = contextBundle;
@@ -83,6 +89,10 @@ public class PathFindingAlgorithmTask extends AbstractOCSANATask {
 
         Double runTime = (postTime - preTime) / 1E9;
 
+        if (paths == null) {
+            return;
+        }
+
         switch (algStep) {
         case FIND_PATHS_TO_TARGETS:
             resultsBundle.setPathsToTargets(paths);
@@ -124,5 +134,6 @@ public class PathFindingAlgorithmTask extends AbstractOCSANATask {
         super.cancel();
         contextBundle.getPathFindingAlgorithm().cancel();
         resultsBundle.setPathFindingWasCanceled();
+        runnerTask.cancel();
     }
 }

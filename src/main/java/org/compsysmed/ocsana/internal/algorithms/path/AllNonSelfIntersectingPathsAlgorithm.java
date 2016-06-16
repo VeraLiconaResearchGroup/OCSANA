@@ -179,6 +179,12 @@ public class AllNonSelfIntersectingPathsAlgorithm
     }
 
     @Override
+    public void uncancel () {
+        super.uncancel();
+        dijkstra.uncancel();
+    }
+
+    @Override
     public String fullName () {
         return NAME;
     }

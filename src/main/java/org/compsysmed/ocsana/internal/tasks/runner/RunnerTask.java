@@ -97,7 +97,7 @@ public class RunnerTask
 
     private void spawnPathsToTargetsTask () {
         PathFindingAlgorithmTaskFactory pathsToTargetsTaskFactory =
-            new PathFindingAlgorithmTaskFactory(contextBundle, resultsBundle,
+            new PathFindingAlgorithmTaskFactory(this, contextBundle, resultsBundle,
                                                 OCSANAStep.FIND_PATHS_TO_TARGETS);
 
         taskManager.execute(pathsToTargetsTaskFactory.createTaskIterator(), this);
@@ -105,7 +105,7 @@ public class RunnerTask
 
     private void spawnPathsToOffTargetsTask () {
         PathFindingAlgorithmTaskFactory pathsToOffTargetsTaskFactory =
-            new PathFindingAlgorithmTaskFactory(contextBundle, resultsBundle,
+            new PathFindingAlgorithmTaskFactory(this, contextBundle, resultsBundle,
                                                 OCSANAStep.FIND_PATHS_TO_OFF_TARGETS);
 
         taskManager.execute(pathsToOffTargetsTaskFactory.createTaskIterator(), this);
@@ -113,35 +113,35 @@ public class RunnerTask
 
     private void spawnOCSANAScoringTask () {
         OCSANAScoringTaskFactory scoringTaskFactory =
-            new OCSANAScoringTaskFactory(contextBundle, resultsBundle);
+            new OCSANAScoringTaskFactory(this, contextBundle, resultsBundle);
 
         taskManager.execute(scoringTaskFactory.createTaskIterator(), this);
     }
 
     private void spawnMHSTask () {
         MHSAlgorithmTaskFactory mhsTaskFactory =
-            new MHSAlgorithmTaskFactory(contextBundle, resultsBundle);
+            new MHSAlgorithmTaskFactory(this, contextBundle, resultsBundle);
 
         taskManager.execute(mhsTaskFactory.createTaskIterator(), this);
     }
 
     private void spawnSignAssignmentTask () {
         SignAssignmentAlgorithmTaskFactory ciSignTaskFactory =
-            new SignAssignmentAlgorithmTaskFactory(contextBundle, resultsBundle);
+            new SignAssignmentAlgorithmTaskFactory(this, contextBundle, resultsBundle);
 
         taskManager.execute(ciSignTaskFactory.createTaskIterator(), this);
     }
 
     private void spawnSignedInterventionScoringTask () {
         SignedInterventionScoringAlgorithmTaskFactory siScoringTaskFactory =
-            new SignedInterventionScoringAlgorithmTaskFactory(contextBundle, resultsBundle);
+            new SignedInterventionScoringAlgorithmTaskFactory(this, contextBundle, resultsBundle);
 
         taskManager.execute(siScoringTaskFactory.createTaskIterator(), this);
     }
 
     private void spawnPresentResultsTask () {
         PresentResultsTaskFactory presentResultsTaskFactory =
-            new PresentResultsTaskFactory(contextBundle, resultsBundle, resultsPanel);
+            new PresentResultsTaskFactory(this, contextBundle, resultsBundle, resultsPanel);
 
         taskManager.execute(presentResultsTaskFactory.createTaskIterator(), this);
     }
@@ -150,7 +150,7 @@ public class RunnerTask
         // Flag that the results are clean
         hasCleanResults = true;
 
-        //observer.taskFinished(this);
+        contextBundle.uncancelAll();
     }
 
     @Override
@@ -168,6 +168,7 @@ public class RunnerTask
         Objects.requireNonNull(task, "Task cannot be null");
 
         if (cancelled) {
+            spawnCleanupTask();
             return;
         }
 
@@ -215,7 +216,6 @@ public class RunnerTask
     public void allFinished(FinishStatus finishStatus) {
         if (finishStatus.getType() != FinishStatus.Type.SUCCEEDED) {
             cancel();
-            spawnCleanupTask();
         }
     }
 }

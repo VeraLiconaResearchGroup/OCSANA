@@ -26,10 +26,21 @@ public abstract class AbstractOCSANAAlgorithm {
     private AtomicBoolean canceled = new AtomicBoolean(false);
 
     /**
-     * Abort execution of the algorithm.
+     * Abort execution of the algorithm
+     * <p>
+     * NOTE: cancel/uncancel operations are not thread safe!
      **/
     public void cancel () {
+        System.out.println("Cancelling " + this);
         canceled.set(true);
+    }
+
+    /**
+     * Clear cancellation flag
+     **/
+    public void uncancel () {
+        System.out.println("Uncancelling " + this);
+        canceled.set(false);
     }
 
     /**

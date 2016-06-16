@@ -24,6 +24,7 @@ import org.cytoscape.model.CyNode;
 import org.compsysmed.ocsana.internal.util.tunables.NodeHandler;
 import org.compsysmed.ocsana.internal.util.tunables.EdgeProcessor;
 
+import org.compsysmed.ocsana.internal.algorithms.AbstractOCSANAAlgorithm;
 import org.compsysmed.ocsana.internal.algorithms.signassignment.AbstractCISignAssignmentAlgorithm;
 import org.compsysmed.ocsana.internal.algorithms.drugability.AbstractSignedInterventionScoringAlgorithm;
 import org.compsysmed.ocsana.internal.algorithms.path.AbstractPathFindingAlgorithm;
@@ -60,6 +61,8 @@ public final class ContextBundle {
 
     private final AbstractCISignAssignmentAlgorithm ciSignAlgorithm;
     private final AbstractSignedInterventionScoringAlgorithm siScoringAlgorithm;
+
+    private final Collection<AbstractOCSANAAlgorithm> allAlgorithms;
 
     public ContextBundle (CyNetwork network,
                           Set<CyNode> sourceNodes,
@@ -114,6 +117,8 @@ public final class ContextBundle {
 
         Objects.requireNonNull(siScoringAlgorithm, "SI scoring algorithm cannot be null");
         this.siScoringAlgorithm = siScoringAlgorithm;
+
+        allAlgorithms = Arrays.asList(pathFindingAlgorithm, mhsAlgorithm, ocsanaAlgorithm, ciSignAlgorithm, siScoringAlgorithm);
 
         // Sanity checks
         if (sourceNodes.stream().anyMatch(node -> !network.containsNode(node))) {
@@ -306,5 +311,23 @@ public final class ContextBundle {
      **/
     public String getNodeName (CyNode node) {
         return nodeHandler.getNodeName(node);
+    }
+
+    /**
+     * Cancel all underlying algorithms
+     **/
+    public void cancelAll () {
+        for (AbstractOCSANAAlgorithm algorithm: allAlgorithms) {
+            algorithm.cancel();
+        }
+    }
+
+    /**
+     * Uncancel all underlying algorithms
+     **/
+    public void uncancelAll () {
+        for (AbstractOCSANAAlgorithm algorithm: allAlgorithms) {
+            algorithm.uncancel();
+        }
     }
 }

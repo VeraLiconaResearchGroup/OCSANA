@@ -20,6 +20,7 @@ import org.cytoscape.work.TaskMonitor;
 // OCSANA imports
 import org.compsysmed.ocsana.internal.tasks.AbstractOCSANATask;
 import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
+import org.compsysmed.ocsana.internal.tasks.runner.RunnerTask;
 
 import org.compsysmed.ocsana.internal.util.context.ContextBundle;
 import org.compsysmed.ocsana.internal.util.results.ResultsBundle;
@@ -31,12 +32,17 @@ public class SignAssignmentAlgorithmTask
     extends AbstractOCSANATask {
     private static final OCSANAStep algStep = OCSANAStep.ASSIGN_CI_SIGNS;
 
+    private final RunnerTask runnerTask;
     private final ContextBundle contextBundle;
     private final ResultsBundle resultsBundle;
 
-    public SignAssignmentAlgorithmTask (ContextBundle contextBundle,
+    public SignAssignmentAlgorithmTask (RunnerTask runnerTask,
+                                        ContextBundle contextBundle,
                                         ResultsBundle resultsBundle) {
         super(contextBundle.getNetwork());
+
+        Objects.requireNonNull(runnerTask, "Runner task cannot be null");
+        this.runnerTask = runnerTask;
 
         Objects.requireNonNull(contextBundle, "Context bundle cannot be null");
         this.contextBundle = contextBundle;
@@ -57,7 +63,9 @@ public class SignAssignmentAlgorithmTask
             }
 
             Collection<SignedIntervention> optimalSignings = contextBundle.getCISignAlgorithm().bestInterventions(ci, contextBundle.getTargetsToActivate());
-            resultsBundle.setOptimalInterventionSignings(ci, optimalSignings);
+            if (optimalSignings != null) {
+                resultsBundle.setOptimalInterventionSignings(ci, optimalSignings);
+            }
         }
         Long postTime = System.nanoTime();
 
@@ -80,5 +88,6 @@ public class SignAssignmentAlgorithmTask
     public void cancel () {
         super.cancel();
         contextBundle.getCISignAlgorithm().cancel();
+        runnerTask.cancel();
     }
 }

@@ -20,6 +20,7 @@ import org.cytoscape.work.TaskMonitor;
 // OCSANA imports
 import org.compsysmed.ocsana.internal.tasks.AbstractOCSANATask;
 import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
+import org.compsysmed.ocsana.internal.tasks.runner.RunnerTask;
 
 import org.compsysmed.ocsana.internal.ui.results.OCSANAResultsPanel;
 
@@ -29,14 +30,20 @@ import org.compsysmed.ocsana.internal.util.results.ResultsBundle;
 public class PresentResultsTask
     extends AbstractOCSANATask {
     private static final OCSANAStep algStep = OCSANAStep.PRESENT_RESULTS;
+
+        private final RunnerTask runnerTask;
     private final ContextBundle contextBundle;
     private final ResultsBundle resultsBundle;
     private final OCSANAResultsPanel resultsPanel;
 
-    public PresentResultsTask (ContextBundle contextBundle,
+    public PresentResultsTask (RunnerTask runnerTask,
+                               ContextBundle contextBundle,
                                ResultsBundle resultsBundle,
                                OCSANAResultsPanel resultsPanel) {
         super(contextBundle.getNetwork());
+
+        Objects.requireNonNull(runnerTask, "Runner task cannot be null");
+        this.runnerTask = runnerTask;
 
         Objects.requireNonNull(contextBundle, "Context bundle cannot be null");
         this.contextBundle = contextBundle;
@@ -67,5 +74,11 @@ public class PresentResultsTask
         } else {
             throw new IllegalArgumentException("Invalid results type for presenter.");
         }
+    }
+
+    @Override
+    public void cancel () {
+        super.cancel();
+        runnerTask.cancel();
     }
 }

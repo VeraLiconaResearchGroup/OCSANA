@@ -19,16 +19,23 @@ import org.cytoscape.work.AbstractTaskFactory;
 import org.cytoscape.work.TaskIterator;
 
 // OCSANA imports
+import org.compsysmed.ocsana.internal.tasks.runner.RunnerTask;
+
 import org.compsysmed.ocsana.internal.util.context.ContextBundle;
 import org.compsysmed.ocsana.internal.util.results.ResultsBundle;
 
 public class OCSANAScoringTaskFactory
     extends AbstractTaskFactory {
+    private final RunnerTask runnerTask;
     private final ContextBundle contextBundle;
     private final ResultsBundle resultsBundle;
 
-    public OCSANAScoringTaskFactory (ContextBundle contextBundle,
+    public OCSANAScoringTaskFactory (RunnerTask runnerTask,
+                                     ContextBundle contextBundle,
                                      ResultsBundle resultsBundle) {
+        Objects.requireNonNull(runnerTask, "Runner task cannot be null");
+        this.runnerTask = runnerTask;
+
         Objects.requireNonNull(contextBundle, "Context bundle cannot be null");
         this.contextBundle = contextBundle;
 
@@ -39,7 +46,7 @@ public class OCSANAScoringTaskFactory
     @Override
     public TaskIterator createTaskIterator () {
         TaskIterator tasks = new TaskIterator();
-        tasks.append(new OCSANAScoringTask(contextBundle, resultsBundle));
+        tasks.append(new OCSANAScoringTask(runnerTask, contextBundle, resultsBundle));
         return tasks;
     }
 }

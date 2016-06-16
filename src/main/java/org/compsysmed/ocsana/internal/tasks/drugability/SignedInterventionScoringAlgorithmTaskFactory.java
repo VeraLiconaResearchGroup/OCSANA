@@ -20,17 +20,24 @@ import org.cytoscape.work.TaskIterator;
 import java.util.Objects;
 
 // OCSANA imports
+import org.compsysmed.ocsana.internal.tasks.runner.RunnerTask;
+
 import org.compsysmed.ocsana.internal.util.context.ContextBundle;
 import org.compsysmed.ocsana.internal.util.results.ResultsBundle;
 
 public class SignedInterventionScoringAlgorithmTaskFactory
     extends AbstractTaskFactory {
+    private final RunnerTask runnerTask;
     private final ContextBundle contextBundle;
     private final ResultsBundle resultsBundle;
 
-    public SignedInterventionScoringAlgorithmTaskFactory (ContextBundle contextBundle,
+    public SignedInterventionScoringAlgorithmTaskFactory (RunnerTask runnerTask,
+                                                          ContextBundle contextBundle,
                                                           ResultsBundle resultsBundle) {
         super();
+
+        Objects.requireNonNull(runnerTask, "Runner task cannot be null");
+        this.runnerTask = runnerTask;
 
         Objects.requireNonNull(contextBundle, "Context bundle cannot be null");
         this.contextBundle = contextBundle;
@@ -42,7 +49,7 @@ public class SignedInterventionScoringAlgorithmTaskFactory
     @Override
     public TaskIterator createTaskIterator () {
         TaskIterator tasks = new TaskIterator();
-        tasks.append(new SignedInterventionScoringAlgorithmTask(contextBundle, resultsBundle));
+        tasks.append(new SignedInterventionScoringAlgorithmTask(runnerTask, contextBundle, resultsBundle));
         return tasks;
     }
 }

@@ -19,16 +19,23 @@ import org.cytoscape.work.AbstractTaskFactory;
 import org.cytoscape.work.TaskIterator;
 
 // OCSANA imports
+import org.compsysmed.ocsana.internal.tasks.runner.RunnerTask;
+
 import org.compsysmed.ocsana.internal.util.context.ContextBundle;
 import org.compsysmed.ocsana.internal.util.results.ResultsBundle;
 
 public class MHSAlgorithmTaskFactory extends AbstractTaskFactory {
+        private final RunnerTask runnerTask;
     private final ContextBundle contextBundle;
     private final ResultsBundle resultsBundle;
 
-    public MHSAlgorithmTaskFactory (ContextBundle contextBundle,
+    public MHSAlgorithmTaskFactory (RunnerTask runnerTask,
+                                    ContextBundle contextBundle,
                                     ResultsBundle resultsBundle) {
         super();
+
+        Objects.requireNonNull(runnerTask, "Runner task cannot be null");
+        this.runnerTask = runnerTask;
 
         Objects.requireNonNull(contextBundle, "Context bundle cannot be null");
         this.contextBundle = contextBundle;
@@ -40,7 +47,7 @@ public class MHSAlgorithmTaskFactory extends AbstractTaskFactory {
     @Override
     public TaskIterator createTaskIterator () {
         TaskIterator tasks = new TaskIterator();
-        tasks.append(new MHSAlgorithmTask(contextBundle, resultsBundle));
+        tasks.append(new MHSAlgorithmTask(runnerTask, contextBundle, resultsBundle));
         return tasks;
     }
 }

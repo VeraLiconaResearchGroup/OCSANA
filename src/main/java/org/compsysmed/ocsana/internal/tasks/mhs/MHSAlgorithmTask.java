@@ -24,6 +24,7 @@ import org.cytoscape.model.CyEdge;
 // OCSANA imports
 import org.compsysmed.ocsana.internal.tasks.AbstractOCSANATask;
 import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
+import org.compsysmed.ocsana.internal.tasks.runner.RunnerTask;
 
 import org.compsysmed.ocsana.internal.util.context.ContextBundle;
 import org.compsysmed.ocsana.internal.util.results.ResultsBundle;
@@ -32,12 +33,17 @@ import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
 public class MHSAlgorithmTask extends AbstractOCSANATask {
     private static final OCSANAStep algStep = OCSANAStep.FIND_MHSES;
 
+    private final RunnerTask runnerTask;
     private final ContextBundle contextBundle;
     private final ResultsBundle resultsBundle;
 
-    public MHSAlgorithmTask (ContextBundle contextBundle,
+    public MHSAlgorithmTask (RunnerTask runnerTask,
+                             ContextBundle contextBundle,
                              ResultsBundle resultsBundle) {
         super(contextBundle.getNetwork());
+
+        Objects.requireNonNull(runnerTask, "Runner task cannot be null");
+        this.runnerTask = runnerTask;
 
         Objects.requireNonNull(contextBundle, "Context bundle cannot be null");
         this.contextBundle = contextBundle;
@@ -98,7 +104,9 @@ public class MHSAlgorithmTask extends AbstractOCSANATask {
         Long preMHSTime = System.nanoTime();
         Collection<Set<CyNode>> MHSes = contextBundle.getMHSAlgorithm().MHSes(nodeSets);
 
-        resultsBundle.setCIs(MHSes.stream().map(mhs -> new CombinationOfInterventions(mhs, targetNodes, node -> contextBundle.getNodeHandler().getNodeName(node), node -> contextBundle.getNodeHandler().getNodeID(node))).collect(Collectors.toList()));
+        if (MHSes != null) {
+            resultsBundle.setCIs(MHSes.stream().map(mhs -> new CombinationOfInterventions(mhs, targetNodes, node -> contextBundle.getNodeHandler().getNodeName(node), node -> contextBundle.getNodeHandler().getNodeID(node))).collect(Collectors.toList()));
+        }
         Long postMHSTime = System.nanoTime();
 
         Double mhsTime = (postMHSTime - preMHSTime) / 1E9;
@@ -122,5 +130,6 @@ public class MHSAlgorithmTask extends AbstractOCSANATask {
         super.cancel();
         contextBundle.getMHSAlgorithm().cancel();
         resultsBundle.setMHSFindingWasCancelled();
+        runnerTask.cancel();
     }
 }

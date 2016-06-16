@@ -11,6 +11,9 @@
 
 package org.compsysmed.ocsana.internal.tasks.drugability;
 
+// Java imports
+import java.util.Objects;
+
 // Cytoscape imports
 import org.cytoscape.work.TaskMonitor;
 
@@ -18,7 +21,7 @@ import org.cytoscape.work.TaskMonitor;
 import org.compsysmed.ocsana.internal.tasks.AbstractOCSANATask;
 import org.compsysmed.ocsana.internal.tasks.OCSANAStep;
 
-import java.util.Objects;
+import org.compsysmed.ocsana.internal.tasks.runner.RunnerTask;
 
 import org.compsysmed.ocsana.internal.util.context.ContextBundle;
 import org.compsysmed.ocsana.internal.util.results.ResultsBundle;
@@ -29,12 +32,17 @@ public class SignedInterventionScoringAlgorithmTask
     extends AbstractOCSANATask {
     private static final OCSANAStep algStep = OCSANAStep.SCORE_SIGNED_INTERVENTIONS;
 
+    private final RunnerTask runnerTask;
     private final ContextBundle contextBundle;
     private final ResultsBundle resultsBundle;
 
-    public SignedInterventionScoringAlgorithmTask (ContextBundle contextBundle,
+    public SignedInterventionScoringAlgorithmTask (RunnerTask runnerTask,
+                                                   ContextBundle contextBundle,
                                                    ResultsBundle resultsBundle) {
         super(contextBundle.getNetwork());
+
+        Objects.requireNonNull(runnerTask, "Runner task cannot be null");
+        this.runnerTask = runnerTask;
 
         Objects.requireNonNull(contextBundle, "Context bundle cannot be null");
         this.contextBundle = contextBundle;
@@ -83,5 +91,6 @@ public class SignedInterventionScoringAlgorithmTask
     public void cancel () {
         super.cancel();
         contextBundle.getCISignAlgorithm().cancel();
+        runnerTask.cancel();
     }
 }

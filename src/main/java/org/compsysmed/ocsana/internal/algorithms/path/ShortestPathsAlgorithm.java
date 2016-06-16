@@ -167,6 +167,12 @@ public class ShortestPathsAlgorithm
     }
 
     @Override
+    public void uncancel () {
+        super.uncancel();
+        dijkstra.uncancel();
+    }
+
+    @Override
     public String fullName () {
         return NAME;
     }
