@@ -31,7 +31,6 @@ public abstract class AbstractOCSANAAlgorithm {
      * NOTE: cancel/uncancel operations are not thread safe!
      **/
     public void cancel () {
-        System.out.println("Cancelling " + this);
         canceled.set(true);
     }
 
@@ -39,7 +38,6 @@ public abstract class AbstractOCSANAAlgorithm {
      * Clear cancellation flag
      **/
     public void uncancel () {
-        System.out.println("Uncancelling " + this);
         canceled.set(false);
     }
 
