@@ -85,7 +85,7 @@ public class SignedInterventionTest {
 
     @Test
     public void constructorShouldWork () {
-        CombinationOfInterventions ci = new CombinationOfInterventions(toyNetworkSources, toyNetworkTargets, toyNetworkNodeNameFunction, toyNetworkNodeBiomoleculeIDFunction);
+        CombinationOfInterventions ci = new CombinationOfInterventions(toyNetworkSources, toyNetworkTargets, toyNetworkNodeNameFunction, toyNetworkNodeBiomoleculeIDFunction, 5d);
 
         SignedIntervention si = new SignedIntervention(ci, toyNetworkSources.stream().limit(1).collect(Collectors.toSet()), toyNetworkEffectOnTargets);
 

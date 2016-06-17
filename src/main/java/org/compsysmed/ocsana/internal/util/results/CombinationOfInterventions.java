@@ -29,7 +29,7 @@ public class CombinationOfInterventions {
     private final Function<CyNode, String> nodeNameFunction;
     private final Function<CyNode, String> nodeIDFunction;
 
-    private Double classicalOCSANAScore;
+    private final Double ocsanaScore;
 
     private Collection<SignedIntervention> optimalSignings;
 
@@ -44,11 +44,13 @@ public class CombinationOfInterventions {
      * @param nodeIDFunction  function returning the biomolecule ID of
      * a given node (if null, use Cytoscape's automatic name, which is
      * based on SUID)
+     * @param ocsanaScore the OCSANA score of this CI
      **/
     public CombinationOfInterventions (Set<CyNode> ciNodes,
                                        Set<CyNode> targetNodes,
                                        Function<CyNode, String> nodeNameFunction,
-                                       Function<CyNode, String> nodeIDFunction) {
+                                       Function<CyNode, String> nodeIDFunction,
+                                       Double ocsanaScore) {
     	Objects.requireNonNull(ciNodes, "CI nodes cannot be null");
         this.ciNodes = ciNodes;
 
@@ -66,6 +68,9 @@ public class CombinationOfInterventions {
         } else {
             this.nodeIDFunction = nodeIDFunction;
         }
+
+        Objects.requireNonNull(ocsanaScore, "OCSANA score cannot be null");
+        this.ocsanaScore = ocsanaScore;
     }
 
     /**
@@ -80,7 +85,7 @@ public class CombinationOfInterventions {
         nodeNameFunction = other.nodeNameFunction;
         nodeIDFunction = other.nodeIDFunction;
 
-        classicalOCSANAScore = other.classicalOCSANAScore;
+        ocsanaScore = other.ocsanaScore;
 
         if (other.optimalSignings != null) {
             optimalSignings = new HashSet<>(other.optimalSignings);
@@ -109,17 +114,10 @@ public class CombinationOfInterventions {
     }
 
     /**
-     * Set the classical OCSANA score of this CI
+     * Get the OCSANA score of this CI
      **/
-    public void setClassicalOCSANAScore (Double classicalOCSANAScore) {
-        this.classicalOCSANAScore = classicalOCSANAScore;
-    }
-
-    /**
-     * Get the classical OCSANA score of this CI
-     **/
-    public Double getClassicalOCSANAScore () {
-        return classicalOCSANAScore;
+    public Double getOCSANAScore () {
+        return ocsanaScore;
     }
 
     /**

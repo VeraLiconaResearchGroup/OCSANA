@@ -51,10 +51,12 @@ public class SimpleSignedInterventionScoringAlgorithm
             return 0d;
         }
 
-        Collection<DrugProteinInteraction> knownSignedInteractions = drugabilityBundle.getAllInteractionsOfSign(node.getSign());
-
-        if (!knownSignedInteractions.isEmpty()) {
+        if (!drugabilityBundle.getAllInteractionsOfSign(node.getSign()).isEmpty()) {
             return 10d;
+        }
+
+        if (!drugabilityBundle.getAllInteractionsNotOfSign(node.getSign()).isEmpty()) {
+            return 4d;
         }
 
         if (drugabilityBundle.getDrProdisPredictions().stream().anyMatch(prediction -> prediction.getCountOfNovelBindingDrugs() > 1)) {

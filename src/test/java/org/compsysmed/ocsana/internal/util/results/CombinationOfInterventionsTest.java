@@ -79,7 +79,7 @@ public class CombinationOfInterventionsTest {
 
     @Test
     public void constructorShouldWork () {
-        CombinationOfInterventions ci = new CombinationOfInterventions(toyNetworkSources, toyNetworkTargets, toyNetworkNodeNameFunction, toyNetworkNodeBiomoleculeIDFunction);
+        CombinationOfInterventions ci = new CombinationOfInterventions(toyNetworkSources, toyNetworkTargets, toyNetworkNodeNameFunction, toyNetworkNodeBiomoleculeIDFunction, 5d);
         assertEquals("CI size", (Integer) 2, ci.size());
     }
 }

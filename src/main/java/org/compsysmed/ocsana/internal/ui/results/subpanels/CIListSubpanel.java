@@ -120,7 +120,7 @@ public class CIListSubpanel
             Objects.requireNonNull(CIs, "CIs collection cannot be null");
             this.CIs = CIs;
         }
-        String[] colNames = {"CI", "Size", "Sign assignment success rate", "Number of optimal sign assignemnts"};
+        String[] colNames = {"CI", "Size", "OCSANA score", "Number of optimal sign assignemnts", "Sign assignment success rate", "Best SI priority score"};
 
         @Override
         public String getColumnName (int col) {
@@ -134,7 +134,7 @@ public class CIListSubpanel
 
         @Override
         public int getColumnCount () {
-            return 4;
+            return colNames.length;
         }
 
         @Override
@@ -148,19 +148,30 @@ public class CIListSubpanel
                 return ci.size();
 
             case 2:
-                return getSignAssignmentSuccessRate(ci);
+                return ci.getOCSANAScore();
 
             case 3:
                 return resultsBundle.getOptimalInterventionSignings(ci).size();
+
+            case 4:
+                return getSignAssignmentSuccessRate(ci);
+
+            case 5:
+                return getSIPriorityScore(ci);
 
             default:
                 throw new IllegalArgumentException(String.format("Table does not have %d columns", col));
             }
         }
 
-        private Double getSignAssignmentSuccessRate(CombinationOfInterventions ci) {
+        private String getSignAssignmentSuccessRate (CombinationOfInterventions ci) {
             Long maxCorrectEffects = resultsBundle.getOptimalInterventionSignings(ci).stream().mapToLong(si -> si.numberOfCorrectEffects()).max().orElse(0);
-            return maxCorrectEffects.doubleValue() / contextBundle.getTargetNodes().size();
+            return String.format("%d/%d", maxCorrectEffects, contextBundle.getTargetNodes().size());
+        }
+
+        private Double getSIPriorityScore (CombinationOfInterventions ci) {
+            Double maxPriorityScore = resultsBundle.getOptimalInterventionSignings(ci).stream().mapToDouble(contextBundle.getSIScoringAlgorithm()::computePriorityScore).max().orElse(0d);
+            return maxPriorityScore;
         }
 
         @Override
