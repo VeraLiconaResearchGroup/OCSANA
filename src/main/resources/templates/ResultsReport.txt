@@ -1,3 +1,4 @@
+{# INPUTS: "contextBundle" is a ContextBundle, "resultsBundle" is a ResultsBundle #}
 --- Optimal cut sets report ---
 Network name: {{contextBundle.getNetworkName()}}
 

@@ -1,3 +1,4 @@
+{# INPUTS: "node" is a SignedInterventionNode, "bundle" is a DrugabilityDataBundle #}
 <html>
     <h3>Drugability report (Node {{node.getName()}}: {{node.getBiomoleculeID}})</h3>
     <h4>Desired effect: {{node.getSign()}}</h4>
@@ -22,13 +23,19 @@
     </p>
     {% else %}
     <p>
+        {% if bundle.getAllInteractionsOfSign(node.getSign()) is empty %}
+        No known drug interactions of sign {{node.getSign()}}.
+        {% else %}
         Known drug interactions (effect: {{node.getSign()}})
         <ul>
             {% for interaction in bundle.getAllInteractionsOfSign(node.getSign()) %}
             <li><a href="{{interaction.getDrug().getDrugBankURL()}}">{{interaction.getDrug().getName()}}</a> ({{interaction.getDrugActionType().getDescription()}})</li>
             {% endfor %}
         </ul>
-        ({{bundle.getAllInteractionsNotOfSign(node.getSign()).size()}} other interactions are known. See <a href="{{bundle.getProtein().getDrugBankBioDBURL()}}">DrugBank BioDB page</a> for details.)
+        {% endif %}
+    </p>
+    <p>
+        ({{bundle.getAllInteractionsNotOfSign(node.getSign()).size()}} other interaction(s) are known. See <a href="{{bundle.getProtein().getDrugBankBioDBURL()}}">DrugBank BioDB page</a> for details.)
     </p>
     {% endif %}
     <h4>Drugability predictions</h4>
@@ -37,11 +44,11 @@
         DrugFEATURE predicted drugable ligands:
         <table>
             <tr>
-                <td>PDB ID</td>
-                <td>Chain</td>
-                <td>Index</td>
-                <td>Ligand</td>
-                <td>Score</td>
+                <th>PDB ID</th>
+                <th>Chain</th>
+                <th>Index</th>
+                <th>Ligand</th>
+                <th>Score</th>
             </tr>
             {% for ligand in bundle.getDrugableLigands() %}
             <tr>
@@ -62,10 +69,10 @@
         DR.PRODIS binding predictions:
         <table>
             <tr>
-                <td>NCBI RefSeq</td>
-                <td>Novel bindings predicted</td>
-                <td>Known bindings predicted</td>
-                <td>DR.PRODIS details page</td>
+                <th>NCBI RefSeq</th>
+                <th>Novel bindings predicted</th>
+                <th>Known bindings predicted</th>
+                <th>DR.PRODIS details page</th>
             </tr>
             {% for prediction in bundle.getDrProdisPredictions() %}
             <tr>
