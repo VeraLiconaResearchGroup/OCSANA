@@ -35,6 +35,7 @@ public class ResultsBundle {
     // Scoring data
     private Double OCSANAScoringExecutionSeconds;
     private Boolean OCSANAScoringCanceled = false;
+    private OCSANAScores ocsanaScores;
 
     // MHS data
     private Collection<CombinationOfInterventions> CIs;
@@ -104,6 +105,14 @@ public class ResultsBundle {
 
     public void setOCSANAScoringWasCanceled () {
         OCSANAScoringCanceled = true;
+    }
+
+    public OCSANAScores getOCSANAScores () {
+        return ocsanaScores;
+    }
+
+    public void setOCSANAScores (OCSANAScores ocsanaScores) {
+        this.ocsanaScores = ocsanaScores;
     }
 
     public Collection<CombinationOfInterventions> getCIs () {

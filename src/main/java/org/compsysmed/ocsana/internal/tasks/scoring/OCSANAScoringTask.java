@@ -26,6 +26,7 @@ import org.compsysmed.ocsana.internal.tasks.runner.RunnerTask;
 
 import org.compsysmed.ocsana.internal.util.context.ContextBundle;
 import org.compsysmed.ocsana.internal.util.results.ResultsBundle;
+import org.compsysmed.ocsana.internal.util.results.OCSANAScores;
 
 public class OCSANAScoringTask
     extends AbstractOCSANATask {
@@ -61,14 +62,13 @@ public class OCSANAScoringTask
         Objects.requireNonNull(resultsBundle.getPathsToTargets(), "Paths to targets have not been computed");
         Objects.requireNonNull(resultsBundle.getPathsToOffTargets(), "Paths to off-targets have not been computed");
 
-        Predicate<CyEdge> inhibitionEdgeTester = (CyEdge edge) -> contextBundle.getEdgeProcessor().edgeIsInhibition(edge);
-
         taskMonitor.setTitle("OCSANA scoring");
 
         taskMonitor.setStatusMessage("Computing OCSANA scores.");
 
         Long OCSANAPreTime = System.nanoTime();
-        contextBundle.getOCSANAAlgorithm().computeScores(resultsBundle.getPathsToTargets(), resultsBundle.getPathsToOffTargets(), inhibitionEdgeTester);
+        OCSANAScores ocsanaScores = contextBundle.getOCSANAAlgorithm().computeScores(resultsBundle.getPathsToTargets(), resultsBundle.getPathsToOffTargets(), contextBundle.getEdgeProcessor()::edgeIsInhibition);
+        resultsBundle.setOCSANAScores(ocsanaScores);
         Long OCSANAPostTime = System.nanoTime();
 
         Double OCSANARunTime = (OCSANAPostTime - OCSANAPreTime) / 1E9;

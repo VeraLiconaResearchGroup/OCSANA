@@ -76,7 +76,9 @@ public class ContextBundleBuilder {
         setPathFindingAlgorithm(new AllNonSelfIntersectingPathsAlgorithm(network));
         setMHSAlgorithm(new MMCSAlgorithm());
 
-        setCISignAssignmentAlgorithm(new ExhaustiveSearchCISignAssignmentAlgorithm(this));
+        ExhaustiveSearchCISignAssignmentAlgorithm exhaustiveAlgorithm = new ExhaustiveSearchCISignAssignmentAlgorithm();
+        ocsanaAlgorithm.addListener(exhaustiveAlgorithm);
+        setCISignAssignmentAlgorithm(exhaustiveAlgorithm);
 
         setSIScoringAlgorithm(new SimpleSignedInterventionScoringAlgorithm());
     }

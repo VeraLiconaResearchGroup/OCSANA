@@ -78,7 +78,9 @@ public class PrioritizationAlgorithmsSubpanel
         signAssignmentAlgorithmPanel.add(new JLabel("Sign assignent algorithm:"));
 
         List<AbstractCISignAssignmentAlgorithm> signAssignmentAlgorithms = new ArrayList<>();
-        signAssignmentAlgorithms.add(new ExhaustiveSearchCISignAssignmentAlgorithm(contextBundleBuilder));
+        ExhaustiveSearchCISignAssignmentAlgorithm exhaustiveAlgorithm = new ExhaustiveSearchCISignAssignmentAlgorithm();
+        contextBundleBuilder.getOCSANAAlgorithm().addListener(exhaustiveAlgorithm);
+        signAssignmentAlgorithms.add(exhaustiveAlgorithm);
 
         signAssignmentAlgorithmSelecter = new JComboBox<>(signAssignmentAlgorithms.toArray(new AbstractCISignAssignmentAlgorithm[signAssignmentAlgorithms.size()]));
         signAssignmentAlgorithmSelecter.addActionListener(this);

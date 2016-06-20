@@ -14,7 +14,7 @@ import static org.junit.Assert.*;
 import java.util.*;
 import java.io.*;
 
-import java.util.function.Predicate;
+import java.util.function.Function;
 
 // Cytoscape imports
 import org.cytoscape.model.CyNetwork;
@@ -23,6 +23,8 @@ import org.cytoscape.model.CyNode;
 
 // OCSANA imports
 import org.compsysmed.ocsana.internal.algorithms.scoring.OCSANAScoringAlgorithm;
+
+import org.compsysmed.ocsana.internal.util.results.OCSANAScores;
 
 import org.compsysmed.ocsana.internal.helpers.SIFFileConverter;
 
@@ -76,7 +78,7 @@ public class OCSANAScoringAlgorithmTest {
         Collection<List<CyEdge>> pathsToOffTargets = Arrays.asList(toyConverter.getPath(I1, A, D));
 
         // Hand-coded method to test whether edges are activation or inhibition
-        Predicate<CyEdge> inhibitionEdgeTester = (CyEdge edge) -> {
+        Function<CyEdge, Boolean> inhibitionEdgeTester = (CyEdge edge) -> {
             CyNode source = edge.getSource();
             CyNode target = edge.getTarget();
 
@@ -96,18 +98,15 @@ public class OCSANAScoringAlgorithmTest {
         };
 
         // Compute scores
-        scoringAlg.computeScores(pathsToTargets, pathsToOffTargets, inhibitionEdgeTester);
+        OCSANAScores scores = scoringAlg.computeScores(pathsToTargets, pathsToOffTargets, inhibitionEdgeTester);
 
         // Tests
-        assertEquals("Toy network score: A", 0.0d, scoringAlg.scoreNode(A), 0.0d);
-        assertEquals("Toy network score: B", 4.0d, scoringAlg.scoreNode(B), 0.0d);
-        assertEquals("Toy network score: C", 3.75d, scoringAlg.scoreNode(C), 0.0d);
-        //assertEquals("Toy network score: D", -1.0d, scoringAlg.scoreNode(D), 0.0d); // TODO: write a test once this case is defined
-        assertEquals("Toy network score: E", 18.0d, scoringAlg.scoreNode(E), 0.0d);
-        assertEquals("Toy network score: F", 2.66d, scoringAlg.scoreNode(F), 0.01d);
-        assertEquals("Toy network score: C+E", 21.75d, scoringAlg.scoreNodeSet(new HashSet<CyNode>(Arrays.asList(C, E))), 0.01d);
-
-        assertEquals("Toy network subpaths: A to all targets", 2, scoringAlg.nodeSubPathsToTargets(A).size());
-        assertEquals("Toy network subpaths: A to O1", 2, scoringAlg.nodeSubPathsToTarget(A, O1).size());
+        assertEquals("Toy network score: A", 0.0d, scores.OCSANA(A), 0.0d);
+        assertEquals("Toy network score: B", 4.0d, scores.OCSANA(B), 0.0d);
+        assertEquals("Toy network score: C", 3.75d, scores.OCSANA(C), 0.0d);
+        //assertEquals("Toy network score: D", -1.0d, scores.OCSANA(D), 0.0d); // TODO: write a test once this case is defined
+        assertEquals("Toy network score: E", 18.0d, scores.OCSANA(E), 0.0d);
+        assertEquals("Toy network score: F", 2.66d, scores.OCSANA(F), 0.01d);
+        assertEquals("Toy network score: C+E", 21.75d, scores.OCSANA(new HashSet<CyNode>(Arrays.asList(C, E))), 0.01d);
     }
 }

@@ -22,9 +22,12 @@ import org.la4j.vector.dense.BasicVector;
 import org.cytoscape.model.CyNode;
 
 // OCSANA imports
+import org.compsysmed.ocsana.internal.algorithms.scoring.OCSANAScoringAlgorithm;
+
 import org.compsysmed.ocsana.internal.util.context.ContextBundleBuilder;
 
 import org.compsysmed.ocsana.internal.util.results.CombinationOfInterventions;
+import org.compsysmed.ocsana.internal.util.results.OCSANAScores;
 import org.compsysmed.ocsana.internal.util.results.SignedIntervention;
 
 /**
@@ -39,25 +42,23 @@ import org.compsysmed.ocsana.internal.util.results.SignedIntervention;
  * more than ~14 terms in a CI.
  **/
 public class ExhaustiveSearchCISignAssignmentAlgorithm
-    extends AbstractCISignAssignmentAlgorithm {
+    extends AbstractCISignAssignmentAlgorithm
+    implements OCSANAScoringAlgorithm.OCSANAScoresListener {
     private static final String NAME = "CI sign testing";
     private static final String SHORTNAME = "CI-sign";
 
-    private final ContextBundleBuilder contextBundleBuilder;
     private final Boolean paretoOptimalOnly;
+
+    private OCSANAScores ocsanaScores;
 
     /**
      * Constructor
      *
-     * @param contextBundleBuilder  the builder for the configuration context
      * @param paretoOptimalOnly if true, filter out sign assignments
      * which are sub-optimal by total effect score (NOTE: this may be
      * expensive if the original set is large)
      **/
-    // TODO: Fix this very silly signature
-    public ExhaustiveSearchCISignAssignmentAlgorithm (ContextBundleBuilder contextBundleBuilder,
-                                                      Boolean paretoOptimalOnly) {
-        this.contextBundleBuilder = contextBundleBuilder;
+    public ExhaustiveSearchCISignAssignmentAlgorithm (Boolean paretoOptimalOnly) {
         this.paretoOptimalOnly = paretoOptimalOnly;
     }
 
@@ -66,12 +67,15 @@ public class ExhaustiveSearchCISignAssignmentAlgorithm
      * <p>
      * Sets {@code paretoOptimalOnly} true
      *
-     * @see #ExhaustiveSearchCISignAssignmentAlgorithm(ContextBundleBuilder)
-     *
-     * @param contextBundleBuilder  the builder for the configuration context
+     * @see #ExhaustiveSearchCISignAssignmentAlgorithm(Boolean paretoOptimalOnly)
      **/
-    public ExhaustiveSearchCISignAssignmentAlgorithm (ContextBundleBuilder contextBundleBuilder) {
-        this(contextBundleBuilder, true);
+    public ExhaustiveSearchCISignAssignmentAlgorithm () {
+        this(true);
+    }
+
+    @Override
+    public void receiveScores (OCSANAScores ocsanaScores) {
+        this.ocsanaScores = ocsanaScores;
     }
 
     /**
@@ -81,6 +85,8 @@ public class ExhaustiveSearchCISignAssignmentAlgorithm
     @Override
     public Collection<SignedIntervention> bestInterventions (CombinationOfInterventions ci,
                                                              Collection<CyNode> targetsToActivate) {
+        Objects.requireNonNull(ocsanaScores, "OCSANA scores must be set before running this algorithm");
+
         // Use lists of the source and target nodes to ensure consistent ordering
         List<CyNode> sourceList = new ArrayList<>(ci.getNodes());
         List<CyNode> targetList = new ArrayList<>(ci.getTargets());
@@ -88,9 +94,9 @@ public class ExhaustiveSearchCISignAssignmentAlgorithm
         // Generate a signed EFFECT_ON_TARGETS function
         BiFunction<CyNode, CyNode, Double> signedEffectOnTarget = (source, target) -> {
             if (targetsToActivate.contains(target)) {
-                return contextBundleBuilder.getOCSANAAlgorithm().effectOnTargetsScore(source, target);
+                return ocsanaScores.EFFECT_ON_TARGETS(source, target);
             } else {
-                return -contextBundleBuilder.getOCSANAAlgorithm().effectOnTargetsScore(source, target);
+                return -ocsanaScores.EFFECT_ON_TARGETS(source, target);
             }
         };
 

@@ -13,8 +13,9 @@ package org.compsysmed.ocsana.internal.algorithms.scoring;
 
 // Java imports
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 // Cytoscape imports
 import org.cytoscape.work.Tunable;
@@ -29,6 +30,8 @@ import org.cytoscape.model.CyRow;
 // OCSANA imports
 import org.compsysmed.ocsana.internal.algorithms.AbstractOCSANAAlgorithm;
 
+import org.compsysmed.ocsana.internal.util.results.OCSANAScores;
+
 /**
  * Implementation of the OCSANA scoring algorithm
  *
@@ -40,124 +43,82 @@ public class OCSANAScoringAlgorithm
     private static final String NAME = "OCSANA scoring";
     private static final String SHORTNAME = "OCSANA";
 
-    // User configuration
-    @Tunable(description = "Create score column",
-             gravity = 335,
-             groups = {NAME})
-             public Boolean storeScores = false;
-
-    @Tunable(description = "Name of column",
-             gravity = 336,
-             dependsOn = "storeScores=true",
-             tooltip = "This column will be overwritten!",
-             groups = {NAME})
-             public String storeScoresColumn = "ocsanaScore";
-
     // Internal data
     private final CyNetwork network;
-
-    // Per-node subscores for each target and off-target
-    Map<CyNode, Map<CyNode, Double>> effectsOnTargets;
-    Map<CyNode, Map<CyNode, Double>> effectsOnOffTargets;
-
-    // Per-node collections of subpaths to targets and off-targets
-    Map<CyNode, Collection<List<CyEdge>>> nodeSubPathsToTargets;
-    Map<CyNode, Collection<List<CyEdge>>> nodeSubPathsToOffTargets;
-
-    // Per-node sets of targets and off-targets hit
-    Map<CyNode, Set<CyNode>> targetsHitDownstream;
-    Map<CyNode, Set<CyNode>> offTargetsHitDownstream;
-
-    // Global sets of targets and off-targets hit by paths
-    Set<CyNode> targetsHitByAllPaths;
-    Set<CyNode> offTargetsHitByAllPaths;
-
-    // Set of all nodes in paths
-    Set<CyNode> elementaryNodes;
-
-    // Subscores
-    private Map<CyNode, Double> nodeTotalScores;
-    private Map<CyNode, Double> nodeTargetScores;
-    private Map<CyNode, Double> nodeOffTargetScores;
-
-    private Boolean scoresComputed = false;
+    private final Collection<OCSANAScoresListener> scoresListeners = new ArrayList<>();
 
     public OCSANAScoringAlgorithm (CyNetwork network) {
         this.network = network;
     }
 
-    private void initializeInternalVariables () {
-        nodeTotalScores = new HashMap<>();
-        nodeTargetScores = new HashMap<>();
-        nodeOffTargetScores = new HashMap<>();
+    public void addListener (OCSANAScoresListener listener) {
+        scoresListeners.add(listener);
+    }
 
-        effectsOnTargets = new HashMap<>();
-        effectsOnOffTargets = new HashMap<>();
+    public void removeListener (OCSANAScoresListener listener) {
+        scoresListeners.remove(listener);
+    }
 
-        nodeSubPathsToTargets = new HashMap<>();
-        nodeSubPathsToOffTargets = new HashMap<>();
-
-        targetsHitDownstream = new HashMap<>();
-        offTargetsHitDownstream = new HashMap<>();
-
-        targetsHitByAllPaths = new HashSet<>();
-        offTargetsHitByAllPaths = new HashSet<>();
-
-        elementaryNodes = new HashSet<>();
+    public void notifyListeners (OCSANAScores scores) {
+        for (OCSANAScoresListener listener: scoresListeners) {
+            listener.receiveScores(scores);
+        }
     }
 
     /**
-     * Compute the OCSANA scores for the specified paths and cache the
-     * results
+     * Apply the OCSANA scoring algorithm
      *
-     * @param pathsToTargets  the paths to the target nodes
-     * @param pathsToOffTargets  the paths to the off-target nodes
-     * @param inhibitionEdgeTester function which returns true if the given
-     * edge is negative (i.e. inhibition)
+     * @param pathsToTargets  the collection of paths to targets
+     * @param pathsToOffTargets  the collection of paths to off-targets
+     * @param edgeIsInhibition  function returning true if a given edge is an inhibition
+     * @return the scores bundle (or null if the algorithm is canceled)
      **/
-    public void computeScores (Collection<List<CyEdge>> pathsToTargets,
-                               Collection<List<CyEdge>> pathsToOffTargets,
-                               Predicate<CyEdge> inhibitionEdgeTester) {
-        // Internal variables
-        scoresComputed = false;
-        initializeInternalVariables();
+    public OCSANAScores computeScores (Collection<List<CyEdge>> pathsToTargets,
+                                       Collection<List<CyEdge>> pathsToOffTargets,
+                                       Function<CyEdge, Boolean> edgeIsInhibition) {
+        Objects.requireNonNull(pathsToTargets, "Collection of paths to targets cannot be null");
+        Objects.requireNonNull(pathsToOffTargets, "Collection of paths to off-targets cannot be null");
 
-        // Compute scores for nodes by iterating over paths
-        scoreNodesInPaths(pathsToTargets, effectsOnTargets, nodeSubPathsToTargets, targetsHitDownstream, targetsHitByAllPaths, elementaryNodes, inhibitionEdgeTester);
-        scoreNodesInPaths(pathsToOffTargets, effectsOnOffTargets, nodeSubPathsToOffTargets, offTargetsHitDownstream, offTargetsHitByAllPaths, elementaryNodes, (CyEdge edge) -> false);
+        Map<CyNode, Map<CyNode, Double>> effectsOnTargets = new HashMap<>();
+        Map<CyNode, Set<CyNode>> targetsHit = new HashMap<>();
+        Map<CyNode, Map<CyNode, Integer>> targetPathCountMap = new HashMap<>();
+        scoreNodesInPaths(pathsToTargets, edgeIsInhibition, effectsOnTargets, targetsHit, targetPathCountMap);
 
-        // Compute total scores for nodes
-        scoreNodes();
+        Map<CyNode, Map<CyNode, Double>> effectsOnOffTargets = new HashMap<>();
+        Map<CyNode, Set<CyNode>> offTargetsHit = new HashMap<>();
+        Map<CyNode, Map<CyNode, Integer>> offTargetPathCountMap = new HashMap<>();
+        scoreNodesInPaths(pathsToOffTargets, (edge -> false), effectsOnOffTargets, offTargetsHit, offTargetPathCountMap);
 
-        if (storeScores) {
-            storeScoresInColumn();
+        if (isCanceled()) {
+            return null;
+        } else {
+            OCSANAScores result = new OCSANAScores(network, effectsOnTargets, targetsHit, targetPathCountMap, effectsOnOffTargets, offTargetsHit, offTargetPathCountMap);
+            notifyListeners(result);
+            return result;
         }
-
-        scoresComputed = true;
     }
 
     /**
      * Compute scores of nodes from the given paths
      *
      * @param paths  the paths to score
-     * @param scoreMap  Map to store scores for nodes (updated in-place)
-     * @param subPathsMap Map to store subpaths from path nodes to
-     * endpoints (NOTE: these are given as subList views of the
-     * original paths, so modifications may have unexpected effects)
-     * @param endpointDownstreamMap  Map to store endpoints downstream of each node (updated in-place)
-     * @param allEndpointsHit  Set to store endpoints hit by these paths (updated in-place)
-     * @param elementaryNodes  Set to store nodes found in these paths (updated in-place)
-     * @param inhibitionEdgeTester  should return true if the given
+     * @param edgeIsInhibition  should return true if the given
      * edge is negative (i.e. inhibition)
+     * @param scoreMap  Map to store scores for nodes (updated in-place)
+     * @param targetsHit  Map to store endpoints hit for each node
+     * in the paths (updated in-place)
+     * @param pathCountMap  Map to store number of paths containing each node
      **/
     private void scoreNodesInPaths (Collection<List<CyEdge>> paths,
+                                    Function<CyEdge, Boolean> edgeIsInhibition,
                                     Map<CyNode, Map<CyNode, Double>> scoreMap,
-                                    Map<CyNode, Collection<List<CyEdge>>> subPathsMap,
-                                    Map<CyNode, Set<CyNode>> endpointDownstreamMap,
-                                    Set<CyNode> allEndpointsHit,
-                                    Set<CyNode> elementaryNodes,
-                                    Predicate<CyEdge> inhibitionEdgeTester) {
-        // TODO: Handle null arguments
+                                    Map<CyNode, Set<CyNode>> targetsHit,
+                                    Map<CyNode, Map<CyNode, Integer>> pathCountMap) {
+        Objects.requireNonNull(paths, "Paths cannot be null");
+        Objects.requireNonNull(edgeIsInhibition, "Edge inhibition testing function cannot be null");
+        Objects.requireNonNull(scoreMap, "Score map cannot be null");
+        Objects.requireNonNull(targetsHit, "Targets hit map cannot be null");
+        Objects.requireNonNull(pathCountMap, "Path count map cannot be null");
 
         // Iterate over the paths
         for (List<CyEdge> path: paths) {
@@ -172,10 +133,8 @@ public class OCSANAScoringAlgorithm
                 continue;
             }
 
-            // Handle the endpoints
-            CyNode endpoint = path.get(path.size() - 1).getTarget();
-            allEndpointsHit.add(endpoint);
-            elementaryNodes.add(endpoint);
+            // Handle the endpoint
+            CyNode pathTarget = path.get(path.size() - 1).getTarget();
 
             // Record the sign of the path
             // This will always be ±1
@@ -198,273 +157,26 @@ public class OCSANAScoringAlgorithm
                 CyNode edgeSource = edge.getSource();
                 Integer subPathLength = path.size() - i;
 
-                if (inhibitionEdgeTester.test(edge)) {
+                if (edgeIsInhibition.apply(edge)) {
                     pathSign *= -1;
                 }
 
                 // Update the node score
-                if (!scoreMap.containsKey(edgeSource)) {
-                    scoreMap.put(edgeSource, new HashMap<>());
-                }
-                Map<CyNode, Double> nodeScoreMap = scoreMap.get(edgeSource);
-                Double nodePrevScore = nodeScoreMap.getOrDefault(endpoint, 0d);
-                Double nodeNewScoreTerm = pathSign * 1.0 / subPathLength.doubleValue();
-                nodeScoreMap.put(endpoint, nodePrevScore + nodeNewScoreTerm);
+                scoreMap.putIfAbsent(edgeSource, new HashMap<>());
+                Double score = scoreMap.get(edgeSource).getOrDefault(pathTarget, 0d);
+                score += (pathSign * 1d / subPathLength.doubleValue());
+                scoreMap.get(edgeSource).put(pathTarget, score);
 
-                // Update the node path records
-                if (!subPathsMap.containsKey(edgeSource)) {
-                    subPathsMap.put(edgeSource, new ArrayList<>());
-                }
-                Collection<List<CyEdge>> nodeSubPaths = subPathsMap.get(edgeSource);
-                List<CyEdge> subPath = path.subList(i, path.size());
-                nodeSubPaths.add(subPath);
-                subPathsMap.put(edgeSource, nodeSubPaths);
+                // Update the target hit record
+                targetsHit.putIfAbsent(edgeSource, new HashSet<>());
+                targetsHit.get(edgeSource).add(pathTarget);
 
-                if (!endpointDownstreamMap.containsKey(edgeSource)) {
-                    endpointDownstreamMap.put(edgeSource, new HashSet<>());
-                }
-                endpointDownstreamMap.get(edgeSource).add(endpoint);
-
-                elementaryNodes.add(edgeSource);
+                // Update the path count map
+                pathCountMap.putIfAbsent(edgeSource, new HashMap<>());
+                Integer count = pathCountMap.get(edgeSource).getOrDefault(pathTarget, 0);
+                count += 1;
+                pathCountMap.get(edgeSource).put(pathTarget, count);
             }
-        }
-    }
-
-    /**
-     * Retrieve the EFFECT_ON_TARGETS score of a node
-     *
-     * @param node  the node
-     *
-     * @return the EFFECT_ON_TARGETS score of that node
-     **/
-    public Double effectOnTargetsScore (CyNode node) {
-        if (!effectsOnTargets.containsKey(node)) {
-            return 0d;
-        } else {
-            return effectsOnTargets.get(node).values().stream().reduce(0d, Double::sum);
-        }
-    }
-
-    /**
-     * Retrieve the EFFECT_ON_TARGETS score of a set of nodes
-     *
-     * @param nodes  the nodes
-     *
-     * @return the EFFECT_ON_TARGETS score of that node set (obtained
-     * by summing over all the nodes)
-     **/
-    public Double effectOnTargetsScore (Collection<CyNode> nodes) {
-        return nodes.stream().mapToDouble(node -> effectOnTargetsScore(node)).sum();
-    }
-
-    /**
-     * Retrieve the EFFECT_ON_TARGETS score of a node on a target
-     *
-     * @param node  the node
-     * @param target  the target
-     *
-     * @return the EFFECT_ON_TARGETS score of that node on that target
-     * (or 0 if the node does not effect the target)
-     **/
-    public Double effectOnTargetsScore (CyNode node,
-                                        CyNode target) {
-        if (!effectsOnTargets.containsKey(node) || !effectsOnTargets.get(node).containsKey(target)) {
-            return 0d;
-        } else {
-            return effectsOnTargets.get(node).get(target);
-        }
-    }
-
-    /**
-     * Retrieve the SIDE_EFFECTS score of a node
-     *
-     * @param node  the node
-     *
-     * @return the SIDE_EFFECTS score of that node
-     **/
-    public Double effectOnOffTargetsScore (CyNode node) {
-        if (!effectsOnOffTargets.containsKey(node)) {
-            return 0d;
-        } else {
-            return effectsOnOffTargets.get(node).values().stream().reduce(0d, Double::sum);
-        }
-    }
-
-    /**
-     * Retrieve the SIDE_EFFECTS score of a set of nodes
-     *
-     * @param nodes  the nodes
-     *
-     * @return the SIDE_EFFECTS score of that node set (obtained
-     * by summing over all the nodes)
-     **/
-    public Double effectOnOffTargetsScore (Collection<CyNode> nodes) {
-        return nodes.stream().mapToDouble(node -> effectOnOffTargetsScore(node)).sum();
-    }
-
-    /**
-     * Retrieve the SIDE_EFFECTS score of a node on a target
-     *
-     * @param node  the node
-     * @param target  the target
-     *
-     * @return the SIDE_EFFECTS score of that node on that target
-     * (or 0 if the node does not effect the target)
-     **/
-    public Double effectOnOffTargetsScore (CyNode node,
-                                           CyNode target) {
-        if (!effectsOnOffTargets.containsKey(node) || !effectsOnOffTargets.get(node).containsKey(target)) {
-            return 0d;
-        } else {
-            return effectsOnOffTargets.get(node).get(target);
-        }
-    }
-
-    /**
-     * Retrieve the set of elementary nodes
-     **/
-    public Set<CyNode> getElementaryNodes () {
-        return elementaryNodes;
-    }
-
-    /**
-     * Retrieve the subpaths from a node to all targets
-     *
-     * @param node  the node
-     *
-     * @return all subpaths starting from the node and ending at the targets
-     **/
-    public Collection<List<CyEdge>> nodeSubPathsToTargets (CyNode node) {
-        return nodeSubPathsToTargets.getOrDefault(node, new HashSet<>());
-    }
-
-    /**
-     * Retrieve the subpaths from a node to a selected target
-     *
-     * @param node  the node
-     * @param target  the target
-     *
-     * @return all subpaths starting from the node and ending at the target
-     **/
-    public Collection<List<CyEdge>> nodeSubPathsToTarget (CyNode node,
-                                                          CyNode target) {
-        return nodeSubPathsToTargets(node).stream().filter(path -> !path.isEmpty()).filter(path -> path.get(path.size() - 1).getTarget().equals(target)).collect(Collectors.toList());
-    }
-
-    /**
-     * Retrieve the subpaths from a node to all off-targets
-     *
-     * @param node  the node
-     *
-     * @return all subpaths starting from the node and ending at the off-targets
-     **/
-    public Collection<List<CyEdge>> nodeSubPathsToOffTargets (CyNode node) {
-        return nodeSubPathsToOffTargets.getOrDefault(node, new HashSet<>());
-    }
-
-    /**
-     * Retrieve the subpaths from a node to a selected off-target
-     *
-     * @param node  the node
-     * @param offTarget  the off-target
-     *
-     * @return all subpaths starting from the node and ending at the off-target
-     **/
-    public Collection<List<CyEdge>> nodeSubPathsToOffTarget (CyNode node,
-                                                             CyNode offTarget) {
-        return nodeSubPathsToOffTargets(node).stream().filter(path -> path.get(path.size() - 1).getTarget().equals(offTarget)).collect(Collectors.toList());
-    }
-
-    /**
-     * Compute the OCSANA scores of all elementary nodes
-     **/
-    private void scoreNodes () {
-        for (CyNode node: elementaryNodes) {
-            // TODO: Handle case that node is an off/target
-            // EFFECT_ON_TARGETS term of OVERALL score
-            Double targetSubScore;
-            if (targetsHitByAllPaths.isEmpty()) {
-                targetSubScore = 0d;
-            } else {
-                Set<CyNode> targetsHitByNode = targetsHitDownstream.getOrDefault(node, new HashSet<>());
-                targetSubScore = targetsHitByNode.size() / (double) targetsHitByAllPaths.size() * Math.abs(effectOnTargetsScore(node));
-            }
-
-            // SIDE_EFFECTS term of OVERALL score
-            Double sideEffectSubScore;
-            if (offTargetsHitByAllPaths.isEmpty()) {
-                sideEffectSubScore = 0d;
-            } else {
-                Set<CyNode> offTargetsHitByNode = offTargetsHitDownstream.getOrDefault(node, new HashSet<>());
-                sideEffectSubScore = offTargetsHitByNode.size() / (double) offTargetsHitByAllPaths.size() * Math.abs(effectOnOffTargetsScore(node));
-            }
-
-            // OVERALL
-            Double overallScore = targetSubScore - sideEffectSubScore;
-
-            // OCSANA
-            if (overallScore > 0d) {
-                Integer setScore = nodeSubPathsToTargets.get(node).size();
-                Double ocsanaScore = overallScore * setScore;
-                nodeTotalScores.put(node, ocsanaScore);
-            } else {
-                nodeTotalScores.put(node, 0d);
-            }
-        }
-    }
-
-    /**
-     * Compute the score of a single node
-     *
-     * @param node  the node
-     * @return the node's score, or null if the node has not been scored
-     **/
-    public Double scoreNode (CyNode node) {
-        if (isCanceled()) {
-            return null;
-        }
-
-        // Will return null
-        return nodeTotalScores.get(node);
-    }
-
-    /**
-     * Compute the score for a set of nodes
-     *
-     * @param nodes  the nodes
-     * @return  score of the node set
-     **/
-    public Double scoreNodeSet (Set<CyNode> nodes) {
-        // Sum the individual node scores
-        return nodes.stream().mapToDouble(node -> scoreNode(node)).sum();
-    }
-
-    /**
-     * Return true if scores are available, false otherwise
-     **/
-    public Boolean hasScores () {
-        return scoresComputed;
-    }
-
-    /**
-     * Record the OCSANA scores in a table column
-     **/
-    private void storeScoresInColumn() {
-        CyTable nodeTable = network.getDefaultNodeTable();
-
-        // Delete the column if it exists
-        nodeTable.deleteColumn(storeScoresColumn);
-
-        // Create the column
-        // TODO: Should we set a default value?
-        nodeTable.createColumn(storeScoresColumn, Double.class, false);
-
-        // Store the values
-        for (Map.Entry<CyNode, Double> entry: nodeTotalScores.entrySet()) {
-            CyNode node = entry.getKey();
-            Double score = entry.getValue();
-            CyRow nodeRow = nodeTable.getRow(node.getSUID());
-            nodeRow.set(storeScoresColumn, score);
         }
     }
 
@@ -482,5 +194,9 @@ public class OCSANAScoringAlgorithm
     @Override
     public String description () {
         return fullName();
+    }
+
+    public static interface OCSANAScoresListener {
+        public void receiveScores (OCSANAScores ocsanaScores);
     }
 }

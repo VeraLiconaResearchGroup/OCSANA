@@ -105,7 +105,7 @@ public class MHSAlgorithmTask extends AbstractOCSANATask {
         Collection<Set<CyNode>> MHSes = contextBundle.getMHSAlgorithm().MHSes(nodeSets);
 
         if (MHSes != null) {
-            resultsBundle.setCIs(MHSes.stream().map(mhs -> new CombinationOfInterventions(mhs, targetNodes, contextBundle.getNodeHandler()::getNodeName, contextBundle.getNodeHandler()::getNodeID, contextBundle.getOCSANAAlgorithm().scoreNodeSet(mhs))).collect(Collectors.toList()));
+            resultsBundle.setCIs(MHSes.stream().map(mhs -> new CombinationOfInterventions(mhs, targetNodes, contextBundle.getNodeHandler()::getNodeName, contextBundle.getNodeHandler()::getNodeID, resultsBundle.getOCSANAScores().OCSANA(mhs))).collect(Collectors.toList()));
         }
         Long postMHSTime = System.nanoTime();
 
