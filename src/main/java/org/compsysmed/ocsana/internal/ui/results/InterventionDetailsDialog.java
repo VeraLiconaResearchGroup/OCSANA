@@ -14,13 +14,18 @@ package org.compsysmed.ocsana.internal.ui.results;
 // Java imports
 import java.util.*;
 
+import java.awt.Component;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.ListCellRenderer;
 
 // Cytoscape imports
 import org.cytoscape.model.CyNetwork;
@@ -82,6 +87,7 @@ public class InterventionDetailsDialog
         setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 
         siSelecter = new JComboBox<SignedIntervention>(signedInterventions.toArray(new SignedIntervention[0]));
+        siSelecter.setRenderer(new SignedInterventionRenderer());
         siSelecter.addActionListener(this);
         add(siSelecter);
 
@@ -124,5 +130,34 @@ public class InterventionDetailsDialog
     @Override
     public void actionPerformed (ActionEvent e) {
         updateSignedInterventionPanel();
+    }
+
+    private static final class SignedInterventionRenderer
+        extends JLabel
+        implements ListCellRenderer<SignedIntervention> {
+        public SignedInterventionRenderer () {
+            setOpaque(true);
+        }
+
+        @Override
+        public Component getListCellRendererComponent (JList<? extends SignedIntervention> list,
+                                                       SignedIntervention value,
+                                                       int index,
+                                                       boolean isSelected,
+                                                       boolean cellHasFocus) {
+
+            String siText = String.format("Activate %d nodes, inhibit %d nodes", value.getNodesToActivate().size(), value.getNodesToInhibit().size());
+            setText(siText);
+
+            if (isSelected) {
+                setBackground(list.getSelectionBackground());
+                setForeground(list.getSelectionForeground());
+            } else {
+                setBackground(list.getBackground());
+                setForeground(list.getForeground());
+            }
+
+            return this;
+        }
     }
 }
