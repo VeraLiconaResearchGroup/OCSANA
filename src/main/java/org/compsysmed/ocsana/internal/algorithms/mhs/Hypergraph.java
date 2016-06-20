@@ -15,7 +15,8 @@ import java.nio.charset.StandardCharsets;
  * Impelementation of hypergraphs/set families
  **/
 
-public class Hypergraph extends ArrayList<BitSet> {
+public class Hypergraph
+    extends ArrayList<BitSet> {
     // TODO: Do we need a no-arg constructor?
     // TODO: Document throws
 

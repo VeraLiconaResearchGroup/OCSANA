@@ -17,7 +17,8 @@ import java.util.concurrent.RecursiveAction;
  * Abstract class for the SHD algorithms
  **/
 
-abstract class SHDRecursiveTask extends RecursiveAction {
+abstract class SHDRecursiveTask
+    extends RecursiveAction {
     Hypergraph H;
     Hypergraph T;
     BitSet S;

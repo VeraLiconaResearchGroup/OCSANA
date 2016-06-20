@@ -29,7 +29,8 @@ import org.cytoscape.model.CyNode;
  * The 'RS' algorithm for finding minimal hitting sets.
  **/
 
-public class RSAlgorithm extends AbstractMHSAlgorithm {
+public class RSAlgorithm
+    extends AbstractMHSAlgorithm {
     private static final String NAME = "RS algorithm";
     private static final String SHORTNAME = "RS";
 
@@ -63,7 +64,7 @@ public class RSAlgorithm extends AbstractMHSAlgorithm {
 
     // No docstring because the interface has one
     @Override
-    public List<Set<CyNode>> MHSes (Collection<Set<CyNode>> sets) {
+    public Collection<Set<CyNode>> MHSes (Collection<Set<CyNode>> sets) {
         HypergraphOfSetsOfCyNodes inputHypergraph
             = new HypergraphOfSetsOfCyNodes(sets);
 

@@ -20,7 +20,8 @@ import org.cytoscape.model.CyNode;
 
 // OCSANA imports
 
-public class HypergraphOfSetsOfCyNodes extends Hypergraph {
+public class HypergraphOfSetsOfCyNodes
+    extends Hypergraph {
     private final Map<CyNode, Integer> mapNodeToHash;
     private final Map<Integer, CyNode> mapHashToNode;
 
@@ -53,8 +54,8 @@ public class HypergraphOfSetsOfCyNodes extends Hypergraph {
     /**
      * Convert a Hypergraph back into a collection of Sets of CyNodes
      **/
-    public List<Set<CyNode>> getCyNodeSetsFromHypergraph (Hypergraph sets) {
-        List<Set<CyNode>> result = new ArrayList<>();
+    public Collection<Set<CyNode>> getCyNodeSetsFromHypergraph (Hypergraph sets) {
+        Collection<Set<CyNode>> result = new ArrayList<>();
         for (BitSet edge: sets) {
             result.add(getCyNodesFromBitSet(edge));
         }

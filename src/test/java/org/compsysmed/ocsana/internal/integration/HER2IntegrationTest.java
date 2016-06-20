@@ -95,7 +95,7 @@ public class HER2IntegrationTest {
         }
 
         AbstractMHSAlgorithm mhsAlg = new MMCSAlgorithm();
-        List<Set<CyNode>> MHSes = mhsAlg.MHSes(nodeSets);
+        Collection<Set<CyNode>> MHSes = mhsAlg.MHSes(nodeSets);
 
         assertEquals("CI count", 320, MHSes.size());
     }

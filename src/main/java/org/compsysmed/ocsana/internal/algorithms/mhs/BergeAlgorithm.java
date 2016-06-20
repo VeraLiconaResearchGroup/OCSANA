@@ -26,7 +26,8 @@ import org.cytoscape.model.CyNode;
  * Berge's algorithm for finding minimal hitting sets
  **/
 
-public class BergeAlgorithm extends AbstractMHSAlgorithm {
+public class BergeAlgorithm
+    extends AbstractMHSAlgorithm {
     private static final String NAME = "Berge's algorithm";
     private static final String SHORTNAME = "Berge";
 
@@ -41,13 +42,13 @@ public class BergeAlgorithm extends AbstractMHSAlgorithm {
              dependsOn = "useMaxCardinality=true")
     public BoundedInteger maxCardinalityBInt = new BoundedInteger(1, 6, 20, false, false);
 
-    public BergeAlgorithm() {
+    public BergeAlgorithm () {
         super();
     }
 
     // No docstring because the interface has one
     @Override
-    public List<Set<CyNode>> MHSes (Collection<Set<CyNode>> sets) {
+    public Collection<Set<CyNode>> MHSes (Collection<Set<CyNode>> sets) {
         HypergraphOfSetsOfCyNodes inputHypergraph
             = new HypergraphOfSetsOfCyNodes(sets);
 
