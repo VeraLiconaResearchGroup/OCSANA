@@ -45,10 +45,6 @@ public class ResultsBundle {
     private Map<CombinationOfInterventions, Collection<SignedIntervention>> optimalInterventionSignings = new HashMap<>();
     private Map<SignedIntervention, Double> signedInterventionScores = new HashMap<>();
 
-    public ResultsBundle () {
-        System.out.println("Creating new ResultsBundle");
-    }
-
     public Collection<List<CyEdge>> getPathsToTargets () {
         return pathsToTargets;
     }
