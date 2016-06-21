@@ -79,6 +79,10 @@ public class MHSSubpanel
         algorithms.add(new RSAlgorithm());
         algorithms.add(new BergeAlgorithm());
 
+        OCSANAGreedyAlgorithm greedyAlgorithm = new OCSANAGreedyAlgorithm(contextBundleBuilder.getNetwork());
+        contextBundleBuilder.getOCSANAAlgorithm().addListener(greedyAlgorithm);
+        algorithms.add(greedyAlgorithm);
+
         algorithmSelecter = new JComboBox<>(algorithms.toArray(new AbstractMHSAlgorithm[algorithms.size()]));
         algSelectionPanel.add(algorithmSelecter);
         algorithmSelecter.addActionListener(this);

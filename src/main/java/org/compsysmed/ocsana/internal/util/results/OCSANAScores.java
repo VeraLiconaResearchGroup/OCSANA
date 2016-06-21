@@ -203,4 +203,11 @@ public class OCSANAScores {
 
         return OCSANA(elementaryNodes, activeTargets, activeOffTargets);
     }
+
+    /**
+     * Return the underlying network
+     **/
+    public CyNetwork getNetwork () {
+        return network;
+    }
 }
