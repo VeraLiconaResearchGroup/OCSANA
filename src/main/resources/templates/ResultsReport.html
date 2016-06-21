@@ -94,7 +94,6 @@
         </p>
 
         <h2>OCSANA scoring</h2>
-        {% if contextBundle.getOCSANAAlgorithm().hasScores() and not resultsBundle.OCSANAScoringWasCanceled() %}
         <p>
             Scoring algorithm: {{contextBundle.getOCSANAAlgorithm().description()}}
         </p>
@@ -102,11 +101,6 @@
         <p>
             Computed OCSANA scores in {{resultsBundle.getOCSANAScoringExecutionSeconds()}}s.
         </p>
-        {% else %}
-        <p>
-            OCSANA scoring disabled.
-        </p>
-        {% endif %}
 
         <h2>CI generation</h2>
         {% if not resultsBundle.mhsFindingWasCanceled() %}
@@ -130,9 +124,9 @@
             <tr>
                 <td>{{ci.interventionNodesString()}}</td>
                 <td>{{ci.size()}}</td>
-                <td>{{contextBundle.getOCSANAAlgorithm().scoreNodeSet(ci.getNodes())}}</td>
-                <td>{{contextBundle.getOCSANAAlgorithm().effectOnTargetsScore(ci.getNodes())}}</td>
-                <td>{{contextBundle.getOCSANAAlgorithm().effectOnOffTargetsScore(ci.getNodes())}}</td>
+                <td>{{resultsBundle.getOCSANAScores().OCSANA(ci.getNodes())}}</td>
+                <td>{{resultsBundle.getOCSANAScores().EFFECT_ON_TARGETS(ci.getNodes())}}</td>
+                <td>{{resultsBundle.getOCSANAScores().SIDE_EFFECTS(ci.getNodes())}}</td>
             </tr>
             {% endfor %}
         </table>

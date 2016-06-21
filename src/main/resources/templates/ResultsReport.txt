@@ -55,13 +55,9 @@ Paths to off-target nodes:
 No paths to off-target nodes found.
 {% endif %}
 
-{% if contextBundle.getOCSANAAlgorithm().hasScores() and not resultsBundle.OCSANAScoringWasCanceled() %}
 Scoring algorithm: {{contextBundle.getOCSANAAlgorithm().description()}}
 
 Computed OCSANA scores in {{resultsBundle.getOCSANAScoringExecutionSeconds()}}s.
-{% else %}
-OCSANA scoring disabled.
-{% endif %}
 
 {% if not resultsBundle.mhsFindingWasCanceled() %}
 MHS algorithm: {{contextBundle.getMHSAlgorithm().description()}}
@@ -70,7 +66,7 @@ Found {{resultsBundle.getCIs().size()}} CIs in {{resultsBundle.getMHSExecutionSe
 
 Cut set	Size	OCSANA score	Target score	Side-effect score
 {% for ci in resultsBundle.getCIs() %}
-{{ci.interventionNodesString()}}	{{ci.size()}}	{{contextBundle.getOCSANAAlgorithm().scoreNodeSet(ci.getNodes())}}	{{contextBundle.getOCSANAAlgorithm().effectOnTargetsScore(ci.getNodes())}}	{{contextBundle.getOCSANAAlgorithm().effectOnOffTargetsScore(ci.getNodes())}}
+{{ci.interventionNodesString()}}	{{ci.size()}}	{{resultsBundle.getOCSANAScores().OCSANA(ci.getNodes())}}	{{resultsBundle.getOCSANAScores().EFFECT_ON_TARGETS(ci.getNodes())}}	{{resultsBundle.getOCSANAScores().SIDE_EFFECTS(ci.getNodes())}}
 
 {% endfor %}
 {% else %}
