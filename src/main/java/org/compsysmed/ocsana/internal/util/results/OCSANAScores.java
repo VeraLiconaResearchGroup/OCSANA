@@ -154,13 +154,19 @@ public class OCSANAScores {
         Objects.requireNonNull(targets, "Set of target nodes cannot be null");
         Objects.requireNonNull(offTargets, "Set of off-target nodes cannot be null");
 
-        Set<CyNode> targetsHit = new HashSet<>(targetsHitMap.getOrDefault(elementaryNode, Collections.emptySet()));
-        targetsHit.retainAll(targets);
-        Double effectScore = (Double.valueOf(targetsHit.size()) / targets.size()) * Math.abs(EFFECT_ON_TARGETS(elementaryNode, targets));
+        Double effectScore = 0d;
+        if (!targets.isEmpty()) {
+            Set<CyNode> targetsHit = new HashSet<>(targetsHitMap.getOrDefault(elementaryNode, Collections.emptySet()));
+            targetsHit.retainAll(targets);
+            effectScore = (Double.valueOf(targetsHit.size()) / targets.size()) * Math.abs(EFFECT_ON_TARGETS(elementaryNode, targets));
+        }
 
-        Set<CyNode> offTargetsHit = new HashSet<>(offTargetsHitMap.getOrDefault(elementaryNode, Collections.emptySet()));
-        offTargetsHit.retainAll(offTargets);
-        Double sideEffectScore = (Double.valueOf(offTargetsHit.size()) / offTargets.size()) * Math.abs(SIDE_EFFECTS(elementaryNode, offTargets));
+        Double sideEffectScore = 0d;
+        if (!offTargets.isEmpty()) {
+            Set<CyNode> offTargetsHit = new HashSet<>(offTargetsHitMap.getOrDefault(elementaryNode, Collections.emptySet()));
+            offTargetsHit.retainAll(offTargets);
+            sideEffectScore = (Double.valueOf(offTargetsHit.size()) / offTargets.size()) * Math.abs(SIDE_EFFECTS(elementaryNode, offTargets));
+        }
 
         if (effectScore < sideEffectScore) {
             return 0d;
