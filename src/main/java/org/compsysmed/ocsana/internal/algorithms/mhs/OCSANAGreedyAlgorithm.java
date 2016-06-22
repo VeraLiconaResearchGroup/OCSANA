@@ -19,6 +19,7 @@ import java.util.stream.Stream;
 
 // Cytoscape imports
 import org.cytoscape.work.Tunable;
+import org.cytoscape.work.util.BoundedDouble;
 import org.cytoscape.work.util.BoundedInteger;
 
 import org.cytoscape.model.CyNetwork;
@@ -58,7 +59,7 @@ public class OCSANAGreedyAlgorithm
     @Tunable(description = "Maximum number of candidates (millions)",
              gravity = 361,
              dependsOn = "useMaxCandidates=true")
-             public Integer maxCandidates = 6;
+             public Double maxMegaCandidates = 0.1d;
 
     // Internal data
     private CyNetwork network;
@@ -92,6 +93,10 @@ public class OCSANAGreedyAlgorithm
         List<Set<CyNode>> largeSets = new ArrayList<>(); // Sets of size at least two (we look for MHSes of this family, then combine with the singletons)
 
         for (Set<CyNode> set: sets) {
+            if (isCanceled()) {
+                return Collections.emptyList();
+            }
+
             // Empty sets are ignored
             if (set.size() == 1) {
                 CyNode node = set.iterator().next();
@@ -108,7 +113,6 @@ public class OCSANAGreedyAlgorithm
         }
 
         // Create sorted lists of nodes
-
         List<CyNode> largeSetNodes = new ArrayList<>(largeSetNodeSet);
         largeSetNodes.sort((left, right) -> -1 * Double.compare(ocsanaScores.OCSANA(left), ocsanaScores.OCSANA(right)));
 
@@ -123,14 +127,20 @@ public class OCSANAGreedyAlgorithm
         Integer currentCardinality = 1;
 
         while (!candidates.isEmpty() && maxCandidatesNotMet(candidatesChecked) && maxCardinalityNotExceeded(currentCardinality, singletonNodes.size())) {
+            if (isCanceled()) {
+                return Collections.emptyList();
+            }
             // Sort candidates in descending OCSANA score order
             candidates.sort((left, right) -> -1 * Double.compare(ocsanaScores.OCSANA(left), ocsanaScores.OCSANA(right))); // Negate comparator for descending sort
 
             // Check whether any candidate is a hitting set
-            List<Set<CyNode>> newHSes = new ArrayList<>();
-
+            // Minimality is guaranteed from the extension procedure below
             Iterator<Set<CyNode>> candidateIterator = candidates.iterator();
             while (candidateIterator.hasNext() && maxCandidatesNotMet(candidatesChecked)) {
+                if (isCanceled()) {
+                    return Collections.emptyList();
+                }
+
                 candidatesChecked += 1;
 
                 Set<CyNode> candidate = candidateIterator.next();
@@ -139,28 +149,38 @@ public class OCSANAGreedyAlgorithm
                 // Test whether the candidate intersects every large set
                 if (largeSets.stream().allMatch(s -> s.stream().anyMatch(e -> candidate.contains(e)))) {
                     candidateIterator.remove();
-                    newHSes.add(candidate);
-                }
-            }
-
-            // Check whether any new HSes are minimal and store them
-            for (Set<CyNode> newHS: newHSes) {
-                if (foundMHSesOfLargeSets.stream().noneMatch(s -> newHS.containsAll(s))) {
-                    foundMHSesOfLargeSets.add(newHS);
+                    foundMHSesOfLargeSets.add(candidate);
                 }
             }
 
             // Build new candidates
-            if (maxCandidatesNotMet(candidatesChecked)) {
-                // For each candidate of size k, construct candidates of size k+1 by adding each elementary node not already in the candidate
-                candidates = candidates.stream()
-                    .map(candidate -> largeSetNodes.stream().filter(node -> !candidate.contains(node)).map(node -> Stream.concat(candidate.stream(), Stream.of(node)).collect(Collectors.toSet())))
-                    .flatMap(s -> s)
-                    .collect(Collectors.toList());
-            }
-
-            // Iterate
             currentCardinality += 1;
+
+            if (maxCandidatesNotMet(candidatesChecked) && maxCardinalityNotExceeded(currentCardinality, singletonNodes.size())) {
+                Set<Set<CyNode>> newCandidates = new HashSet<>();
+
+                for (Set<CyNode> oldCandidate: candidates) {
+                    if (isCanceled()) {
+                        return Collections.emptyList();
+                    }
+
+                    if (!maxCandidatesNotMet(candidatesChecked + newCandidates.size())) {
+                        break;
+                    }
+
+                    Set<CyNode> extensionNodes = largeSets.stream()
+                        .filter(set -> !oldCandidate.stream().anyMatch(node -> set.contains(node)))
+                        .flatMap(Set::stream)
+                        .collect(Collectors.toSet());
+
+                    extensionNodes.stream()
+                        .map(node -> Stream.concat(Stream.of(node), oldCandidate.stream()).collect(Collectors.toSet()))
+                        .filter(candidate -> !foundMHSesOfLargeSets.stream().anyMatch(candidate::containsAll))
+                        .forEachOrdered(newCandidates::add);
+                }
+
+                candidates = new ArrayList<>(newCandidates);
+            }
         }
 
         // Combine MHSes of large sets with singleton sets and return
@@ -169,7 +189,7 @@ public class OCSANAGreedyAlgorithm
     }
 
     private Boolean maxCandidatesNotMet (Integer candidatesChecked) {
-        return (!useMaxCandidates || candidatesChecked < maxCandidates * 1e9);
+        return (!useMaxCandidates || candidatesChecked < maxMegaCandidates * 1e6);
     }
 
     private Boolean maxCardinalityNotExceeded (Integer candidateCardinality,
@@ -204,7 +224,7 @@ public class OCSANAGreedyAlgorithm
         }
 
         if (useMaxCandidates) {
-            result.append(String.format("maximum candidates: %d million", maxCandidates));
+            result.append(String.format("maximum candidates: %f million", maxMegaCandidates));
         } else {
             result.append("no max candidate count");
         }
