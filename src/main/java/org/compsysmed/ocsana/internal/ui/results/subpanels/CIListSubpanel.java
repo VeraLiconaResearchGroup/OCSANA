@@ -26,7 +26,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.RowSorter;
+import javax.swing.SortOrder;
 
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
@@ -78,11 +78,13 @@ public class CIListSubpanel
             MHSTableModel mhsModel = new MHSTableModel(contextBundle, resultsBundle, CIs);
             setModel(mhsModel);
 
-            // Sort the rows on CI size
-            RowSorter<TableModel> mhsSorter = new TableRowSorter<TableModel>(mhsModel);
-            mhsSorter.toggleSortOrder(1);
+            // Set up the sorter
+            TableRowSorter<TableModel> mhsSorter = new TableRowSorter<>(mhsModel);
+            mhsSorter.setSortable(0, false); // Disable sorting by CI node string
+            mhsSorter.toggleSortOrder(1); // Sort by increasing CI size
             setRowSorter(mhsSorter);
 
+            // Handle double click events per row
             MouseListener mouseListener = new MouseAdapter() {
                     public void mousePressed(MouseEvent me) {
                         Point p = me.getPoint();
@@ -120,7 +122,7 @@ public class CIListSubpanel
             Objects.requireNonNull(CIs, "CIs collection cannot be null");
             this.CIs = CIs;
         }
-        String[] colNames = {"CI", "Size", "OCSANA score", "Number of optimal sign assignemnts", "Sign assignment success rate", "Best SI priority score"};
+        String[] colNames = {"CI", "Size", "OCSANA score", "Best SI priority score"};
 
         @Override
         public String getColumnName (int col) {
@@ -151,22 +153,11 @@ public class CIListSubpanel
                 return ci.getOCSANAScore();
 
             case 3:
-                return resultsBundle.getOptimalInterventionSignings(ci).size();
-
-            case 4:
-                return getSignAssignmentSuccessRate(ci);
-
-            case 5:
                 return getSIPriorityScore(ci);
 
             default:
                 throw new IllegalArgumentException(String.format("Table does not have %d columns", col));
             }
-        }
-
-        private String getSignAssignmentSuccessRate (CombinationOfInterventions ci) {
-            Long maxCorrectEffects = resultsBundle.getOptimalInterventionSignings(ci).stream().mapToLong(si -> si.numberOfCorrectEffects()).max().orElse(0);
-            return String.format("%d/%d", maxCorrectEffects, contextBundle.getTargetNodes().size());
         }
 
         private Double getSIPriorityScore (CombinationOfInterventions ci) {
