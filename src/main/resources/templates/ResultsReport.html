@@ -1,5 +1,5 @@
 {# INPUTS: "contextBundle" is a ContextBundle, "resultsBundle" is a ResultsBundle #}
-!<html>
+<html>
     <body>
         <h1>
             Optimal cut sets report
@@ -102,6 +102,24 @@
             Computed OCSANA scores in {{resultsBundle.getOCSANAScoringExecutionSeconds()}}s.
         </p>
 
+        <h3>EFFECT_ON_TARGETS for all elementary nodes</h3>
+        <table>
+            <tr>
+                <th scope="col">Elementary node</th>
+                {% for target in contextBundle.getTargetNodes() %}
+                <th scope="col">{{contextBundle.getNodeName(target)}}</th>
+                {% endfor %}
+            </tr>
+            {% for node in resultsBundle.getElementaryNodes() %}
+            <tr>
+                <th scope="row">{{contextBundle.getNodeName(node)}}</th>
+                {% for target in contextBundle.getTargetNodes() %}
+                <td>{{resultsBundle.getOCSANAScores().EFFECT_ON_TARGETS(node, target)}}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+
         <h2>CI generation</h2>
         {% if not resultsBundle.mhsFindingWasCanceled() %}
         <p>
@@ -112,6 +130,7 @@
             Found {{resultsBundle.getCIs().size()}} CIs in {{resultsBundle.getMHSExecutionSeconds()}}s.
         </p>
 
+        <h3>Scoring data for all CIs</h3>
         <table>
             <tr>
                 <th>Cut set</th>

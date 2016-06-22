@@ -59,11 +59,19 @@ Scoring algorithm: {{contextBundle.getOCSANAAlgorithm().description()}}
 
 Computed OCSANA scores in {{resultsBundle.getOCSANAScoringExecutionSeconds()}}s.
 
+Elementary node{% for target in contextBundle.getTargetNodes() %}       {{contextBundle.getNodeName(target)}}{% endfor %}
+
+EFFECT_ON_TARGETS data for all elementary nodes:
+{% for node in resultsBundle.getElementaryNodes() %}
+{{contextBundle.getNodeName(node)}}{% for target in contextBundle.getTargetNodes() %}   {{resultsBundle.getOCSANAScores().EFFECT_ON_TARGETS(node, target)}}{% endfor %}
+{% endfor %}
+
 {% if not resultsBundle.mhsFindingWasCanceled() %}
 MHS algorithm: {{contextBundle.getMHSAlgorithm().description()}}
 
 Found {{resultsBundle.getCIs().size()}} CIs in {{resultsBundle.getMHSExecutionSeconds()}}s.
 
+Scoring data for all CIs:
 Cut set	Size	OCSANA score	Target score	Side-effect score
 {% for ci in resultsBundle.getCIs() %}
 {{ci.interventionNodesString()}}	{{ci.size()}}	{{resultsBundle.getOCSANAScores().OCSANA(ci.getNodes())}}	{{resultsBundle.getOCSANAScores().EFFECT_ON_TARGETS(ci.getNodes())}}	{{resultsBundle.getOCSANAScores().SIDE_EFFECTS(ci.getNodes())}}

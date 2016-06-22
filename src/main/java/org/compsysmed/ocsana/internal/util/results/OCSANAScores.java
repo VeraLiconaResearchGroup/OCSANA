@@ -99,6 +99,15 @@ public class OCSANAScores {
     }
 
     /**
+     * Return the EFFECT_ON_TARGETS score of a set of elementary nodes
+     * on the entire set of targets
+     **/
+    public Double EFFECT_ON_TARGETS (Set<CyNode> elementaryNodes) {
+        Objects.requireNonNull(elementaryNodes, "Set of elementary nodes cannot be null");
+        return elementaryNodes.stream().mapToDouble(this::EFFECT_ON_TARGETS).sum();
+    }
+
+    /**
      * Return the SIDE_EFFECT score of a node on an off-target
      **/
     public Double SIDE_EFFECTS (CyNode elementaryNode,
@@ -124,6 +133,15 @@ public class OCSANAScores {
     public Double SIDE_EFFECTS (CyNode elementaryNode) {
         Objects.requireNonNull(elementaryNode, "Elementary node cannot be null");
         return SIDE_EFFECTS(elementaryNode, activeOffTargets);
+    }
+
+    /**
+     * Return the SIDE_EFFECTS score of a set of elementary nodes on
+     * the entire set of off-targets
+     **/
+    public Double SIDE_EFFECTS (Set<CyNode> elementaryNodes) {
+        Objects.requireNonNull(elementaryNodes, "Set of elementary nodes cannot be null");
+        return elementaryNodes.stream().mapToDouble(this::SIDE_EFFECTS).sum();
     }
 
     /**
