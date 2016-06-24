@@ -25,7 +25,7 @@ import javax.swing.JPanel;
 import org.cytoscape.work.swing.PanelTaskManager;
 
 // OCSANA imports
-import org.compsysmed.ocsana.internal.algorithms.drugability.*;
+import org.compsysmed.ocsana.internal.algorithms.siscoring.*;
 import org.compsysmed.ocsana.internal.algorithms.signassignment.*;
 
 import org.compsysmed.ocsana.internal.ui.control.OCSANAControlPanel;
@@ -100,7 +100,7 @@ public class PrioritizationAlgorithmsSubpanel
         signedInterventionScoringAlgorithmPanel.add(new JLabel("Sign assignent algorithm:"));
 
         List<AbstractSignedInterventionScoringAlgorithm> signedInterventionScoringAlgorithms = new ArrayList<>();
-        signedInterventionScoringAlgorithms.add(new SimpleSignedInterventionScoringAlgorithm());
+        signedInterventionScoringAlgorithms.add(new SimpleDrugabilityScoringAlgorithm());
 
         signedInterventionScoringAlgorithmSelecter = new JComboBox<>(signedInterventionScoringAlgorithms.toArray(new AbstractSignedInterventionScoringAlgorithm[signedInterventionScoringAlgorithms.size()]));
         signedInterventionScoringAlgorithmSelecter.addActionListener(this);

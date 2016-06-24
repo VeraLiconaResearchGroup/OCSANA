@@ -9,7 +9,7 @@
  * details
  **/
 
-package org.compsysmed.ocsana.internal.algorithms.drugability;
+package org.compsysmed.ocsana.internal.algorithms.siscoring;
 
 // Java imports
 import java.util.*;
@@ -26,7 +26,7 @@ import org.compsysmed.ocsana.internal.util.results.SignedInterventionNode;
 /**
  * Simple algorithm to score a signed intervention based on drugability
  **/
-public class SimpleSignedInterventionScoringAlgorithm
+public class SimpleDrugabilityScoringAlgorithm
     extends AbstractSignedInterventionScoringAlgorithm {
     private DrugabilityDataBundleFactory drugabilityDataBundleFactory;
 

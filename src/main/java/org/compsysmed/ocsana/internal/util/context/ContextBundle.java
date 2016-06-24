@@ -26,7 +26,7 @@ import org.compsysmed.ocsana.internal.util.tunables.EdgeProcessor;
 
 import org.compsysmed.ocsana.internal.algorithms.AbstractOCSANAAlgorithm;
 import org.compsysmed.ocsana.internal.algorithms.signassignment.AbstractCISignAssignmentAlgorithm;
-import org.compsysmed.ocsana.internal.algorithms.drugability.AbstractSignedInterventionScoringAlgorithm;
+import org.compsysmed.ocsana.internal.algorithms.siscoring.AbstractSignedInterventionScoringAlgorithm;
 import org.compsysmed.ocsana.internal.algorithms.path.AbstractPathFindingAlgorithm;
 import org.compsysmed.ocsana.internal.algorithms.mhs.AbstractMHSAlgorithm;
 import org.compsysmed.ocsana.internal.algorithms.scoring.OCSANAScoringAlgorithm;

@@ -22,8 +22,8 @@ import org.cytoscape.model.CyNode;
 import org.compsysmed.ocsana.internal.util.tunables.NodeHandler;
 import org.compsysmed.ocsana.internal.util.tunables.EdgeProcessor;
 
-import org.compsysmed.ocsana.internal.algorithms.drugability.AbstractSignedInterventionScoringAlgorithm;
-import org.compsysmed.ocsana.internal.algorithms.drugability.SimpleSignedInterventionScoringAlgorithm;
+import org.compsysmed.ocsana.internal.algorithms.siscoring.AbstractSignedInterventionScoringAlgorithm;
+import org.compsysmed.ocsana.internal.algorithms.siscoring.SimpleDrugabilityScoringAlgorithm;
 
 import org.compsysmed.ocsana.internal.algorithms.mhs.AbstractMHSAlgorithm;
 import org.compsysmed.ocsana.internal.algorithms.mhs.MMCSAlgorithm;
@@ -33,8 +33,8 @@ import org.compsysmed.ocsana.internal.algorithms.path.AllNonSelfIntersectingPath
 
 import org.compsysmed.ocsana.internal.algorithms.scoring.OCSANAScoringAlgorithm;
 
-import org.compsysmed.ocsana.internal.algorithms.signassignment.AbstractCISignAssignmentAlgorithm
-;import org.compsysmed.ocsana.internal.algorithms.signassignment.ExhaustiveSearchCISignAssignmentAlgorithm;
+import org.compsysmed.ocsana.internal.algorithms.signassignment.AbstractCISignAssignmentAlgorithm;
+import org.compsysmed.ocsana.internal.algorithms.signassignment.ExhaustiveSearchCISignAssignmentAlgorithm;
 
 /**
  * Context builder for an OCSANA run
@@ -80,7 +80,7 @@ public class ContextBundleBuilder {
         ocsanaAlgorithm.addListener(exhaustiveAlgorithm);
         setCISignAssignmentAlgorithm(exhaustiveAlgorithm);
 
-        setSIScoringAlgorithm(new SimpleSignedInterventionScoringAlgorithm());
+        setSIScoringAlgorithm(new SimpleDrugabilityScoringAlgorithm());
     }
 
     /**

@@ -10,7 +10,7 @@
  * details
  **/
 
-package org.compsysmed.ocsana.internal.algorithms.drugability;
+package org.compsysmed.ocsana.internal.algorithms.siscoring;
 
 // OCSANA imports
 import org.compsysmed.ocsana.internal.algorithms.AbstractOCSANAAlgorithm;
