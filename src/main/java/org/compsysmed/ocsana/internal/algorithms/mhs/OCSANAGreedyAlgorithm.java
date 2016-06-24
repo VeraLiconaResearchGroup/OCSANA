@@ -86,119 +86,141 @@ public class OCSANAGreedyAlgorithm
         Objects.requireNonNull(sets, "Collection of sets cannot be null");
         Objects.requireNonNull(ocsanaScores, "OCSANA scores must be set before running this algorithm");
 
-        // Construct temporary lists containing copies of the nodes and sets
-        Set<CyNode> largeSetNodeSet = sets.stream().flatMap(Set::stream).collect(Collectors.toSet());
-        Set<CyNode> singletonNodeSet = new HashSet<>();
+        HypergraphOfSetsOfScoredCyNodes H = new HypergraphOfSetsOfScoredCyNodes(sets, ocsanaScores);
 
-        List<Set<CyNode>> largeSets = new ArrayList<>(); // Sets of size at least two (we look for MHSes of this family, then combine with the singletons)
+        Hypergraph T = transversalHypergraph(H);
+        return H.getCyNodeSetsFromHypergraph(T);
+    }
 
-        for (Set<CyNode> set: sets) {
-            if (isCanceled()) {
-                return Collections.emptyList();
-            }
+    /**
+     * Compute the transversals of a given hypergraph.
+     **/
+    public Hypergraph transversalHypergraph (HypergraphOfSetsOfScoredCyNodes H) {
+        Hypergraph largeEdges = new Hypergraph();
+        Set<Integer> largeEdgeIndexSet = new HashSet<>();
+        BitSet singletons = new BitSet();
 
-            // Empty sets are ignored
-            if (set.size() == 1) {
-                CyNode node = set.iterator().next();
-                largeSetNodeSet.remove(node);
-                singletonNodeSet.add(node);
-            } else if (set.size() > 1) {
-                largeSets.add(new HashSet<>(set));
+        for (BitSet edge: H) {
+            if (edge.cardinality() == 1) {
+                singletons.or(edge);
+            } else if (edge.cardinality() > 1) {
+                largeEdges.add(edge);
+                for (int index = edge.nextSetBit(0); index >= 0; index = edge.nextSetBit(index + 1)) {
+                    largeEdgeIndexSet.add(index);
+                }
             }
         }
+
+        List<Integer> largeEdgeIndices = new ArrayList<>(largeEdgeIndexSet);
+        largeEdgeIndices.sort((Integer left, Integer right) -> -1 * Double.compare(H.score(left), H.score(right)));
 
         // Short-circuit if there are no large sets
-        if (largeSets.isEmpty()) {
-            return Collections.singletonList(singletonNodeSet);
+        if (largeEdges.isEmpty()) {
+            Hypergraph T = new Hypergraph();
+            T.add(singletons);
+            return T;
         }
 
-        // Create sorted lists of nodes
-        List<CyNode> largeSetNodes = new ArrayList<>(largeSetNodeSet);
-        largeSetNodes.sort((left, right) -> -1 * Double.compare(ocsanaScores.OCSANA(left), ocsanaScores.OCSANA(right)));
-
-        List<CyNode> singletonNodes = new ArrayList<>(singletonNodeSet);
-        singletonNodes.sort((left, right) -> -1 * Double.compare(ocsanaScores.OCSANA(left), ocsanaScores.OCSANA(right)));
-
         // Search for hitting sets
-        List<Set<CyNode>> foundMHSesOfLargeSets = new ArrayList<>();
-        List<Set<CyNode>> candidates = largeSetNodes.stream().map(Collections::singleton).collect(Collectors.toList()); // Singleton set of each node found in a large set
+        Hypergraph T = new Hypergraph();
+        Hypergraph candidates = new Hypergraph();
+        for (Integer index: largeEdgeIndices) {
+            BitSet candidate = new BitSet();
+            candidate.set(index);
+            candidates.add(candidate);
+        }
 
         Integer candidatesChecked = 0;
         Integer currentCardinality = 1;
 
-        while (!candidates.isEmpty() && maxCandidatesNotMet(candidatesChecked) && maxCardinalityNotExceeded(currentCardinality, singletonNodes.size())) {
+        while (!candidates.isEmpty() && !haltForCandidates(candidatesChecked) && !haltForCardinality(currentCardinality, singletons.cardinality())) {
             if (isCanceled()) {
-                return Collections.emptyList();
+                return new Hypergraph();
             }
+
             // Sort candidates in descending OCSANA score order
-            candidates.sort((left, right) -> -1 * Double.compare(ocsanaScores.OCSANA(left), ocsanaScores.OCSANA(right))); // Negate comparator for descending sort
+            candidates.sort((BitSet left, BitSet right) -> -1 * Double.compare(H.score(left), H.score(right)));
 
             // Check whether any candidate is a hitting set
             // Minimality is guaranteed from the extension procedure below
-            Iterator<Set<CyNode>> candidateIterator = candidates.iterator();
-            while (candidateIterator.hasNext() && maxCandidatesNotMet(candidatesChecked)) {
+            Iterator<BitSet> candidateIterator = candidates.iterator();
+            while (candidateIterator.hasNext() && !haltForCandidates(candidatesChecked)) {
                 if (isCanceled()) {
-                    return Collections.emptyList();
+                    return new Hypergraph();
                 }
 
                 candidatesChecked += 1;
 
-                Set<CyNode> candidate = candidateIterator.next();
-                assert candidate.size() == currentCardinality;
+                BitSet candidate = candidateIterator.next();
+                assert candidate.cardinality() == currentCardinality;
 
-                // Test whether the candidate intersects every large set
-                if (largeSets.stream().allMatch(s -> s.stream().anyMatch(e -> candidate.contains(e)))) {
+                if (largeEdges.isTransversedBy(candidate)) {
                     candidateIterator.remove();
-                    foundMHSesOfLargeSets.add(candidate);
+                    T.add(candidate);
                 }
             }
 
             // Build new candidates
             currentCardinality += 1;
 
-            if (maxCandidatesNotMet(candidatesChecked) && maxCardinalityNotExceeded(currentCardinality, singletonNodes.size())) {
-                Set<Set<CyNode>> newCandidates = new HashSet<>();
+            if (!haltForCandidates(candidatesChecked) && !haltForCardinality(currentCardinality, singletons.cardinality())) {
+                Set<BitSet> newCandidates = new HashSet<>();
 
-                for (Set<CyNode> oldCandidate: candidates) {
+                for (BitSet oldCandidate: candidates) {
                     if (isCanceled()) {
-                        return Collections.emptyList();
+                        return new Hypergraph();
                     }
 
-                    if (!maxCandidatesNotMet(candidatesChecked + newCandidates.size())) {
+                    if (haltForCandidates(candidatesChecked + newCandidates.size())) {
                         break;
                     }
 
-                    Set<CyNode> extensionNodes = largeSets.stream()
-                        .filter(set -> !oldCandidate.stream().anyMatch(node -> set.contains(node)))
-                        .flatMap(Set::stream)
-                        .collect(Collectors.toSet());
+                    Set<Integer> extensionIndices = largeEdges.stream()
+                        .filter(edge -> !edge.intersects(oldCandidate)) // Find edges we haven't hit
+                        .map(edge -> edge.stream().boxed()).flatMap(s -> s) // Get their indices
+                        .collect(Collectors.toSet()); // Form a set
 
-                    extensionNodes.stream()
-                        .map(node -> Stream.concat(Stream.of(node), oldCandidate.stream()).collect(Collectors.toSet()))
-                        .filter(candidate -> !foundMHSesOfLargeSets.stream().anyMatch(candidate::containsAll))
-                        .forEachOrdered(newCandidates::add);
+                    // Build the new candidates
+                    for (Integer index: extensionIndices) {
+                        // For each extension index, build a new bitset by adding that index to the old candidate
+                        BitSet newCandidate = (BitSet) oldCandidate.clone();
+                        newCandidate.set(index);
+                        assert newCandidate.cardinality() == currentCardinality;
+
+                        // Test minimality
+                        if (!T.stream().anyMatch(mhs -> mhs.intersects(newCandidate))) {
+                            newCandidates.add(newCandidate);
+                        }
+                    }
                 }
 
-                candidates = new ArrayList<>(newCandidates);
+                candidates = new Hypergraph();
+                for (BitSet candidate: newCandidates) {
+                    candidates.add(candidate);
+                }
             }
         }
 
         // Combine MHSes of large sets with singleton sets and return
-        List<Set<CyNode>> foundMHSes = foundMHSesOfLargeSets.stream().map(MHS -> Stream.concat(MHS.stream(), singletonNodes.stream()).collect(Collectors.toSet())).collect(Collectors.toList());
-        return foundMHSes;
+        T.stream().forEachOrdered(edge -> edge.or(singletons));
+        return T;
     }
 
-    private Boolean maxCandidatesNotMet (Integer candidatesChecked) {
-        return (!useMaxCandidates || candidatesChecked < maxMegaCandidates * 1e6);
+    /**
+     * Return true if the computation should be stopped due to the
+     * number of candidates and false if it should not.
+     **/
+    private Boolean haltForCandidates (Integer candidatesChecked) {
+        return !(!useMaxCandidates || candidatesChecked < maxMegaCandidates * 1e6);
     }
 
-    private Boolean maxCardinalityNotExceeded (Integer candidateCardinality,
-                                               Integer singletonNodesSize) {
-        return (!useMaxCardinality || candidateCardinality + singletonNodesSize <= maxCardinalityBInt.getValue());
-    }
-
-    private static <T> Boolean setsIntersect (Set<? extends T> left, Set<? extends T> right) {
-        return left.stream().anyMatch(e -> right.contains(e));
+    /**
+     * Return true if the computation should be stopped due to the
+     * cardinality of the candidates and false if it should not.
+     **/
+    private Boolean haltForCardinality (Integer candidateCardinality,
+                                        Integer singletonNodesSize) {
+        return !(!useMaxCardinality || candidateCardinality + singletonNodesSize <= maxCardinalityBInt.getValue());
     }
 
     @Override

@@ -25,7 +25,7 @@ public class HypergraphOfSetsOfCyNodes
     private final Map<CyNode, Integer> mapNodeToHash;
     private final Map<Integer, CyNode> mapHashToNode;
 
-    private Integer nextKey = 0;
+    protected Integer nextKey = 0;
 
     /**
      * Construct a Hypergraph from a collection of Sets of CyNodes
