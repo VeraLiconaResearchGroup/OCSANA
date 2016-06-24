@@ -59,7 +59,7 @@ public class OCSANAGreedyAlgorithm
     @Tunable(description = "Maximum number of candidates (millions)",
              gravity = 361,
              dependsOn = "useMaxCandidates=true")
-             public Double maxMegaCandidates = 0.1d;
+             public Double maxMegaCandidates = 5d;
 
     // Internal data
     private CyNetwork network;
